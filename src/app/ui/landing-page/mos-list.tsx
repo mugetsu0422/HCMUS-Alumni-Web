@@ -9,38 +9,37 @@ import {
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import { nunito } from '../fonts'
-import { Calendar } from 'react-bootstrap-icons'
 
 const data = [
   {
     imgSrc:
-      'https://alumni.hcmus.edu.vn/wp-content/uploads/2023/10/Screenshot-2023-10-24-135118.jpg',
+      'https://alumni.hcmus.edu.vn/wp-content/uploads/2023/09/under30_2022_Le-Yen-Thanh-e1698137690375-1024x411.jpg',
     title:
-      'Hội nghị Liên ban Cộng đồng Cựu sinh viên Khoa học lần 1 - Nhiệm kỳ 2022 - 2025',
-    date: '12/12/2023',
+      'Lê Yên Thanh',
+    info: 'Khóa 2014 - Khoa Công nghệ thông tin ',
   },
   {
-    imgSrc: 'https://alumni.hcmus.edu.vn/wp-content/uploads/2023/10/CSV.jpg',
+    imgSrc: 'https://alumni.hcmus.edu.vn/wp-content/uploads/2023/09/1-1024x896.jpg',
     title:
-      'Thư mời tham gia diễn đàn Khoa học – Doanh nghiệp và Đổi mới Sáng tạo',
-    date: '12/12/2023',
+      'Nguyễn Thị Thanh Mai',
+    info: 'Khóa 2006 - Khoa Hóa học',
   },
   {
     imgSrc:
-      'https://vcdn-vnexpress.vnecdn.net/2023/10/13/image001-7172-1697179567.jpg',
-    title: 'Trường Đại học Khoa học tự nhiên mở diễn đàn đổi mới sáng tạo',
-    date: '12/12/2023',
+      'https://alumni.hcmus.edu.vn/wp-content/uploads/2023/09/Thiet-ke-chua-co-ten-1024x896.jpg',
+    title: 'Trần Thị Như Hoa',
+    info: 'Khóa 2013 - Khoa Hóa học',
   },
 ]
 
-function NewsCard({
+function MirrorOfSuccessCard({
   imgSrc,
   title,
-  date,
+  info,
 }: {
   imgSrc: string
   title: string
-  date: string
+  info: string
 }) {
   return (
     <Card placeholder={undefined} className="w-[18rem] sm:w-[24rem] group">
@@ -61,31 +60,30 @@ function NewsCard({
         </CardBody>
         <CardFooter
           placeholder={undefined}
-          className="pt-0 text-[var(--secondary)] flex items-center gap-1">
-          <Calendar />
-          {date}
+          className="pt-0 text-[var(--text)] flex items-center gap-1">
+          {info}
         </CardFooter>
       </Link>
     </Card>
   )
 }
 
-function NewsList() {
+function MirrorOfSuccessList() {
   return (
     <div
       className={`${nunito.className} antialiased py-5 sm:py-10 flex flex-col justify-center items-center border-b-2 border-solid border-[var(--cocoa-brown-20)]`}>
       <div
         className={`font-bold text-[1.5rem] sm:text-[2.25rem] text-[var(--blue-02)]`}>
-        TIN TỨC & SỰ KIỆN
+        CỰU SINH VIÊN TIÊU BIỂU
       </div>
       <div className="flex flex-row flex-wrap justify-center gap-6 pt-3 pb-8">
         {data.map((ele, idx) => {
           return (
-            <NewsCard
+            <MirrorOfSuccessCard
               key={idx}
               imgSrc={ele.imgSrc}
               title={ele.title}
-              date={ele.date}
+              info={ele.info}
             />
           )
         })}
@@ -99,4 +97,4 @@ function NewsList() {
   )
 }
 
-export default NewsList
+export default MirrorOfSuccessList

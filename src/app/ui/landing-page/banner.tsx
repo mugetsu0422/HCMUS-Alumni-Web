@@ -4,10 +4,10 @@ import Link from 'next/link'
 
 function Banner() {
   return (
-    <div className="md:px-10 py-16 flex flex-wrap justify-center items-center bg-gradient-to-r from-[var(--blue-05-10)] to-[#00000000]">
-      <div className="basis-5/12 flex flex-col gap-y-3 md:gap-y-6 pl-6 md:pl-0">
+    <div className="px-3 md:px-10 py-16 flex flex-wrap justify-center items-center bg-gradient-to-r from-[var(--blue-05-10)] to-[#00000000]">
+      <div className="basis-5/12 flex flex-col gap-y-3 md:gap-y-6">
         <div
-          className={`${koho.className} antialiased text-[var(--text)] w-fit font-bold text-[1.5rem] md:text-[2.5rem]`}>
+          className={`${koho.className} antialiased text-[var(--text)] w-fit font-bold text-[1.25rem] md:text-[2.5rem]`}>
           ALUMVERSE HCMUS
         </div>
         <div
@@ -21,7 +21,7 @@ function Banner() {
         </div>
         <Link
           href={'#'}
-          className={`${nunito.className} antialiased bg-[var(--blue-05)] hover:opacity-90 w-fit text-white md:py-4 md:px-5 py-2.5 px-3.5 font-bold rounded-xl md:rounded-2xl text-xs md:text-base`}>
+          className={`${nunito.className} antialiased bg-[var(--blue-05)] hover:opacity-90 w-fit text-white md:py-4 md:px-5 py-2.5 px-3.5 font-bold rounded-xl md:rounded-2xl text-[0.6rem] md:text-base`}>
           ĐĂNG KÝ NGAY
         </Link>
       </div>
