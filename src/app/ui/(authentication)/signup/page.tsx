@@ -18,7 +18,7 @@ export default function page() {
       placeholder={undefined}
       className={`${roboto} w-[20rem] m-auto pt-[10rem] `}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
-        ĐĂNG NHẬP
+        ĐĂNG KÝ
       </Typography>
 
       <form className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
@@ -43,7 +43,24 @@ export default function page() {
             variant="h6"
             color="blue-gray"
             className={` ${roboto} -mb-3`}>
-            Mật Khẩu <span className="text-red-700 font-bold text-lg">*</span>
+            Mật khẩu <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
+          <Input
+            type="password"
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            crossOrigin={undefined}
+          />
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={` ${roboto} -mb-3`}>
+            Nhập lại mật khẩu{' '}
+            <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
           <Input
             type="password"
@@ -55,50 +72,29 @@ export default function page() {
             crossOrigin={undefined}
           />
         </div>
-        <div className="flex justify-between pt-2">
-          <Checkbox
-            label={
-              <Typography
-                variant="small"
-                className={` ${roboto} flex items-center font-normal`}
-                placeholder={undefined}>
-                Ghi nhớ đăng nhập
-              </Typography>
-            }
-            color="blue"
-            containerProps={{ className: '-ml-2.5' }}
-            crossOrigin={undefined}
-          />
-          <Typography
-            variant="small"
-            className={` ${roboto} flex items-center font-normal`}
-            placeholder={undefined}>
-            <Link href={'#'}>Quên mật khẩu ?</Link>
-          </Typography>
-        </div>
 
         <Button
           placeholder={undefined}
           ripple={true}
-          className={` ${roboto} mt-6 w-full bg-blue-800 text-white rounded-md py-4`}>
-          Đăng nhập
+          className={` ${roboto} mt-[3rem] w-full bg-blue-800 text-white rounded-md py-4`}>
+          Đăng Ký
         </Button>
 
-        <div className=" mt-[3rem] flex items-center justify-between md:mt-[5rem] lg:mt[5rem] xl:mt-[13rem]">
+        <div className=" mt-[3rem] flex items-center justify-between md:mt-[5rem] lg:mt[5rem] xl:mt-[12rem]">
           <Typography
             placeholder={undefined}
             color="gray"
             className={`${roboto} text-center font-normal`}>
-            Bạn chưa có tài khoản ?
+            Bạn đã có tài khoản ?
           </Typography>
-          <Link href="http://localhost:3000/ui/signup">
+          <Link href="http://localhost:3000/ui/signin">
             <Button
               placeholder={undefined}
               size="lg"
               variant="outlined"
               className={` ${roboto} font-bold text-blue-700 `}
               ripple={true}>
-              Đăng ký
+              Đăng Nhập
             </Button>
           </Link>
         </div>
