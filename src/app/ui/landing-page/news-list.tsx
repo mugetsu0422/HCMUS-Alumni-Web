@@ -7,7 +7,6 @@ import {
   CardBody,
   CardFooter,
 } from '@material-tailwind/react'
-import Image from 'next/image'
 import { nunito } from '../fonts'
 import { Calendar } from 'react-bootstrap-icons'
 

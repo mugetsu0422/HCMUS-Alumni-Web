@@ -3,14 +3,6 @@
 import React from 'react'
 import {
   Navbar,
-  Typography,
-  Button,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Avatar,
-  IconButton,
   Collapse,
 } from '@material-tailwind/react'
 import Image from 'next/image'

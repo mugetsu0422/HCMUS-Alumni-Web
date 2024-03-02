@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 import { inter } from '../fonts'
-import Image from 'next/image'
 
 function Brands() {
   return (
@@ -9,13 +9,11 @@ function Brands() {
         Hơn một 100+ doanh nghiệp liên kết
       </div>
       <div className="w-100 border-y-2 border-solid border-[var(--cocoa-brown-20)] flex flex-wrap flex-row justify-center gap-[3rem] py-3">
-        <Image
+        <img
           className="w-full h-full"
-          src={'/landing-page/brand.png'}
-          sizes="100vw"
-          width={1}
-          height={1}
-          alt="axon-icon"></Image>
+          src="/landing-page/brand.png"
+          alt="brands"
+        />
       </div>
     </>
   )
