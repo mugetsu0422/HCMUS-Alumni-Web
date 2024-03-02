@@ -9,8 +9,13 @@ import {
   Typography,
 } from '@material-tailwind/react'
 import { roboto } from '../../fonts'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function page() {
+  // sau này sẽ xử lý thêm dữ kiện đăng nhập ở đây
+  const notify = () => toast.success('Đăng nhập thành công')
+  const error = () => toast.error('Đăng nhập thất bại')
+
   return (
     <Card
       color="transparent"
@@ -30,6 +35,7 @@ export default function page() {
             className={`${roboto} -mb-3`}>
             Email <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
+          {/* Input email */}
           <Input
             size="lg"
             className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
@@ -45,6 +51,7 @@ export default function page() {
             className={` ${roboto} -mb-3`}>
             Mật Khẩu <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
+          {/* Input password */}
           <Input
             type="password"
             size="lg"
@@ -55,6 +62,7 @@ export default function page() {
             crossOrigin={undefined}
           />
         </div>
+
         <div className="flex justify-between pt-2">
           <Checkbox
             label={
@@ -78,12 +86,28 @@ export default function page() {
         </div>
 
         <Button
+          onClick={notify}
           placeholder={undefined}
           ripple={true}
           className={` ${roboto} mt-6 w-full bg-blue-800 text-white rounded-md py-4`}>
           Đăng nhập
         </Button>
-
+        <Toaster
+          toastOptions={{
+            success: {
+              style: {
+                background: '#00a700',
+                color: 'white',
+              },
+            },
+            error: {
+              style: {
+                background: '#ea7b7b',
+                color: 'white',
+              },
+            },
+          }}
+        />
         <div className=" mt-[3rem] flex items-center justify-between md:mt-[5rem] lg:mt[5rem] xl:mt-[13rem]">
           <Typography
             placeholder={undefined}
