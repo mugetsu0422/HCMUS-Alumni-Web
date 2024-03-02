@@ -41,16 +41,16 @@ const navListItems = [
 
 function NavList() {
   return (
-    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
+    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
       {navListItems.map(({ label, subMenu }) => (
-        <div className="group cursor-pointer" key={label}>
+        <div className="group cursor-pointer lg:py-3" key={label}>
           {subMenu ? (
             <>
               <div className="text-[var(--text)] font-bold group-hover:text-[var(--blue-02)] flex items-center gap-2">
                 {label}
                 <ChevronDown className="group-hover:rotate-180" />
               </div>
-              <div className="w-fit px-5 py-3 ml-3 lg:ml-0 hidden group-hover:flex lg:absolute  flex-col gap-3 bg-white rounded-xl font-medium">
+              <div className="w-[fit] px-5 py-3 ml-3 lg:ml-0 hidden group-hover:flex lg:absolute  flex-col gap-3 bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--blue-02)]">
                 {subMenu.map(({ title }) => (
                   <Link
                     key={title}

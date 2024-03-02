@@ -7,6 +7,7 @@ import NewsList from './ui/landing-page/news-list'
 import MirrorOfSuccessList from './ui/landing-page/mos-list'
 import Explore from './ui/landing-page/explore'
 import Navbar from './ui/landing-page/navbar'
+import Footer from './ui/landing-page/footer'
 
 export default function Home() {
   return (
@@ -29,6 +30,7 @@ export default function Home() {
           <Explore />
         </section>
       </main>
+      <Footer />
     </>
   )
 }

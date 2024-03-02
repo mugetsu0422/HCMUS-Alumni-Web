@@ -13,8 +13,8 @@ function Brands() {
           className="w-full h-full"
           src={'/landing-page/brand.png'}
           sizes="100vw"
-          width={0}
-          height={0}
+          width={1}
+          height={1}
           alt="axon-icon"></Image>
       </div>
     </>

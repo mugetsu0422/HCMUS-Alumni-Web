@@ -75,7 +75,7 @@ function NewsList() {
     <div
       className={`${nunito.className} antialiased py-5 sm:py-10 flex flex-col justify-center items-center border-b-2 border-solid border-[var(--cocoa-brown-20)]`}>
       <div
-        className={`font-bold text-[1.5rem] sm:text-[2.25rem] text-[var(--blue-02)]`}>
+        className={`font-bold text-[1.5rem] sm:text-[2.25rem] text-[var(--blue-02)] text-center`}>
         TIN TỨC & SỰ KIỆN
       </div>
       <div className="flex flex-row flex-wrap justify-center gap-6 pt-3 pb-8">
