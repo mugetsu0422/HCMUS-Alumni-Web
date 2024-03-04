@@ -2,16 +2,23 @@
 import React from 'react'
 import Link from 'next/link'
 import { Card, Input, Button, Typography } from '@material-tailwind/react'
-import { roboto } from '../../fonts'
+import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
-import ErrorInput from './ErrorInput'
+import ErrorInput from '../../ui/Error-input'
+
+import { useRouter } from 'next/navigation'
 
 export default function page() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const router = useRouter()
   const onSubmit = (data) => {
     console.log(data) // Submit form data
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  function hanldeClick() {
+    router.push('/verify-email')
+  }
+
   const {
     register,
     handleSubmit,
@@ -25,7 +32,7 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto pt-[10rem] `}>
+      className={`${roboto} w-[20rem] m-auto pt-[8rem] `}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG KÝ
       </Typography>
@@ -121,11 +128,12 @@ export default function page() {
         </div>
 
         <Button
+          onClick={hanldeClick}
           type="submit"
           placeholder={undefined}
           ripple={true}
           className={` ${roboto} mt-[3rem] w-full bg-blue-800 text-white rounded-md py-4`}>
-          Đăng Ký
+          Tiếp tục
         </Button>
 
         <div className=" mt-[3rem] flex items-center justify-between md:mt-[5rem] lg:mt[5rem] xl:mt-[10rem]">
@@ -135,7 +143,7 @@ export default function page() {
             className={`${roboto} text-center font-normal`}>
             Bạn đã có tài khoản ?
           </Typography>
-          <Link href="http://localhost:3000/ui/signin">
+          <Link href="/signin">
             <Button
               placeholder={undefined}
               size="lg"

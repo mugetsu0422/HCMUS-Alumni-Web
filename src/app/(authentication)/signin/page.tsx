@@ -8,7 +8,7 @@ import {
   Button,
   Typography,
 } from '@material-tailwind/react'
-import { roboto } from '../../fonts'
+import { roboto } from '../../ui/fonts'
 import toast, { Toaster } from 'react-hot-toast'
 
 export default function page() {
@@ -21,7 +21,7 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto pt-[10rem] `}>
+      className={`${roboto} w-[20rem] m-auto pt-[8rem] `}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG NHẬP
       </Typography>
@@ -92,6 +92,7 @@ export default function page() {
           className={` ${roboto} mt-6 w-full bg-blue-800 text-white rounded-md py-4`}>
           Đăng nhập
         </Button>
+
         <Toaster
           toastOptions={{
             success: {
@@ -115,7 +116,7 @@ export default function page() {
             className={`${roboto} text-center font-normal`}>
             Bạn chưa có tài khoản ?
           </Typography>
-          <Link href="http://localhost:3000/ui/signup">
+          <Link href="/signup">
             <Button
               placeholder={undefined}
               size="lg"
