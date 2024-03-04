@@ -15,15 +15,14 @@ export default function page() {
     console.log(data) // Submit form data
   }
 
-  // Sau này sẽ xử lý dữ liệu
   function hanldeClick() {
-    router.push('/verify-user')
+    router.push('/verify-email')
   }
 
   const {
     register,
     handleSubmit,
-    getValues,
+    //getValues,
     formState: { errors },
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm()
@@ -33,15 +32,10 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto -pt-[10rem]  `}>
+      className={`${roboto} w-[20rem] m-auto pt-[8rem] `}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG KÝ
       </Typography>
-
-      <div
-        className={` text-blue-400	 ${roboto} italic text-nowrap w-[450px]	mt-[2rem] -mb-[1rem] `}>
-        Mã đăng ký đã được gửi đến nnquynh20@clc.fitus.edu.vn
-      </div>
 
       <form
         //summit form
@@ -52,44 +46,80 @@ export default function page() {
             placeholder={undefined}
             variant="h6"
             color="blue-gray"
-            className={` ${roboto} -mb-3`}>
-            Mã đăng ký <span className="text-red-700 font-bold text-lg">*</span>
+            className={`${roboto} -mb-3`}>
+            Họ và tên <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
+          
+          <Input
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+            {...register('name', {
+              required: 'Bạn cần phải nhập họ và tên',
+              pattern: {
+                value: /[a-zA-Z]/,
+                message: 'Hãy nhập đúng định dạng tên',
+              },
+            })}
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            crossOrigin={undefined}
+          />
 
-          <div className="flex relative w-full max-w-[24rem]">
-            <Input
-              size="lg"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
-              labelProps={{
-                className: 'before:content-none after:content-none',
-              }}
-              {...register('confirmPassword', {
-                required: 'Vui lòng nhập mã xác nhận',
-              })}
-              containerProps={{
-                className: 'min-w-0',
-              }}
-              crossOrigin={undefined}
-            />
-            <Button
-              placeholder={undefined}
-              size="sm"
-              color="blue"
-              variant="text"
-              className="!absolute right-1 top-1.5 rounded"
-              //loading={}
-            >
-              Gửi lại
-            </Button>
-          </div>
           <ErrorInput
             // This is the error message
-            errors={errors?.confirmPassword?.message}
+            errors={errors?.name?.message}
+          />
+
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={` ${roboto} -mb-3`}>
+            Mã số sinh viên
+          </Typography>
+
+          <Input
+            {...register('MSSV', {
+              pattern: {
+                value: /[0-9]/,
+                message: 'Hãy nhập đúng định dạng MSSV',
+              },
+            })}
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            crossOrigin={undefined}
+          />
+
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={` ${roboto} -mb-3`}>
+            Năm tốt nghiệp{' '}
+          </Typography>
+
+          <Input
+            {...register('Year', {
+              pattern: {
+                value: /[0-9]/,
+                message: 'Hãy nhập đúng định dạng năm',
+              },
+            })}
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            crossOrigin={undefined}
           />
         </div>
 
         <Button
-          onClick={hanldeClick}
+          //onClick={hanldeClick}
           type="submit"
           placeholder={undefined}
           ripple={true}
