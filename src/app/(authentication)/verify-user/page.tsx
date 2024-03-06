@@ -32,7 +32,7 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto pt-[8rem] `}>
+      className={`${roboto} w-[20rem] m-auto sm:pt-[10rem]  2xl:pt-0`}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG KÝ
       </Typography>
@@ -49,7 +49,7 @@ export default function page() {
             className={`${roboto} -mb-3`}>
             Họ và tên <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
-          
+
           <Input
             size="lg"
             className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
