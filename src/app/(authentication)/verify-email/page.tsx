@@ -33,13 +33,13 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto -pt-[10rem]  `}>
+      className={`${roboto} w-[20rem] m-auto sm:pt-[10rem]  2xl:pt-0 `}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG KÝ
       </Typography>
 
       <div
-        className={` text-blue-400	 ${roboto} italic text-nowrap w-[450px]	mt-[2rem] -mb-[1rem] `}>
+        className={` text-blue-400 ${roboto} italic text-nowrap sm:w-[400px] w-[450px]	mt-[2rem] -mb-[1rem] `}>
         Mã đăng ký đã được gửi đến nnquynh20@clc.fitus.edu.vn
       </div>
 

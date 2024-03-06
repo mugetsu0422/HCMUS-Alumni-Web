@@ -32,7 +32,7 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto pt-[8rem] `}>
+      className={`${roboto} w-[20rem] m-auto sm:pt-[10rem]  2xl:pt-0`}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG KÝ
       </Typography>
@@ -136,7 +136,7 @@ export default function page() {
           Tiếp tục
         </Button>
 
-        <div className=" mt-[3rem] flex items-center justify-between md:mt-[5rem] lg:mt[5rem] xl:mt-[10rem]">
+        <div className=" mt-[7rem] flex items-center justify-between ">
           <Typography
             placeholder={undefined}
             color="gray"

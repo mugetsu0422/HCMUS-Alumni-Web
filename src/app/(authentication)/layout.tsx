@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <div className="lg:flex items-center justify-between ">
+    <div className="flex items-center justify-between ">
       <Image
         className="absolute left-10 top-4 "
         alt="Alumni Logo"
@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
         priority
       />
       {children}
-      <div className="flex shrink-1 w-full md:w-[48%]">
+      <div className="xl:flex w-full md:w-[48%] sm:hidden  ">
         <Image
           className="md:w-[100%] brightness-75 blur-sm md:m-auto "
           alt="Alumni Image"
