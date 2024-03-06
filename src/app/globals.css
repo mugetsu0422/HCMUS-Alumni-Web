@@ -3,34 +3,24 @@
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
     --hcmus-logo: #111b88;
     --blue-01: #21262c;
     --blue-02: #055abc;
-    --blue-02-20-percent: #003f8833;
     --blue-03: #e0fffb;
+    --blue-04: #e6f0fb;
+    --blue-05: #003f88;
+    --blue-05-10: #003f881A;
+    --blue-05-20: #003f8833;
     --secondary: #a1a1a1;
     --text: #343f52;
-    --blue-04: #e6f0fb;
     --warning: #cc3300;
+    --cocoa-brown: #1E1515;
+    --cocoa-brown-20: #1E151533;
+    --pampas: #F2EFE8;
+    --westar: #DDD9D3;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-start-rgb: 0, 0, 0;
-        --background-end-rgb: 0, 0, 0;
     }
-}
-
-body {
-    color: rgb(var(--foreground-rgb));
-    background: linear-gradient(
-            to bottom,
-            transparent,
-            rgb(var(--background-end-rgb))
-        )
-        rgb(var(--background-start-rgb));
 }
