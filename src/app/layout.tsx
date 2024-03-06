@@ -2,7 +2,10 @@ import './globals.css'
 import { inter } from './ui/fonts'
 
 export const metadata = {
-  title: 'Alumverse',
+  title: {
+    template: '%s | Alumverse',
+    default: 'Alumverse',
+  },
   description: 'Alumverse',
 }
 
