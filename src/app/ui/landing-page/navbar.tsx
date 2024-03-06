@@ -104,12 +104,12 @@ export default function MyNavbar() {
 
         <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6">
           <Link
-            href={'#'}
+            href={'/signup'}
             className="text-[var(--blue-02)] text-center text-sm sm:text-base sm:w-[7.25rem] py-2 px-3 sm:px-0 border-2 border-[var(--blue-02)] rounded-xl font-bold hover:bg-[var(--blue-05-10)]">
             Đăng ký
           </Link>
           <Link
-            href={'#'}
+            href={'/signin'}
             className="bg-[var(--blue-02)] text-white text-center text-sm sm:text-base sm:w-[7.25rem] py-2 px-3 sm:px-0 rounded-xl font-bold hover:opacity-90">
             Đăng nhập
           </Link>

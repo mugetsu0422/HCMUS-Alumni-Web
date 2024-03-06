@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Card, Input, Button, Typography } from '@material-tailwind/react'
 import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
-import ErrorInput from '../../ui/Error-input'
+import ErrorInput from '../../ui/error-input'
 
 import { useRouter } from 'next/navigation'
 
