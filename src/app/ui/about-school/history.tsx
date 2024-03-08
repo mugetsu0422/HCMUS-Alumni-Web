@@ -80,14 +80,17 @@ const text = [
 
 export default function History() {
   return (
-    <div className="[&>*]:mt-[15px] [&>*]:text-justify text-[2.2vw] 2xl:text-xl text-zinc-700 ">
+    <div className=" [&>*]:mt-[15px] [&>*]:text-justify text-[2.2vw] 2xl:text-xl text-zinc-700">
       {text.map(({ heading, content }) => (
         <>
-          <div className="text-[3.5vw] lg:text-[3vw] 2xl:text-3xl font-bold mb-5px">
+          <div
+            className={` ${nunito} text-[3.5vw] lg:text-[3vw] 2xl:text-3xl font-bold mb-5px`}>
             {heading}
           </div>
           {content.map(({ text }, idx) => (
-            <p key={idx}>{text}</p>
+            <p className={`${nunito}`} key={idx}>
+              {text}
+            </p>
           ))}
         </>
       ))}
