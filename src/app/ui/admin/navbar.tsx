@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Navbar, Collapse } from '@material-tailwind/react'
+import { Navbar, Collapse, Input } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronDown } from 'react-bootstrap-icons'
@@ -51,7 +51,7 @@ const navListItems = [
 
 function NavList() {
   return (
-    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
+    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
       {navListItems.map(({ label, subMenu, icon }) => (
         <div className="group cursor-pointer lg:py-3" key={label}>
           {subMenu ? (
@@ -89,6 +89,7 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
+  const [message, setMessage] = React.useState('')
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -124,9 +125,25 @@ export default function MyNavbar() {
           className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
           icon={faBars}
         />
-        <div>
-          <input placeholder="demo"></input>
-        </div>
+        {/* <div className=" w-[40vw] m-auto ">
+          <Input
+            placeholder="Tìm kiếm ..."
+            crossOrigin={undefined}
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 max-w-sm"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                alert(message)
+              }
+            }}
+            type="text"
+          />
+        </div> */}
+
         <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
           <>
             <div className="absolute right-28 -mt-6 lg:mt-0 lg:top-4 lg:right-[134px] bg-[#055abc] rounded-full text-white w-5 h-5 text-center text-sm font-bold">
