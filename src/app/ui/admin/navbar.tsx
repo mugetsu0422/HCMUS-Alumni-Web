@@ -1,7 +1,13 @@
 'use client'
 
 import React from 'react'
-import { Navbar, Collapse, Input } from '@material-tailwind/react'
+import {
+  Navbar,
+  Collapse,
+  Badge,
+  Avatar,
+  Button,
+} from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronDown } from 'react-bootstrap-icons'
@@ -145,21 +151,19 @@ export default function MyNavbar() {
         </div> */}
 
         <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
-          <>
-            <div className="absolute right-28 -mt-6 lg:mt-0 lg:top-4 lg:right-[134px] bg-[#055abc] rounded-full text-white w-5 h-5 text-center text-sm font-bold">
-              2
-            </div>
-            <FontAwesomeIcon icon={faBell} className="text-3xl" />
-          </>
+          <Badge content={2} color="blue">
+            <Button placeholder={undefined} variant="text" size="sm">
+              <FontAwesomeIcon icon={faBell} className="text-2xl" />
+            </Button>
+          </Badge>
 
-          <>
-            <div className="absolute -mt-6 right-16 lg:mt-0 -mr-2 lg:mr-0 lg:top-4 lg:right-20 bg-[#055abc] rounded-full text-white w-5 h-5 text-center text-sm font-bold">
-              2
-            </div>
-            <FontAwesomeIcon icon={faEnvelope} className="text-3xl " />
-          </>
+          <Badge content={2} color="blue">
+            <Button placeholder={undefined} variant="text" size="sm">
+              <FontAwesomeIcon icon={faEnvelope} className="text-2xl " />
+            </Button>
+          </Badge>
 
-          <div className="w-[50px] h-[50px] rounded-full bg-blue-900"></div>
+          <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
         </div>
       </div>
 
