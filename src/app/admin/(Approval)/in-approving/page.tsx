@@ -53,19 +53,19 @@ export default function page() {
   }
 
   return (
-    <div className="m-auto w-[78vw] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 p-4">
+    <div className="m-auto w-[85vw] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 p-4">
       <p
         className={`text-gray-900 font-bold text-lg lg:text-[1.5vw] ${nunito}`}>
         Yêu cầu xét duyệt cựu sinh viên - #5
       </p>
       <Filter />
-      <div className="flex flex-wrap gap-2 justify-between mt-5">
+      <div className="flex flex-wrap gap-5 justify-between mt-5">
         {items
           .slice(0, visible)
           .map(({ name, MSSV, Year, Email, link, LinkImg }, idx) => (
             <div
               key={idx}
-              className="w-[100%] lg:w-[49.5%] py-3 px-2 border-2 border-slate-700 rounded-md">
+              className="w-[100%] lg:w-[49%] py-3 px-2 border-2 border-slate-700 rounded-md">
               {/* First line include FullName MSSV and Year*/}
               <div className={`grid grid-cols-4  gap-5 ${inter} mb-2`}>
                 <div className="flex-col col-span-2">
