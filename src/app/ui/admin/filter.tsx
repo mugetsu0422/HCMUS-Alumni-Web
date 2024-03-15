@@ -1,13 +1,13 @@
 'use client'
 import React from 'react'
 import { Input, Button, Radio } from '@material-tailwind/react'
-import { ChevronDown } from 'react-bootstrap-icons'
+import { CaretDownFill } from 'react-bootstrap-icons'
 
 const filerBtn = [
   { name: 'Mới nhất', filter: [{ sub: 'Mới nhất' }, { sub: 'Cũ nhất' }] },
   { name: 'MSSV', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
   { name: 'Họ tên', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
-  { name: 'Năm tốt nghiệp', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
+  { name: 'Năm nhập học', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
 ]
 
 const IconAtoZ = () => {
@@ -95,7 +95,7 @@ export default function Filter() {
               className="flex gap-2 -mb-1"
               key={name}>
               {name}
-              <ChevronDown className="group-hover:rotate-180 " />
+              <CaretDownFill className="group-hover:rotate-180 " />
             </Button>
             <div className="w-[fit] px-3 py-1 ml-3 lg:ml-0 hidden group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] fixed">
               {filter.map(({ sub }, idx) => (

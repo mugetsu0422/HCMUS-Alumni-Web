@@ -33,8 +33,8 @@ const navListItems = [
   {
     label: 'Xét duyệt',
     subMenu: [
-      { title: 'Xét duyệt', link: '#' },
-      { title: 'Chưa xét duyệt', link: '#' },
+      { title: 'Xét duyệt', link: 'in-approving' },
+      { title: 'Chưa xét duyệt', link: 'approved' },
     ],
     icon: faUserPlus,
   },
