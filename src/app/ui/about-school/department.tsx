@@ -92,10 +92,10 @@ export default function Department() {
   return (
     <div>
       <p className="text-[4vw] font-bold m-auto w-fit my-[4.5vw]"> CÁC KHOA </p>
-      <div className="w-fit flex flex-wrap gap-8 ">
+      <div className="w-fit gap-8 flex flex-wrap justify-center">
         {data.map(({ name, TK, PK, special, imgLink }) => (
           <div key={name} className="w-[350px] h-fit">
-            <div className="flex items-center bg-gray-50 rounded-lg justify-between">
+            <div className="flex items-center bg-gray-50 rounded-lg justify-between ">
               <div className="w-[130px] bg-[#ffde59] h-[130px] flex items-center rounded-lg">
                 <Image
                   src={imgLink}
