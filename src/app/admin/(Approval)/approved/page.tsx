@@ -123,7 +123,7 @@ export default function page() {
                       {isApproved ? (
                         <Button
                           placeholder={undefined}
-                          className={`${nunito} w-52 bg-[var(--blue-02)] font-bold`}>
+                          className={`${nunito.className} w-52 bg-[var(--blue-02)] font-bold`}>
                           Phê duyệt
                         </Button>
                       ) : (
