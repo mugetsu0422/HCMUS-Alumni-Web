@@ -1,151 +1,469 @@
 'use client'
-import React from 'react'
+import React, { createContext, useContext, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Card, Input, Button, Typography } from '@material-tailwind/react'
+import {
+  Input,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from '@material-tailwind/react'
 import { roboto } from '../../ui/fonts'
-import { useForm } from 'react-hook-form'
+import { UseFormRegister, useForm } from 'react-hook-form'
 import ErrorInput from '../../ui/error-input'
-
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import toast, { Toaster } from 'react-hot-toast'
+import axios from 'axios'
+import Cropper from 'react-easy-crop'
 
-export default function page() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const router = useRouter()
-  const onSubmit = (data) => {
-    console.log(data) // Submit form data
+const FormContext = createContext(null)
+
+function AvatarModal({ register, getValues, setValue }) {
+  const { setInputs, croppedAvatar, setCroppedAvatar } = useContext(FormContext)
+
+  const [open, setOpen] = useState(false)
+  const [avatarForCropping, setAvatarForCropping] = useState(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+
+  const handleOpen = () => {
+    if (open) setAvatarForCropping(null)
+    setOpen(!open)
+  }
+  const onCropComplete = (croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }
+  const handleAvatarSelected = (e) => {
+    const file = e.target.files[0]
+
+    if (!file) {
+      return
+    }
+
+    if (file.size > 1048576 * 5) {
+      toast.error('Hãy chọn file có dung lượng thấp hơn 5MB')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setAvatarForCropping({ file: file, src: reader.result as string })
+    }
+    reader.readAsDataURL(file)
+  }
+  const handleCrop = async () => {
+    const croppedImageBitmap = await createImageBitmap(
+      avatarForCropping.file,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    )
+    const canvas = document.createElement('canvas') as HTMLCanvasElement
+
+    // resize it to the size of our ImageBitmap
+    canvas.width = croppedImageBitmap.width
+    canvas.height = croppedImageBitmap.height
+
+    // get a bitmaprenderer context
+    const ctx = canvas.getContext('bitmaprenderer')
+    ctx.transferFromImageBitmap(croppedImageBitmap)
+
+    // get it back as a Blob
+    const croppedImageBlob = (await new Promise((res) =>
+      canvas.toBlob(res)
+    )) as Blob
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setCroppedAvatar(reader.result as string)
+    }
+    reader.readAsDataURL(croppedImageBlob)
+
+    const originalAvatarFile = getValues('avatar')[0]
+    const avatarFile = new File([croppedImageBlob], originalAvatarFile.name, {
+      type: originalAvatarFile.type,
+    })
+    setInputs((values) => ({
+      ...values,
+      avatar: avatarFile,
+    }))
+    console.log('original', getValues('avatar')[0].size)
+    console.log('cropped', avatarFile.size)
+
+    handleOpen()
   }
 
-  function hanldeClick() {
-    router.push('/verify-email')
-  }
+  return (
+    <>
+      <div
+        onClick={handleOpen}
+        className="w-[180px] h-[180px] rounded-[50%] cursor-pointer border-2 border-[var(--blue-02)]">
+        {croppedAvatar && (
+          <Image
+            className="w-full h-full rounded-[50%]"
+            src={croppedAvatar}
+            alt="preview-avatar"
+            width={180}
+            height={180}
+          />
+        )}
+      </div>
+      <Dialog
+        className="overflow-y-auto scroll-smooth max-h-[90vh]"
+        placeholder={undefined}
+        open={open}
+        handler={handleOpen}>
+        <DialogHeader
+          tabIndex={0}
+          className="border-b-2 border-gray-300 justify-center"
+          placeholder={undefined}>
+          Chọn ảnh đại diện
+        </DialogHeader>
+        <DialogBody placeholder={undefined} className="h-[70vh] flex flex-col">
+          {!avatarForCropping && (
+            <>
+              <label
+                className="h-full w-full text-[var(--text)] text-xl cursor-pointer font-bold flex justify-center items-center"
+                htmlFor="avatar">
+                Tải ảnh lên
+              </label>
+              <input
+                className="hidden"
+                id="avatar"
+                type="file"
+                accept="image/png, image/jpg, image/jpeg"
+                {...register('avatar', {
+                  onChange: handleAvatarSelected,
+                })}
+              />
+            </>
+          )}
+          {avatarForCropping && (
+            <Cropper
+              image={avatarForCropping.src}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              onCropChange={setCrop}
+              onCropComplete={onCropComplete}
+              onZoomChange={setZoom}
+              zoomWithScroll={false}
+              showGrid={false}
+              cropShape="round"
+            />
+          )}
+        </DialogBody>
+        {avatarForCropping && (
+          <div className="flex justify-center">
+            <input
+              type="range"
+              value={zoom}
+              min={1}
+              max={3}
+              step={0.1}
+              aria-labelledby="Zoom"
+              onChange={(e) => {
+                setZoom(+e.target.value)
+              }}
+              className="w-1/2 hover:cursor-pointer h-[3rem]"
+            />
+          </div>
+        )}
+        <DialogFooter
+          className="border-t-2 border-gray-300"
+          placeholder={undefined}>
+          <div className="font-semibold flex gap-4">
+            <button
+              onClick={handleOpen}
+              className="text-blue-800 px-3 py-[6px] rounded-md hover:bg-gray-200 ">
+              <span>Hủy</span>
+            </button>
+            <button
+              // type="submit"
+              onClick={handleCrop}
+              className="bg-blue-700 text-white px-10 py-[6px] rounded-md hover:bg-blue-600">
+              <span>Lưu</span>
+            </button>
+          </div>
+        </DialogFooter>
+      </Dialog>
+    </>
+  )
+}
 
+function Step1() {
+  const { inputs, setInputs, handleNext } = useContext(FormContext)
   const {
     register,
     handleSubmit,
-    //getValues,
+    getValues,
+    setValue,
     formState: { errors },
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      avatar: null,
+      full_name: inputs.full_name || '',
+    },
+  })
+  const onSubmit = (data) => {
+    setInputs((values) => ({
+      ...values,
+      full_name: data.full_name,
+    }))
+
+    handleNext()
+  }
 
   return (
-    <Card
-      color="transparent"
-      shadow={false}
-      placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto sm:pt-[10rem]  2xl:pt-0`}>
-      <Typography variant="h2" color="blue-gray" placeholder={undefined}>
-        ĐĂNG KÝ
-      </Typography>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mb-1 flex flex-col gap-6">
+      <p className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
+        Ảnh đại diện
+      </p>
+      <AvatarModal
+        register={register}
+        getValues={getValues}
+        setValue={setValue}
+      />
 
-      <form
-        //summit form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
-        <div className="mb-1 flex flex-col gap-6">
-          <Typography
-            placeholder={undefined}
-            variant="h6"
-            color="blue-gray"
-            className={`${roboto} -mb-3`}>
-            Họ và tên <span className="text-red-700 font-bold text-lg">*</span>
-          </Typography>
+      <p className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
+        Họ và tên <span className="text-red-700 text-lg">*</span>
+      </p>
+      <Input
+        size="lg"
+        className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+        {...register('full_name', {
+          required: 'Bạn cần phải nhập họ và tên',
+          pattern: {
+            value: /[a-zA-Z]/,
+            message: 'Hãy nhập đúng định dạng tên',
+          },
+        })}
+        labelProps={{
+          className: 'before:content-none after:content-none',
+        }}
+        crossOrigin={undefined}
+      />
 
-          <Input
-            size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
-            {...register('name', {
-              required: 'Bạn cần phải nhập họ và tên',
-              pattern: {
-                value: /[a-zA-Z]/,
-                message: 'Hãy nhập đúng định dạng tên',
-              },
-            })}
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            crossOrigin={undefined}
-          />
+      <ErrorInput
+        // This is the error message
+        errors={errors?.full_name?.message}
+      />
 
-          <ErrorInput
-            // This is the error message
-            errors={errors?.name?.message}
-          />
+      <Button
+        // onClick={handleNext}
+        type="submit"
+        placeholder={undefined}
+        ripple={true}
+        className={`mt-[2rem] w-full bg-blue-800 text-white rounded-md py-4`}>
+        Tiếp tục
+      </Button>
+    </form>
+  )
+}
 
-          <Typography
-            placeholder={undefined}
-            variant="h6"
-            color="blue-gray"
-            className={` ${roboto} -mb-3`}>
-            Mã số sinh viên
-          </Typography>
+function Step2() {
+  const { inputs, setInputs, handleBack } = useContext(FormContext)
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      student_id: inputs.student_id || '',
+      beginning_year: inputs.beginning_year || '',
+      social_media_link: inputs.social_media_link || '',
+    },
+  })
+  const onSubmit = (data) => {
+    setInputs((values) => ({ ...values, ...data }))
 
-          <Input
-            {...register('MSSV', {
-              pattern: {
-                value: /[0-9]/,
-                message: 'Hãy nhập đúng định dạng MSSV',
-              },
-            })}
-            size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            crossOrigin={undefined}
-          />
+    // Call API here
+    axios
+      .postForm(
+        `${process.env.NEXT_PUBLIC_USER_SERVICE_HOST}/user/alumni-verification`,
+        inputs
+      )
+      .then((res) => {
+        toast.success('Thiết lập thành công')
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
+  const onBack = () => {
+    setInputs((values) => ({ ...values, ...getValues() }))
+    handleBack()
+  }
 
-          <Typography
-            placeholder={undefined}
-            variant="h6"
-            color="blue-gray"
-            className={` ${roboto} -mb-3`}>
-            Năm tốt nghiệp{' '}
-          </Typography>
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mb-1 flex flex-col gap-6">
+      {' '}
+      <p className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
+        Mã số sinh viên
+      </p>
+      <Input
+        {...register('student_id', {
+          pattern: {
+            value: /[0-9]/,
+            message: 'Hãy nhập đúng định dạng MSSV',
+          },
+        })}
+        size="lg"
+        className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+        labelProps={{
+          className: 'before:content-none after:content-none',
+        }}
+        crossOrigin={undefined}
+      />
+      <ErrorInput
+        // This is the error message
+        errors={errors?.student_id?.message}
+      />
+      <p className={`-mb-3 text-[var(--blue-01)] font-semibold `}>
+        Năm nhập học{' '}
+      </p>
+      <Input
+        {...register('beginning_year', {
+          pattern: {
+            value: /[0-9]/,
+            message: 'Hãy nhập đúng định dạng năm',
+          },
+        })}
+        size="lg"
+        className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+        labelProps={{
+          className: 'before:content-none after:content-none',
+        }}
+        crossOrigin={undefined}
+      />
+      <ErrorInput
+        // This is the error message
+        errors={errors?.beginning_year?.message}
+      />
+      <p className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
+        Trang cá nhân Facebook/ Linkedin
+      </p>
+      <Input
+        size="lg"
+        className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+        {...register('social_media_link', {
+          pattern: {
+            value:
+              /(https?:\/)?(www\.)?(?:facebook\.com|linkedin\.com)\/(?:[^\s\/]+)/,
+            message: 'Hãy nhập đúng đường dẫn',
+          },
+        })}
+        labelProps={{
+          className: 'before:content-none after:content-none',
+        }}
+        crossOrigin={undefined}
+      />
+      <ErrorInput
+        // This is the error message
+        errors={errors?.social_media_link?.message}
+      />
+      <Button
+        onClick={onBack}
+        placeholder={undefined}
+        ripple={true}
+        className={`mt-[2rem] w-full bg-blue-800 text-white rounded-md py-4`}>
+        Quay về
+      </Button>
+      <Button
+        type="submit"
+        placeholder={undefined}
+        ripple={true}
+        className={`w-full bg-blue-800 text-white rounded-md py-4`}>
+        Hoàn thành
+      </Button>
+    </form>
+  )
+}
 
-          <Input
-            {...register('Year', {
-              pattern: {
-                value: /[0-9]/,
-                message: 'Hãy nhập đúng định dạng năm',
-              },
-            })}
-            size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            crossOrigin={undefined}
-          />
-        </div>
+function AlumniVerificationForm() {
+  const { currentStep } = useContext(FormContext)
 
-        <Button
-          //onClick={hanldeClick}
-          type="submit"
-          placeholder={undefined}
-          ripple={true}
-          className={` ${roboto} mt-[3rem] w-full bg-blue-800 text-white rounded-md py-4`}>
-          Tiếp tục
-        </Button>
+  return (
+    <div className="mt-7 mb-2 w-80 max-w-screen-lg sm:w-96">
+      <div className="mb-1 flex flex-col gap-6">
+        {currentStep == 1 && (
+          <>
+            <Step1 />
+          </>
+        )}
+        {currentStep == 2 && (
+          <>
+            <Step2 />
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
 
-        <div className=" mt-[3rem] flex items-center justify-between md:mt-[5rem] lg:mt[5rem] xl:mt-[10rem]">
-          <Typography
-            placeholder={undefined}
-            color="gray"
-            className={`${roboto} text-center font-normal`}>
-            Bạn đã có tài khoản ?
-          </Typography>
-          <Link href="/signin">
-            <Button
-              placeholder={undefined}
-              size="lg"
-              variant="outlined"
-              className={` ${roboto} font-bold text-blue-700 `}
-              ripple={true}>
-              Đăng Nhập
-            </Button>
-          </Link>
-        </div>
-      </form>
-    </Card>
+export default function Page() {
+  const [inputs, setInputs] = useState({ avatar: null })
+  const [currentStep, setCurrentStep] = useState(1)
+  const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
+
+  // console.log(inputs)
+
+  const handleNext = () => {
+    // Optional validation before moving to next step
+    setCurrentStep(currentStep + 1)
+  }
+  const handleBack = () => {
+    setCurrentStep(currentStep - 1)
+  }
+
+  const router = useRouter()
+
+  return (
+    <div
+      className={`${roboto.className} w-[20rem] m-auto sm:pt-[10rem] 2xl:pt-0 flex flex-col items-center sm:items-start`}>
+      <Toaster
+        containerStyle={{ zIndex: 99999 }}
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
+            },
+          },
+        }}
+      />
+      <p className="text-3xl text-[var(--blue-01)] font-bold">BẮT ĐẦU</p>
+      <p className="mt-2 text-[var(--text)] font-medium">
+        Hãy thiết lập hồ sơ của bạn. Những thông tin này sẽ giúp chúng tôi xét
+        duyệt tài khoản của bạn.
+      </p>
+      <FormContext.Provider
+        value={{
+          inputs: inputs,
+          setInputs: setInputs,
+          currentStep: currentStep,
+          handleBack: handleBack,
+          handleNext: handleNext,
+          croppedAvatar: croppedAvatar,
+          setCroppedAvatar: setCroppedAvatar,
+        }}>
+        <AlumniVerificationForm />
+      </FormContext.Provider>
+    </div>
   )
 }
