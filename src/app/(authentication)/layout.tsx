@@ -7,7 +7,7 @@ export default function RootLayout({ children }) {
     <div className="flex items-center justify-between ">
       <Link href={'/'}>
         <Image
-          className="absolute left-10 top-4 "
+          className="absolute left-10 top-4 sm:mb-[10rem] "
           alt="Alumni Logo"
           src="/logo.png"
           width={123}

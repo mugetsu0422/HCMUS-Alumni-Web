@@ -21,7 +21,7 @@ export default function page() {
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto sm:pt-[10rem]  2xl:pt-[0]`}>
+      className={`${roboto} w-[20rem] m-auto mt-[10rem]`}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG NHẬP
       </Typography>

@@ -14,11 +14,6 @@ export default function page() {
   const onSubmit = (data) => {
     console.log(data) // Submit form data
   }
-
-  function hanldeClick() {
-    router.push('/verify-email')
-  }
-
   const {
     register,
     handleSubmit,
@@ -27,12 +22,17 @@ export default function page() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm()
 
+  function hanldeClick() {
+    if (errors) return
+    router.push('/verify-email')
+  }
+
   return (
     <Card
       color="transparent"
       shadow={false}
       placeholder={undefined}
-      className={`${roboto} w-[20rem] m-auto sm:pt-[10rem]  2xl:pt-0`}>
+      className={`${roboto} w-[20rem] m-auto mt-[10rem]`}>
       <Typography variant="h2" color="blue-gray" placeholder={undefined}>
         ĐĂNG KÝ
       </Typography>

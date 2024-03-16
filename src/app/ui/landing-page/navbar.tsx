@@ -1,10 +1,7 @@
 'use client'
 
 import React from 'react'
-import {
-  Navbar,
-  Collapse,
-} from '@material-tailwind/react'
+import { Navbar, Collapse } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronDown } from 'react-bootstrap-icons'
@@ -16,9 +13,9 @@ const navListItems = [
   {
     label: 'Về chúng tôi',
     subMenu: [
-      { title: 'Nhà trường' },
-      { title: 'AlumVerse' },
-      { title: 'Cựu sinh viên tiêu biểu' },
+      { title: 'Nhà trường', link: '/about-school' },
+      { title: 'AlumVerse', link: '/' },
+      { title: 'Cựu sinh viên tiêu biểu', link: '/' },
     ],
   },
   {
@@ -43,11 +40,11 @@ function NavList() {
                 <ChevronDown className="group-hover:rotate-180" />
               </div>
               <div className="w-[fit] px-5 py-3 ml-3 lg:ml-0 hidden group-hover:flex lg:absolute  flex-col gap-3 bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--blue-02)]">
-                {subMenu.map(({ title }) => (
+                {subMenu.map(({ title, link }) => (
                   <Link
                     key={title}
                     className="text-[var(--text)] hover:text-[var(--blue-02)]"
-                    href={'#'}>
+                    href={link}>
                     {title}
                   </Link>
                 ))}
