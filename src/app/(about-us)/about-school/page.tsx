@@ -2,7 +2,8 @@ import React from 'react'
 import Heading from '../../ui/about-school/heading'
 import History from '../../ui/about-school/history'
 import Department from '../../ui/about-school/department'
-export default function page() {
+
+export default function Page() {
   return (
     <main>
       <section className="sm:mb-[25vw] md:mb-[27vw] lg:mb-[28vw] xl:mb-[23vw] ">

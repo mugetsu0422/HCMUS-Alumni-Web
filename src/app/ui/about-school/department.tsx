@@ -1,6 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 
+import { koho, nunito } from '../fonts'
+
 const data = [
   {
     special: false,
@@ -91,7 +93,10 @@ const data = [
 export default function Department() {
   return (
     <div>
-      <p className="text-[4vw] font-bold m-auto w-fit my-[4.5vw]"> CÁC KHOA </p>
+      <p
+        className={`${koho.className} text-[4vw] font-bold m-auto w-fit my-[4.5vw]`}>
+        CÁC KHOA{' '}
+      </p>
       <div className="w-fit gap-8 flex flex-wrap justify-center">
         {data.map(({ name, TK, PK, special, imgLink }) => (
           <div key={name} className="w-[350px] h-fit">
@@ -111,7 +116,8 @@ export default function Department() {
                 <p className="w-48 text-[#004aad] ">{name}</p>
               </div>
             </div>
-            <div className="[&>*]:mt-1 mt-4 text-zinc-700 text-base">
+            <div
+              className={` ${nunito.className} [&>*]:mt-1 mt-4 text-zinc-700 text-base`}>
               <p className="italic">Trưởng khoa:</p>
               <p className="font-bold">{TK}</p>
               {PK.length > 0 && (
