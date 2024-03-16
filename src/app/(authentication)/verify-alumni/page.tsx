@@ -73,9 +73,13 @@ function AvatarModal({ register, getValues, setValue }) {
     ctx.transferFromImageBitmap(croppedImageBitmap)
 
     // get it back as a Blob
-    const croppedImageBlob = (await new Promise((res) =>
-      canvas.toBlob(res)
-    )) as Blob
+    const croppedImageBlob = (await new Promise((res) => {
+      if (avatarForCropping.file.type == 'image/jpeg') {
+        canvas.toBlob(res, 'image/jpeg', 0.8)
+      } else {
+        canvas.toBlob(res)
+      }
+    })) as Blob
 
     const reader = new FileReader()
     reader.onload = () => {
@@ -91,8 +95,6 @@ function AvatarModal({ register, getValues, setValue }) {
       ...values,
       avatar: avatarFile,
     }))
-    console.log('original', getValues('avatar')[0].size)
-    console.log('cropped', avatarFile.size)
 
     handleOpen()
   }
@@ -135,7 +137,7 @@ function AvatarModal({ register, getValues, setValue }) {
                 className="hidden"
                 id="avatar"
                 type="file"
-                accept="image/png, image/jpg, image/jpeg"
+                accept="image/png, image/jpeg"
                 {...register('avatar', {
                   onChange: handleAvatarSelected,
                 })}
@@ -414,8 +416,6 @@ export default function Page() {
   const [inputs, setInputs] = useState({ avatar: null })
   const [currentStep, setCurrentStep] = useState(1)
   const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
-
-  // console.log(inputs)
 
   const handleNext = () => {
     // Optional validation before moving to next step
