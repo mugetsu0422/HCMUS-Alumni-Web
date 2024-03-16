@@ -42,7 +42,7 @@ const tempData = [
   },
 ]
 
-export default function page() {
+export default function Page() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [items, setItems] = React.useState(tempData)
   // eslint-disable-next-line react-hooks/rules-of-hooks
