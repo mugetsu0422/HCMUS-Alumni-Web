@@ -33,7 +33,7 @@ export default function CardInformation({ items, visible }) {
               </div>
             </div>
             {/* Second line include Email and link  */}
-            <div className={`grid grid-cols-4  gap-5 ${inter} mb-2`}>
+            <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
               <div className="flex-col col-span-2">
                 <p className=" font-bold text-[var(--secondary)]">Email</p>
                 <p>{Email}</p>

@@ -33,7 +33,7 @@ export default function CardInformation({ items, visible }) {
               </div>
             </div>
             {/* Second line include Email and link  */}
-            <div className={`grid grid-cols-4  gap-5 ${inter} mb-2`}>
+            <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
               <div className="flex-col col-span-2">
                 <p className=" font-bold text-[var(--secondary)]">Email</p>
                 <p>{Email}</p>
@@ -65,13 +65,13 @@ export default function CardInformation({ items, visible }) {
                   {isApproved ? (
                     <Button
                       placeholder={undefined}
-                      className={`${nunito} w-52 bg-[var(--blue-02)] font-bold`}>
+                      className={`${nunito.className} w-52 bg-[var(--blue-02)] font-bold`}>
                       Phê duyệt
                     </Button>
                   ) : (
                     <Button
                       placeholder={undefined}
-                      className={`${nunito} w-52 bg-[#ff7373] text-black font-bold`}>
+                      className={`${nunito.className} w-52 bg-[#ff7373] text-black font-bold`}>
                       Từ chối
                     </Button>
                   )}
