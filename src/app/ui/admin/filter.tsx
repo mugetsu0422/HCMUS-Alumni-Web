@@ -4,10 +4,26 @@ import { Input, Button, Radio } from '@material-tailwind/react'
 import { CaretDownFill } from 'react-bootstrap-icons'
 
 const filerBtn = [
-  { name: 'Mới nhất', filter: [{ sub: 'Mới nhất' }, { sub: 'Cũ nhất' }] },
-  { name: 'MSSV', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
-  { name: 'Họ tên', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
-  { name: 'Năm nhập học', filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }] },
+  {
+    criteria: 'time',
+    name: 'Mới nhất',
+    filter: [{ sub: 'Mới nhất' }, { sub: 'Cũ nhất' }],
+  },
+  {
+    criteria: 'student-id',
+    name: 'MSSV',
+    filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }],
+  },
+  {
+    criteria: 'full-name',
+    name: 'Họ tên',
+    filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }],
+  },
+  {
+    criteria: 'beginning-year',
+    name: 'Năm nhập học',
+    filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }],
+  },
 ]
 
 const IconAtoZ = () => {
@@ -77,7 +93,7 @@ export default function Filter() {
         }}
         type="text"
       />
-      <div className="flex mt-3 gap-2 ">
+      <div className="flex mt-3 gap-2 flex-wrap">
         <Button
           onClick={handleClick}
           variant="outlined"
@@ -86,8 +102,8 @@ export default function Filter() {
           className="h-fit">
           Xóa bộ lọc
         </Button>
-        {filerBtn.map(({ name, filter }) => (
-          <div key={name} className="flex-col group ">
+        {filerBtn.map(({ criteria, name, filter }) => (
+          <div key={name} className="flex-col group">
             <Button
               variant="outlined"
               placeholder={undefined}
@@ -97,7 +113,7 @@ export default function Filter() {
               {name}
               <CaretDownFill className="group-hover:rotate-180 " />
             </Button>
-            <div className="w-[fit] px-3 py-1 ml-3 lg:ml-0 hidden group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] fixed">
+            <div className="w-[fit] p-5 hidden group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] absolute z-10">
               {filter.map(({ sub }, idx) => (
                 <div key={idx} className="flex items-center">
                   <Radio
@@ -106,8 +122,10 @@ export default function Filter() {
                     crossOrigin={undefined}
                     key={idx}
                     label={sub}
-                    id="radio"
-                    className="sticky"
+                    containerProps={{
+                      className: 'p-0 m-3 ml-0',
+                    }}
+                    id={criteria + idx}
                   />
                   {sub === 'Mới nhất' || sub === 'A tới Z' ? (
                     <IconAtoZ />
