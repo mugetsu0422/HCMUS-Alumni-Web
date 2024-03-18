@@ -1,7 +1,27 @@
 'use client'
+
 import React from 'react'
 import { Input, Button, Radio } from '@material-tailwind/react'
 import { CaretDownFill } from 'react-bootstrap-icons'
+
+// const initialState = {
+//   Time: {
+//     option1: false,
+//     option2: false,
+//   },
+//   MSSV: {
+//     option1: false,
+//     option2: false,
+//   },
+//   Fullname: {
+//     option1: false,
+//     option2: false,
+//   },
+//   YearBegin: {
+//     option1: false,
+//     option2: false,
+//   },
+// }
 
 const filerBtn = [
   {
@@ -65,16 +85,25 @@ const IconZtoA = () => {
 
 export default function Filter() {
   const [message, setMessage] = React.useState('')
+  // const [{ Time, MSSV, Fullname, YearBegin }, setIsChecked] =
+  //   React.useState(initialState)
 
   //delete all selected radio options
   function handleClick() {
-    let allRadioButtons = document.querySelectorAll('#radio')
-    allRadioButtons.forEach((radioButton) => {
-      if (radioButton instanceof HTMLInputElement) {
-        radioButton.checked = false
-      }
-    })
+    {
+      filerBtn.map(({ name }) => {
+        let allRadioButtons = document.getElementsByName(`${name} type`)
+        allRadioButtons.forEach((radioButton) => {
+          if (radioButton instanceof HTMLInputElement) {
+            radioButton.checked = false
+          }
+        })
+      })
+    }
   }
+
+  // function handleFilter() {}
+
   return (
     <>
       <Input
@@ -113,7 +142,7 @@ export default function Filter() {
               {name}
               <CaretDownFill className="group-hover:rotate-180 " />
             </Button>
-            <div className="w-[fit] p-5 hidden group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] absolute z-10">
+            <div className="w-[fit] p-5  group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] absolute z-10">
               {filter.map(({ sub }, idx) => (
                 <div key={idx} className="flex items-center">
                   <Radio
