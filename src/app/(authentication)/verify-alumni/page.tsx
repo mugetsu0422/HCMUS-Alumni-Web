@@ -17,6 +17,8 @@ import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import axios from 'axios'
 import Cropper from 'react-easy-crop'
+import Cookies from 'js-cookie'
+import { JWT_COOKIE } from '../../constant'
 
 const FormContext = createContext(null)
 
@@ -289,8 +291,13 @@ function Step2() {
     // Call API here
     axios
       .postForm(
-        `${process.env.NEXT_PUBLIC_USER_SERVICE_HOST}/user/alumni-verification`,
-        inputs
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+        inputs,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
       )
       .then((res) => {
         toast.success('Thiết lập thành công')
@@ -378,7 +385,7 @@ function Step2() {
         placeholder={undefined}
         ripple={true}
         className={`mt-[2rem] w-full bg-blue-800 text-white rounded-md py-4`}>
-        Quay về
+        Trở lại
       </Button>
       <Button
         type="submit"
@@ -418,7 +425,6 @@ export default function Page() {
   const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
 
   const handleNext = () => {
-    // Optional validation before moving to next step
     setCurrentStep(currentStep + 1)
   }
   const handleBack = () => {
