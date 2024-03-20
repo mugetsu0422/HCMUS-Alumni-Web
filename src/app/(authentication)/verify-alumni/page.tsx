@@ -286,13 +286,11 @@ function Step2() {
     },
   })
   const onSubmit = (data) => {
-    setInputs((values) => ({ ...values, ...data }))
-
     // Call API here
     axios
       .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-        inputs,
+        {...inputs, ...data},
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,

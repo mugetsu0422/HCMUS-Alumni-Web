@@ -1,57 +1,35 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import Filter from '../../../ui/admin/filter'
-import { inter, nunito } from '../../../ui/fonts'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Input, Button } from '@material-tailwind/react'
-import CardInformation from '../../../ui/admin/card-information-approved'
-
-const tempData = [
-  {
-    name: 'Trương Samule',
-    MSSV: '20127610',
-    Year: '2020',
-    Email: 'tsamule@gmail.com',
-    link: 'https://facebook.com/',
-    isApproved: false,
-    LinkImg: '/demo.jpg',
-  },
-  {
-    name: 'Trần Hồng Minh Phúc',
-    MSSV: '20127610',
-    Year: '2020',
-    Email: 'tsamule@gmail.com',
-    link: 'https://facebook.com/',
-    isApproved: true,
-    LinkImg: '/demo.jpg',
-  },
-  {
-    name: 'Nguyễn Mai Hoàng Quang Huy',
-    MSSV: '20127610',
-    Year: '2020',
-    Email: 'tsamule@gmail.com',
-    link: 'https://facebook.com/',
-    isApproved: false,
-    LinkImg: '/demo.jpg',
-  },
-  {
-    name: 'Trương Samule',
-    MSSV: '20127610',
-    Year: '2020',
-    Email: 'tsamule@gmail.com',
-    Link: 'https://facebook.com/',
-    isApproved: true,
-    LinkImg: '/demo.jpg',
-  },
-]
+import { nunito } from '../../../ui/fonts'
+import { Button } from '@material-tailwind/react'
+import CardInformation from '../../../ui/admin/card-information-resolved'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { JWT_COOKIE } from '../../../constant'
 
 export default function Page() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [items, setItems] = React.useState(tempData)
+  const [items, setItems] = React.useState([])
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [visible, setVisible] = React.useState(2) //Coi lại và thống nhất để có số thích hợp hơn.
+
+  useEffect(() => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/resolved`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then((res) => {
+        setItems(res.data)
+      })
+      .catch((e) => {})
+  }, [])
 
   function showMore() {
     setVisible((e) => e + 1) //Sau này thay số 1 thành số khác để linh hoạt hơn
@@ -61,7 +39,7 @@ export default function Page() {
     <div className="m-auto w-[85vw] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 p-4">
       <p
         className={`text-gray-900 font-bold text-lg lg:text-[1.5vw] ${nunito}`}>
-        Yêu cầu xét duyệt cựu sinh viên - #5
+        Đã xét duyệt cựu sinh viên - #{items.length}
       </p>
       <Filter />
       <div className="flex flex-wrap gap-5 justify-between mt-5">

@@ -229,7 +229,7 @@ function Step2() {
       <div className="mb-1 flex flex-col gap-6">
         <div
           className={` text-blue-400 ${roboto} italic sm:w-[400px] mt-[2rem] -mb-[1rem]`}>
-          Mã xác thực đã được gửi đến {inputs.email}
+          Mã xác thực đã được gửi đến {inputs.email} <br />
           Mã có giá trị trong 60s
         </div>
         <Typography

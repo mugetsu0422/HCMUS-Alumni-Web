@@ -33,8 +33,8 @@ const navListItems = [
   {
     label: 'Xét duyệt',
     subMenu: [
-      { title: 'Chưa xét duyệt', link: 'alumni-verification/pending' },
-      { title: 'Đã xét duyệt', link: 'alumni-verification/resolved' },
+      { title: 'Chưa xét duyệt', link: '/admin/alumni-verification/pending' },
+      { title: 'Đã xét duyệt', link: '/admin/alumni-verification/resolved' },
     ],
     icon: faUserPlus,
   },
