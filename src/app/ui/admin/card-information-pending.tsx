@@ -7,50 +7,50 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '../../constant'
 import { useForm } from 'react-hook-form'
+import { Facebook, Linkedin } from 'react-bootstrap-icons'
+import LinkIcon from './link-icon'
 
-export default function CardInformation({ items, visible }) {
+export default function CardInformation({ items }) {
   const { register, handleSubmit } = useForm()
 
   const onSubmit = (data, id, status) => {
     axios
-    .put(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/${id}/verify`,
-    {
-      status: status,
-      comment: data.comment
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-      },
-    })
-    .then((res) => {
-      console.log('thành công');
-      
-    })
-    .catch((e) => {})
+      .put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/${id}/verify`,
+        {
+          status: status,
+          comment: data.comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log('thành công')
+      })
+      .catch((e) => {})
   }
 
   return (
     <>
-      {items
-        .slice(0, visible)
-        .map(({ id, user, studentId, beginningYear, socialMediaLink }, idx) => (
+      {items.map(
+        ({ id, user, studentId, beginningYear, socialMediaLink }, idx) => (
           <div
             key={id}
-            className="w-[100%] lg:w-[49%] py-3 px-2 border-2 border-slate-700 rounded-md">
+            className="w-[100%] lg:w-[49%] py-3 px-2 border-2 border-slate-700 rounded-md break-words">
             {/* First line include FullName MSSV and Year*/}
             <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
-              <div className="flex-col col-span-2">
-                <p className="font-bold text-[var(--secondary)]   ">
-                  Họ và tên
-                </p>
+              <div className="flex-col col-span-2 ">
+                <p className="font-bold text-[var(--secondary)]">Họ và tên</p>
                 <p>{user?.fullName}</p>
               </div>
               <div className="flex-col">
                 <p className="font-bold text-[var(--secondary)]">MSSV</p>
                 <p>{studentId}</p>
               </div>
-              <div className="flex-col ">
+              <div className="flex-col">
                 <p className="font-bold text-[var(--secondary)]">
                   Năm nhập học
                 </p>
@@ -63,17 +63,20 @@ export default function CardInformation({ items, visible }) {
                 <p className=" font-bold text-[var(--secondary)]">Email</p>
                 <p>{user?.email}</p>
               </div>
-              <div className="col-span-2">
-                <p className=" font-bold text-[var(--secondary)]">
-                  Linkedin/Facebook
-                </p>
-                <Link
-                  className=''
-                  href={`${socialMediaLink}`}
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  {socialMediaLink}
-                </Link>
+              <div className="col-span-1">
+                <p className=" font-bold text-[var(--secondary)]">Khoa</p>
+                <p>Công nghệ thông tin</p>
+              </div>
+              <div className="col-span-1">
+                <div className="w-fit">
+                  <Link
+                    className="text-[2.5rem]"
+                    href={`${socialMediaLink}`}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <LinkIcon link={socialMediaLink} />
+                  </Link>
+                </div>
               </div>
             </div>
             {/* Final line for the profile image */}
@@ -114,7 +117,8 @@ export default function CardInformation({ items, visible }) {
               </form>
             </div>
           </div>
-        ))}
+        )
+      )}
     </>
   )
 }
