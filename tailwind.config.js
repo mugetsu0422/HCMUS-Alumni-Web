@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const withMT = require("@material-tailwind/react/utils/withMT");
+const withMT = require('@material-tailwind/react/utils/withMT')
 module.exports = withMT({
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -15,5 +15,31 @@ module.exports = withMT({
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.scrollbar-thin': {
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgb(31 29 29) white ',
+        },
+        '.scrollbar-webkit': {
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '5px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'white',
+          },
+
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#000',
+            borderRadius: '20px',
+            border: '1px solid white',
+          },
+        },
+      }
+
+      addUtilities(newUtilities, ['responsive', 'hover'])
+    },
+  ],
 })
