@@ -79,7 +79,8 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className="px-3 lg:pl-6 py-4 lg:py-0">
+      className="px-3 lg:pl-6 py-4 lg:py-0 border-b-2 border-slate-700 "
+      shadow={false}>
       <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
         <Link href="/">
           <Image

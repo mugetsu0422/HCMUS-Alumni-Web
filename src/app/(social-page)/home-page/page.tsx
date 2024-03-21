@@ -2,22 +2,19 @@
 
 import React from 'react'
 import Sidebar from '../../ui/social-page/sidebar'
-import { Button } from '@material-tailwind/react'
-const userTemp = []
+
+import ListUser from '../../ui/social-page/list-user'
+import RegisteredEvent from '../../ui/social-page/registered-event'
 
 export default function Page() {
   return (
     <div>
       <Sidebar>
-        <div>
-          <p>Nhắn tin</p>
-          <Button placeholder={undefined} variant="text">
-            {' '}
-            Tất cả{' '}
-          </Button>
-        </div>
+        <ListUser />
       </Sidebar>
-      Page
+      <div className="flex flex-col items-center justify-center w-[1250px] ml-44 border-r-2 pr-14">
+        <RegisteredEvent />
+      </div>
     </div>
   )
 }
