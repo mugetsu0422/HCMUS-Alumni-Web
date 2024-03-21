@@ -18,23 +18,19 @@ module.exports = withMT({
   plugins: [
     function ({ addUtilities }) {
       const newUtilities = {
-        '.scrollbar-thin': {
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgb(31 29 29) white ',
-        },
         '.scrollbar-webkit': {
           '&::-webkit-scrollbar': {
-            width: '8px',
-            height: '5px',
+            width: '5px',
+            height: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            background: 'white',
+            background: '#a1a1a1',
+            borderRadius: '20px',
           },
 
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#000',
+            backgroundColor: '#055abc',
             borderRadius: '20px',
-            border: '1px solid white',
           },
         },
       }
