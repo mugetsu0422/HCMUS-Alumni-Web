@@ -1,48 +1,45 @@
 'use client'
 
 import React from 'react'
-import { Input, Button, Radio } from '@material-tailwind/react'
+import { Input, Button, Radio, Select, Option } from '@material-tailwind/react'
 import { CaretDownFill } from 'react-bootstrap-icons'
-
-// const initialState = {
-//   Time: {
-//     option1: false,
-//     option2: false,
-//   },
-//   MSSV: {
-//     option1: false,
-//     option2: false,
-//   },
-//   Fullname: {
-//     option1: false,
-//     option2: false,
-//   },
-//   YearBegin: {
-//     option1: false,
-//     option2: false,
-//   },
-// }
+import { useFieldArray, useForm } from 'react-hook-form'
+import { classNames } from 'react-easy-crop/helpers'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
 
 const filerBtn = [
   {
-    criteria: 'time',
-    name: 'Mới nhất',
-    filter: [{ sub: 'Mới nhất' }, { sub: 'Cũ nhất' }],
+    type: 'createAtOrder',
+    title: 'Ngày tạo',
+    filter: [
+      { sub: 'Mới nhất', order: 'desc' },
+      { sub: 'Cũ nhất', order: 'asc' },
+    ],
   },
   {
-    criteria: 'student-id',
-    name: 'MSSV',
-    filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }],
+    type: 'studentIdOrder',
+    title: 'MSSV',
+    filter: [
+      { sub: 'A tới Z', order: 'desc' },
+      { sub: 'Z tới A', order: 'asc' },
+    ],
   },
   {
-    criteria: 'full-name',
-    name: 'Họ tên',
-    filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }],
+    type: 'fullNameOrder',
+    title: 'Họ tên',
+    filter: [
+      { sub: 'A tới Z', order: 'desc' },
+      { sub: 'Z tới A', order: 'asc' },
+    ],
   },
   {
-    criteria: 'beginning-year',
-    name: 'Năm nhập học',
-    filter: [{ sub: 'A tới Z' }, { sub: 'Z tới A' }],
+    type: 'beginningYearOrder',
+    title: 'Năm nhập học',
+    filter: [
+      { sub: 'A tới Z', order: 'desc' },
+      { sub: 'Z tới A', order: 'asc' },
+    ],
   },
 ]
 
@@ -83,70 +80,119 @@ const IconZtoA = () => {
   )
 }
 
-export default function Filter() {
-  const [message, setMessage] = React.useState('')
-  // const [{ Time, MSSV, Fullname, YearBegin }, setIsChecked] =
-  //   React.useState(initialState)
+export default function Filter({setMyParams, status}) {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const {
+    register,
+    getValues,
+    reset,
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+  } = useForm({
+    values: {
+      keyword: searchParams.get('keyword')?.toString() || '',
+      criteria: searchParams.get('criteria')?.toString() || 'email',
+      createAtOrder: searchParams.get('createAt')?.toString() || 'desc',
+      studentIdOrder: searchParams.get('studentId')?.toString() || null,
+      fullNameOrder: searchParams.get('fullName')?.toString() || null,
+      beginningYearOrder: searchParams.get('beginningYear')?.toString() || null,
+    },
+  })
 
-  //delete all selected radio options
-  function handleClick() {
-    {
-      filerBtn.map(({ name }) => {
-        let allRadioButtons = document.getElementsByName(`${name} type`)
-        allRadioButtons.forEach((radioButton) => {
-          if (radioButton instanceof HTMLInputElement) {
-            radioButton.checked = false
-          }
-        })
-      })
+  const handleSearch = useDebouncedCallback((keyword) => {
+    const params = new URLSearchParams(searchParams)
+    if (keyword) {
+      params.set('keyword', keyword)
+    } else {
+      params.delete('keyword')
     }
+    params.set('criteria', getValues('criteria'))
+    params.set('createAtOrder', getValues('createAtOrder'))
+    if (getValues('studentIdOrder')) {
+      params.set('studentIdOrder', getValues('studentIdOrder'))
+    }
+    if (getValues('fullNameOrder')) {
+      params.set('fullNameOrder', getValues('fullNameOrder'))
+    }
+    if (getValues('beginningYearOrder')) {
+      params.set('beginningYearOrder', getValues('beginningYearOrder'))
+    }
+
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?status=${status}&${params.toString()}`)
+  }, 500)
+
+  const handleResetForm = () => {
+    reset()
+    replace(pathname)
+    setMyParams(`?status=${status}`)
   }
 
-  // function handleFilter() {}
+  const handleInputs = (e) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(e.target.name, e.target.value)
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?status=${status}&${params.toString()}`)
+  }
 
   return (
-    <>
-      <Input
-        placeholder="Tìm kiếm theo email ..."
-        crossOrigin={undefined}
-        size="md"
-        className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 w-full"
-        labelProps={{
-          className: 'before:content-none after:content-none',
-        }}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            alert(message)
-          }
-        }}
-        type="text"
-      />
+    <form>
+      <div className="grid sm:grid-cols-4 gap-5 max-w-[50rem]">
+        <Input
+          placeholder=""
+          crossOrigin={undefined}
+          size="md"
+          containerProps={{ className: 'col-span-3' }}
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
+          className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
+          {...register('keyword')}
+          onChange={(e) => handleSearch(e.target.value)}
+          type="text"
+        />
+        <select
+          className="h-10 col-span-1 hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
+          {...register('criteria')}
+          onChange={(e) => handleInputs(e)}
+          >
+          <option value="email">Email</option>
+          <option value="fullName">Họ và tên</option>
+          <option className="cursor-pointer" value="studentId">
+            MSSV
+          </option>
+          <option className="cursor-pointer" value="beginningYear">
+            Năm nhập học
+          </option>
+        </select>
+      </div>
       <div className="flex mt-3 gap-2 flex-wrap">
         <Button
-          onClick={handleClick}
+          onClick={handleResetForm}
           variant="outlined"
           placeholder={undefined}
           size="sm"
           className="h-fit">
-          Xóa bộ lọc
+          Đặt lại
         </Button>
-        {filerBtn.map(({ criteria, name, filter }) => (
-          <div key={name} className="flex-col group">
+        {filerBtn.map(({ type, title, filter }) => (
+          <div key={title} className="flex-col group">
             <Button
               variant="outlined"
               placeholder={undefined}
               size="sm"
-              className="flex gap-2 -mb-1"
-              key={name}>
-              {name}
+              className="flex gap-2 -mb-1">
+              {title}
               <CaretDownFill className="group-hover:rotate-180 " />
             </Button>
             <div className="w-[fit] p-5 hidden group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] absolute z-10">
-              {filter.map(({ sub }, idx) => (
+              {filter.map(({ sub, order }, idx) => (
                 <div key={idx} className="flex items-center">
                   <Radio
-                    name={`${name} type`}
+                    {...register(`${type}` as any)}
+                    value={order}
+                    onClick={(e) => handleInputs(e)}
                     color="blue"
                     crossOrigin={undefined}
                     key={idx}
@@ -154,7 +200,7 @@ export default function Filter() {
                     containerProps={{
                       className: 'p-0 m-3 ml-0',
                     }}
-                    id={criteria + idx}
+                    id={type + idx}
                   />
                   {sub === 'Mới nhất' || sub === 'A tới Z' ? (
                     <IconAtoZ />
@@ -163,20 +209,10 @@ export default function Filter() {
                   )}
                 </div>
               ))}
-              {name === 'Mới nhất' ? (
-                ''
-              ) : (
-                <Input
-                  crossOrigin={undefined}
-                  className=""
-                  placeholder={name}
-                />
-              )}
-              <Button placeholder={undefined}>Lọc</Button>
             </div>
           </div>
         ))}
       </div>
-    </>
+    </form>
   )
 }

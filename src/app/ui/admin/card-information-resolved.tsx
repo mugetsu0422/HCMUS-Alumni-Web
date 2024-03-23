@@ -4,33 +4,36 @@ import Image from 'next/image'
 import { inter, nunito } from '../fonts'
 import { Input, Button } from '@material-tailwind/react'
 import LinkIcon from './link-icon'
+import { CheckCircleFill, XCircleFill } from 'react-bootstrap-icons'
 
-export default function CardInformation({ items }) {
+export default function CardInformation({ offset, items }) {
   return (
     <>
       {items.map(
         (
           {
             id,
-            user,
             studentId,
             beginningYear,
             socialMediaLink,
             status,
             comment,
+            fullName,
+            email,
+            avatarUrl,
           },
           idx
         ) => (
           <div
             key={id}
-            className="w-[100%] lg:w-[49%] py-3 px-2 border-2 border-slate-700 rounded-md">
+            className="w-[100%] lg:w-[49%] p-5 border border-gray-200 rounded-md break-words">
             {/* First line include FullName MSSV and Year*/}
             <div className={`grid grid-cols-4  gap-5 ${inter} mb-2`}>
               <div className="flex-col col-span-2">
                 <p className="font-bold text-[var(--secondary)]   ">
                   Họ và tên
                 </p>
-                <p>{user?.fullName}</p>
+                <p>{fullName}</p>
               </div>
               <div className="flex-col ">
                 <p className="font-bold text-[var(--secondary)]">MSSV</p>
@@ -47,7 +50,7 @@ export default function CardInformation({ items }) {
             <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
               <div className="flex-col col-span-2">
                 <p className=" font-bold text-[var(--secondary)]">Email</p>
-                <p>{user?.email}</p>
+                <p>{email}</p>
               </div>
               <div className="col-span-1">
                 <p className=" font-bold text-[var(--secondary)]">Khoa</p>
@@ -68,7 +71,7 @@ export default function CardInformation({ items }) {
             {/* Final line for the profile image */}
             <div className="grid grid-cols-3 gap-3">
               <Image
-                src={user?.avatarUrl}
+                src={avatarUrl || ''}
                 alt="profile image"
                 width={200}
                 height={200}
@@ -78,26 +81,16 @@ export default function CardInformation({ items }) {
                 <Input
                   disabled
                   crossOrigin={undefined}
-                  className="w-full "
+                  className="w-full"
                   size="lg"
                   // label="Ghi chú"
                   value={comment}
                 />
                 <div className="flex justify-center gap-5 mt-3">
                   {status == 'APPROVED' ? (
-                    <Button
-                      disabled
-                      placeholder={undefined}
-                      className={`${nunito.className} w-52 bg-[var(--blue-02)] font-bold disabled:opacity-100`}>
-                      Phê duyệt
-                    </Button>
+                    <CheckCircleFill className="text-[4rem] text-green-500" />
                   ) : (
-                    <Button
-                      disabled
-                      placeholder={undefined}
-                      className={`${nunito.className} w-52 bg-[#ff7373] text-black font-bold disabled:opacity-100`}>
-                      Từ chối
-                    </Button>
+                    <XCircleFill className="text-[4rem] text-red-500" />
                   )}
                 </div>
               </form>

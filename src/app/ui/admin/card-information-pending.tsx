@@ -6,14 +6,24 @@ import { Input, Button } from '@material-tailwind/react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '../../constant'
-import { useForm } from 'react-hook-form'
+import { FieldValues, useForm } from 'react-hook-form'
 import { Facebook, Linkedin } from 'react-bootstrap-icons'
 import LinkIcon from './link-icon'
+import toast from 'react-hot-toast'
 
-export default function CardInformation({ items }) {
+export default function CardInformation({ offset, items, setItems }) {
   const { register, handleSubmit } = useForm()
 
-  const onSubmit = (data, id, status) => {
+  const onSubmit = (
+    data: FieldValues,
+    id: any,
+    status: string,
+    idx: number,
+    fullName: string
+  ) => {
+    offset.current--
+    setItems((items) => items.filter((e, i) => i != idx))
+
     axios
       .put(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/${id}/verify`,
@@ -28,7 +38,11 @@ export default function CardInformation({ items }) {
         }
       )
       .then((res) => {
-        console.log('thành công')
+        if (status == 'APPROVED') {
+          toast.success(`Đã phê duyệt ${fullName}`)
+        } else if (status == 'DENIED') {
+          toast.success(`Đã từ chối ${fullName}`)
+        }
       })
       .catch((e) => {})
   }
@@ -36,15 +50,26 @@ export default function CardInformation({ items }) {
   return (
     <>
       {items.map(
-        ({ id, user, studentId, beginningYear, socialMediaLink }, idx) => (
+        (
+          {
+            id,
+            studentId,
+            beginningYear,
+            socialMediaLink,
+            fullName,
+            email,
+            avatarUrl,
+          },
+          idx
+        ) => (
           <div
             key={id}
-            className="w-[100%] lg:w-[49%] py-3 px-2 border-2 border-slate-700 rounded-md break-words">
+            className="w-[100%] lg:w-[49%] p-5 border border-gray-200 rounded-md break-words">
             {/* First line include FullName MSSV and Year*/}
             <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
               <div className="flex-col col-span-2 ">
                 <p className="font-bold text-[var(--secondary)]">Họ và tên</p>
-                <p>{user?.fullName}</p>
+                <p>{fullName}</p>
               </div>
               <div className="flex-col">
                 <p className="font-bold text-[var(--secondary)]">MSSV</p>
@@ -61,7 +86,7 @@ export default function CardInformation({ items }) {
             <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
               <div className="flex-col col-span-2">
                 <p className=" font-bold text-[var(--secondary)]">Email</p>
-                <p>{user?.email}</p>
+                <p>{email}</p>
               </div>
               <div className="col-span-1">
                 <p className=" font-bold text-[var(--secondary)]">Khoa</p>
@@ -82,7 +107,7 @@ export default function CardInformation({ items }) {
             {/* Final line for the profile image */}
             <div className="grid grid-cols-3 gap-3">
               <Image
-                src={user?.avatarUrl}
+                src={avatarUrl || ''}
                 alt="profile image"
                 width={200}
                 height={200}
@@ -99,7 +124,7 @@ export default function CardInformation({ items }) {
                 <div className="flex justify-between gap-5 mt-3">
                   <Button
                     onClick={handleSubmit((data) =>
-                      onSubmit(data, id, 'APPROVED')
+                      onSubmit(data, id, 'APPROVED', idx, fullName)
                     )}
                     placeholder={undefined}
                     className={`${nunito.className} w-52 bg-[var(--blue-02)] font-bold`}>
@@ -107,7 +132,7 @@ export default function CardInformation({ items }) {
                   </Button>
                   <Button
                     onClick={handleSubmit((data) =>
-                      onSubmit(data, id, 'DENIED')
+                      onSubmit(data, id, 'DENIED', idx, fullName)
                     )}
                     placeholder={undefined}
                     className={`${nunito.className} w-52 bg-[var(--blue-04)] text-black font-bold`}>

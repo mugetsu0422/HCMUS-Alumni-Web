@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Filter from '../../../ui/admin/filter'
 import CardInformation from '../../../ui/admin/card-information-pending'
 import { nunito } from '../../../ui/fonts'
@@ -8,17 +8,24 @@ import { Button } from '@material-tailwind/react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'
+import { useSearchParams } from 'next/navigation'
+import { Toaster } from 'react-hot-toast'
 
 export default function Page() {
-  const [count, setCount] = useState(0)
+  const status = 'pending'
+  const searchParams = useSearchParams()
+  const [myParams, setMyParams] = useState(`?status=${status}`)
+  const [totalCount, setTotalCount] = useState(0)
   const [items, setItems] = useState([])
-  const [page, setPage] = useState(0)
+  const isShowMore = useRef(false)
+  const itemNumber = useRef(0)
+  const offset = useRef(0)
 
   useEffect(() => {
     // Get total number
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/pending/count`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/count?status=${status}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -26,7 +33,7 @@ export default function Page() {
         }
       )
       .then((res) => {
-        setCount(res.data)
+        setTotalCount(res.data)
       })
       .catch((e) => {})
   }, [])
@@ -35,7 +42,7 @@ export default function Page() {
     // Get first page
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification/pending?page=${page}&size=${ADMIN_VERIFY_ALUMNI_PAGE_LIMIT}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification${myParams}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -43,27 +50,44 @@ export default function Page() {
         }
       )
       .then((res) => {
-        // setItems((items) => items.concat(res.data))
-        setItems(items.concat(res.data))
+        // Load more data
+        if (isShowMore.current) {
+          setItems(items.concat(res.data.items))
+          isShowMore.current = false
+        } else {
+          // Get new data
+          setItems(res.data.items)
+          itemNumber.current = res.data.itemNumber
+          offset.current = 0
+        }
       })
-      .catch((e) => {})
+      .catch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page])
+  }, [myParams])
 
   function showMore() {
-    setPage((p) => p + 1)
+    offset.current += ADMIN_VERIFY_ALUMNI_PAGE_LIMIT
+    isShowMore.current = true
+    const p = new URLSearchParams(searchParams)
+    p.set('offset', offset.current.toString())
+    p.set('limit', ADMIN_VERIFY_ALUMNI_PAGE_LIMIT.toString())
+    setMyParams(`?status=${status}&${p.toString()}`)
   }
 
   return (
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 py-4 px-10">
+      <Toaster />
       <p className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito}`}>
-        Yêu cầu xét duyệt cựu sinh viên - #{count}
+        Yêu cầu xét duyệt cựu sinh viên - #{totalCount}
       </p>
-      {count === 0 ? null : <Filter />}
+      {totalCount === 0 ? null : (
+        <Filter setMyParams={setMyParams} status={status} />
+      )}
       <div className="flex flex-wrap gap-5 justify-between mt-5">
-        <CardInformation items={items} />
+        <CardInformation offset={offset} items={items} setItems={setItems} />
       </div>
-      {count === items.length ? null : (
+      {offset.current + ADMIN_VERIFY_ALUMNI_PAGE_LIMIT >= itemNumber.current ||
+      itemNumber.current == 0 ? null : (
         <Button
           onClick={showMore}
           placeholder={undefined}
