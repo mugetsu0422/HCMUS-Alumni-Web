@@ -1,5 +1,11 @@
 'use client'
-import React, { createContext, useContext, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Link from 'next/link'
 import {
   Input,
@@ -272,7 +278,7 @@ function Step1() {
 }
 
 function Step2() {
-  const { inputs, setInputs, handleBack } = useContext(FormContext)
+  const { facultyList, inputs, setInputs, handleBack } = useContext(FormContext)
   const {
     register,
     handleSubmit,
@@ -282,29 +288,33 @@ function Step2() {
     defaultValues: {
       studentId: inputs.studentId || '',
       beginningYear: inputs.beginningYear || '',
+      faculty: inputs.faculty || '',
       socialMediaLink: inputs.socialMediaLink || '',
     },
   })
+
   const onSubmit = (data) => {
     // Call API here
-    axios
-      .postForm(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-        {...inputs, ...data},
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then((res) => {
-        toast.success('Thiết lập thành công')
-      })
-      .catch((e) => {
-        console.error(e)
-      })
+    // axios
+    //   .postForm(
+    //     `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+    //     {...inputs, ...data},
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+    //       },
+    //     }
+    //   )
+    //   .then((res) => {
+    //     toast.success('Thiết lập thành công')
+    //   })
+    //   .catch((e) => {
+    //     console.error(e)
+    //   })
   }
   const onBack = () => {
+    console.log(getValues())
+
     setInputs((values) => ({ ...values, ...getValues() }))
     handleBack()
   }
@@ -356,6 +366,25 @@ function Step2() {
         // This is the error message
         errors={errors?.beginningYear?.message}
       />
+      <label
+        htmlFor="faculty"
+        className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
+        Khoa
+      </label>
+      <select
+        className="h-11 col-span-1 hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
+        {...register('faculty')}>
+        <option selected value="">
+          Không
+        </option>
+        {facultyList.map((ele) => {
+          return (
+            <option key={ele.id} value={ele.name}>
+              {ele.name}
+            </option>
+          )
+        })}
+      </select>
       <p className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
         Trang cá nhân Facebook/ Linkedin
       </p>
@@ -421,6 +450,7 @@ export default function Page() {
   const [inputs, setInputs] = useState({ avatar: null })
   const [currentStep, setCurrentStep] = useState(1)
   const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
+  const [facultyList, setFacultyList] = useState([])
 
   const handleNext = () => {
     setCurrentStep(currentStep + 1)
@@ -429,7 +459,20 @@ export default function Page() {
     setCurrentStep(currentStep - 1)
   }
 
-  const router = useRouter()
+  useEffect(() => {
+    // Call api to get faculty list
+    setFacultyList([
+      { id: '1', name: 'Công nghệ Thông tin' },
+      { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
+      { id: '3', name: 'Địa chất' },
+      { id: '4', name: 'Toán – Tin học' },
+      { id: '5', name: 'Điện tử - Viễn thông' },
+      { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
+      { id: '7', name: 'Hóa học' },
+      { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
+      { id: '9', name: 'Môi trường' },
+    ])
+  }, [])
 
   return (
     <div
@@ -458,6 +501,7 @@ export default function Page() {
       </p>
       <FormContext.Provider
         value={{
+          facultyList: facultyList,
           inputs: inputs,
           setInputs: setInputs,
           currentStep: currentStep,
