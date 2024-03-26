@@ -1,5 +1,5 @@
 'use client'
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Input, Button, Typography } from '@material-tailwind/react'
 import { roboto } from '../../ui/fonts'
@@ -157,6 +157,7 @@ function Step2() {
   const { inputs, setInputs, handleBack } = useContext(FormContext)
   const [isCodeExpired, setIsCodeExpired] = useState(false)
   const router = useRouter()
+  const timer = useRef(Date.now());
 
   const {
     register,
@@ -220,7 +221,9 @@ function Step2() {
         console.error(e)
       })
     setIsCodeExpired(false)
+    timer.current = Date.now()
   }
+  
 
   return (
     <form
@@ -229,7 +232,7 @@ function Step2() {
       <div className="mb-1 flex flex-col gap-6">
         <div
           className={` text-blue-400 ${roboto} italic sm:w-[400px] mt-[2rem] -mb-[1rem]`}>
-          Mã xác thực đã được gửi đến {inputs.email}
+          Mã xác thực đã được gửi đến {inputs.email} <br />
           Mã có giá trị trong 60s
         </div>
         <Typography
@@ -267,7 +270,8 @@ function Step2() {
             </Button>
           ) : (
             <Countdown
-              date={Date.now() + EMAIL_ACTIVATION_CODE_TIMER}
+              key={timer.current}
+              date={timer.current + EMAIL_ACTIVATION_CODE_TIMER}
               renderer={countdownRenderer}
               onComplete={() => setIsCodeExpired(true)}
             />
