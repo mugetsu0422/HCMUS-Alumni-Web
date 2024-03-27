@@ -96,7 +96,7 @@ export default function CardInformation({ offset, items, setItems }) {
               <div className="col-span-1">
                 <div className="w-fit">
                   <Link
-                    className="text-[2.5rem]"
+                    className=""
                     href={`${socialMediaLink}`}
                     target="_blank"
                     rel="noopener noreferrer">
