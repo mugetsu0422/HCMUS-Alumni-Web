@@ -29,11 +29,14 @@ const dataTemp = [
   { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: true },
   { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: false },
   { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: false },
+  { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: true },
+  { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: false },
+  { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: false },
 ]
 
 export default function ListUser() {
   return (
-    <Card placeholder={undefined} className="p-4  gap-y-4 mt-3">
+    <Card placeholder={undefined} className="p-4 gap-y-4 mt-3  ">
       <div className="flex justify-between">
         <p className={`${nunito.className}`}>Nhắn tin</p>
         <Button
