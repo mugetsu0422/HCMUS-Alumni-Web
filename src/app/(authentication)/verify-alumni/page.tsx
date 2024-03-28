@@ -1,5 +1,11 @@
 'use client'
-import React, { createContext, useContext, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Link from 'next/link'
 import {
   Input,
@@ -45,7 +51,7 @@ function AvatarModal({ register, getValues, setValue }) {
       return
     }
 
-    if (file.size > 1048576 * 5) {
+    if (file.size > 1024 * 1024 * 5) {
       toast.error('Hãy chọn file có dung lượng thấp hơn 5MB')
       return
     }
@@ -210,13 +216,13 @@ function Step1() {
   } = useForm({
     defaultValues: {
       avatar: null,
-      full_name: inputs.full_name || '',
+      fullName: inputs.fullName || '',
     },
   })
   const onSubmit = (data) => {
     setInputs((values) => ({
       ...values,
-      full_name: data.full_name,
+      fullName: data.fullName,
     }))
 
     handleNext()
@@ -241,7 +247,7 @@ function Step1() {
       <Input
         size="lg"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
-        {...register('full_name', {
+        {...register('fullName', {
           required: 'Bạn cần phải nhập họ và tên',
           pattern: {
             value: /[a-zA-Z]/,
@@ -256,7 +262,7 @@ function Step1() {
 
       <ErrorInput
         // This is the error message
-        errors={errors?.full_name?.message}
+        errors={errors?.fullName?.message}
       />
 
       <Button
@@ -272,7 +278,7 @@ function Step1() {
 }
 
 function Step2() {
-  const { inputs, setInputs, handleBack } = useContext(FormContext)
+  const { facultyList, inputs, setInputs, handleBack } = useContext(FormContext)
   const {
     register,
     handleSubmit,
@@ -280,19 +286,19 @@ function Step2() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      student_id: inputs.student_id || '',
-      beginning_year: inputs.beginning_year || '',
-      social_media_link: inputs.social_media_link || '',
+      studentId: inputs.studentId || '',
+      beginningYear: inputs.beginningYear || '',
+      socialMediaLink: inputs.socialMediaLink || '',
+      facultyId: inputs.facultyId || '',
     },
   })
-  const onSubmit = (data) => {
-    setInputs((values) => ({ ...values, ...data }))
 
+  const onSubmit = (data) => {
     // Call API here
     axios
       .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-        inputs,
+        {...inputs, ...data},
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -320,7 +326,7 @@ function Step2() {
         Mã số sinh viên
       </p>
       <Input
-        {...register('student_id', {
+        {...register('studentId', {
           pattern: {
             value: /[0-9]/,
             message: 'Hãy nhập đúng định dạng MSSV',
@@ -335,13 +341,13 @@ function Step2() {
       />
       <ErrorInput
         // This is the error message
-        errors={errors?.student_id?.message}
+        errors={errors?.studentId?.message}
       />
       <p className={`-mb-3 text-[var(--blue-01)] font-semibold `}>
         Năm nhập học{' '}
       </p>
       <Input
-        {...register('beginning_year', {
+        {...register('beginningYear', {
           pattern: {
             value: /[0-9]/,
             message: 'Hãy nhập đúng định dạng năm',
@@ -356,15 +362,34 @@ function Step2() {
       />
       <ErrorInput
         // This is the error message
-        errors={errors?.beginning_year?.message}
+        errors={errors?.beginningYear?.message}
       />
+      <label
+        htmlFor="faculty"
+        className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
+        Khoa
+      </label>
+      <select
+        className="h-11 col-span-1 hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
+        {...register('facultyId')}>
+        <option selected value="">
+          Không
+        </option>
+        {facultyList.map((ele) => {
+          return (
+            <option key={ele.id} value={ele.id}>
+              {ele.name}
+            </option>
+          )
+        })}
+      </select>
       <p className={`-mb-3 text-[var(--blue-01)] font-semibold`}>
         Trang cá nhân Facebook/ Linkedin
       </p>
       <Input
         size="lg"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
-        {...register('social_media_link', {
+        {...register('socialMediaLink', {
           pattern: {
             value:
               /(https?:\/)?(www\.)?(?:facebook\.com|linkedin\.com)\/(?:[^\s\/]+)/,
@@ -378,7 +403,7 @@ function Step2() {
       />
       <ErrorInput
         // This is the error message
-        errors={errors?.social_media_link?.message}
+        errors={errors?.socialMediaLink?.message}
       />
       <Button
         onClick={onBack}
@@ -423,6 +448,17 @@ export default function Page() {
   const [inputs, setInputs] = useState({ avatar: null })
   const [currentStep, setCurrentStep] = useState(1)
   const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
+  const [facultyList, setFacultyList] = useState([
+    { id: '1', name: 'Công nghệ Thông tin' },
+    { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
+    { id: '3', name: 'Địa chất' },
+    { id: '4', name: 'Toán – Tin học' },
+    { id: '5', name: 'Điện tử - Viễn thông' },
+    { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
+    { id: '7', name: 'Hóa học' },
+    { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
+    { id: '9', name: 'Môi trường' },
+  ])
 
   const handleNext = () => {
     setCurrentStep(currentStep + 1)
@@ -430,8 +466,6 @@ export default function Page() {
   const handleBack = () => {
     setCurrentStep(currentStep - 1)
   }
-
-  const router = useRouter()
 
   return (
     <div
@@ -460,6 +494,7 @@ export default function Page() {
       </p>
       <FormContext.Provider
         value={{
+          facultyList: facultyList,
           inputs: inputs,
           setInputs: setInputs,
           currentStep: currentStep,
