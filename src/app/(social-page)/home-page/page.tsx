@@ -10,12 +10,12 @@ import { nunito } from '../../ui/fonts'
 
 export default function Page() {
   return (
-    <div className="relative top-24">
+    <div className="relative">
       <Sidebar>
         <ListUser />
       </Sidebar>
       <div
-        className={`${nunito.className}  flex flex-col items-center justify-center w-[1250px] ml-44 relative gap-y-10`}>
+        className={`${nunito.className} -z-10 top-24 flex flex-col place-items-center justify-center sm:w-[95%] md:w-[90%] relative gap-y-10 `}>
         <TodayNews />
         <TrendingNews />
         <HallOfFame />
