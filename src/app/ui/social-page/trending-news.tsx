@@ -26,7 +26,7 @@ function SmallTrendingNews() {
   return (
     <div className="flex flex-col gap-6">
       {dataTempSmall.map(({ title, detail, imgSrc }, idx) => (
-        <div className="flex gap-x-4 h-36 cursor-pointer" key={idx}>
+        <div className="flex gap-x-4 sm:h-44 2xl:h-36 cursor-pointer" key={idx}>
           <Image
             src={imgSrc}
             width={240}
@@ -35,7 +35,7 @@ function SmallTrendingNews() {
             className="rounded-md "
           />
           <div className="w-72 flex flex-col items-center justify-center gap-1">
-            <p className="text-lg font-bold">{title}</p>
+            <p className="sm:sm md:text-lg font-bold">{title}</p>
             <p className="text-xs">{detail}</p>
           </div>
         </div>
@@ -46,9 +46,9 @@ function SmallTrendingNews() {
 
 function BigTrendingNews() {
   return (
-    <figure className="relative w-fit h-[600px]">
+    <figure className="relative w-fit sm:h-[300px] 2xl:h-[600px] m-auto">
       <Image
-        className="h-[600px] w-full rounded-xl object-cover object-center"
+        className="sm:h-[300px] 2xl:h-[600px] sm:w-[500px] 2xl:w-full rounded-xl object-cover object-center"
         src="/authentication.png"
         alt="nature image"
         width={800}
@@ -65,9 +65,9 @@ function BigTrendingNews() {
 
 export default function TrendingNews() {
   return (
-    <div className="flex w-[1104px] h-[600px] bg-[#ebeef3] rounded-md">
+    <div className="xl:flex-row sm:flex-col sm:justify-between sm:items-center xl:items-stretch flex w-fit h-fit bg-[#ebeef3] rounded-md p-6">
       <div className="w-fit h-[45%] px-10 py-6 gap-y-8 flex flex-col">
-        <p className="text-3xl leading-9 font-extrabold">Trending News </p>
+        <p className="text-3xl leading-9 font-extrabold">Tin nổi bật </p>
         <SmallTrendingNews />
       </div>
       <BigTrendingNews />

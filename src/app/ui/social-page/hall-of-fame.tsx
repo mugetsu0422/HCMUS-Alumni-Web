@@ -9,9 +9,9 @@ const tempData = [
 
 export default function HallOfFame() {
   return (
-    <div className=" flex flex-col w-[1104px] h-fit mb-10 gap-y-6">
+    <div className=" flex flex-col sm:justify-center sm:items-center xl:items-start m-auto sm:w-[500px] xl:w-full max-w-[1110px] h-fit mb-10 gap-y-6">
       <p className="text-3xl font-bold">Gương thành công tiêu biểu</p>
-      <div className="flex justify-between">
+      <div className="flex sm:flex-col xl:flex-row sm:items-center xl:justify-between w-full">
         {tempData.map(({ name }, idx) => (
           <div
             className="flex flex-col justify-start items-start gap-2"
