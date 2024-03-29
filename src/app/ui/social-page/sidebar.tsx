@@ -42,9 +42,9 @@ const Sidebar = ({ children }) => {
 
   React.useEffect(() => {
     window.addEventListener('resize', () => {
-      window.innerWidth <= 1280
+      window.innerWidth <= 1536
         ? handleChangeSmallScreen()
-        : handleChangeBigScreen() // 1280 = xl (tailwind)
+        : handleChangeBigScreen() // 1536 = 2xl (tailwind)
     })
   }, [isSideBarOpen])
   return (
@@ -66,7 +66,7 @@ const Sidebar = ({ children }) => {
         open={isSideBarOpen}
         placement="right"
         overlay={false}
-        className="fixed h-screen top-[5rem] bg-[#f7fafd] overflow-auto scrollbar-webkit w-80 p-4 right-0">
+        className="fixed h-screen top-[4.75rem] bg-[#f7fafd] overflow-auto scrollbar-webkit w-80 p-4 right-0">
         {isSideBarOpen && isSmallerThanXL ? (
           <CloseSideBar closeSideBar={closeSideBar} />
         ) : (
