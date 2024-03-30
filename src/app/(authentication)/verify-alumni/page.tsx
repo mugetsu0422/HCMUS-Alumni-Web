@@ -51,7 +51,7 @@ function AvatarModal({ register, getValues, setValue }) {
       return
     }
 
-    if (file.size > 1048576 * 5) {
+    if (file.size > 1024 * 1024 * 5) {
       toast.error('Hãy chọn file có dung lượng thấp hơn 5MB')
       return
     }
@@ -288,33 +288,31 @@ function Step2() {
     defaultValues: {
       studentId: inputs.studentId || '',
       beginningYear: inputs.beginningYear || '',
-      faculty: inputs.faculty || '',
       socialMediaLink: inputs.socialMediaLink || '',
+      facultyId: inputs.facultyId || '',
     },
   })
 
   const onSubmit = (data) => {
     // Call API here
-    // axios
-    //   .postForm(
-    //     `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-    //     {...inputs, ...data},
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-    //       },
-    //     }
-    //   )
-    //   .then((res) => {
-    //     toast.success('Thiết lập thành công')
-    //   })
-    //   .catch((e) => {
-    //     console.error(e)
-    //   })
+    axios
+      .postForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+        {...inputs, ...data},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then((res) => {
+        toast.success('Thiết lập thành công')
+      })
+      .catch((e) => {
+        console.error(e)
+      })
   }
   const onBack = () => {
-    console.log(getValues())
-
     setInputs((values) => ({ ...values, ...getValues() }))
     handleBack()
   }
@@ -373,13 +371,13 @@ function Step2() {
       </label>
       <select
         className="h-11 col-span-1 hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
-        {...register('faculty')}>
+        {...register('facultyId')}>
         <option selected value="">
           Không
         </option>
         {facultyList.map((ele) => {
           return (
-            <option key={ele.id} value={ele.name}>
+            <option key={ele.id} value={ele.id}>
               {ele.name}
             </option>
           )
@@ -450,7 +448,17 @@ export default function Page() {
   const [inputs, setInputs] = useState({ avatar: null })
   const [currentStep, setCurrentStep] = useState(1)
   const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
-  const [facultyList, setFacultyList] = useState([])
+  const [facultyList, setFacultyList] = useState([
+    { id: '1', name: 'Công nghệ Thông tin' },
+    { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
+    { id: '3', name: 'Địa chất' },
+    { id: '4', name: 'Toán – Tin học' },
+    { id: '5', name: 'Điện tử - Viễn thông' },
+    { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
+    { id: '7', name: 'Hóa học' },
+    { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
+    { id: '9', name: 'Môi trường' },
+  ])
 
   const handleNext = () => {
     setCurrentStep(currentStep + 1)
@@ -458,21 +466,6 @@ export default function Page() {
   const handleBack = () => {
     setCurrentStep(currentStep - 1)
   }
-
-  useEffect(() => {
-    // Call api to get faculty list
-    setFacultyList([
-      { id: '1', name: 'Công nghệ Thông tin' },
-      { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
-      { id: '3', name: 'Địa chất' },
-      { id: '4', name: 'Toán – Tin học' },
-      { id: '5', name: 'Điện tử - Viễn thông' },
-      { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
-      { id: '7', name: 'Hóa học' },
-      { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
-      { id: '9', name: 'Môi trường' },
-    ])
-  }, [])
 
   return (
     <div

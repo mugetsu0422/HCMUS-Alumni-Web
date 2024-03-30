@@ -190,7 +190,7 @@ function Step2() {
                 pass: inputs.pass,
               })
               .then((res) => {
-                Cookies.set(JWT_COOKIE, res.data, { expires: JWT_EXPIRED_TIME })
+                Cookies.set(JWT_COOKIE, res.data.jwt, { expires: JWT_EXPIRED_TIME })
                 // Move to next page
                 setTimeout(() => router.push('/verify-alumni'), 2500)
               })
