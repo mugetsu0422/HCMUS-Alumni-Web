@@ -95,7 +95,7 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
-  const [message, setMessage] = React.useState('')
+  //const [message, setMessage] = React.useState('')
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -104,7 +104,7 @@ export default function MyNavbar() {
       'resize',
       () => window.innerWidth >= 960 && setIsNavOpen(false) // 960 = lg (tailwind)
     )
-  }, [])
+  }, [isNavOpen])
 
   return (
     <Navbar
@@ -126,29 +126,29 @@ export default function MyNavbar() {
           <NavList />
         </div>
 
-        <FontAwesomeIcon
+        <Button
+          placeholder={undefined}
+          onClick={toggleIsNavOpen}
+          variant="text"
+          className="mr-auto lg:hidden text-[var(--blue-02)] px-3 py-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            className="bi bi-list w-8 h-8"
+            viewBox="0 0 16 16">
+            <path
+              fillRule="evenodd"
+              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+            />
+          </svg>
+        </Button>
+        {/* <FontAwesomeIcon
           onClick={toggleIsNavOpen}
           className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
           icon={faBars}
-        />
-        {/* <div className=" w-[40vw] m-auto ">
-          <Input
-            placeholder="Tìm kiếm ..."
-            crossOrigin={undefined}
-            size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 max-w-sm"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                alert(message)
-              }
-            }}
-            type="text"
-          />
-        </div> */}
+        /> */}
 
         <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
           <Badge content={2} color="blue">
@@ -167,7 +167,9 @@ export default function MyNavbar() {
         </div>
       </div>
 
-      <Collapse open={isNavOpen} className="overflow-scroll">
+      <Collapse
+        open={isNavOpen}
+        className="overflow-scroll overflow-x-hidden scrollbar-webkit">
         <NavList />
       </Collapse>
     </Navbar>
