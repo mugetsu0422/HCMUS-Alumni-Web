@@ -1,5 +1,13 @@
 import '../globals.css'
+import Navbar from '../ui/social-page/navbar'
 
 export default function RootLayout({ children }) {
-  return <div className="flex items-center justify-between ">{children}</div>
+  return (
+    <>
+      <section>
+        <Navbar />
+      </section>
+      <section>{children}</section>
+    </>
+  )
 }
