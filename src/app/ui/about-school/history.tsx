@@ -84,11 +84,11 @@ export default function History() {
       {text.map(({ heading, content }) => (
         <>
           <div
-            className={` ${nunito} text-[3.5vw] lg:text-[3vw] 2xl:text-3xl font-bold mb-5px`}>
+            className={` ${nunito.className} text-[3.5vw] lg:text-[3vw] 2xl:text-3xl font-bold mb-5px`}>
             {heading}
           </div>
           {content.map(({ text }, idx) => (
-            <p className={`${nunito}`} key={idx}>
+            <p className={`${nunito.className}`} key={idx}>
               {text}
             </p>
           ))}
