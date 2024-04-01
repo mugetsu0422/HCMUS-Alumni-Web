@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import EditorToolbar, { modules, formats } from './EditorToolbar'
 import 'react-quill/dist/quill.snow.css'
 import { Input, Button } from '@material-tailwind/react'
@@ -8,7 +8,7 @@ import { nunito } from '../../fonts'
 import dynamic from 'next/dynamic'
 
 function TextEditor() {
-  const [userInfo, setuserInfo] = useState({
+  const [userInfo, setuserInfo] = React.useState({
     title: '',
     description: '',
     //information: '',
@@ -18,10 +18,6 @@ function TextEditor() {
       ...userInfo,
       [e.target.name]: e.target.value,
     })
-  }
-
-  function isBrowser() {
-    return typeof window !== 'undefined'
   }
 
   const ondescription = (value) => {
@@ -34,6 +30,7 @@ function TextEditor() {
     () => dynamic(() => import('react-quill'), { ssr: false }),
     []
   )
+
   return (
     <>
       <form className="px-8 py-10 overflow-y-auto">
@@ -56,17 +53,16 @@ function TextEditor() {
           <div className="flex flex-col gap-2">
             <label className="text-xl font-bold">Bài đăng</label>
             <EditorToolbar toolbarId={'t1'} />
-            {isBrowser() && (
-              <ReactQuill
-                theme="snow"
-                value={userInfo.description}
-                onChange={ondescription}
-                placeholder={'Hãy nhập nội dung...'}
-                modules={modules('t1')}
-                formats={formats}
-                className="h-96 overflow-y-auto text-base"
-              />
-            )}
+
+            <ReactQuill
+              theme="snow"
+              value={userInfo.description}
+              onChange={ondescription}
+              placeholder={'Hãy nhập nội dung...'}
+              modules={modules('t1')}
+              formats={formats}
+              className="h-96 overflow-y-auto text-base"
+            />
           </div>
 
           <div className="flex justify-end gap-x-4  ">
