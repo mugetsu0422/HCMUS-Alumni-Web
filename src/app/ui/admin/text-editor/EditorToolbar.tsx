@@ -1,7 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Quill } from 'react-quill'
+import dynamic from 'next/dynamic'
 
 // Custom Undo button icon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -35,6 +36,27 @@ function redoChange() {
   this.quill.history.redo()
 }
 
+function imageHandler(a) {
+  const input = document.createElement('input')
+  input.setAttribute('type', 'file')
+  input.setAttribute('accept', '.png')
+  input.click()
+
+  input.onchange = async () => {
+    const file = input.files[0]
+    if (file && file.type === 'image/png') {
+      const formData = new FormData()
+      formData.append('image', file)
+
+      // Handle image upload logic (e.g., upload to server)
+      // Once uploaded, insert the image into the editor
+      const range = this.quill.getEditor().getSelection()
+    } else {
+      alert('Please select a PNG image.')
+    }
+  }
+}
+
 // Modules object for setting up the Quill editor
 export const modules = (props) => ({
   toolbar: {
@@ -42,7 +64,11 @@ export const modules = (props) => ({
     handlers: {
       undo: undoChange,
       redo: redoChange,
+      // image: imageHandler,
     },
+  },
+  clipboard: {
+    matchVisual: false,
   },
   history: {
     delay: 500,
@@ -76,6 +102,16 @@ export const formats = [
 
 // Quill Toolbar component
 export const QuillToolbar = (props) => {
+  // const { ImageResize } = React.useMemo(
+  //   () =>
+  //     dynamic(() => import('quill-image-resize-module'), {
+  //       ssr: false,
+  //       loading: () => <p>Loading ...</p>,
+  //     }),
+
+  //   []
+  // )
+
   return (
     <>
       {props.toolbarId !== undefined && (
