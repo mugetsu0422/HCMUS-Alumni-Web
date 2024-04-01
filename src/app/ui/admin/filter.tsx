@@ -80,7 +80,7 @@ const IconZtoA = () => {
   )
 }
 
-export default function Filter({setMyParams, status}) {
+export default function Filter({ setMyParams, status }) {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
@@ -97,8 +97,21 @@ export default function Filter({setMyParams, status}) {
       studentIdOrder: searchParams.get('studentId')?.toString() || null,
       fullNameOrder: searchParams.get('fullName')?.toString() || null,
       beginningYearOrder: searchParams.get('beginningYear')?.toString() || null,
+      facultyId: searchParams.get('facultyId')?.toString() || '0',
     },
   })
+  const facultyList = [
+    { id: '0', name: 'Toàn bộ' },
+    { id: '1', name: 'Công nghệ Thông tin' },
+    { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
+    { id: '3', name: 'Địa chất' },
+    { id: '4', name: 'Toán – Tin học' },
+    { id: '5', name: 'Điện tử - Viễn thông' },
+    { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
+    { id: '7', name: 'Hóa học' },
+    { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
+    { id: '9', name: 'Môi trường' },
+  ]
 
   const handleSearch = useDebouncedCallback((keyword) => {
     const params = new URLSearchParams(searchParams)
@@ -138,12 +151,12 @@ export default function Filter({setMyParams, status}) {
 
   return (
     <form>
-      <div className="grid sm:grid-cols-4 gap-5 max-w-[50rem]">
+      <div className="flex flex-wrap lg:flex-nowrap gap-5 max-w-[65rem]">
         <Input
           placeholder=""
           crossOrigin={undefined}
           size="md"
-          containerProps={{ className: 'col-span-3' }}
+          containerProps={{ className: 'col-span-6' }}
           labelProps={{
             className: 'before:content-none after:content-none',
           }}
@@ -152,20 +165,41 @@ export default function Filter({setMyParams, status}) {
           onChange={(e) => handleSearch(e.target.value)}
           type="text"
         />
-        <select
-          className="h-10 col-span-1 hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
-          {...register('criteria')}
-          onChange={(e) => handleInputs(e)}
-          >
-          <option value="email">Email</option>
-          <option value="fullName">Họ và tên</option>
-          <option className="cursor-pointer" value="studentId">
-            MSSV
-          </option>
-          <option className="cursor-pointer" value="beginningYear">
-            Năm nhập học
-          </option>
-        </select>
+        <div className="h-10 flex ">
+          <label htmlFor="criteria" className="font-semibold self-center pr-3">
+            Theo
+          </label>
+          <select
+            className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
+            {...register('criteria')}
+            onChange={(e) => handleInputs(e)}>
+            <option value="email">Email</option>
+            <option value="fullName">Họ và tên</option>
+            <option className="cursor-pointer" value="studentId">
+              MSSV
+            </option>
+            <option className="cursor-pointer" value="beginningYear">
+              Năm nhập học
+            </option>
+          </select>
+        </div>
+        <div className="h-10 flex ">
+          <label htmlFor="facultyId" className="font-semibold self-center pr-3">
+            Khoa
+          </label>
+          <select
+            className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
+            {...register('facultyId')}
+            onChange={(e) => handleInputs(e)}>
+            {facultyList.map(({ id, name }) => {
+              return (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              )
+            })}
+          </select>
+        </div>
       </div>
       <div className="flex mt-3 gap-2 flex-wrap">
         <Button

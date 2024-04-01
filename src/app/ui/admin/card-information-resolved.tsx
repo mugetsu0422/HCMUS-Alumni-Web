@@ -21,6 +21,7 @@ export default function CardInformation({ offset, items }) {
             fullName,
             email,
             avatarUrl,
+            facultyName,
           },
           idx
         ) => (
@@ -54,7 +55,7 @@ export default function CardInformation({ offset, items }) {
               </div>
               <div className="col-span-1">
                 <p className=" font-bold text-[var(--secondary)]">Khoa</p>
-                <p>Công nghệ thông tin</p>
+                <p>{facultyName}</p>
               </div>
               <div className="col-span-1">
                 <div className="w-fit">
@@ -71,6 +72,7 @@ export default function CardInformation({ offset, items }) {
             {/* Final line for the profile image */}
             <div className="grid grid-cols-3 gap-3">
               <Image
+                priority={true}
                 src={avatarUrl || ''}
                 alt="profile image"
                 width={200}

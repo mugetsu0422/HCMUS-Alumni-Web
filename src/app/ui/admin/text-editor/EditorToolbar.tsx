@@ -57,7 +57,7 @@ export const modules = (props) => ({
   },
   history: {
     delay: 500,
-    maxStack: 100,
+    maxStack: 10,
     userOnly: true,
   },
 })

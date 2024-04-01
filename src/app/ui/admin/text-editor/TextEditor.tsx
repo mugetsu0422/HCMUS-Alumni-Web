@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import EditorToolbar, { modules, formats } from './EditorToolbar'
+import { modules, formats } from './EditorToolbar'
 import 'react-quill/dist/quill.snow.css'
 import { Input, Button } from '@material-tailwind/react'
 import { nunito } from '../../fonts'
@@ -20,14 +20,32 @@ function TextEditor() {
     })
   }
 
-  const ondescription = (value) => {
+  function isBrowser() {
+    return typeof window !== 'undefined'
+  }
+
+  const onDescription = (value) => {
     setuserInfo({ ...userInfo, description: value })
   }
   // const oninformation = (value) => {
   //   setuserInfo({ ...userInfo, information: value });
   // };
   const ReactQuill = React.useMemo(
-    () => dynamic(() => import('react-quill'), { ssr: false }),
+    () =>
+      dynamic(() => import('react-quill'), {
+        ssr: false,
+        loading: () => <p>Loading ...</p>,
+      }),
+
+    []
+  )
+
+  const EditorToolbar = React.useMemo(
+    () =>
+      dynamic(() => import('./EditorToolbar'), {
+        ssr: false,
+        loading: () => <p>Loading ...</p>,
+      }),
     []
   )
 
@@ -53,16 +71,17 @@ function TextEditor() {
           <div className="flex flex-col gap-2">
             <label className="text-xl font-bold">Bài đăng</label>
             <EditorToolbar toolbarId={'t1'} />
-
-            <ReactQuill
-              theme="snow"
-              value={userInfo.description}
-              onChange={ondescription}
-              placeholder={'Hãy nhập nội dung...'}
-              modules={modules('t1')}
-              formats={formats}
-              className="h-96 overflow-y-auto text-base"
-            />
+            {
+              <ReactQuill
+                theme="snow"
+                value={userInfo.description}
+                onChange={onDescription}
+                placeholder={'Hãy nhập nội dung...'}
+                modules={modules('t1')}
+                formats={formats}
+                className="h-96 overflow-y-auto text-base"
+              />
+            }
           </div>
 
           <div className="flex justify-end gap-x-4  ">

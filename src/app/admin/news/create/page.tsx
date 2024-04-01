@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import TextEditor from '../../ui/admin/text-editor/TextEditor'
-import { nunito } from '../../ui/fonts'
+import TextEditor from '../../../ui/admin/text-editor/TextEditor'
+import { nunito } from '../../../ui/fonts'
 
 export default function Page() {
   return (
