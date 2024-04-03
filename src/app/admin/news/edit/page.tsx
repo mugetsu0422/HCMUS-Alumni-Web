@@ -1,9 +1,12 @@
+'use client'
+
 import React from 'react'
+import { useAppSelector } from './../../../../lib/hook'
 
 function Page() {
-  return (
-    <div>page</div>
-  )
+  const name = useAppSelector((store) => store.news.name)
+
+  return <div key={name}>{name}</div>
 }
 
 export default Page
