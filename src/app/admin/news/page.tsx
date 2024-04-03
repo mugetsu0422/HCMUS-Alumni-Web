@@ -65,7 +65,7 @@ function CardNews({ name, imgSrc, isShow }) {
           height={0}
           className="h-52 object-cover object-center mb-2"
         />
-        <p className="h-20 text-center p-2 ">{name}</p>
+        <p className="h-20 text-center p-2 font-bold text-black">{name}</p>
       </Link>
       <div className="flex justify-end px-2">
         <Button
@@ -73,16 +73,16 @@ function CardNews({ name, imgSrc, isShow }) {
           //onClick={handleClick}
           placeholder={undefined}
           className="">
-          <Trash3 className="text-2xl" />
+          <Trash3 className="text-2xl text-black" />
         </Button>
         <Button
           variant="text"
           //onClick={handleClick}
           placeholder={undefined}>
           {isShow ? (
-            <Eye className="text-2xl" />
+            <Eye className="text-2xl text-black" />
           ) : (
-            <EyeSlash className="text-2xl" />
+            <EyeSlash className="text-2xl text-black" />
           )}
         </Button>
       </div>
