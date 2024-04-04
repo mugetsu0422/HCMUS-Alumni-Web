@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useCallback } from 'react'
+import { Quill } from 'react-quill'
+import dynamic from 'next/dynamic'
 
 // Custom Undo button icon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -26,26 +28,56 @@ const CustomRedo = () => (
   </svg>
 )
 
-function imageHandler(a) {
-  const input = document.createElement('input')
-  input.setAttribute('type', 'file')
-  input.setAttribute('accept', '.png')
-  input.click()
-
-  input.onchange = async () => {
-    const file = input.files[0]
-    if (file && file.type === 'image/png') {
-      const formData = new FormData()
-      formData.append('image', file)
-
-      // Handle image upload logic (e.g., upload to server)
-      // Once uploaded, insert the image into the editor
-      const range = this.quill.getEditor().getSelection()
-    } else {
-      alert('Please select a PNG image.')
-    }
-  }
+// Undo and redo functions for Custom Toolbar
+function undoChange() {
+  this.quill.history.undo()
 }
+function redoChange() {
+  this.quill.history.redo()
+}
+
+// Modules object for setting up the Quill editor
+export const modules = (props) => ({
+  toolbar: {
+    container: '#' + props,
+    handlers: {
+      undo: undoChange,
+      redo: redoChange,
+      // image: imageHandler,
+    },
+  },
+  clipboard: {
+    matchVisual: false,
+  },
+  history: {
+    delay: 500,
+    maxStack: 10,
+    userOnly: true,
+  },
+})
+
+// Formats objects for setting up the Quill editor
+export const formats = [
+  'header',
+  'font',
+  'size',
+  'bold',
+  'italic',
+  'underline',
+  'align',
+  'strike',
+  'script',
+  'blockquote',
+  'background',
+  'list',
+  'bullet',
+  'indent',
+  'link',
+  'image',
+  'video',
+  'color',
+  'code-block',
+]
 
 // Quill Toolbar component
 export const QuillToolbar = (props) => {

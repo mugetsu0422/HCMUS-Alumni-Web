@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
 import { Input, Button } from '@material-tailwind/react'
@@ -11,10 +11,12 @@ import toast, { Toaster } from 'react-hot-toast'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
+import NoData from '../../../ui/no-data'
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
+  const [news, setNews] = useState(null)
+  const [noData, setNoData] = useState(false)
   const [content, setContent] = useState(null)
-  const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const {
     register,
     handleSubmit,
@@ -27,7 +29,10 @@ export default function Page() {
     const file = e.target.files[0]
 
     if (!file) {
-      setThumbnailPreview(null)
+      setNews((news) => ({
+        ...news,
+        thumbnail: null,
+      }))
       return
     }
 
@@ -38,34 +43,71 @@ export default function Page() {
 
     const reader = new FileReader()
     reader.onload = () => {
-      setThumbnailPreview(reader.result as string)
+      setNews((news) => ({
+        ...news,
+        thumbnail: reader.result as string,
+      }))
     }
     reader.readAsDataURL(file)
   }
 
-  const postToast = toast.loading('Đang cập nhật')
-
   const onSubmit = (data) => {
+    console.log({
+      title: data.title,
+      thumbnail: data.thumbnail[0] || null,
+      content: content,
+    })
+
+    const updateToast = toast.loading('Đang cập nhật')
+
     // Call api
-    axios.postForm(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news`,
-      { title: data.title, thumbnail: data.thumbnail[0], content: content },
-      {
+    axios
+      .putForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
+        {
+          title: data.title,
+          thumbnail: data.thumbnail[0] || null,
+          content: content,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Cập nhật thành công', {
+          id: updateToast,
+        })
+      })
+      .catch(({ message }) => {
+        toast.error(message, {
+          id: updateToast,
+        })
+      })
+  }
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      }
-    ).then(() => {
-      toast.success('Cập nhật thành công', {
-        id: postToast
       })
-    }).catch(e => {
-      toast.error(e, {
-        id: postToast
+      .then(({ data }) => {
+        setNews(data)
+        setValue('title', data.title)
+        setContent(data.content)
       })
-    })
-  }
+      .catch((e) => {
+        setNoData(true)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id])
 
+  if (noData) {
+    return <NoData />
+  }
   return (
     <div
       className={`${nunito.className} max-w-[81.25%] max-h-[755px] m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
@@ -125,17 +167,13 @@ export default function Page() {
               accept="image/png, image/jpeg"
               {...register('thumbnail', {
                 onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
               })}
             />
-            <ErrorInput
-              // This is the error message
-              errors={errors?.thumbnail?.message}
-            />
             {
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview || '/no-image-placeholder.png'}
+                src={news?.thumbnail || '/no-image-placeholder.png'}
                 alt="preview-thumbnail"
                 width={300}
                 height={200}
@@ -162,7 +200,7 @@ export default function Page() {
               size="lg"
               type="submit"
               className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Tạo
+              Cập nhật
             </Button>
           </div>
         </form>
