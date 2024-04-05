@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
 import 'react-quill/dist/quill.bubble.css'
-import { modules, formats } from './EditorToolbar'
+import { modules as basicModules, formats } from './EditorToolbar'
 import dynamic from 'next/dynamic'
 import clsx from 'clsx'
 
@@ -24,6 +24,8 @@ function TextEditor({
   content: string
   setContent: Function
 }) {
+  const [enableEditor, setEnableEditor] = useState(false)
+  const [modules, setmodules] = useState(basicModules)
   // Formats objects for setting up the Quill editor
   const ReactQuill = React.useMemo(
     () =>
@@ -46,17 +48,68 @@ function TextEditor({
     setContent(value)
   }
 
+  useEffect(() => {
+    const loadQuill = async () => {
+      return new Promise(async (resolve, reject) => {
+        const Quill = await require('react-quill').Quill
+        const BlotFormatter = await require('quill-blot-formatter').default
+        const { ResizeAction, DeleteAction, ImageSpec } =
+          await require('quill-blot-formatter')
+        const ImageResize = await require('quill-image-resize-module-react')
+          .default
+        resolve({
+          Quill,
+          BlotFormatter,
+          ImageResize,
+          ResizeAction,
+          DeleteAction,
+          ImageSpec,
+        })
+      })
+        .then(
+          ({
+            Quill,
+            BlotFormatter,
+            ImageResize,
+            ResizeAction,
+            DeleteAction,
+            ImageSpec,
+          }) => {
+            class CustomImageSpec extends ImageSpec {
+              getActions() {
+                return [ResizeAction, DeleteAction]
+              }
+            }
+
+            Quill.register('modules/blotFormatter', BlotFormatter)
+            Quill.register('modules/imageResize', ImageResize)
+            setmodules((modules) => ({
+              ...modules,
+              blotFormatter: {
+                specs: [CustomImageSpec],
+              },
+            }))
+            return
+          }
+        )
+        .then((value) => {
+          setEnableEditor(true)
+        })
+    }
+    loadQuill()
+  }, [])
+
   return (
     <>
       <label className="text-xl font-bold">Bài đăng</label>
       <EditorToolbar toolbarId={'t1'} />
-      {
+      {enableEditor && (
         <ReactQuill
           theme={readOnly ? 'bubble' : 'snow'}
           value={content}
           onChange={onContentChange}
           placeholder={'Hãy nhập nội dung...'}
-          modules={modules('t1')}
+          modules={modules}
           formats={formats}
           className={clsx({
             '': readOnly,
@@ -64,7 +117,7 @@ function TextEditor({
           })}
           readOnly={readOnly}
         />
-      }
+      )}
     </>
   )
 }

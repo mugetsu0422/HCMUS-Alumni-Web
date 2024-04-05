@@ -37,13 +37,12 @@ function redoChange() {
 }
 
 // Modules object for setting up the Quill editor
-export const modules = (props) => ({
+export const modules = {
   toolbar: {
-    container: '#' + props,
+    container: '#t1',
     handlers: {
       undo: undoChange,
       redo: redoChange,
-      // image: imageHandler,
     },
   },
   clipboard: {
@@ -54,7 +53,7 @@ export const modules = (props) => ({
     maxStack: 10,
     userOnly: true,
   },
-})
+}
 
 // Formats objects for setting up the Quill editor
 export const formats = [
@@ -77,6 +76,8 @@ export const formats = [
   'video',
   'color',
   'code-block',
+  'width',
+  'height',
 ]
 
 // Quill Toolbar component

@@ -43,27 +43,41 @@ export default function Page() {
     reader.readAsDataURL(file)
   }
 
-  const postToast = toast.loading('Đang cập nhật')
+  const onSubmit = async (data) => {
+    const postToast = toast.loading('Đang cập nhật')
 
-  const onSubmit = (data) => {
-    // Call api
-    axios.postForm(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news`,
-      { title: data.title, thumbnail: data.thumbnail[0], content: content },
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    ).then(() => {
+    try {
+      // Post without content
+      const res1 = await axios.postForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news`,
+        { title: data.title, thumbnail: data.thumbnail[0] },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      const { data: id } = res1
+
+      // Update content
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${id}/content`,
+        { content: content },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
       toast.success('Cập nhật thành công', {
-        id: postToast
+        id: postToast,
       })
-    }).catch(e => {
-      toast.error(e, {
-        id: postToast
+    } catch ({ message }) {
+      toast.error(message, {
+        id: postToast,
       })
-    })
+    }
   }
 
   return (
@@ -148,6 +162,7 @@ export default function Page() {
               content={content}
               setContent={setContent}
             />
+            {/* <div className="ql-editor" dangerouslySetInnerHTML={{__html: content}}></div> */}
           </div>
           <div className="flex justify-end gap-x-4 pt-6 ">
             <Button

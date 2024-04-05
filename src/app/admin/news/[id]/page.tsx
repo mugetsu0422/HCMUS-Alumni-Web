@@ -51,40 +51,40 @@ export default function Page({ params }: { params: { id: string } }) {
     reader.readAsDataURL(file)
   }
 
-  const onSubmit = (data) => {
-    console.log({
-      title: data.title,
-      thumbnail: data.thumbnail[0] || null,
-      content: content,
-    })
+  const onSubmit = async(data) => {
+    const putToast = toast.loading('Đang cập nhật')
 
-    const updateToast = toast.loading('Đang cập nhật')
-
-    // Call api
-    axios
-      .putForm(
+    try {
+      // Post without content
+      await axios.putForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
-        {
-          title: data.title,
-          thumbnail: data.thumbnail[0] || null,
-          content: content,
-        },
+        { title: data.title, thumbnail: data.thumbnail[0] },
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
           },
         }
       )
-      .then(() => {
-        toast.success('Cập nhật thành công', {
-          id: updateToast,
-        })
+
+      // Update content
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/content`,
+        { content: content },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
+      toast.success('Cập nhật thành công', {
+        id: putToast,
       })
-      .catch(({ message }) => {
-        toast.error(message, {
-          id: updateToast,
-        })
+    } catch ({ message }) {
+      toast.error(message, {
+        id: putToast,
       })
+    }
   }
 
   useEffect(() => {
