@@ -1,25 +1,38 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
-import { Input, Button } from '@material-tailwind/react'
+import {
+  Input,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from '@material-tailwind/react'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import { JWT_COOKIE } from '../../../constant'
+import { JWT_COOKIE, FACULTIES, TAGS } from '../../../constant'
 import toast, { Toaster } from 'react-hot-toast'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
+import DateTimeLocalPickerDialog from '../../../ui/admin/date-time-picker-dialog'
+import { ReactTags } from 'react-tag-autocomplete'
+import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
 
 export default function Page() {
   const [content, setContent] = useState(null)
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
+  const [openDialog, setOpenDialog] = useState(false)
+  const [scheduledTime, setScheduledTime] = useState(null)
+  const [selectedTags, setSelectedTags] = useState([])
+
   const {
     register,
     handleSubmit,
-    getValues,
-    setValue,
+    trigger,
     formState: { errors },
   } = useForm()
 
@@ -43,14 +56,49 @@ export default function Page() {
     reader.readAsDataURL(file)
   }
 
-  const onSubmit = async (data) => {
-    const postToast = toast.loading('Đang cập nhật')
+  const handleOpenDialog = () => {
+    setOpenDialog(!openDialog)
+  }
+  const handleDateTime = (props) => {
+    setScheduledTime((state) => ({
+      ...state,
+      ...props,
+    }))
+  }
+  const onAddTags = useCallback(
+    (newTag) => {
+      setSelectedTags([...selectedTags, newTag])
+    },
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
+    },
+    [selectedTags]
+  )
 
+  const onSubmit = async (data) => {
+    const news = {
+      title: data.title,
+      thumbnail: data.thumbnail[0],
+      tagsId: selectedTags.map((tag) => {
+        return tag.value
+      }),
+      facultyId: data.facultyId,
+      scheduledTime: openDialog
+        ? new Date(
+            scheduledTime.date + 'T' + scheduledTime.time + ':00.000'
+          ).getTime()
+        : null,
+    }
+
+    const postToast = toast.loading(openDialog ? 'Đang lên lịch' : 'Đang đăng')
     try {
       // Post without content
       const res1 = await axios.postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/news`,
-        { title: data.title, thumbnail: data.thumbnail[0] },
+        news,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -70,7 +118,7 @@ export default function Page() {
         }
       )
 
-      toast.success('Cập nhật thành công', {
+      toast.success(openDialog ? 'Lên lịch thành công' : 'Đăng thành công', {
         id: postToast,
       })
     } catch ({ message }) {
@@ -115,14 +163,61 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập tiêu đề',
               })}
-              // value={inputs.title}
-              // onChange={onTitleChange}
               label="Nội dung tiêu đề"
+              className="bg-white"
             />
             <ErrorInput
               // This is the error message
               errors={errors?.title?.message}
             />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xl font-bold">Thẻ</label>
+            <ReactTags
+              activateFirstOption={true}
+              placeholderText="Thêm thẻ"
+              selected={selectedTags}
+              suggestions={TAGS}
+              onAdd={onAddTags}
+              onDelete={onDeleteTags}
+              noOptionsText="No matching countries"
+              classNames={{
+                root: `${styles['react-tags']}`,
+                rootIsActive: `${styles['is-active']}`,
+                rootIsDisabled: `${styles['is-disabled']}`,
+                rootIsInvalid: `${styles['is-invalid']}`,
+                label: `${styles['react-tags__label']}`,
+                tagList: `${styles['react-tags__list']}`,
+                tagListItem: `${styles['react-tags__list-item']}`,
+                tag: `${styles['react-tags__tag']}`,
+                tagName: `${styles['react-tags__tag-name']}`,
+                comboBox: `${styles['react-tags__combobox']}`,
+                input: `${styles['react-tags__combobox-input']}`,
+                listBox: `${styles['react-tags__listbox']}`,
+                option: `${styles['react-tags__listbox-option']}`,
+                optionIsActive: `${styles['is-active']}`,
+                highlight: `${styles['react-tags__listbox-option-highlight']}`,
+              }}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="facultyId" className="text-xl font-bold">
+              Khoa
+            </label>
+            <select
+              className="h-full hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+              {...register('facultyId')}>
+              <option value={0}>Không</option>
+              {FACULTIES.map(({ id, name }) => {
+                return (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -135,7 +230,7 @@ export default function Page() {
             <input
               type="file"
               id="thumbnail"
-              className="hidden"
+              className="opacity-0 absolute w-0"
               accept="image/png, image/jpeg"
               {...register('thumbnail', {
                 onChange: onThumbnailChange,
@@ -168,16 +263,35 @@ export default function Page() {
             <Button
               placeholder={undefined}
               size="lg"
-              type="submit"
               className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
               Hủy
             </Button>
+            <Button
+              onClick={async () => {
+                const output = await trigger(['title', 'thumbnail'], {
+                  shouldFocus: true,
+                })
+                if (output) {
+                  handleOpenDialog()
+                }
+              }}
+              placeholder={undefined}
+              size="lg"
+              className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
+              Lên lịch
+            </Button>
+            <DateTimeLocalPickerDialog
+              open={openDialog}
+              handleOpen={handleOpenDialog}
+              onChange={handleDateTime}
+              onSubmit={handleSubmit(onSubmit)}
+            />
             <Button
               placeholder={undefined}
               size="lg"
               type="submit"
               className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Tạo
+              Đăng ngay
             </Button>
           </div>
         </form>
