@@ -76,9 +76,6 @@ export default function Page({ params }: { params: { id: string } }) {
       facultyId: data.facultyId,
     }
 
-    console.log(news);
-    
-
     const putToast = toast.loading('Đang cập nhật')
     try {
       // Post without content
