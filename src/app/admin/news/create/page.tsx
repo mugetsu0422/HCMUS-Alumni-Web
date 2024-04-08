@@ -6,10 +6,6 @@ import { nunito } from '../../../ui/fonts'
 import {
   Input,
   Button,
-  Dialog,
-  DialogHeader,
-  DialogBody,
-  DialogFooter,
 } from '@material-tailwind/react'
 import Cookies from 'js-cookie'
 import axios from 'axios'

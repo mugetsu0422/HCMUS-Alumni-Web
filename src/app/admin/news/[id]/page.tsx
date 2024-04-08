@@ -1,26 +1,29 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
 import { Input, Button } from '@material-tailwind/react'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import { JWT_COOKIE } from '../../../constant'
+import { FACULTIES, JWT_COOKIE, TAGS } from '../../../constant'
 import toast, { Toaster } from 'react-hot-toast'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
 import NoData from '../../../ui/no-data'
+import { ReactTags } from 'react-tag-autocomplete'
+import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
   const [noData, setNoData] = useState(false)
   const [content, setContent] = useState(null)
+  const [selectedTags, setSelectedTags] = useState([])
+
   const {
     register,
     handleSubmit,
-    getValues,
     setValue,
     formState: { errors },
   } = useForm()
@@ -50,15 +53,38 @@ export default function Page({ params }: { params: { id: string } }) {
     }
     reader.readAsDataURL(file)
   }
+  const onAddTags = useCallback(
+    (newTag) => {
+      setSelectedTags([...selectedTags, newTag])
+    },
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
+    },
+    [selectedTags]
+  )
 
-  const onSubmit = async(data) => {
+  const onSubmit = async (data) => {
+    const news = {
+      title: data.title,
+      thumbnail: data.thumbnail[0] || null,
+      tagsId: selectedTags.map((tag) => {
+        return tag.value
+      }),
+      facultyId: data.facultyId,
+    }
+
+    console.log(news);
+    
+
     const putToast = toast.loading('Đang cập nhật')
-
     try {
       // Post without content
       await axios.putForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
-        { title: data.title, thumbnail: data.thumbnail[0] },
+        news,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -97,13 +123,20 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data }) => {
         setNews(data)
         setValue('title', data.title)
+        setValue('facultyId', data.faculty.id)
+        setSelectedTags(
+          data.tags.map((tag) => {
+            const { id } = tag
+            return TAGS.find(({ value }) => value === id)
+          })
+        )
         setContent(data.content)
       })
       .catch((e) => {
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id])
+  }, [])
 
   if (noData) {
     return <NoData />
@@ -151,6 +184,54 @@ export default function Page({ params }: { params: { id: string } }) {
               // This is the error message
               errors={errors?.title?.message}
             />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xl font-bold">Thẻ</label>
+            <ReactTags
+              activateFirstOption={true}
+              placeholderText="Thêm thẻ"
+              selected={selectedTags}
+              suggestions={TAGS}
+              onAdd={onAddTags}
+              onDelete={onDeleteTags}
+              noOptionsText="No matching countries"
+              classNames={{
+                root: `${styles['react-tags']}`,
+                rootIsActive: `${styles['is-active']}`,
+                rootIsDisabled: `${styles['is-disabled']}`,
+                rootIsInvalid: `${styles['is-invalid']}`,
+                label: `${styles['react-tags__label']}`,
+                tagList: `${styles['react-tags__list']}`,
+                tagListItem: `${styles['react-tags__list-item']}`,
+                tag: `${styles['react-tags__tag']}`,
+                tagName: `${styles['react-tags__tag-name']}`,
+                comboBox: `${styles['react-tags__combobox']}`,
+                input: `${styles['react-tags__combobox-input']}`,
+                listBox: `${styles['react-tags__listbox']}`,
+                option: `${styles['react-tags__listbox-option']}`,
+                optionIsActive: `${styles['is-active']}`,
+                highlight: `${styles['react-tags__listbox-option-highlight']}`,
+              }}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="facultyId" className="text-xl font-bold">
+              Khoa
+            </label>
+            <select
+              className="h-full hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+              {...register('facultyId')}>
+              <option value={0}>Không</option>
+              {FACULTIES.map(({ id, name }) => {
+                return (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
           </div>
 
           <div className="flex flex-col gap-2">
