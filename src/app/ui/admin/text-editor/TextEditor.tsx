@@ -1,45 +1,40 @@
 'use client'
 
-import React, { useState } from 'react'
-import { modules, formats } from './EditorToolbar'
+import React, { useEffect, useState } from 'react'
 import 'react-quill/dist/quill.snow.css'
-import { Input, Button } from '@material-tailwind/react'
-import { nunito } from '../../fonts'
+import 'react-quill/dist/quill.bubble.css'
+import { modules as basicModules, formats } from './EditorToolbar'
 import dynamic from 'next/dynamic'
+import clsx from 'clsx'
 
-function TextEditor() {
-  const [userInfo, setuserInfo] = useState({
-    title: '',
-    description: '',
-    //information: '',
-  })
-  const onChangeValue = (e) => {
-    setuserInfo({
-      ...userInfo,
-      [e.target.name]: e.target.value,
-    })
-  }
+// Undo and redo functions for Custom Toolbar
+function undoChange() {
+  this.quill.history.undo()
+}
+function redoChange() {
+  this.quill.history.redo()
+}
 
-  function isBrowser() {
-    return typeof window !== 'undefined'
-  }
-
-  const onDescription = (value) => {
-    setuserInfo({ ...userInfo, description: value })
-  }
-  // const oninformation = (value) => {
-  //   setuserInfo({ ...userInfo, information: value });
-  // };
+function TextEditor({
+  readOnly,
+  content,
+  setContent,
+}: {
+  readOnly: boolean
+  content: string
+  setContent: Function
+}) {
+  const [enableEditor, setEnableEditor] = useState(false)
+  const [modules, setmodules] = useState(basicModules)
+  // Formats objects for setting up the Quill editor
   const ReactQuill = React.useMemo(
     () =>
       dynamic(() => import('react-quill'), {
         ssr: false,
         loading: () => <p>Loading ...</p>,
       }),
-
     []
   )
-
   const EditorToolbar = React.useMemo(
     () =>
       dynamic(() => import('./EditorToolbar'), {
@@ -49,59 +44,80 @@ function TextEditor() {
     []
   )
 
+  const onContentChange = (value) => {
+    setContent(value)
+  }
+
+  useEffect(() => {
+    const loadQuill = async () => {
+      return new Promise(async (resolve, reject) => {
+        const Quill = await require('react-quill').Quill
+        const BlotFormatter = await require('quill-blot-formatter').default
+        const { ResizeAction, DeleteAction, ImageSpec } =
+          await require('quill-blot-formatter')
+        const ImageResize = await require('quill-image-resize-module-react')
+          .default
+        resolve({
+          Quill,
+          BlotFormatter,
+          ImageResize,
+          ResizeAction,
+          DeleteAction,
+          ImageSpec,
+        })
+      })
+        .then(
+          ({
+            Quill,
+            BlotFormatter,
+            ImageResize,
+            ResizeAction,
+            DeleteAction,
+            ImageSpec,
+          }) => {
+            class CustomImageSpec extends ImageSpec {
+              getActions() {
+                return [ResizeAction, DeleteAction]
+              }
+            }
+
+            Quill.register('modules/blotFormatter', BlotFormatter)
+            Quill.register('modules/imageResize', ImageResize)
+            setmodules((modules) => ({
+              ...modules,
+              blotFormatter: {
+                specs: [CustomImageSpec],
+              },
+            }))
+            return
+          }
+        )
+        .then((value) => {
+          setEnableEditor(true)
+        })
+    }
+    loadQuill()
+  }, [])
+
   return (
     <>
-      <form className="px-8 py-10 overflow-y-auto">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-xl font-bold">Tiêu đề</label>
-            <Input
-              size="lg"
-              crossOrigin={undefined}
-              variant="outlined"
-              type="text"
-              name="title"
-              value={userInfo.title}
-              onChange={onChangeValue}
-              label="Nội dung tiêu đề"
-              required
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-xl font-bold">Bài đăng</label>
-            <EditorToolbar toolbarId={'t1'} />
-            {
-              <ReactQuill
-                theme="snow"
-                value={userInfo.description}
-                onChange={onDescription}
-                placeholder={'Hãy nhập nội dung...'}
-                modules={modules('t1')}
-                formats={formats}
-                className="h-96 overflow-y-auto text-base"
-              />
-            }
-          </div>
-
-          <div className="flex justify-end gap-x-4  ">
-            <Button
-              placeholder={undefined}
-              size="lg"
-              type="submit"
-              className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
-              Hủy
-            </Button>
-            <Button
-              placeholder={undefined}
-              size="lg"
-              type="submit"
-              className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Cập nhật
-            </Button>
-          </div>
-        </div>
-      </form>
+      <label className="text-xl font-bold">Bài đăng</label>
+      <EditorToolbar toolbarId={'t1'} />
+      {enableEditor && (
+        <ReactQuill
+          theme={readOnly ? 'bubble' : 'snow'}
+          value={content}
+          onChange={onContentChange}
+          placeholder={'Hãy nhập nội dung...'}
+          modules={modules}
+          formats={formats}
+          className={clsx({
+            '': readOnly,
+            'h-[30rem] overflow-y-auto': !readOnly,
+          })}
+          readOnly={readOnly}
+        />
+      )}
     </>
   )
 }

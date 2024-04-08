@@ -9,18 +9,25 @@
     --blue-03: #e0fffb;
     --blue-04: #e6f0fb;
     --blue-05: #003f88;
-    --blue-05-10: #003f881A;
+    --blue-05-10: #003f881a;
     --blue-05-20: #003f8833;
     --secondary: #a1a1a1;
     --text: #343f52;
     --warning: #cc3300;
-    --cocoa-brown: #1E1515;
-    --cocoa-brown-20: #1E151533;
-    --pampas: #F2EFE8;
-    --westar: #DDD9D3;
+    --cocoa-brown: #1e1515;
+    --cocoa-brown-20: #1e151533;
+    --pampas: #f2efe8;
+    --westar: #ddd9d3;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
     }
+}
+.ql-editor {
+    font-size: 16px;
+}
+
+.ql-editor img {
+    cursor: default !important;
 }
