@@ -26,7 +26,7 @@ const navListItems = [
   {
     label: 'Tin tức',
     icon: faNewspaper,
-    urlLink: '  #',
+    urlLink: 'news',
   },
   {
     label: 'Sự kiện',
