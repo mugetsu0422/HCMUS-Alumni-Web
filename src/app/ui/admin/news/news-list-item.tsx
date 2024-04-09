@@ -2,13 +2,63 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React from 'react'
-import { Button } from '@material-tailwind/react'
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import { nunito } from '../../fonts'
 import { getDataFromCard } from '../../../admin/news/newsSclice'
 import { Trash3, Eye, EyeSlash, PencilSquare } from 'react-bootstrap-icons'
 import { useAppDispatch } from '../../../../lib/hook'
-export default function NewsListItem({ name, imgSrc, isShow }) {
+
+function DialogComfirm({ id, open, handleOpen, title, noti }) {
+  function handleClick() {
+    console.log({ id })
+  }
+
+  return (
+    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
+      <DialogHeader placeholder={undefined}>{title}</DialogHeader>
+      <DialogBody placeholder={undefined}>{noti}</DialogBody>
+      <DialogFooter placeholder={undefined}>
+        <Button
+          placeholder={undefined}
+          color="blue-gray"
+          variant="gradient"
+          onClick={handleOpen}
+          className="mr-1">
+          <span>Hủy</span>
+        </Button>
+        <Button
+          placeholder={undefined}
+          color="red"
+          className="mr-1"
+          onClick={handleOpen}>
+          <span>Xác nhận</span>
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  )
+}
+
+export default function NewsListItem({
+  name,
+  imgSrc,
+  status,
+  views,
+  publishedAt,
+  id,
+}) {
+  const [openDelete, setOpenDelete] = React.useState(false)
+  const [openShow, setOpenShow] = React.useState(false)
+
+  const handleOpenDetele = () => setOpenDelete((e) => !e)
+  const handleOpenShow = () => setOpenShow((e) => !e)
+
   const dispatch = useAppDispatch()
   const router = useRouter()
   function handleClick() {
@@ -28,10 +78,10 @@ export default function NewsListItem({ name, imgSrc, isShow }) {
         {name}
       </p>
       <p className="w-[8rem] text-center text-black p-2 font-[600] ">
-        20/10/2024
+        {publishedAt}
       </p>
       <p className="w-[7.5rem] text-center text-black p-2 font-[600] ">
-        1000000000
+        {views}
       </p>
       <div className="flex justify-end px-2">
         <Button
@@ -43,22 +93,43 @@ export default function NewsListItem({ name, imgSrc, isShow }) {
         </Button>
         <Button
           variant="text"
-          //onClick={handleClick}
+          onClick={handleOpenDetele}
           placeholder={undefined}
           className="px-4">
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
+        <DialogComfirm
+          id={id}
+          open={openDelete}
+          handleOpen={handleOpenDetele}
+          title={'Xác nhận xóa'}
+          noti={'Bạn có chắc chắn muốn xóa.'}
+        />
+
         <Button
           variant="text"
-          //onClick={handleClick}
+          onClick={handleOpenShow}
           className="px-4"
           placeholder={undefined}>
-          {isShow ? (
+          {status.name === 'Bình thường' ? (
             <Eye className="text-2xl  text-black" />
-          ) : (
+          ) : status.name === 'Ẩn' ? (
             <EyeSlash className="text-2xl text-black" />
+          ) : (
+            ''
           )}
         </Button>
+        <DialogComfirm
+          id={id}
+          open={openShow}
+          handleOpen={handleOpenShow}
+          title={status.name === 'Ẩn' ? 'Xác nhận hiện' : 'Xác nhận ẩn'}
+          noti={
+            status.name === 'Ẩn'
+              ? 'Bạn có chắc chắn muốn hiện tin tức'
+              : 'Bạn có chắc chắn muốnn ẩn tin tức'
+          }
+        />
       </div>
     </div>
   )
