@@ -5,9 +5,10 @@ import Header from '../../ui/admin/news/Header'
 import { Input, Button } from '@material-tailwind/react'
 import { ArrowRight, ArrowLeft } from 'react-bootstrap-icons'
 import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../constant'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { useSearchParams } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
 
 function Pagination({ pages, setActive, active, setNews, itemsPerPage }) {
   const next = () => {
@@ -49,7 +50,22 @@ function Pagination({ pages, setActive, active, setNews, itemsPerPage }) {
   )
 }
 
-function Search() {
+function Search({ setParams }) {
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const searchParams = useSearchParams()
+  const params = new URLSearchParams(searchParams)
+
+  const handleSearch = useDebouncedCallback((keyword) => {
+    if (keyword) {
+      params.set('title', keyword)
+    } else {
+      params.delete('title')
+    }
+    replace(`${pathname}?${params.toString()}`)
+    setParams(`?${params.toString()}`)
+  }, 500)
+
   return (
     <div className="mb-10 w-[1184px] m-auto">
       <Input
@@ -57,6 +73,7 @@ function Search() {
         crossOrigin={undefined}
         label="Tìm kiếm bài viết..."
         placeholder={undefined}
+        onChange={(e) => handleSearch(e.target.value)}
       />
     </div>
   )
@@ -67,13 +84,14 @@ export default function Page() {
   const [pages, setPages] = useState(0)
   const [active, setActive] = useState(0)
   const [news, setNews] = useState(0)
+  const [params, setParams] = useState('')
 
   const [items, setItems] = useState([])
 
   useEffect(() => {
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news?offset=${news}&limit=${itemsPerPage}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news?offset=${news}&limit=${itemsPerPage}${params}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -85,7 +103,7 @@ export default function Page() {
         setItems(res.data.news)
       })
       .catch()
-  }, [news, itemsPerPage])
+  }, [news, itemsPerPage, params])
 
   if (pages > 0) {
     setPages(1)
@@ -93,8 +111,8 @@ export default function Page() {
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
-      <Search />
-      <Header />
+      <Search setParams={setParams} />
+      <Header setParams={setParams} />
       <div className="relative mb-10">
         {items.map(({ id, title, thumbnail, views, status, publishedAt }) => (
           <div key={title} className=" m-auto">
