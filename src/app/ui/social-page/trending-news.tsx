@@ -34,7 +34,7 @@ function SmallTrendingNews() {
             alt="image news"
             className="rounded-md "
           />
-          <div className="w-72 flex flex-col items-center justify-center gap-1">
+          <div className="w-[16rem] flex flex-col items-center justify-center gap-1">
             <p className="sm:sm md:text-lg font-bold">{title}</p>
             <p className="text-xs">{detail}</p>
           </div>
@@ -46,15 +46,15 @@ function SmallTrendingNews() {
 
 function BigTrendingNews() {
   return (
-    <figure className="relative w-fit sm:h-[300px] 2xl:h-[600px] m-auto">
+    <figure className="relative right-0 w-fit sm:h-[300px] 2xl:h-[600px] m-auto">
       <Image
         className="sm:h-[300px] 2xl:h-[600px] sm:w-[500px] 2xl:w-full rounded-xl object-cover object-center"
         src="/authentication.png"
         alt="nature image"
-        width={800}
+        width={780}
         height={600}
       />
-      <figcaption className="absolute bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-2 px-4 saturate-200 backdrop-blur-sm">
+      <figcaption className="absolute bottom-0 left-2/4 flex 2xl:w-full -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-2 px-4 saturate-200 backdrop-blur-sm">
         <div className={`text-2xl`}>
           Ethiopian runners took the top four spots.
         </div>
@@ -65,8 +65,8 @@ function BigTrendingNews() {
 
 export default function TrendingNews() {
   return (
-    <div className="xl:flex-row sm:flex-col sm:justify-between sm:items-center xl:items-stretch flex w-fit h-fit bg-[#ebeef3] rounded-md p-6">
-      <div className="w-fit h-[45%] px-10 py-6 gap-y-8 flex flex-col">
+    <div className="xl:flex-row sm:flex-col sm:justify-between sm:items-center xl:items-stretch flex w-fit h-fit bg-[#ebeef3] rounded-md ">
+      <div className="w-fit h-[45%] pl-8 pr-4 py-6 gap-y-8 flex flex-col">
         <p className="text-3xl leading-9 font-extrabold">Tin nổi bật </p>
         <SmallTrendingNews />
       </div>
