@@ -7,6 +7,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { classNames } from 'react-easy-crop/helpers'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
+import { FACULTIES } from '../../constant'
 import { SortAlphaUp, SortAlphaDown } from 'react-bootstrap-icons'
 const filerBtn = [
   {
@@ -63,18 +64,6 @@ export default function Filter({ setMyParams, status }) {
       facultyId: searchParams.get('facultyId')?.toString() || '0',
     },
   })
-  const facultyList = [
-    { id: '0', name: 'Toàn bộ' },
-    { id: '1', name: 'Công nghệ Thông tin' },
-    { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
-    { id: '3', name: 'Địa chất' },
-    { id: '4', name: 'Toán – Tin học' },
-    { id: '5', name: 'Điện tử - Viễn thông' },
-    { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
-    { id: '7', name: 'Hóa học' },
-    { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
-    { id: '9', name: 'Môi trường' },
-  ]
 
   const handleSearch = useDebouncedCallback((keyword) => {
     const params = new URLSearchParams(searchParams)
@@ -154,7 +143,10 @@ export default function Filter({ setMyParams, status }) {
             className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
             {...register('facultyId')}
             onChange={(e) => handleInputs(e)}>
-            {facultyList.map(({ id, name }) => {
+            <option key={0} value={0}>
+              Toàn bộ
+            </option>
+            {FACULTIES.map(({ id, name }) => {
               return (
                 <option key={id} value={id}>
                   {name}

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 
 // Custom Undo button icon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -47,20 +47,23 @@ function redoChange() {
 }
 
 // Modules object for setting up the Quill editor
-export const modules = (props) => ({
+export const modules = {
   toolbar: {
-    container: '#' + props,
+    container: '#t1',
     handlers: {
       undo: undoChange,
       redo: redoChange,
     },
+  },
+  clipboard: {
+    matchVisual: false,
   },
   history: {
     delay: 500,
     maxStack: 10,
     userOnly: true,
   },
-})
+}
 
 // Formats objects for setting up the Quill editor
 export const formats = [
@@ -83,6 +86,8 @@ export const formats = [
   'video',
   'color',
   'code-block',
+  'width',
+  'height',
 ]
 
 // Quill Toolbar component

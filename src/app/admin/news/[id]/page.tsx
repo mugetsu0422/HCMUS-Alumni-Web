@@ -1,34 +1,30 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
-import {
-  Input,
-  Button,
-} from '@material-tailwind/react'
+import { Input, Button } from '@material-tailwind/react'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import { JWT_COOKIE, FACULTIES, TAGS } from '../../../constant'
+import { FACULTIES, JWT_COOKIE, TAGS } from '../../../constant'
 import toast, { Toaster } from 'react-hot-toast'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import DateTimeLocalPickerDialog from '../../../ui/admin/date-time-picker-dialog'
+import NoData from '../../../ui/no-data'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
+  const [news, setNews] = useState(null)
+  const [noData, setNoData] = useState(false)
   const [content, setContent] = useState(null)
-  const [thumbnailPreview, setThumbnailPreview] = useState(null)
-  const [openDialog, setOpenDialog] = useState(false)
-  const [scheduledTime, setScheduledTime] = useState(null)
   const [selectedTags, setSelectedTags] = useState([])
 
   const {
     register,
     handleSubmit,
-    trigger,
+    setValue,
     formState: { errors },
   } = useForm()
 
@@ -36,7 +32,10 @@ export default function Page() {
     const file = e.target.files[0]
 
     if (!file) {
-      setThumbnailPreview(null)
+      setNews((news) => ({
+        ...news,
+        thumbnail: null,
+      }))
       return
     }
 
@@ -47,19 +46,12 @@ export default function Page() {
 
     const reader = new FileReader()
     reader.onload = () => {
-      setThumbnailPreview(reader.result as string)
+      setNews((news) => ({
+        ...news,
+        thumbnail: reader.result as string,
+      }))
     }
     reader.readAsDataURL(file)
-  }
-
-  const handleOpenDialog = () => {
-    setOpenDialog(!openDialog)
-  }
-  const handleDateTime = (props) => {
-    setScheduledTime((state) => ({
-      ...state,
-      ...props,
-    }))
   }
   const onAddTags = useCallback(
     (newTag) => {
@@ -77,23 +69,18 @@ export default function Page() {
   const onSubmit = async (data) => {
     const news = {
       title: data.title,
-      thumbnail: data.thumbnail[0],
+      thumbnail: data.thumbnail[0] || null,
       tagsId: selectedTags.map((tag) => {
         return tag.value
       }),
       facultyId: data.facultyId,
-      scheduledTime: openDialog
-        ? new Date(
-            scheduledTime.date + 'T' + scheduledTime.time + ':00.000'
-          ).getTime()
-        : null,
     }
 
-    const postToast = toast.loading(openDialog ? 'Đang lên lịch' : 'Đang đăng')
+    const putToast = toast.loading('Đang cập nhật')
     try {
       // Post without content
-      const res1 = await axios.postForm(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news`,
+      await axios.putForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
         news,
         {
           headers: {
@@ -101,11 +88,10 @@ export default function Page() {
           },
         }
       )
-      const { data: id } = res1
 
       // Update content
       await axios.put(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${id}/content`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/content`,
         { content: content },
         {
           headers: {
@@ -114,16 +100,44 @@ export default function Page() {
         }
       )
 
-      toast.success(openDialog ? 'Lên lịch thành công' : 'Đăng thành công', {
-        id: postToast,
+      toast.success('Cập nhật thành công', {
+        id: putToast,
       })
     } catch ({ message }) {
       toast.error(message, {
-        id: postToast,
+        id: putToast,
       })
     }
   }
 
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setNews(data)
+        setValue('title', data.title)
+        setValue('facultyId', data.faculty.id)
+        setSelectedTags(
+          data.tags.map((tag) => {
+            const { id } = tag
+            return TAGS.find(({ value }) => value === id)
+          })
+        )
+        setContent(data.content)
+      })
+      .catch((e) => {
+        setNoData(true)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (noData) {
+    return <NoData />
+  }
   return (
     <div
       className={`${nunito.className} max-w-[81.25%] max-h-[755px] m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
@@ -159,8 +173,9 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập tiêu đề',
               })}
+              // value={inputs.title}
+              // onChange={onTitleChange}
               label="Nội dung tiêu đề"
-              className="bg-white"
             />
             <ErrorInput
               // This is the error message
@@ -226,21 +241,17 @@ export default function Page() {
             <input
               type="file"
               id="thumbnail"
-              className="opacity-0 absolute w-0"
+              className="hidden"
               accept="image/png, image/jpeg"
               {...register('thumbnail', {
                 onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
               })}
             />
-            <ErrorInput
-              // This is the error message
-              errors={errors?.thumbnail?.message}
-            />
             {
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview || '/no-image-placeholder.png'}
+                src={news?.thumbnail || '/no-image-placeholder.png'}
                 alt="preview-thumbnail"
                 width={300}
                 height={200}
@@ -253,41 +264,21 @@ export default function Page() {
               content={content}
               setContent={setContent}
             />
-            {/* <div className="ql-editor" dangerouslySetInnerHTML={{__html: content}}></div> */}
           </div>
           <div className="flex justify-end gap-x-4 pt-6 ">
             <Button
               placeholder={undefined}
               size="lg"
+              type="submit"
               className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <Button
-              onClick={async () => {
-                const output = await trigger(['title', 'thumbnail'], {
-                  shouldFocus: true,
-                })
-                if (output) {
-                  handleOpenDialog()
-                }
-              }}
-              placeholder={undefined}
-              size="lg"
-              className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Lên lịch
-            </Button>
-            <DateTimeLocalPickerDialog
-              open={openDialog}
-              handleOpen={handleOpenDialog}
-              onChange={handleDateTime}
-              onSubmit={handleSubmit(onSubmit)}
-            />
             <Button
               placeholder={undefined}
               size="lg"
               type="submit"
               className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Đăng ngay
+              Cập nhật
             </Button>
           </div>
         </form>
