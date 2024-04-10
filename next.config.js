@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['storage.googleapis.com'],
+    domains: ['storage.googleapis.com', 'hcmus.edu.vn'],
     minimumCacheTTL: 1500000,
   },
 }

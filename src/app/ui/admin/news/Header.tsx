@@ -16,13 +16,15 @@ import {
 } from '@material-tailwind/react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-export default function Header({ setParams }) {
+export default function Header({ setParams, setCurPage }) {
   const pathname = usePathname()
   const { replace } = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
 
   function handleClick(name, order) {
+    params.delete('page')
+    setCurPage(1)
     params.set('orderBy', name)
     params.set('order', order)
     replace(`${pathname}?${params.toString()}`)
@@ -45,14 +47,14 @@ export default function Header({ setParams }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('title', 'desc')}
+              onClick={() => handleClick('title', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('title', 'asc')}
+              onClick={() => handleClick('title', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
@@ -101,14 +103,14 @@ export default function Header({ setParams }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('publishedAt', 'desc')}
+              onClick={() => handleClick('views', 'desc')}
               className="text-center font-bold flex justify-center">
               Giảm dần
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('publishedAt', 'asc')}
+              onClick={() => handleClick('views', 'asc')}
               className="text-center font-bold flex justify-center">
               Tăng dần
               <ArrowUp />

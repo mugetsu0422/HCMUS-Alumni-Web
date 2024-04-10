@@ -14,6 +14,8 @@ import { nunito } from '../../fonts'
 import { getDataFromCard } from '../../../admin/news/newsSclice'
 import { Trash3, Eye, EyeSlash, PencilSquare } from 'react-bootstrap-icons'
 import { useAppDispatch } from '../../../../lib/hook'
+import Image from 'next/image'
+import moment from 'moment'
 
 function DialogComfirm({ id, open, handleOpen, title, noti }) {
   function handleClick() {
@@ -59,12 +61,12 @@ export default function NewsListItem({
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
 
-  const dispatch = useAppDispatch()
   const router = useRouter()
-  function handleClick() {
+  function handleEdit() {
     router.push('news/edit')
-    dispatch(getDataFromCard({ name, imgSrc }))
   }
+
+  const formatedPublishedAt = moment(publishedAt).format("DD/MM/YYYY HH:mm:ss")
 
   return (
     <div
@@ -72,21 +74,21 @@ export default function NewsListItem({
       <img
         src={imgSrc}
         alt="news image"
-        className="h-36 w-[300px] object-cover object-center"
+        className="h-[200px] w-[300px] object-cover object-center"
       />
-      <p className="h-20 w-[500px] text-left p-2 font-[600]  text-black">
+      <p className="h-20 w-[500px] p-2 font-[600] text-black align-middle flex items-center">
         {name}
       </p>
-      <p className="w-[8rem] text-center text-black p-2 font-[600] ">
-        {publishedAt}
+      <p className="w-[8rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+        {moment(publishedAt).local().format("DD/MM/YYYY HH:mm:ss")}
       </p>
-      <p className="w-[7.5rem] text-center text-black p-2 font-[600] ">
+      <p className="w-[7.5rem] text-center text-black p-2 font-[600] flex items-center justify-center">
         {views}
       </p>
       <div className="flex justify-end px-2">
         <Button
           variant="text"
-          onClick={handleClick}
+          onClick={handleEdit}
           placeholder={undefined}
           className="px-4">
           <PencilSquare className="text-2xl text-[--blue-05]" />
