@@ -16,6 +16,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { roboto } from '../../ui/fonts'
 import { classNames } from 'react-easy-crop/helpers'
 import { useForm } from 'react-hook-form'
+import Link from 'next/link'
 
 function Pagination({ totalPages, curPage, onNextPage, onPrevPage }) {
   return (
@@ -47,6 +48,7 @@ function Pagination({ totalPages, curPage, onNextPage, onPrevPage }) {
 }
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const { register, reset } = useForm({
@@ -70,6 +72,7 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
         />
       </div>
       <Button
+        onClick={() => router.push('/admin/news/create')}
         placeholder={undefined}
         className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
         Tạo mới

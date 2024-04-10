@@ -24,3 +24,9 @@ export const TAGS = [
   { value: 6, label: 'Học tập' },
   { value: 7, label: 'Việc làm' },
 ]
+export const POST_STATUS = {
+  'Chờ': 1,
+  'Bình thường': 2,
+  'Ẩn': 3,
+  'Xoá': 4,
+}
