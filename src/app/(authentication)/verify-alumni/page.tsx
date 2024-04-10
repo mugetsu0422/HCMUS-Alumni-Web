@@ -298,7 +298,7 @@ function Step2() {
     axios
       .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-        {...inputs, ...data},
+        { ...inputs, ...data },
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -310,6 +310,7 @@ function Step2() {
       })
       .catch((e) => {
         console.error(e)
+        toast.error(e.message)
       })
   }
   const onBack = () => {

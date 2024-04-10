@@ -6,6 +6,11 @@ import { nunito } from '../../../ui/fonts'
 import {
   Input,
   Button,
+  Textarea,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
 } from '@material-tailwind/react'
 import Cookies from 'js-cookie'
 import axios from 'axios'
@@ -17,6 +22,37 @@ import ErrorInput from '../../../ui/error-input'
 import DateTimeLocalPickerDialog from '../../../ui/admin/date-time-picker-dialog'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
+import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
+import { useRouter } from 'next/navigation'
+
+function CancelDialog({ open, handleOpen }) {
+  const router = useRouter()
+
+  return (
+    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
+      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
+      <DialogBody placeholder={undefined}>
+        Bạn có muốn huỷ tạo bài viết?
+      </DialogBody>
+      <DialogFooter placeholder={undefined}>
+        <Button
+          className={`${nunito.className} mr-4 bg-[var(--secondary)] text-black normal-case text-md`}
+          placeholder={undefined}
+          onClick={handleOpen}>
+          <span>Không</span>
+        </Button>
+        <Button
+          className={`${nunito.className} bg-[var(--blue-05)] text-white normal-case text-md`}
+          placeholder={undefined}
+          onClick={() => {
+            router.push('/admin/news')
+          }}>
+          <span>Hủy</span>
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  )
+}
 
 export default function Page() {
   const [content, setContent] = useState(null)
@@ -24,6 +60,9 @@ export default function Page() {
   const [openDialog, setOpenDialog] = useState(false)
   const [scheduledTime, setScheduledTime] = useState(null)
   const [selectedTags, setSelectedTags] = useState([])
+  const [summaryCharCount, setSummaryCharCount] = useState(0)
+  const summaryMaxCharCount = 150
+  const [openCancelDialog, setOpenCancelDialog] = useState(false)
 
   const {
     register,
@@ -55,6 +94,9 @@ export default function Page() {
   const handleOpenDialog = () => {
     setOpenDialog(!openDialog)
   }
+  const handleOpenCancelDialog = () => {
+    setOpenCancelDialog(!openCancelDialog)
+  }
   const handleDateTime = (props) => {
     setScheduledTime((state) => ({
       ...state,
@@ -78,6 +120,7 @@ export default function Page() {
     const news = {
       title: data.title,
       thumbnail: data.thumbnail[0],
+      summary: data.summary,
       tagsId: selectedTags.map((tag) => {
         return tag.value
       }),
@@ -237,16 +280,44 @@ export default function Page() {
               // This is the error message
               errors={errors?.thumbnail?.message}
             />
-            {
-              <Image
+            {thumbnailPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview || '/no-image-placeholder.png'}
+                src={thumbnailPreview}
                 alt="preview-thumbnail"
                 width={300}
                 height={200}
               />
-            }
+            ) : (
+              <ImageSkeleton width={300} height={200} />
+            )}
           </div>
+
+          <div className="flex flex-col gap-2">
+            <label className={`relative max-w-[400px] text-xl font-bold`}>
+              Tóm tắt
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'max-w-[400px] h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('summary', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
+            />
+          </div>
+
           <div className="flex flex-col gap-2">
             <TextEditor
               readOnly={false}
@@ -257,11 +328,16 @@ export default function Page() {
           </div>
           <div className="flex justify-end gap-x-4 pt-6 ">
             <Button
+              onClick={handleOpenCancelDialog}
               placeholder={undefined}
               size="lg"
               className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
               Hủy
             </Button>
+            <CancelDialog
+              open={openCancelDialog}
+              handleOpen={handleOpenCancelDialog}
+            />
             <Button
               onClick={async () => {
                 const output = await trigger(['title', 'thumbnail'], {

@@ -1,30 +1,40 @@
 'use client'
 
 import React, { useCallback } from 'react'
-import { Quill } from 'react-quill'
-import dynamic from 'next/dynamic'
 
 // Custom Undo button icon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
 // handle them correctly
 const CustomUndo = () => (
-  <svg viewBox="0 0 18 18">
-    <polygon className="ql-fill ql-stroke" points="6 10 4 12 2 10 6 10" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    className="bi bi-arrow-counterclockwise"
+    viewBox="0 0 16 16">
     <path
-      className="ql-stroke"
-      d="M8.09,13.91A4.6,4.6,0,0,0,9,14,5,5,0,1,0,4,9"
+      fillRule="evenodd"
+      d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"
     />
+    <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466" />
   </svg>
 )
 
 // Redo button icon component for Quill editor
 const CustomRedo = () => (
-  <svg viewBox="0 0 18 18">
-    <polygon className="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    className="bi bi-arrow-clockwise"
+    viewBox="0 0 16 16">
     <path
-      className="ql-stroke"
-      d="M9.91,13.91A4.6,4.6,0,0,1,9,14a5,5,0,1,1,5-5"
+      fillRule="evenodd"
+      d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"
     />
+    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
   </svg>
 )
 
@@ -81,7 +91,7 @@ export const formats = [
 ]
 
 // Quill Toolbar component
-export const QuillToolbar = (props) => {
+function QuillToolbar(props) {
   return (
     <>
       {props.toolbarId !== undefined && (

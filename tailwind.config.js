@@ -36,17 +36,17 @@ module.exports = withMT({
 
         '.scrollbar-webkit-main': {
           '&::-webkit-scrollbar': {
-            width: '8px',
+            width: '10px',
             height: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            background: '#ffffff',
-            borderRadius: '20px',
+            background: '#f1f1f1',
+            borderRadius: '10px',
           },
 
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#ffffff',
-            borderRadius: '20px',
+            backgroundColor: '#c1c1c1',
+            borderRadius: '10px',
           },
         },
       }
