@@ -5,6 +5,8 @@ import React from 'react'
 import Image from 'next/image'
 import { Button } from '@material-tailwind/react'
 import { ArrowRight, ArrowLeft } from 'react-bootstrap-icons'
+import { Calendar } from 'react-bootstrap-icons'
+import MostViewed from '../../ui/social-page/news/most-viewed'
 
 const dataTemp = [
   {
@@ -30,29 +32,6 @@ const dataTemp = [
   },
 ]
 
-const mostViewed = [
-  {
-    name: ' Sinh viên Bùi Thị Khánh Linh giành giải nhất tại Cuộc thi Công nghệ chế biến sau thu hoạch năm 2019',
-    view: 600,
-  },
-  {
-    name: ' Sinh viên Bùi Thị Khánh Linh giành giải nhất tại Cuộc thi Công nghệ chế biến sau thu hoạch năm 2019',
-    view: 600,
-  },
-  {
-    name: ' Sinh viên Bùi Thị Khánh Linh giành giải nhất tại Cuộc thi Công nghệ chế biến sau thu hoạch năm 2019',
-    view: 600,
-  },
-  {
-    name: ' Sinh viên Bùi Thị Khánh Linh giành giải nhất tại Cuộc thi Công nghệ chế biến sau thu hoạch năm 2019',
-    view: 600,
-  },
-  {
-    name: ' Sinh viên Bùi Thị Khánh Linh giành giải nhất tại Cuộc thi Công nghệ chế biến sau thu hoạch năm 2019',
-    view: 600,
-  },
-]
-
 function NewsListItem({ title, des, datePost, tag, imgSrc }) {
   return (
     <div className="flex lg:flex-row flex-col  items-center gap-x-6">
@@ -68,7 +47,10 @@ function NewsListItem({ title, des, datePost, tag, imgSrc }) {
           {title}
         </p>
         <p className="w-[500px] md:w-[600px]">{des}</p>
-        <p>{datePost}</p>
+        <div className="flex gap-x-1 items-center">
+          <Calendar className="text-[--blue-02]" />
+          <text>{datePost}</text>
+        </div>
         <div className="flex gap-x-2">
           Thẻ:
           {tag.map(({ name }, idx) => (
@@ -90,42 +72,24 @@ function Pagination() {
       <Button
         placeholder={undefined}
         variant="text"
-        className="flex items-center gap-2 font-bold normal-case text-base"
+        className="flex items-center gap-2 font-bold normal-case text-base bg-[--blue-02]"
         // onClick={prev}
         // disabled={active === 1 || active === 0}
       >
-        <ArrowLeft className="h-6 w-6" />
+        <ArrowLeft className="h-6 w-6 text-white" />
       </Button>
-      <p className="w-20 text-center font-bold">
-        {/* {active} / {pages} */}
-        0/0
+      <p className="w-20 text-center font-bold ">
+        {/* {active} / {pages} */}0 / 0
       </p>
       <Button
         placeholder={undefined}
         variant="text"
-        className="flex items-center gap-2  font-bold normal-case text-base"
+        className="flex items-center gap-2 font-bold normal-case text-base bg-[--blue-02]"
         // onClick={next}
         // disabled={active === pages || pages === 0}
       >
-        <ArrowRight strokeWidth={2} className="h-6 w-6" />
+        <ArrowRight strokeWidth={2} className="h-6 w-6 text-white" />
       </Button>
-    </div>
-  )
-}
-
-function MostViewed() {
-  return (
-    <div className="mt-20 xl:w-72 w-fit bg-gray-300 text-[--blue-05] font-medium py-6 px-4">
-      <p className="my-6 text-xl font-extrabold text-[#008000]">
-        Xem nhiều nhất
-      </p>
-      <ol className="flex sm:flex-wrap gap-y-4 list-disc">
-        {mostViewed.map(({ view, name }, idx) => (
-          <li className="ml-8" key={idx}>
-            {name} <text className="text-[--text]">({view}).</text>
-          </li>
-        ))}
-      </ol>
     </div>
   )
 }
