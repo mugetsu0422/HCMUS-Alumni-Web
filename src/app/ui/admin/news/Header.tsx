@@ -67,7 +67,7 @@ export default function Header({ setParams, setCurPage }) {
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[9rem] text-center ml-6 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-white">
+              className="w-[9rem] text-center ml-8 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-white">
               Ngày đăng
               <CaretDownFill />
             </Button>
