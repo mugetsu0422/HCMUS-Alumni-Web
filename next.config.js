@@ -2,13 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'storage.googleapis.com',
-        pathname: '**',
-      },
-    ],
+    domains: ['storage.googleapis.com', 'hcmus.edu.vn'],
     minimumCacheTTL: 30,
   },
 }

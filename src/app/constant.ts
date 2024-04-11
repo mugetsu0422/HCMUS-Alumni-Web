@@ -3,6 +3,7 @@ export const EMAIL_ACTIVATION_CODE_TIMER = 59000 // 59s
 export const JWT_COOKIE = 'jwt'
 export const JWT_EXPIRED_TIME = 3 // 3 days
 export const ADMIN_VERIFY_ALUMNI_PAGE_LIMIT = 10
+export const ADMIN_NEWS_PAGE_LIMIT = 10
 export const FACULTIES = [
   { id: '1', name: 'Công nghệ Thông tin' },
   { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
@@ -23,3 +24,9 @@ export const TAGS = [
   { value: 6, label: 'Học tập' },
   { value: 7, label: 'Việc làm' },
 ]
+export const POST_STATUS = {
+  'Chờ': 1,
+  'Bình thường': 2,
+  'Ẩn': 3,
+  'Xoá': 4,
+}
