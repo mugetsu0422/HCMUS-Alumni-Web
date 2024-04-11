@@ -5,7 +5,7 @@ export default function ErrorInput({ errors }) {
   return (
     <>
       {errors && (
-        <div className="text-red-600 -my-4 font-semibold">
+        <div className="text-red-600 font-semibold">
           <> {errors}</>
         </div>
       )}

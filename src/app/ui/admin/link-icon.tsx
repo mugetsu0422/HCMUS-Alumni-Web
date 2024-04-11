@@ -11,10 +11,9 @@ function LinkIcon({ link }: { link: string }) {
         <Facebook className="text-[#1877F2] text-[2.5rem]" />
       ) : linkedinPattern.test(link) ? (
         <Linkedin className="text-[#0077B5] text-[2.5rem]" />
-      ) : (
+      ) : link ? (
         <p className="decoration-solid underline text-blue-700">Social media</p>
-      )}
-      {}
+      ) : null}
     </>
   )
 }
