@@ -3,9 +3,9 @@
 import React from 'react'
 import Sidebar from '../../ui/social-page/sidebar'
 import ListUser from '../../ui/social-page/list-user'
-import TodayNews from '../../ui/social-page/today-new'
 import TrendingNews from '../../ui/social-page/trending-news'
 import HallOfFame from '../../ui/social-page/hall-of-fame'
+import NewEvents from '../../ui/social-page/new-events'
 import { nunito } from '../../ui/fonts'
 import { Button, Avatar, Badge, Textarea } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -120,7 +120,7 @@ export default function Page() {
       </Sidebar>
       <div
         className={`${nunito.className} -z-10 top-24 flex flex-col place-items-center justify-center sm:w-[95%] md:w-[90%] relative gap-y-10 `}>
-        <TodayNews />
+        <NewEvents />
         <TrendingNews />
         <HallOfFame />
       </div>
