@@ -25,3 +25,10 @@
     :root {
     }
 }
+.ql-editor {
+    font-size: 16px;
+}
+
+.ql-editor img {
+    cursor: default !important;
+}
