@@ -11,12 +11,19 @@ import {
 } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import { nunito } from '../../fonts'
-import { Trash3, Eye, EyeSlash, PencilSquare } from 'react-bootstrap-icons'
+import {
+  Trash3,
+  Eye,
+  EyeSlash,
+  PencilSquare,
+  CalendarCheck,
+} from 'react-bootstrap-icons'
 import Image from 'next/image'
 import moment from 'moment'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
+import toast, { Toaster } from 'react-hot-toast'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -49,20 +56,18 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
   )
 }
 
-function HideOrShowDialog({ id, open, handleOpen, status, onHideOrShow }) {
+function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
   let header = ''
   let body = ''
   let statusId = null
-  if (status === 'Bình thường') {
-    header = 'Ẩn'
-    body = 'Bạn có muốn ẩn bài viết này'
-    statusId = POST_STATUS['Ẩn']
-  } else if (status === 'Ẩn') {
-    header = 'Hiện thị'
+  if (isHidden) {
+    header = 'Hiển thị'
     body = 'Bạn có muốn hiển thị bài viết này?'
     statusId = POST_STATUS['Bình thường']
   } else {
-    return null
+    header = 'Ẩn'
+    body = 'Bạn có muốn ẩn bài viết này'
+    statusId = POST_STATUS['Ẩn']
   }
 
   return (
@@ -103,6 +108,10 @@ export default function NewsListItem({
 }) {
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
+  const [isDeleted, setIsDeleted] = React.useState(false)
+  const [isHidden, setIsHidden] = React.useState(
+    status.name === 'Ẩn' ? true : status.name === 'Bình thường' ? false : null
+  )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
@@ -119,8 +128,13 @@ export default function NewsListItem({
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then((res) => {})
-      .catch((e) => {})
+      .then((res) => {
+        toast.success('Xoá thành công')
+        setIsDeleted(true)
+      })
+      .catch((e) => {
+        toast.success('Xoá thất bại')
+      })
   }
 
   const onHideOrShow = (id, statusId) => {
@@ -134,13 +148,44 @@ export default function NewsListItem({
           },
         }
       )
-      .then((res) => {})
-      .catch((e) => {})
+      .then((res) => {
+        if (isHidden) {
+          toast.success('Hiển thị thành công')
+        } else {
+          toast.success('Ẩn thành công')
+        }
+        setIsHidden(!isHidden)
+      })
+      .catch((e) => {
+        if (isHidden) {
+          toast.success('Hiển thị thất bại')
+        } else {
+          toast.success('Ẩn thất bại')
+        }
+      })
   }
 
+  if (isDeleted) return null
   return (
     <div
       className={`${nunito.className} border-2 border-t-0 gap-2 border-[--blue-02] w-[1184px] m-auto items-center justify-between h-fit flex pl-6 py-2`}>
+      <Toaster
+        containerStyle={{ zIndex: 99999 }}
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
+            },
+          },
+        }}
+      />
       <img
         src={imgSrc}
         alt="news image"
@@ -177,24 +222,29 @@ export default function NewsListItem({
           onDelete={onDelete}
         />
 
-        <Button
-          variant="text"
-          onClick={handleOpenShow}
-          className="px-4"
-          placeholder={undefined}>
-          {status.name === 'Bình thường' ? (
-            <Eye className="text-2xl  text-black" />
-          ) : status.name === 'Ẩn' ? (
-            <EyeSlash className="text-2xl text-black" />
-          ) : (
-            ''
-          )}
-        </Button>
+        {status.name === 'Chờ' ? (
+          <div className="flex justify-center items-center px-4">
+            <CalendarCheck className="text-2xl text-green-800" />
+          </div>
+        ) : (
+          <Button
+            variant="text"
+            onClick={handleOpenShow}
+            className="px-4"
+            placeholder={undefined}>
+            {!isHidden ? (
+              <Eye className="text-2xl  text-black" />
+            ) : (
+              <EyeSlash className="text-2xl text-black" />
+            )}
+          </Button>
+        )}
+
         <HideOrShowDialog
           id={id}
           open={openShow}
           handleOpen={handleOpenShow}
-          status={status.name}
+          isHidden={isHidden}
           onHideOrShow={onHideOrShow}
         />
       </div>

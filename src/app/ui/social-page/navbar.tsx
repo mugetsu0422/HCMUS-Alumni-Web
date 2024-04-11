@@ -14,41 +14,39 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faBars,
-  faHouse,
   faUserGroup,
+  faNewspaper,
   faCalendarDays,
   faCertificate,
   faBell,
-  faEnvelope,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
 const navListItems = [
   {
-    label: 'Trang chủ',
-    icon: faHouse,
-  },
-  {
-    label: 'Mọi người',
-    icon: faUserGroup,
+    label: 'Tin tức',
+    icon: faNewspaper,
+    urlLink: 'news',
   },
   {
     label: 'Sự kiện',
     icon: faCalendarDays,
+    urlLink: '#',
   },
   {
     label: 'Gương thành công',
     icon: faCertificate,
+    urlLink: '#',
   },
 ]
 
 function NavList() {
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
-      {navListItems.map(({ label, icon }) => (
+      {navListItems.map(({ label, icon, urlLink }) => (
         <div className="group cursor-pointer lg:py-3" key={label}>
           <Link
-            href="#"
+            href={urlLink}
             className="text-[var(--text)] font-bold group-hover:text-[var(--blue-02)] flex items-center gap-2">
             <FontAwesomeIcon
               className="mr-auto text-[var(--blue-02)] text-2xl lg:block hidden"
@@ -79,10 +77,10 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className="fixed top-0 z-10 px-3 lg:pl-6 py-4 lg:py-0 border-b-2 border-slate-700 "
+      className="sticky top-0 z-10 px-3 lg:pl-6 py-4 lg:py-0 border-b-2 border-slate-700 "
       shadow={false}>
       <div className="mx-auto flex items-center justify-between text-blue-gray-900">
-        <Link href="/">
+        <Link href="/home-page">
           <Image
             className="hidden lg:block"
             src="/logo-square.svg"
@@ -121,12 +119,6 @@ export default function MyNavbar() {
           <Badge content={2} color="blue">
             <Button placeholder={undefined} variant="text" size="sm">
               <FontAwesomeIcon icon={faBell} className="text-2xl" />
-            </Button>
-          </Badge>
-
-          <Badge content={2} color="blue">
-            <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon icon={faEnvelope} className="text-2xl " />
             </Button>
           </Badge>
 

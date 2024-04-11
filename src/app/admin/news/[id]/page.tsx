@@ -176,8 +176,6 @@ export default function Page({ params }: { params: { id: string } }) {
         setContent(data.content)
       })
       .catch((e) => {
-        console.log(e)
-
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
