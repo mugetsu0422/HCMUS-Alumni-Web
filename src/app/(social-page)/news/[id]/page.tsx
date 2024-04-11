@@ -41,7 +41,7 @@ export default function Page({ params }: { params: { id: string } }) {
     return <NoData />
   }
   return (
-    <div className="flex m-auto w-[80%]">
+    <div className="flex flex-col xl:flex-row m-auto w-[80%]">
       <div className={`mt-10 flex flex-col gap-y-8 mx-auto w-[70%]`}>
         <div className="flex justify-between">
           {news?.faculty ? (
