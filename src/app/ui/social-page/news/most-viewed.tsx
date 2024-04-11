@@ -26,7 +26,7 @@ const mostViewed = [
 
 export default function MostViewed() {
   return (
-    <div className="mt-20 xl:w-72 w-fit bg-gray-300 text-[--blue-05] font-medium py-6 px-4">
+    <div className="xl:w-72 w-fit bg-gray-300 text-[--blue-05] font-medium py-6 px-4">
       <p className="my-6 text-xl font-extrabold text-[#008000]">
         Xem nhiều nhất
       </p>
