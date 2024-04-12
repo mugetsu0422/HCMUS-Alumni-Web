@@ -97,8 +97,8 @@ function EventsListItem({
 
 export default function Page() {
   return (
-    <div className="flex justify-center gap-8">
-      <div className="flex gap-6 justify-center mt-8">
+    <div className="flex justify-center gap-8 w-[70%] m-auto max-w-[1400px]">
+      <div className="flex w-full flex-wrap gap-6 justify-center mt-8">
         {dataTemp.map(
           ({
             id,
