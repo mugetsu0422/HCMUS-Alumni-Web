@@ -22,14 +22,14 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} w-[75%] bg-[--blue-04] rounded-lg m-auto py-20 mt-16`}>
-      <div className="flex flex-col w-[90%] items-center justify-center m-auto gap-y-10">
-        <div className="flex justify-between w-full">
+      <div className="flex flex-col w-[90%] items-center justify-center m-auto  gap-y-10">
+        <div className="flex flex-col lg:flex-row justify-between gap-4 w-full">
           <img
             src={dataTemp.thumbnail}
             alt="image event"
-            className="w-[750px] h-[430px] object-cover object-center rounded-lg"
+            className="sm:w-[450px] xl:w-[600px] 2xl:w-[750px] 2xl:h-[430px] object-cover object-center rounded-lg"
           />
-          <div className="flex flex-col w-[500px] gap-y-10">
+          <div className="flex flex-col sm:w-[450px] lg:w-[500px] xl:gap-y-6 2xl:gap-y-10">
             <p className="text-[1.9rem] font-extrabold">{dataTemp.title}</p>
 
             <div>
@@ -49,7 +49,7 @@ export default function Page() {
 
             <div className="flex items-center gap-2">
               <BarChartFill className="text-[--blue-02] text-[4.1rem]" />
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col">
                 <p className="text-[30px] font-extrabold">{dataTemp.views}</p>
                 <p className="text-lg">Số người tham gia</p>
               </div>
