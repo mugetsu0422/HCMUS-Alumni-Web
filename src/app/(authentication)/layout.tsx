@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
         <Image
           className="sm:absolute sm:left-10 sm:top-4 "
           alt="Alumni Logo"
-          src="/logo-square.svg"
+          src="/logo-square.png"
           width={125}
           height={125}
           priority

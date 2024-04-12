@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import ErrorInput from '../../ui/error-input'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { jwtDecode } from 'jwt-decode'
 
 export default function Page() {
   // sau này sẽ xử lý thêm dữ kiện đăng nhập ở đây
@@ -30,7 +31,11 @@ export default function Page() {
       .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
       .then(({ data: { jwt } }) => {
         notify()
+        const decoded: { roles?: string[] } = jwtDecode(jwt)
+        const { roles = null } = decoded
+
         Cookies.set('jwt', jwt, { expires: 3 })
+        Cookies.set('roles', (roles), { expires: 3 })
       })
       .catch((e) => {
         error(e.response.data.msg)
