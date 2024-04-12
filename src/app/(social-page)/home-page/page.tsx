@@ -119,7 +119,7 @@ export default function Page() {
         <ListUser />
       </Sidebar>
       <div
-        className={`${nunito.className} -z-10 top-24 flex flex-col place-items-center justify-center sm:w-[95%] md:w-[90%] relative gap-y-10 `}>
+        className={`${nunito.className} -z-10 mt-8 flex flex-col place-items-center justify-center sm:w-[95%] md:w-[90%] relative gap-y-10 `}>
         <NewEvents />
         <TrendingNews />
         <HallOfFame />
