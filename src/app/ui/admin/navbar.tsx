@@ -115,7 +115,7 @@ export default function MyNavbar() {
         <Link href="/">
           <Image
             className="hidden lg:block"
-            src="/logo-square.svg"
+            src="/logo-square.png"
             alt="log"
             width={80}
             height={80}

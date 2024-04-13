@@ -4,12 +4,12 @@ import Link from 'next/link'
 
 export default function RootLayout({ children }) {
   return (
-    <div className="flex items-center justify-between flex-col sm:flex-row">
+    <div className="flex justify-between flex-col sm:flex-row">
       <Link href={'/'}>
         <Image
           className="sm:absolute sm:left-10 sm:top-4 "
           alt="Alumni Logo"
-          src="/logo-square.svg"
+          src="/logo-square.png"
           width={125}
           height={125}
           priority
