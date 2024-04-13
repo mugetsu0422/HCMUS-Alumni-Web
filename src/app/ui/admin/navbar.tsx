@@ -13,10 +13,9 @@ import Link from 'next/link'
 import { ChevronDown } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faBars,
   faBell,
   faEnvelope,
-  faHouse,
+  faNewspaper,
   faUserPlus,
   faCalendar,
   faUserGroup,
@@ -26,11 +25,6 @@ import {
 // nav list component
 const navListItems = [
   {
-    label: 'Trang chủ',
-    subMenu: null,
-    icon: faHouse,
-  },
-  {
     label: 'Xét duyệt',
     subMenu: [
       { title: 'Chưa xét duyệt', link: '/admin/alumni-verification/pending' },
@@ -39,26 +33,35 @@ const navListItems = [
     icon: faUserPlus,
   },
   {
+    label: 'Tin tức',
+    subMenu: null,
+    icon: faNewspaper,
+    link: '/admin/news',
+  },
+  {
     label: 'Sự kiện',
     subMenu: null,
     icon: faCalendar,
+    link: '/admin/events',
   },
   {
     label: 'Gương thành công',
     subMenu: null,
     icon: faUserGroup,
+    link: '#',
   },
   {
     label: 'Tư vấn',
     subMenu: null,
     icon: faCircleQuestion,
+    link: '#',
   },
 ]
 
 function NavList() {
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
-      {navListItems.map(({ label, subMenu, icon }) => (
+      {navListItems.map(({ label, subMenu, icon, link }) => (
         <div className="group cursor-pointer lg:py-3" key={label}>
           {subMenu ? (
             <>
@@ -80,7 +83,7 @@ function NavList() {
             </>
           ) : (
             <Link
-              href="#"
+              href={link}
               className="text-[var(--text)] font-bold group-hover:text-[var(--blue-02)] flex items-center gap-2">
               <FontAwesomeIcon icon={icon} className="text-2xl" />
 

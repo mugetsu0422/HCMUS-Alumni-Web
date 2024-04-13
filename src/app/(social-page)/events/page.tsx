@@ -1,11 +1,12 @@
 'use client'
 
-/* eslint-disable @next/next/no-img-element */
-import React from 'react'
-import Link from 'next/link'
-import { Clock, GeoAltFill, BarChartFill } from 'react-bootstrap-icons'
+import React, { useState } from 'react'
+import EventsListItem from '../../ui/social-page/events/events-list-item'
+import Pagination from '../../ui/common/pagination'
 import { Button } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
+import { FACULTIES } from '../../constant'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 
 const dataTemp = [
   {
@@ -16,7 +17,7 @@ const dataTemp = [
     organizationLocation: '227 Nguyễn Văn Cừ, P4, Q5',
     organizationTime: 'DD-MM-YYYY HH:mm:ss',
     status: '',
-    faculty_id: 'CNTT',
+    faculty_id: 'Công Nghệ Thông Tin',
   },
   {
     id: '2',
@@ -26,7 +27,7 @@ const dataTemp = [
     organizationLocation: '227 Nguyễn Văn Cừ, P4, Q5',
     organizationTime: 'DD-MM-YYYY HH:mm:ss',
     status: '',
-    faculty_id: 'CNTT',
+    faculty_id: 'Sinh học – Công nghệ Sinh học',
   },
   {
     id: '3',
@@ -40,65 +41,62 @@ const dataTemp = [
   },
 ]
 
-function EventsListItem({
-  id,
-  title,
-  thumbnail,
-  views,
-  organizationLocation,
-  organizationTime,
-  faculty_id,
-}) {
-  const router = useRouter()
-
+function FilterFaculty() {
   return (
-    <div className="flex w-[25rem] flex-col justify-start items-start gap-3">
-      <Link href={`/events/${id}`} className="w-full h-60 ">
-        <figure className="relative h-60 w-full">
-          <img
-            src={thumbnail}
-            alt="thumbnail"
-            className="w-full h-full object-cover object-center rounded-xl"
-          />
-          <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
-            {faculty_id}
-          </figcaption>
-        </figure>
-      </Link>
-      <p className="text-2xl">{title}</p>
-      <p className="flex items-center gap-1 text-md">
-        <GeoAltFill className="text-[--blue-02]" /> Địa điểm:{' '}
-        <text>{organizationLocation}</text>
-      </p>
-      <p className="flex items-center gap-1 text-md">
-        <Clock className="text-[--blue-02]" /> Thời gian:{' '}
-        <text>{organizationTime}</text>
-      </p>
-      <p className="flex items-center gap-1 text-md">
-        <BarChartFill className="text-[--blue-02]" /> Số người tham gia:{' '}
-        <text>{views}</text>
-      </p>
-      <Button
-        placeholder={undefined}
-        onClick={() => router.push(`/events/${id}`)}
-        size="lg"
-        className="bg-[--secondary] text-black w-full">
-        Xem chi tiết
+    <div className="flex items-end gap-x-2 w-fit">
+      <Button placeholder={undefined} className="bg-[--blue-05]">
+        <FontAwesomeIcon icon={faFilterCircleXmark} className="text-lg mr-2" />
+        Xóa bộ lọc
       </Button>
-      <Button
-        placeholder={undefined}
-        size="lg"
-        className="bg-[--blue-02] w-full">
-        Tham gia
-      </Button>
+
+      <div className="flex flex-col gap-1">
+        <p className="font-semibold text-md">Khoa</p>
+        <select
+          className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+          //{...register('facultyId')}
+        >
+          <option value={0}>Không</option>
+          {FACULTIES.map(({ id, name }) => {
+            return (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            )
+          })}
+        </select>
+      </div>
     </div>
   )
 }
 
 export default function Page() {
+  const [curPage, setCurPage] = useState(0)
+  //* Number(params.get('page')) + 1 || 1
+  const [totalPages, setTotalPages] = useState(0)
+
+  const onNextPage = () => {
+    // if (curPage == totalPages) return
+    // params.set('page', curPage.toString())
+    // replace(`${pathname}?${params.toString()}`)
+    // setMyParams(`?${params.toString()}`)
+    // setCurPage((curPage) => {
+    //   return curPage + 1
+    // })
+  }
+  const onPrevPage = () => {
+    // if (curPage == 1) return
+    // params.set('page', (curPage - 2).toString())
+    // replace(`${pathname}?${params.toString()}`)
+    // setMyParams(`?${params.toString()}`)
+    // setCurPage((curPage) => {
+    //   return curPage - 1
+    // })
+  }
+
   return (
-    <div className="flex justify-center gap-8 w-[70%] m-auto max-w-[1400px]">
-      <div className="flex w-full flex-wrap gap-6 justify-center mt-8">
+    <div className="mt-8 flex flex-col justify-center gap-8 w-[70%] m-auto max-w-[1248px]">
+      <FilterFaculty />
+      <div className="flex w-full flex-wrap gap-6 justify-center mt-4">
         {dataTemp.map(
           ({
             id,
@@ -122,6 +120,12 @@ export default function Page() {
           )
         )}
       </div>
+      <Pagination
+        totalPages={totalPages}
+        curPage={curPage}
+        onNextPage={onNextPage}
+        onPrevPage={onPrevPage}
+      />
     </div>
   )
 }
