@@ -3,11 +3,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import NewsListItem from '../../ui/admin/news/news-list-item'
 import FilterHeader from '../../ui/admin/news/Header'
 import { Input, Button } from '@material-tailwind/react'
-import {
-  ArrowRight,
-  ArrowLeft,
-  ArrowCounterclockwise,
-} from 'react-bootstrap-icons'
+import { ArrowCounterclockwise } from 'react-bootstrap-icons'
 import { JWT_COOKIE } from '../../constant'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
@@ -17,35 +13,7 @@ import { roboto } from '../../ui/fonts'
 import { classNames } from 'react-easy-crop/helpers'
 import { useForm } from 'react-hook-form'
 import Link from 'next/link'
-
-function Pagination({ totalPages, curPage, onNextPage, onPrevPage }) {
-  return (
-    <div className="flex items-center gap-4 justify-center mb-6">
-      <Button
-        placeholder={undefined}
-        variant="text"
-        className="flex items-center gap-2 font-bold normal-case text-base"
-        onClick={onPrevPage}
-        disabled={curPage <= 1}>
-        <ArrowLeft className="text-2xl text-[var(--blue-02)]" />
-      </Button>
-      <p className="w-20 text-center font-bold text-[var(--blue-02)]">
-        {curPage} / {totalPages}
-      </p>
-      <Button
-        placeholder={undefined}
-        variant="text"
-        className="flex items-center gap-2 font-bold normal-case text-base"
-        onClick={onNextPage}
-        disabled={curPage >= totalPages}>
-        <ArrowRight
-          strokeWidth={2}
-          className="text-2xl text-[var(--blue-02)]"
-        />
-      </Button>
-    </div>
-  )
-}
+import Pagination from '../../ui/common/pagination'
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   const router = useRouter()
