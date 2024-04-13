@@ -105,6 +105,14 @@ export default function Page() {
       return curPage - 1
     })
   }
+  const onFilter = (name: string, order: string) => {
+    params.delete('page')
+    setCurPage(1)
+    params.set('orderBy', name)
+    params.set('order', order)
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
 
   useEffect(() => {
     axios
@@ -130,7 +138,7 @@ export default function Page() {
         onSearch={onSearch}
         onResetSearchAndFilter={onResetSearchAndFilter}
       />
-      <FilterHeader setParams={setMyParams} setCurPage={setCurPage} />
+      <FilterHeader onFilter={onFilter} />
       <div className="relative mb-10">
         {news.map(({ id, title, thumbnail, views, status, publishedAt }) => (
           <div key={title} className="">

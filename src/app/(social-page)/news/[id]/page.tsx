@@ -7,7 +7,7 @@ import { Textarea } from '@material-tailwind/react'
 
 import { nunito } from '../../../ui/fonts'
 import axios from 'axios'
-import { JWT_COOKIE, TAGS } from '../../../constant'
+import { JWT_COOKIE, MOST_VIEWED_LIMIT, TAGS } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import moment from 'moment'
@@ -15,11 +15,7 @@ import moment from 'moment'
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
   const [noData, setNoData] = useState(false)
-  const [content, setContent] = useState(null)
-  const [selectedTags, setSelectedTags] = useState([])
-  const [summaryCharCount, setSummaryCharCount] = useState(0)
-  const summaryMaxCharCount = 150
-  const [openCancelDialog, setOpenCancelDialog] = useState(false)
+  const [mostViewed, setMostViewed] = useState([])
 
   useEffect(() => {
     axios
@@ -34,6 +30,20 @@ export default function Page({ params }: { params: { id: string } }) {
       .catch((e) => {
         setNoData(true)
       })
+    // Most viewed news
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/most-viewed?limit=${MOST_VIEWED_LIMIT}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { news } }) => {
+        setMostViewed(news)
+      })
+      .catch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -69,10 +79,11 @@ export default function Page({ params }: { params: { id: string } }) {
           <div className="flex gap-x-2 items-center">
             <TagFill />
             Thẻ:
-            {/* Xem thêm ở user news */}
-            {...news?.tags.map(({ name }) => {
+            {news?.tags.map(({ name }) => {
               return (
-                <span className="text-[var(--blue-05)] font-semibold" key={name}>
+                <span
+                  className="text-[var(--blue-05)] font-semibold"
+                  key={name}>
                   {name}
                 </span>
               )
@@ -95,7 +106,12 @@ export default function Page({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <MostViewed />
+      <MostViewed
+        className={
+          'xl:w-72 w-fit h-fit mt-6 xl:mt-0 bg-gray-300 text-[--blue-05] font-medium py-6 px-4'
+        }
+        news={mostViewed}
+      />
     </div>
   )
 }

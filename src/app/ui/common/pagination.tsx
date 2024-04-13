@@ -5,12 +5,19 @@ import { Button } from '@material-tailwind/react'
 
 import { ArrowRight, ArrowLeft } from 'react-bootstrap-icons'
 
+interface PaginationProps {
+  totalPages: number
+  curPage: number
+  onNextPage: () => void
+  onPrevPage: () => void
+}
+
 export default function Pagination({
   totalPages,
   curPage,
   onNextPage,
   onPrevPage,
-}) {
+}: PaginationProps) {
   return (
     <div className="flex items-center gap-4 justify-center mb-6">
       <Button

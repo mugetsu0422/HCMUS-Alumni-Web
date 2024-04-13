@@ -26,12 +26,12 @@ const navListItems = [
   {
     label: 'Tin tức',
     icon: faNewspaper,
-    urlLink: 'news',
+    urlLink: '/news',
   },
   {
     label: 'Sự kiện',
     icon: faCalendarDays,
-    urlLink: 'events',
+    urlLink: '/events',
   },
   {
     label: 'Gương thành công',
@@ -99,7 +99,7 @@ export default function MyNavbar() {
         </div>
         <FontAwesomeIcon
           onClick={toggleIsNavOpen}
-          className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
+          className="ml-5 mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
           icon={faBars}
         />
         <div className=" w-[40vw] m-auto ">
