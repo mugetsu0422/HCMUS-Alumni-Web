@@ -40,7 +40,7 @@ export default function HeaderFilter({ setParams, setCurPage }) {
               placeholder={undefined}
               variant="text"
               className="w-[650px] ml-4 text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-white">
-              Bài viết
+              Sự kiện
               <CaretDownFill />
             </Button>
           </MenuHandler>
@@ -96,7 +96,7 @@ export default function HeaderFilter({ setParams, setCurPage }) {
               placeholder={undefined}
               variant="text"
               className="ml-2 w-[20rem] text-center p-1 flex items-center justify-center gap-2 font-bold normal-case text-base text-white">
-              Địa chỉ
+              Địa điểm
               <CaretDownFill />
             </Button>
           </MenuHandler>
