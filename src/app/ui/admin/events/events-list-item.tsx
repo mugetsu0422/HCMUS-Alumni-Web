@@ -2,7 +2,7 @@
 'use client'
 import React from 'react'
 import { Trash3, Eye, EyeSlash, PencilSquare } from 'react-bootstrap-icons'
-import { nunito } from '../fonts'
+import { nunito } from '../../fonts'
 import {
   Button,
   Dialog,
@@ -12,7 +12,7 @@ import {
 } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 
-import { JWT_COOKIE, POST_STATUS } from '../../constant'
+import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (

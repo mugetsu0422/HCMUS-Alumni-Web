@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faBars,
+  faComments,
   faNewspaper,
   faCalendarDays,
   faCertificate,
@@ -30,11 +31,16 @@ const navListItems = [
   {
     label: 'Sự kiện',
     icon: faCalendarDays,
-    urlLink: '#',
+    urlLink: 'events',
   },
   {
     label: 'Gương thành công',
     icon: faCertificate,
+    urlLink: '#',
+  },
+  {
+    label: 'Tư vấn',
+    icon: faComments,
     urlLink: '#',
   },
 ]
@@ -98,12 +104,12 @@ export default function MyNavbar() {
         />
         <div className=" w-[40vw] m-auto ">
           <Input
-            placeholder="Tìm kiếm ..."
+            label="Tìm kiếm"
             crossOrigin={undefined}
             size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 max-w-sm"
+            className="pl-2 !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 max-w-sm"
             labelProps={{
-              className: 'before:content-none after:content-none',
+              className: 'pl-2 before:content-none after:content-none',
             }}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {

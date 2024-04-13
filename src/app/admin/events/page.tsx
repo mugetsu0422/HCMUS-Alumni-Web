@@ -4,8 +4,8 @@ import { Input, Button } from '@material-tailwind/react'
 import { ArrowCounterclockwise } from 'react-bootstrap-icons'
 import { roboto } from '../../ui/fonts'
 import Pagination from '../../ui/common/pagination'
-import EventsListItem from '../../ui/events/events-list-item'
-import FilterHeader from '../../ui/events/header-filter'
+import EventsListItem from '../../ui/admin/events/events-list-item'
+import FilterHeader from '../../ui/admin/events/header-filter'
 import { useRouter } from 'next/navigation'
 
 const events = [
