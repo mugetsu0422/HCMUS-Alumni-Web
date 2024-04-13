@@ -11,13 +11,13 @@ function Footer() {
         <div className="flex flex-col items-center gap-4">
           <div className="flex gap-10">
             <Image
-              src={'/hcmus-logo.svg'}
+              src={'/hcmus-logo.png'}
               width={100}
               height={100}
               alt="hcmus-logo"
             />
             <Image
-              src={'/logo-square.svg'}
+              src={'/logo-square.png'}
               width={100}
               height={100}
               alt="hcmus-logo"

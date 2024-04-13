@@ -2,7 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['storage.googleapis.com', 'hcmus.edu.vn'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: '/hcmus-alumverse/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'hcmus.edu.vn',
+        pathname: '**',
+      },
+    ],
     minimumCacheTTL: 30,
   },
 }
