@@ -56,97 +56,99 @@ function Step1() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-1 flex flex-col gap-6">
-        <Typography
-          placeholder={undefined}
-          variant="h6"
-          color="blue-gray"
-          className={`${roboto} -mb-3`}>
-          Email <span className="text-red-700 font-bold text-lg">*</span>
-        </Typography>
-        <Input
-          size="lg"
-          className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
-          {...register('email', {
-            required: 'Bạn cần phải nhập email',
-            pattern: {
-              value:
-                /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-              message: 'Hãy nhập đúng định dạng email',
-            },
-          })}
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          crossOrigin={undefined}
-        />
+      <div>
+        <div className="mb-4 flex flex-col gap-3">
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={`${roboto}`}>
+            Email <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
+          <Input
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+            {...register('email', {
+              required: 'Vui lòng nhập email',
+              pattern: {
+                value:
+                  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                message: 'Hãy nhập đúng định dạng email',
+              },
+            })}
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            crossOrigin={undefined}
+          />
+          <ErrorInput
+            // This is the error message
+            errors={errors?.email?.message}
+          />
+        </div>
 
-        <ErrorInput
-          // This is the error message
-          errors={errors?.email?.message}
-        />
+        <div className="mb-4 flex flex-col gap-3">
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={``}>
+            Mật khẩu <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
+          <Input
+            type="password"
+            {...register('password', {
+              required: 'Vui lòng nhập mật khẩu',
+            })}
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            crossOrigin={undefined}
+          />
+          <ErrorInput
+            // This is the error message
+            errors={errors?.password?.message}
+          />
+        </div>
 
-        <Typography
-          placeholder={undefined}
-          variant="h6"
-          color="blue-gray"
-          className={` ${roboto} -mb-3`}>
-          Mật khẩu <span className="text-red-700 font-bold text-lg">*</span>
-        </Typography>
+        <div className="mb-4 flex flex-col gap-3">
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={``}>
+            Nhập lại mật khẩu{' '}
+            <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
 
-        <Input
-          type="password"
-          {...register('password', {
-            required: 'Bạn cần phải nhập mật khẩu',
-          })}
-          size="lg"
-          className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          crossOrigin={undefined}
-        />
-
-        <ErrorInput
-          // This is the error message
-          errors={errors?.password?.message}
-        />
-
-        <Typography
-          placeholder={undefined}
-          variant="h6"
-          color="blue-gray"
-          className={` ${roboto} -mb-3`}>
-          Nhập lại mật khẩu{' '}
-          <span className="text-red-700 font-bold text-lg">*</span>
-        </Typography>
-
-        <Input
-          type="password"
-          size="lg"
-          className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          {...register('confirmPassword', {
-            required: 'Vui lòng xác nhận lại mật khẩu',
-            validate: (value) =>
-              value === getValues().password || 'Mật khẩu không khớp',
-          })}
-          crossOrigin={undefined}
-        />
-
-        <ErrorInput
-          // This is the error message
-          errors={errors?.confirmPassword?.message}
-        />
+          <Input
+            type="password"
+            size="lg"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            {...register('confirmPassword', {
+              required: 'Vui lòng xác nhận lại mật khẩu',
+              validate: (value) =>
+                value === getValues().password || 'Mật khẩu không khớp',
+            })}
+            crossOrigin={undefined}
+          />
+          <ErrorInput
+            // This is the error message
+            errors={errors?.confirmPassword?.message}
+          />
+        </div>
       </div>
 
       <Button
         type="submit"
         placeholder={undefined}
         ripple={true}
-        className={` ${roboto} mt-[3rem] w-full bg-blue-800 text-white rounded-md py-4`}>
+        className={` mt-[3rem] w-full bg-blue-800 text-white rounded-md py-4`}>
         Tiếp tục
       </Button>
     </form>
@@ -157,7 +159,7 @@ function Step2() {
   const { inputs, setInputs, handleBack } = useContext(FormContext)
   const [isCodeExpired, setIsCodeExpired] = useState(false)
   const router = useRouter()
-  const timer = useRef(Date.now());
+  const timer = useRef(Date.now())
 
   const {
     register,
@@ -190,7 +192,9 @@ function Step2() {
                 pass: inputs.pass,
               })
               .then((res) => {
-                Cookies.set(JWT_COOKIE, res.data.jwt, { expires: JWT_EXPIRED_TIME })
+                Cookies.set(JWT_COOKIE, res.data.jwt, {
+                  expires: JWT_EXPIRED_TIME,
+                })
                 // Move to next page
                 setTimeout(() => router.push('/verify-alumni'), 2500)
               })
@@ -223,7 +227,6 @@ function Step2() {
     setIsCodeExpired(false)
     timer.current = Date.now()
   }
-  
 
   return (
     <form
@@ -231,7 +234,7 @@ function Step2() {
       onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-1 flex flex-col gap-6">
         <div
-          className={` text-blue-400 ${roboto} italic sm:w-[400px] mt-[2rem] -mb-[1rem]`}>
+          className={` text-blue-400 italic sm:w-[400px] mt-[2rem] -mb-[1rem]`}>
           Mã xác thực đã được gửi đến {inputs.email} <br />
           Mã có giá trị trong 60s
         </div>
@@ -239,7 +242,7 @@ function Step2() {
           placeholder={undefined}
           variant="h6"
           color="blue-gray"
-          className={` ${roboto} -mb-3`}>
+          className={` -mb-3`}>
           Mã đăng ký <span className="text-red-700 font-bold text-lg">*</span>
         </Typography>
 
@@ -356,7 +359,7 @@ export default function Page() {
         variant="h2"
         color="blue-gray"
         placeholder={undefined}
-        className="mb-8">
+        className="my-8">
         ĐĂNG KÝ
       </Typography>
       <FormContext.Provider
@@ -369,7 +372,7 @@ export default function Page() {
         }}>
         <SignupForm />
       </FormContext.Provider>
-      <div className=" mt-[5rem] flex items-center justify-between ">
+      <div className=" mt-[2rem] flex items-center justify-between ">
         <Typography
           placeholder={undefined}
           color="gray"
