@@ -14,23 +14,8 @@ import {
   MenuItem,
   Button,
 } from '@material-tailwind/react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-export default function Header({ setParams, setCurPage }) {
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
-
-  function handleClick(name, order) {
-    params.delete('page')
-    setCurPage(1)
-    params.set('orderBy', name)
-    params.set('order', order)
-    replace(`${pathname}?${params.toString()}`)
-    setParams(`?${params.toString()}`)
-  }
-
+export default function Header({ onFilter }) {
   return (
     <div className="w-[1184px] h-fit bg-[--blue-02] border-2 border-[--blue-02] m-auto py-1 ">
       <div className="flex w-fit justify-evenly items-center ">
@@ -47,14 +32,14 @@ export default function Header({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('title', 'asc')}
+              onClick={() => onFilter('title', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('title', 'desc')}
+              onClick={() => onFilter('title', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
@@ -75,14 +60,14 @@ export default function Header({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('publishedAt', 'desc')}
+              onClick={() => onFilter('publishedAt', 'desc')}
               className="text-center font-bold flex justify-center">
               Mới nhất
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('publishedAt', 'asc')}
+              onClick={() => onFilter('publishedAt', 'asc')}
               className="text-center font-bold flex justify-center">
               Cũ nhất
               <ArrowUp />
@@ -103,14 +88,14 @@ export default function Header({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('views', 'desc')}
+              onClick={() => onFilter('views', 'desc')}
               className="text-center font-bold flex justify-center">
               Giảm dần
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('views', 'asc')}
+              onClick={() => onFilter('views', 'asc')}
               className="text-center font-bold flex justify-center">
               Tăng dần
               <ArrowUp />
