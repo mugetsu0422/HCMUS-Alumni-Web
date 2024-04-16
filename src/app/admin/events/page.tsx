@@ -44,7 +44,7 @@ function FuntionSection({
   })
 
   return (
-    <div className="my-5 w-[1500px] m-auto flex items-center gap-5">
+    <div className="my-5 w-full flex items-center gap-5">
       <div className="h-full w-[500px] mr-auto">
         <Input
           size="lg"
@@ -147,39 +147,41 @@ export default function Page() {
   }, [myParams])
 
   return (
-    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
+    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] ">
       <p
-        className={`${roboto.className} mx-auto w-[1500px] text-3xl font-bold text-[var(--blue-02)]`}>
+        className={`${roboto.className} mx-auto w-full text-3xl font-bold text-[var(--blue-02)]`}>
         Quản lý sự kiện
       </p>
       <FuntionSection
         onSearch={onSearch}
         onResetSearchAndFilter={onResetSearchAndFilter}
       />
-      <FilterHeader onFilter={onFilter} />
-      <div className="relative mb-10">
-        {events.map(
-          ({
-            id,
-            title,
-            thumbnail,
-            participants,
-            organizationLocation,
-            organizationTime,
-            status,
-          }) => (
-            <EventsListItem
-              key={id}
-              id={id}
-              title={title}
-              thumbnail={thumbnail}
-              participants={participants}
-              organizationLocation={organizationLocation}
-              organizationTime={organizationTime}
-              status={status}
-            />
-          )
-        )}
+      <div className='overflow-x-auto'>
+        <FilterHeader onFilter={onFilter} />
+        <div className="relative mb-10">
+          {events.map(
+            ({
+              id,
+              title,
+              thumbnail,
+              participants,
+              organizationLocation,
+              organizationTime,
+              status,
+            }) => (
+              <EventsListItem
+                key={id}
+                id={id}
+                title={title}
+                thumbnail={thumbnail}
+                participants={participants}
+                organizationLocation={organizationLocation}
+                organizationTime={organizationTime}
+                status={status}
+              />
+            )
+          )}
+        </div>
       </div>
       <Pagination
         totalPages={totalPages}

@@ -123,7 +123,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const onSubmit = async (data) => {
     const event = {
       ...data,
-      thumbnail: data.thumbnail[0],
+      thumbnail: data.thumbnail[0] || null,
       organizationTime: moment(data.organizationTime).format(
         'YYYY-MM-DD HH:mm:ss'
       ),
@@ -336,12 +336,7 @@ export default function Page({ params }: { params: { id: string } }) {
               accept="image/png, image/jpeg"
               {...register('thumbnail', {
                 onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
               })}
-            />
-            <ErrorInput
-              // This is the error message
-              errors={errors?.thumbnail?.message}
             />
             {thumbnailPreview ? (
               // eslint-disable-next-line @next/next/no-img-element
