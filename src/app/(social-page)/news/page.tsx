@@ -14,6 +14,7 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import Link from 'next/link'
 import moment from 'moment'
+import Pagination from '../../ui/common/pagination'
 
 function NewsListItem({
   id,
@@ -56,34 +57,6 @@ function NewsListItem({
           ))}
         </div>
       </div>
-    </div>
-  )
-}
-
-function Pagination() {
-  return (
-    <div className="flex items-center gap-4 justify-center m-6">
-      <Button
-        placeholder={undefined}
-        variant="text"
-        className="flex items-center gap-2 font-bold normal-case text-base bg-[--blue-02]"
-        // onClick={prev}
-        // disabled={active === 1 || active === 0}
-      >
-        <ArrowLeft className="h-6 w-6 text-white" />
-      </Button>
-      <p className="w-20 text-center font-bold ">
-        {/* {active} / {pages} */}0 / 0
-      </p>
-      <Button
-        placeholder={undefined}
-        variant="text"
-        className="flex items-center gap-2 font-bold normal-case text-base bg-[--blue-02]"
-        // onClick={next}
-        // disabled={active === pages || pages === 0}
-      >
-        <ArrowRight strokeWidth={2} className="h-6 w-6 text-white" />
-      </Button>
     </div>
   )
 }
@@ -173,7 +146,12 @@ export default function Page() {
         </div>
         <MostViewed />
       </div>
-      <Pagination />
+      <Pagination
+        totalPages={totalPages}
+        curPage={curPage}
+        onNextPage={onNextPage}
+        onPrevPage={onPrevPage}
+      />
     </>
   )
 }

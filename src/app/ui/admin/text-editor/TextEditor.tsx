@@ -101,7 +101,7 @@ function TextEditor({
 
   return (
     <>
-      <label className="text-xl font-bold">Bài đăng</label>
+      <label className="text-xl font-bold">Nội dung</label>
       <EditorToolbar toolbarId={'t1'} />
       {enableEditor && (
         <ReactQuill

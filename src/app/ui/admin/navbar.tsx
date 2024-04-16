@@ -48,7 +48,7 @@ const navListItems = [
     label: 'Gương thành công',
     subMenu: null,
     icon: faUserGroup,
-    link: '#',
+    link: '/admin/hof',
   },
   {
     label: 'Tư vấn',
