@@ -10,12 +10,18 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useDebouncedCallback } from 'use-debounce'
 import { roboto } from '../../ui/fonts'
-import { classNames } from 'react-easy-crop/helpers'
 import { useForm } from 'react-hook-form'
-import Link from 'next/link'
 import Pagination from '../../ui/common/pagination'
 
-function FuntionSection({ onSearch, onResetSearchAndFilter }) {
+interface FunctionSectionProps {
+  onSearch: (keyword: string) => void
+  onResetSearchAndFilter: () => void
+}
+
+function FuntionSection({
+  onSearch,
+  onResetSearchAndFilter,
+}: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)

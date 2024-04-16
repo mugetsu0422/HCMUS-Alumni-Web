@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { nunito } from '../../../ui/fonts'
 import toast, { Toaster } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import { JWT_COOKIE, FACULTIES } from '../../../constant'
+import { JWT_COOKIE, FACULTIES, TAGS } from '../../../constant'
 import { useRouter } from 'next/navigation'
 import {
   Input,
@@ -17,6 +17,29 @@ import {
   DialogHeader,
 } from '@material-tailwind/react'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
+import { ReactTags } from 'react-tag-autocomplete'
+import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
+import moment from 'moment'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+
+const getTodayDate = () => {
+  //*Get current date
+  let newDate = new Date()
+  let date =
+    newDate.getDate() < 10
+      ? '0' + newDate.getDate().toString()
+      : newDate.getDate().toString()
+
+  let month =
+    newDate.getMonth() + 1 < 10
+      ? '0' + (newDate.getMonth() + 1).toString()
+      : (newDate.getMonth() + 1).toString()
+
+  let year = newDate.getFullYear().toString()
+
+  return `${year}-${month}-${date}T00:00`.toString()
+}
 
 function CancelDialog({ open, handleOpen }) {
   const router = useRouter()
@@ -56,9 +79,38 @@ export default function Page() {
   } = useForm()
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
-  const textareaRef = useRef(null)
+  const [selectedTags, setSelectedTags] = useState([])
 
-  const onSubmit = async (data) => {}
+  const onSubmit = async (data) => {
+    const event = {
+      ...data,
+      thumbnail: data.thumbnail[0],
+      organizationTime: moment(data.organizationTime).format(
+        'YYYY-MM-DD HH:mm:ss'
+      ),
+      tagsId: selectedTags.map((tag) => {
+        return tag.value
+      }),
+    }
+
+    const postToast = toast.loading('Đang đăng')
+    axios
+      .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events`, event, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(() => {
+        toast.success('Đăng thành công', {
+          id: postToast,
+        })
+      })
+      .catch(({ message }) => {
+        toast.error(message, {
+          id: postToast,
+        })
+      })
+  }
 
   const onThumbnailChange = (e) => {
     const file = e.target.files[0]
@@ -79,25 +131,23 @@ export default function Page() {
     }
     reader.readAsDataURL(file)
   }
-
   const handleOpenCancelDialog = () => {
     setOpenCancelDialog(!openCancelDialog)
   }
-  //*Get current date
-  let newDate = new Date()
-  let date =
-    newDate.getDate() < 10
-      ? '0' + newDate.getDate().toString()
-      : newDate.getDate().toString()
+  const onAddTags = useCallback(
+    (newTag) => {
+      setSelectedTags([...selectedTags, newTag])
+    },
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
+    },
+    [selectedTags]
+  )
 
-  let month =
-    newDate.getMonth() + 1 < 10
-      ? '0' + (newDate.getMonth() + 1).toString()
-      : (newDate.getMonth() + 1).toString()
-
-  let year = newDate.getFullYear().toString()
-
-  let mindate = `${year}-${month}-${date}T00:00`.toString()
+  const today = getTodayDate()
 
   return (
     <div
@@ -139,8 +189,10 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập tiêu đề',
               })}
-              label="Nội dung tiêu đề"
-              className="bg-white"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
@@ -148,28 +200,23 @@ export default function Page() {
             />
           </div>
 
-          <div
-            className="flex gap-6"
-            //* INPUT CHO THỜI GIAN ĐỊA ĐIỂM VÀ KHOA
-          >
+          <div className="flex gap-6 flex-wrap">
             <div className="flex flex-col gap-2">
-              <label
-                className="text-xl font-bold"
-                //* INPUT CHO THỜI GIAN
-              >
-                Thời gian
-              </label>
+              <label className="text-xl font-bold">Thời gian</label>
               <Input
                 size="lg"
                 crossOrigin={undefined}
                 variant="outlined"
-                min={mindate}
+                min={today}
                 type="datetime-local"
                 {...register('organizationTime', {
-                  required: 'Vui lòng nhập địa chỉ',
+                  required: 'Vui lòng nhập thời gian diễn ra',
                 })}
-                label="Thời gian bắt đầu"
-                className="bg-white w-[350px]"
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white w-[350px] !border-t-blue-gray-200 focus:!border-t-gray-900"
               />
               <ErrorInput
                 // This is the error message
@@ -178,22 +225,20 @@ export default function Page() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label
-                className="text-xl font-bold"
-                //* INPUT CHO ĐỊA CHỈ
-              >
-                Địa điểm
-              </label>
+              <label className="text-xl font-bold">Địa điểm</label>
               <Input
                 size="lg"
                 crossOrigin={undefined}
                 variant="outlined"
                 type="text"
                 {...register('organizationLocation', {
-                  required: 'Vui lòng nhập địa chỉ',
+                  required: 'Vui lòng nhập địa điểm',
                 })}
-                label="Địa chỉ"
-                className="bg-white w-[600px]"
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[300px] !border-t-blue-gray-200 focus:!border-t-gray-900"
               />
               <ErrorInput
                 // This is the error message
@@ -205,7 +250,7 @@ export default function Page() {
                 Khoa
               </label>
               <select
-                className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+                className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
                 {...register('facultyId')}>
                 <option value={0}>Không</option>
                 {FACULTIES.map(({ id, name }) => {
@@ -217,6 +262,36 @@ export default function Page() {
                 })}
               </select>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xl font-bold">Thẻ</label>
+            <ReactTags
+              activateFirstOption={true}
+              placeholderText="Thêm thẻ"
+              selected={selectedTags}
+              suggestions={TAGS}
+              onAdd={onAddTags}
+              onDelete={onDeleteTags}
+              noOptionsText="No matching countries"
+              classNames={{
+                root: `${styles['react-tags']}`,
+                rootIsActive: `${styles['is-active']}`,
+                rootIsDisabled: `${styles['is-disabled']}`,
+                rootIsInvalid: `${styles['is-invalid']}`,
+                label: `${styles['react-tags__label']}`,
+                tagList: `${styles['react-tags__list']}`,
+                tagListItem: `${styles['react-tags__list-item']}`,
+                tag: `${styles['react-tags__tag']}`,
+                tagName: `${styles['react-tags__tag-name']}`,
+                comboBox: `${styles['react-tags__combobox']}`,
+                input: `${styles['react-tags__combobox-input']}`,
+                listBox: `${styles['react-tags__listbox']}`,
+                option: `${styles['react-tags__listbox-option']}`,
+                optionIsActive: `${styles['is-active']}`,
+                highlight: `${styles['react-tags__listbox-option-highlight']}`,
+              }}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -258,7 +333,6 @@ export default function Page() {
               Thông tin chi tiết
             </label>
             <Textarea
-              ref={textareaRef}
               size="lg"
               variant="outlined"
               className="bg-white h-44 !border-t-blue-gray-200 focus:!border-t-gray-900"
@@ -268,7 +342,7 @@ export default function Page() {
               labelProps={{
                 className: 'before:content-none after:content-none',
               }}
-              {...register('summary')}
+              {...register('content')}
             />
           </div>
 
