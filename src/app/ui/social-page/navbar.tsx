@@ -36,7 +36,7 @@ const navListItems = [
   {
     label: 'Gương thành công',
     icon: faCertificate,
-    urlLink: '#',
+    urlLink: '/hof',
   },
   {
     label: 'Tư vấn',
