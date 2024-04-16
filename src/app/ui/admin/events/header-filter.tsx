@@ -16,21 +16,11 @@ import {
 } from '@material-tailwind/react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-export default function HeaderFilter({ setParams, setCurPage }) {
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
+interface HeaderFilterProps {
+  onFilter: (name: string, order: string) => void
+}
 
-  function handleClick(name, order) {
-    params.delete('page')
-    setCurPage(1)
-    params.set('orderBy', name)
-    params.set('order', order)
-    replace(`${pathname}?${params.toString()}`)
-    setParams(`?${params.toString()}`)
-  }
-
+export default function HeaderFilter({ onFilter }: HeaderFilterProps) {
   return (
     <div className="w-[1500px] h-fit bg-[--blue-02] border-2 border-[--blue-02] m-auto py-1 ">
       <div className="flex w-fit justify-start items-center gap-x-1">
@@ -47,14 +37,14 @@ export default function HeaderFilter({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('title', 'asc')}
+              onClick={() => onFilter('title', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('title', 'desc')}
+              onClick={() => onFilter('title', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
@@ -75,14 +65,14 @@ export default function HeaderFilter({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('organizationTime', 'desc')}
+              onClick={() => onFilter('organizationTime', 'desc')}
               className="text-center font-bold flex justify-center">
               Mới nhất
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('organizationTime', 'asc')}
+              onClick={() => onFilter('organizationTime', 'asc')}
               className="text-center font-bold flex justify-center">
               Cũ nhất
               <ArrowUp />
@@ -103,14 +93,14 @@ export default function HeaderFilter({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('organizationLocation', 'asc')}
+              onClick={() => onFilter('organizationLocation', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('organizationLocation', 'desc')}
+              onClick={() => onFilter('organizationLocation', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
@@ -131,14 +121,14 @@ export default function HeaderFilter({ setParams, setCurPage }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('views', 'desc')}
-              className="-ml-2 text-center font-bold flex justify-center">
+              onClick={() => onFilter('participants', 'desc')}
+              className="text-center font-bold flex justify-center">
               Giảm dần
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => handleClick('views', 'asc')}
+              onClick={() => onFilter('participants', 'asc')}
               className="text-center font-bold flex justify-center">
               Tăng dần
               <ArrowUp />

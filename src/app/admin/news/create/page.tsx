@@ -202,8 +202,10 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập tiêu đề',
               })}
-              label="Nội dung tiêu đề"
-              className="bg-white"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
