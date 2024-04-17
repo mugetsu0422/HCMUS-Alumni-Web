@@ -23,9 +23,9 @@ export default function Page() {
     <div
       className={`${nunito.className} w-[75%] bg-[--blue-04] rounded-lg m-auto py-20 mt-16`}>
       <div className="flex flex-col w-[90%] items-center justify-center m-auto  gap-y-10">
-        <div className="flex flex-col lg:flex-row justify-between gap-4 w-full">
+        <div className="flex flex-col justify-between gap-4 w-full">
           <img
-            src={dataTemp.thumbnail}
+            src={dataTemp.thumbnail} 
             alt="image event"
             className="sm:w-[450px] xl:w-[600px] 2xl:w-[750px] 2xl:h-[430px] object-cover object-center rounded-lg"
           />
@@ -35,15 +35,15 @@ export default function Page() {
             <div>
               <p className="flex items-center gap-2 text-[20px]">
                 <GeoAltFill className="text-[--blue-02]" /> Địa điểm:
-                <text>{dataTemp.organizationLocation}</text>
+                <p>{dataTemp.organizationLocation}</p>
               </p>
               <p className="flex items-center gap-2 text-[20px]">
                 <Clock className="text-[--blue-02]" /> Thời gian:
-                <text>{dataTemp.organizationTime}</text>
+                <p>{dataTemp.organizationTime}</p>
               </p>
               <p className="flex items-center gap-2 text-[20px]">
                 <Tag className="text-[--blue-02]" /> Khoa:
-                <text>{dataTemp.faculty_id}</text>
+                <p>{dataTemp.faculty_id}</p>
               </p>
             </div>
 

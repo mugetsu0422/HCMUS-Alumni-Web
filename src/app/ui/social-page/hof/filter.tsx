@@ -5,6 +5,8 @@ import { Button, Input } from '@material-tailwind/react'
 import { useDebouncedCallback } from 'use-debounce'
 import { useForm } from 'react-hook-form'
 import { FACULTIES } from '../../../constant'
+import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export default function Filter({ setMyParams }) {
   const handleSearch = useDebouncedCallback((keyword) => {})
@@ -30,7 +32,7 @@ export default function Filter({ setMyParams }) {
 
   return (
     <form>
-      <div className="flex flex-wrap lg:flex-nowrap gap-5 max-w-[65rem]">
+      <div className="flex flex-wrap lg:flex-nowrap gap-5 max-w-[80rem]">
         <Input
           placeholder=""
           crossOrigin={undefined}
@@ -52,8 +54,12 @@ export default function Filter({ setMyParams }) {
           variant="outlined"
           placeholder={undefined}
           size="sm"
-          className="border-blue-gray-200 self-stretch">
-          Đặt lại
+          className="border-blue-gray-200 self-stretch bg-[--blue-05] text-white">
+          <FontAwesomeIcon
+            icon={faFilterCircleXmark}
+            className="text-md mr-1"
+          />
+          Xóa bộ lọc
         </Button>
 
         <div className="h-10 flex">
