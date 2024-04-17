@@ -32,7 +32,7 @@ function FuntionSection({
   })
 
   return (
-    <div className="my-5 w-[1184px] m-auto flex items-center gap-5">
+    <div className="my-5 w-[1184px] flex items-center gap-5">
       <div className="h-full w-[500px] mr-auto">
         <Input
           size="lg"
@@ -135,29 +135,31 @@ export default function Page() {
   }, [myParams])
 
   return (
-    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
+    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
       <p
-        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-02)]`}>
+        className={`${roboto.className} mx-auto w-full text-3xl font-bold text-[var(--blue-02)]`}>
         Quản lý tin tức
       </p>
       <FuntionSection
         onSearch={onSearch}
         onResetSearchAndFilter={onResetSearchAndFilter}
       />
-      <FilterHeader onFilter={onFilter} />
-      <div className="relative mb-10">
-        {news.map(({ id, title, thumbnail, views, status, publishedAt }) => (
-          <div key={title} className="">
-            <NewsListItem
-              name={title}
-              imgSrc={thumbnail}
-              status={status}
-              views={views}
-              id={id}
-              publishedAt={publishedAt}
-            />
-          </div>
-        ))}
+      <div className="overflow-x-auto">
+        <FilterHeader onFilter={onFilter} />
+        <div className="relative mb-10">
+          {news.map(({ id, title, thumbnail, views, status, publishedAt }) => (
+            <div key={title} className="">
+              <NewsListItem
+                name={title}
+                imgSrc={thumbnail}
+                status={status}
+                views={views}
+                id={id}
+                publishedAt={publishedAt}
+              />
+            </div>
+          ))}
+        </div>
       </div>
       <Pagination
         totalPages={totalPages}

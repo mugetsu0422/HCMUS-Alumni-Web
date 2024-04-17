@@ -1,57 +1,90 @@
 'use client'
 
 /* eslint-disable @next/next/no-img-element */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Clock, GeoAltFill, BarChartFill, Tag } from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
 import { Button } from '@material-tailwind/react'
+import axios from 'axios'
+import { JWT_COOKIE } from '../../../constant'
+import Cookies from 'js-cookie'
+import NoData from '../../../ui/no-data'
+import moment from 'moment'
 
-const dataTemp = {
-  id: '1',
-  title: 'Khai mạc Trường hè Khoa học Dữ liệu 2024',
-  thumbnail: '/authentication.png',
-  views: 100,
-  organizationLocation: '227 Nguyễn Văn Cừ, P4, Q5',
-  organizationTime: 'DD-MM-YYYY HH:mm:ss',
-  content:
-    'Sed lectus amet, eu lacus viverra magna ullamcorper ultricies. Laoreet est molestie tellus, volutpat, vitae. Viverra vitae nunc molestie nec. Id orci tincidunt amet ullamcorper morbi mauris augue. Faucibus ornare tincidunt malesuada phasellus. Volutpat, est id tincidunt dolor eu. Enim dictum aenean ultrices pharetra lorem leo cursus. Mollis dui turpis sed suscipit. Mauris vestibulum in phasellus velit morbi lobortis varius egestas posuere. Commodo purus non adipiscing porttitor lectus nunc, nisi. Urna amet, nisl, lectus vel. Aliquam, porttitor quis at vel sed ut montes, egestas. Nisl, vestibulum tempor natoque lacinia posuere. Risus id tempor turpis faucibus ante volutpat nunc. Viverra iaculis iaculis at convallis tellus. Condimentum massa faucibus at porttitor vestibulum in.',
-  faculty_id: 'CNTT',
-}
+export default function Page({ params }: { params: { id: string } }) {
+  const [event, setEvent] = useState(null)
+  const [noData, setNoData] = useState(false)
 
-export default function Page() {
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setEvent(data)
+      })
+      .catch((e) => {
+        setNoData(true)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (noData) {
+    return <NoData />
+  }
+
   return (
     <div
-      className={`${nunito.className} w-[75%] bg-[--blue-04] rounded-lg m-auto py-20 mt-16`}>
-      <div className="flex flex-col w-[90%] items-center justify-center m-auto  gap-y-10">
-        <div className="flex flex-col lg:flex-row justify-between gap-4 w-full">
+      className={`${nunito.className} w-[75%] max-w-[1366px] bg-[--blue-04] rounded-lg m-auto py-10 mt-16`}>
+      <div className="flex flex-col w-[90%] items-center justify-center m-auto gap-y-10">
+        <div className="flex flex-col justify-center items-center gap-4 w-full">
           <img
-            src={dataTemp.thumbnail}
+            src={event?.thumbnail}
             alt="image event"
-            className="sm:w-[450px] xl:w-[600px] 2xl:w-[750px] 2xl:h-[430px] object-cover object-center rounded-lg"
+            className="sm:w-[450px] xl:w-[600px] 2xl:w-[750px] 2xl:h-[500px] object-cover object-center rounded-lg"
           />
-          <div className="flex flex-col sm:w-[450px] lg:w-[500px] xl:gap-y-6 2xl:gap-y-10">
-            <p className="text-[1.9rem] font-extrabold">{dataTemp.title}</p>
+          <div>
+            <p className="text-center text-[1.9rem] font-extrabold">{event?.title}</p>
+            {event?.faculty && (
+              <p className="text-center text-[1.5rem] font-semibold">Khoa {event.faculty.name}</p>
+            )}
+          </div>
 
+          <div className="w-full flex flex-col xl:gap-y-6 2xl:gap-y-10 items-center">
             <div>
               <p className="flex items-center gap-2 text-[20px]">
                 <GeoAltFill className="text-[--blue-02]" /> Địa điểm:
-                <text>{dataTemp.organizationLocation}</text>
+                <span>{event?.organizationLocation}</span>
               </p>
               <p className="flex items-center gap-2 text-[20px]">
                 <Clock className="text-[--blue-02]" /> Thời gian:
-                <text>{dataTemp.organizationTime}</text>
+                <span>
+                  {event &&
+                    moment(event?.organizationTime).format(
+                      'DD-MM-YYYY HH:mm:ss'
+                    )}
+                </span>
               </p>
-              <p className="flex items-center gap-2 text-[20px]">
-                <Tag className="text-[--blue-02]" /> Khoa:
-                <text>{dataTemp.faculty_id}</text>
-              </p>
+              {event?.tags && (
+                <p className="flex items-center gap-2 text-[20px]">
+                  <Tag className="text-[--blue-02]" /> Thẻ:
+                  {event.tags.map((tag) => (
+                    <span key={tag.name}>{tag.name}</span>
+                  ))}
+                </p>
+              )}
             </div>
-
-            <div className="flex items-center gap-2">
+          </div>
+          <div className="w-full flex items-end gap-6 ">
+            <div className="flex items-end">
               <BarChartFill className="text-[--blue-02] text-[4.1rem]" />
               <div className="flex flex-col">
-                <p className="text-[30px] font-extrabold">{dataTemp.views}</p>
-                <p className="text-lg">Số người tham gia</p>
+                <p className="text-[30px] font-extrabold">
+                  {event?.participants}
+                </p>
+                <p className="text-lg">người tham gia</p>
               </div>
             </div>
             <Button
@@ -64,7 +97,7 @@ export default function Page() {
         </div>
         <div className="flex flex-col gap-2 w-full">
           <p className="text-[26px] font-extrabold">Thông tin chi tiết</p>
-          <p className="text-pretty text-base">{dataTemp.content}</p>
+          <p className="text-pretty text-base">{event?.content}</p>
         </div>
       </div>
     </div>
