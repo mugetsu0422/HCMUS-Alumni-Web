@@ -32,7 +32,7 @@ function FuntionSection({
   })
 
   return (
-    <div className="my-5 w-[1184px] flex items-center gap-5">
+    <div className="my-5 w-full max-w-[1184px] flex items-center gap-5 m-auto">
       <div className="h-full w-[500px] mr-auto">
         <Input
           size="lg"
@@ -137,7 +137,7 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
       <p
-        className={`${roboto.className} mx-auto w-full text-3xl font-bold text-[var(--blue-02)]`}>
+        className={`${roboto.className} mx-auto max-w-[1184px] w-full text-3xl font-bold text-[var(--blue-02)]`}>
         Quản lý tin tức
       </p>
       <FuntionSection
@@ -148,8 +148,9 @@ export default function Page() {
         <FilterHeader onFilter={onFilter} />
         <div className="relative mb-10">
           {news.map(({ id, title, thumbnail, views, status, publishedAt }) => (
-            <div key={title} className="">
+
               <NewsListItem
+                key={id}
                 name={title}
                 imgSrc={thumbnail}
                 status={status}
@@ -157,7 +158,6 @@ export default function Page() {
                 id={id}
                 publishedAt={publishedAt}
               />
-            </div>
           ))}
         </div>
       </div>

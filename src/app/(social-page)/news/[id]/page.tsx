@@ -58,7 +58,7 @@ export default function Page({ params }: { params: { id: string } }) {
             <p className="font-medium text-lg text-[--blue-05]">
               Khoa {news?.faculty.name}
             </p>
-          ) : null}
+          ) : <p></p>}
           <p className="font-medium text-lg flex items-center gap-x-1">
             <Clock />
             {moment(news?.publsihedAt).format('DD/MM/YYYY')}

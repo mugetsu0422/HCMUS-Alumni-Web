@@ -21,7 +21,7 @@ interface HeaderProps {
 
 export default function Header({ onFilter }: HeaderProps) {
   return (
-    <div className="w-[1184px] h-fit bg-[--blue-02] border-2 border-[--blue-02] py-1 ">
+    <div className="w-[1184px] h-fit bg-[--blue-02] border-2 border-[--blue-02] m-auto py-1 ">
       <div className="flex w-fit justify-evenly items-center ">
         <Menu>
           <MenuHandler>
