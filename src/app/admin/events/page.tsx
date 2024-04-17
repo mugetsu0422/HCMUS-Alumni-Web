@@ -44,7 +44,7 @@ function FuntionSection({
   })
 
   return (
-    <div className="my-5 w-full flex items-center gap-5">
+    <div className="my-5 w-full max-w-[1500px] m-auto flex items-center gap-5">
       <div className="h-full w-[500px] mr-auto">
         <Input
           size="lg"
@@ -149,7 +149,7 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] ">
       <p
-        className={`${roboto.className} mx-auto w-full text-3xl font-bold text-[var(--blue-02)]`}>
+        className={`${roboto.className} mx-auto w-full max-w-[1500px] text-3xl font-bold text-[var(--blue-02)]`}>
         Quản lý sự kiện
       </p>
       <FuntionSection
