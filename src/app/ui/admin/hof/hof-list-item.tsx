@@ -118,16 +118,16 @@ export default function HofListItem({
         alt="hall of fame image"
         className="h-[200px] w-[300px] object-cover object-center"
       />
-      <p className="text-lg h-20 bg-red-200 w-[320px]  p-2 font-[600] text-black  justify-center flex items-center">
+      <p className="text-lg h-20 w-[320px]  p-2 font-[600] text-black  justify-center flex items-center">
         {title}
       </p>
-      <p className="text-lg w-[10rem] bg-red-300 text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[10rem] text-center text-black p-2 font-[600] flex items-center justify-center">
         {faculty}
       </p>
-      <p className="text-lg w-[8rem] bg-red-400  text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[8rem] text-center text-black p-2 font-[600] flex items-center justify-center">
         {beginning_year}
       </p>
-      <p className="text-lg w-[7.5rem] bg-red-500  text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[7.5rem] text-center text-black p-2 font-[600] flex items-center justify-center">
         {views}
       </p>
       <div className="flex justify-end px-2">

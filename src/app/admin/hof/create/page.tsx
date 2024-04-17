@@ -124,8 +124,10 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập gương thành công',
               })}
-              label="Tên gương thành công"
-              className="bg-white"
+              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+              labelProps={{
+                className: 'hidden',
+              }}
             />
             <ErrorInput
               // This is the error message
@@ -143,8 +145,12 @@ export default function Page() {
               {...register('beginningYear', {
                 required: 'Vui lòng nhập khóa',
               })}
-              label="Khóa"
-              className="bg-white"
+              minLength={4}
+              maxLength={4}
+              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+              labelProps={{
+                className: 'hidden',
+              }}
             />
             <ErrorInput
               // This is the error message
@@ -159,8 +165,10 @@ export default function Page() {
               crossOrigin={undefined}
               variant="outlined"
               type="text"
-              label="Email gương thành công"
-              className="bg-white"
+              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+              labelProps={{
+                className: 'hidden',
+              }}
             />
           </div>
 
@@ -185,7 +193,7 @@ export default function Page() {
             <p className="text-xl font-bold">Ảnh thumbnail</p>
             <label
               htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
+              className="rounded-xl text-white hover:cursor-pointer rounded-lgtext-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
               Tải ảnh lên
             </label>
             <input
@@ -236,12 +244,26 @@ export default function Page() {
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
             />
+                        <Button
+              onClick={async () => {
+                const output = await trigger(['title', 'thumbnail'], {
+                  shouldFocus: true,
+                })
+                if (output) {
+                  handleOpenDialog()
+                }
+              }}
+              placeholder={undefined}
+              size="lg"
+              className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
+              Lên lịch
+            </Button>
             <Button
               placeholder={undefined}
               size="lg"
               type="submit"
               className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Đăng
+              Đăng ngay
             </Button>
           </div>
         </form>

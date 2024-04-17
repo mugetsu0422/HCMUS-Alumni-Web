@@ -12,8 +12,8 @@ import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Pagination from '../../ui/common/pagination'
-import FilterHeader from '../../ui/admin/halloffame/filter-header'
-import HofListItem from '../../ui/admin/halloffame/hof-list-item'
+import FilterHeader from '../../ui/admin/hof/filter-header'
+import HofListItem from '../../ui/admin/hof/hof-list-item'
 
 const hofTemp = [
   {
