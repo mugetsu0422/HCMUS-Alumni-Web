@@ -1,6 +1,7 @@
+'use client'
 import React from 'react'
 import Image from 'next/image'
-
+/* eslint-disable @next/next/no-img-element */
 const dataTempSmall = [
   {
     title: '6-Year-Old Horse Dies at Belmont Park After Race Injury',
@@ -34,7 +35,7 @@ function SmallTrendingNews() {
             alt="image news"
             className="rounded-md "
           />
-          <div className="w-[16rem] flex flex-col items-center justify-center gap-1">
+          <div className="w-[16rem] flex flex-col items-center justify-center">
             <p className="sm:sm md:text-lg font-bold">{title}</p>
             <p className="text-xs">{detail}</p>
           </div>
@@ -54,8 +55,8 @@ function BigTrendingNews() {
         width={780}
         height={600}
       />
-      <figcaption className="absolute bottom-0 left-2/4 flex 2xl:w-full -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-2xl`}>
+      <figcaption className="absolute bottom-0 left-2/4 flex 2xl:w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
+        <div className={`text-2xl text-white`}>
           Ethiopian runners took the top four spots.
         </div>
       </figcaption>

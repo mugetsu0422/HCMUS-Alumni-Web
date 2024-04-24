@@ -63,8 +63,8 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
           reset()
         }}
         placeholder={undefined}
-        className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-        <ArrowCounterclockwise className="text-2xl font-bold" />
+        className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[#E4E4E7] text-white ">
+        <ArrowCounterclockwise className="text-2xl font-bold text-[#3F3F46]" />
       </Button>
     </div>
   )
@@ -78,7 +78,7 @@ export default function Page() {
 
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [hof, setHof] = useState([])
 
   const resetCurPage = () => {
@@ -137,7 +137,7 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
       <p
-        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-02)]`}>
+        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
       <FuntionSection

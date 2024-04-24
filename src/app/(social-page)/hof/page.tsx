@@ -97,7 +97,7 @@ function HofListItem({ id, thumbnail, faculty_id, title, beginning_year }) {
 
 export default function Page() {
   const [curPage, setCurPage] = useState() //Number(params.get('page')) + 1 || 1
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const onNextPage = () => {
     // if (curPage == totalPages) return
     // params.set('page', curPage.toString())

@@ -2,13 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React from 'react'
-import {
-  Button,
-  Dialog,
-  DialogHeader,
-  DialogBody,
-  DialogFooter,
-} from '@material-tailwind/react'
+import { Button } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import { nunito } from '../../fonts'
 import {
@@ -95,7 +89,7 @@ export default function HofListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--blue-02] w-[1184px] m-auto items-center justify-between h-fit flex pl-6 py-2`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1184px] m-auto items-center justify-between h-fit flex pl-4 py-2`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -116,18 +110,18 @@ export default function HofListItem({
       <img
         src={thumbnail}
         alt="hall of fame image"
-        className="h-[200px] w-[300px] object-cover object-center"
+        className="h-[120px] w-[180px] object-cover object-center"
       />
-      <p className="text-lg h-20 bg-red-200 w-[320px]  p-2 font-[600] text-black  justify-center flex items-center">
+      <p className="text-lg h-20 w-[320px]  p-2 font-[600] text-black  justify-center flex items-center">
         {title}
       </p>
-      <p className="text-lg w-[10rem] bg-red-300 text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[10rem] text-center text-black p-2 font-[600] flex items-center justify-center">
         {faculty}
       </p>
-      <p className="text-lg w-[8rem] bg-red-400  text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[8rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
         {beginning_year}
       </p>
-      <p className="text-lg w-[7.5rem] bg-red-500  text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[7.5rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
         {views}
       </p>
       <div className="flex justify-end px-2">

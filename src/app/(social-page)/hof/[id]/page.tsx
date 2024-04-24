@@ -1,6 +1,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react'
+import { nunito } from '../../../ui/fonts'
 
 export default function Page() {
   //const [hof, setHof] = useState()
@@ -12,7 +13,8 @@ export default function Page() {
         alt="Hall of fame image"
         className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
       />
-      <p className="2xl:text-[28px] sm:text-lg lg:text-2xl font-bold">
+      <p
+        className={`${nunito.className} 2xl:text-[28px] sm:text-lg lg:text-2xl font-bold`}>
         Nguyễn Mai Hoàng Quang Huy
       </p>
       <div className="flex flex-col gap-4 ql-editor sm:text:md lg:text-base text-justify">

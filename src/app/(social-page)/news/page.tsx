@@ -2,19 +2,43 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { Button } from '@material-tailwind/react'
-import { ArrowRight, ArrowLeft } from 'react-bootstrap-icons'
+import { Button, Input } from '@material-tailwind/react'
 import { Calendar } from 'react-bootstrap-icons'
-import MostViewed from '../../ui/social-page/news/most-viewed'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
-import { JWT_COOKIE } from '../../constant'
+import { JWT_COOKIE, MOST_VIEWED_LIMIT, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import Link from 'next/link'
 import moment from 'moment'
 import Pagination from '../../ui/common/pagination'
+import { roboto } from '../../ui/fonts'
+import { useForm } from 'react-hook-form'
+import Thumbnail from '../../ui/social-page/thumbnail-image'
+
+function FuntionSection({ onSearch, onResetSearchAndFilter, title }) {
+  const { register, reset } = useForm({
+    defaultValues: {
+      title: title,
+    },
+  })
+
+  return (
+    <div className="flex items-center gap-5 ml-5 lg:ml-0">
+      <div className="h-full w-[500px] mr-auto">
+        <Input
+          size="lg"
+          crossOrigin={undefined}
+          label="Tìm kiếm tìn tức..."
+          placeholder={undefined}
+          {...register('title', {
+            onChange: (e) => onSearch(e.target.value),
+          })}
+        />
+      </div>
+    </div>
+  )
+}
 
 function NewsListItem({
   id,
@@ -69,8 +93,9 @@ export default function Page() {
 
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [news, setNews] = useState([])
+  const [mostViewed, setMostViewed] = useState([])
 
   const resetCurPage = () => {
     params.delete('page')
@@ -110,25 +135,54 @@ export default function Page() {
   }
 
   useEffect(() => {
+    // News list
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&statusId=${POST_STATUS['Bình thường']}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(({ data: { totalPages, news } }) => {
-        console.log(news)
-
         setTotalPages(totalPages)
         setNews(news)
       })
       .catch()
   }, [myParams])
 
+  useEffect(() => {
+    // Most viewed news
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/most-viewed?limit=${MOST_VIEWED_LIMIT}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { news } }) => {
+        setMostViewed(news)
+      })
+      .catch()
+  }, [])
+
   return (
     <>
-      <div className="flex flex-col xl:flex-row m-auto justify-center gap-x-8">
+      <Thumbnail />
+      <div className="xl:w-[1264px] flex flex-col xl:flex-row justify-between gap-x-8 m-auto">
         <div className="flex flex-col gap-y-6 mt-10">
+          <p
+            className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+            TIN TỨC
+          </p>
+          <FuntionSection
+            onSearch={onSearch}
+            onResetSearchAndFilter={onResetSearchAndFilter}
+            title={params.get('title')}
+          />
           {news.map(
             ({ id, title, summary, publishedAt, faculty, tags, thumbnail }) => (
               <NewsListItem
@@ -144,7 +198,6 @@ export default function Page() {
             )
           )}
         </div>
-        <MostViewed />
       </div>
       <Pagination
         totalPages={totalPages}

@@ -181,9 +181,6 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
-  }
   return (
     <div
       className={`${nunito.className} max-w-[81.25%] max-h-[755px] m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
@@ -347,7 +344,10 @@ export default function Page({ params }: { params: { id: string } }) {
               className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog open={openCancelDialog} handleOpen={handleOpenCancelDialog}/>
+            <CancelDialog
+              open={openCancelDialog}
+              handleOpen={handleOpenCancelDialog}
+            />
             <Button
               placeholder={undefined}
               size="lg"

@@ -182,37 +182,34 @@ export default function Page() {
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label
-              htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
-            </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
-              })}
-            />
-            <ErrorInput
-              // This is the error message
-              errors={errors?.thumbnail?.message}
-            />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
+            <label htmlFor="thumbnail">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                  required: 'Vui lòng chọn ảnh thumbnail',
+                })}
               />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
+              <ErrorInput
+                // This is the error message
+                errors={errors?.thumbnail?.message}
+              />
+              {thumbnailPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={thumbnailPreview}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
+            </label>
           </div>
 
           <div className="flex flex-col gap-2">

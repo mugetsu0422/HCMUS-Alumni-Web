@@ -19,6 +19,8 @@ import {
   faCalendarDays,
   faCertificate,
   faBell,
+  faMagnifyingGlass,
+  faEnvelope,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
@@ -26,12 +28,12 @@ const navListItems = [
   {
     label: 'Tin tức',
     icon: faNewspaper,
-    urlLink: 'news',
+    urlLink: '/news',
   },
   {
     label: 'Sự kiện',
     icon: faCalendarDays,
-    urlLink: 'events',
+    urlLink: '/events',
   },
   {
     label: 'Gương thành công',
@@ -52,9 +54,9 @@ function NavList() {
         <div className="group cursor-pointer lg:py-3" key={label}>
           <Link
             href={urlLink}
-            className="text-[var(--text)] font-bold group-hover:text-[var(--blue-02)] flex items-center gap-2">
+            className="text-[--text-navbar] font-semibold group-hover:text-[--blue-05] flex items-center gap-2">
             <FontAwesomeIcon
-              className="mr-auto text-[var(--blue-02)] text-2xl lg:block hidden"
+              className="mr-auto text-[--text-navbar] group-hover:text-[--blue-05] text-2xl lg:block hidden"
               icon={icon}
             />
             {label}
@@ -82,7 +84,7 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className="sticky top-0 z-10 px-3 lg:pl-6 py-4 lg:py-0 border-b-2 border-slate-700 "
+      className="sticky top-0 z-10 px-3 lg:pl-10 py-4 lg:py-0 border-b-2 border-slate-700 "
       shadow={false}>
       <div className="mx-auto flex items-center justify-between text-blue-gray-900">
         <Link href="/home-page">
@@ -99,10 +101,10 @@ export default function MyNavbar() {
         </div>
         <FontAwesomeIcon
           onClick={toggleIsNavOpen}
-          className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
+          className="ml-5 mr-auto lg:hidden text-[--text-navbar] text-2xl"
           icon={faBars}
         />
-        <div className=" w-[40vw] m-auto ">
+        {/* <div className=" w-[40vw] m-auto ">
           <Input
             label="Tìm kiếm"
             crossOrigin={undefined}
@@ -119,15 +121,33 @@ export default function MyNavbar() {
             }}
             type="text"
           />
-        </div>
-        <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6">
+        </div> */}
+
+        <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
+          <Button placeholder={undefined} variant="text" size="sm">
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="text-2xl text-[--text-navbar]"
+            />
+          </Button>
           <Badge content={2} color="blue">
             <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon icon={faBell} className="text-2xl" />
+              <FontAwesomeIcon
+                icon={faBell}
+                className="text-2xl text-[--text-navbar]"
+              />
+            </Button>
+          </Badge>
+          <Badge content={2} color="blue">
+            <Button placeholder={undefined} variant="text" size="sm">
+              <FontAwesomeIcon
+                icon={faEnvelope}
+                className="text-2xl text-[--text-navbar]"
+              />
             </Button>
           </Badge>
 
-          <Avatar placeholder={undefined} src="/logo.png" alt="avatar" />
+          <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
         </div>
       </div>
       <Collapse open={isNavOpen} className="overflow-scroll flex text-left">

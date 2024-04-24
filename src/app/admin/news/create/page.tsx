@@ -169,7 +169,7 @@ export default function Page() {
 
   return (
     <div
-      className={`${nunito.className} max-w-[81.25%] max-h-[755px] m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
+      className={`${nunito.className} max-w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -202,8 +202,10 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập tiêu đề',
               })}
-              label="Nội dung tiêu đề"
-              className="bg-white"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
@@ -261,41 +263,39 @@ export default function Page() {
 
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label
-              htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
-            </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
-              })}
-            />
-            <ErrorInput
-              // This is the error message
-              errors={errors?.thumbnail?.message}
-            />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
+            <label htmlFor="thumbnail">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                  required: 'Vui lòng chọn ảnh thumbnail',
+                })}
               />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
+              <ErrorInput
+                // This is the error message
+                errors={errors?.thumbnail?.message}
+              />
+
+              {thumbnailPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={thumbnailPreview}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
+            </label>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className={`relative max-w-[400px] text-xl font-bold`}>
+            <label className={`relative text-xl font-bold`}>
               Tóm tắt
               <p className="absolute right-0 bottom-0 font-normal text-base">
                 {summaryCharCount}/{summaryMaxCharCount}
@@ -307,7 +307,7 @@ export default function Page() {
               variant="outlined"
               className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
-                className: 'max-w-[400px] h-[110px]',
+                className: 'h-[110px]',
               }}
               labelProps={{
                 className: 'before:content-none after:content-none',
@@ -349,7 +349,7 @@ export default function Page() {
               }}
               placeholder={undefined}
               size="lg"
-              className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
+              className={`${nunito.className}  bg-[var(--blue-03)] text-[--blue-02] normal-case text-md`}>
               Lên lịch
             </Button>
             <DateTimeLocalPickerDialog

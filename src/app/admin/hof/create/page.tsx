@@ -181,13 +181,10 @@ export default function Page() {
               })}
             </select>
           </div>
+          
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label
-              htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
-            </label>
+            <label htmlFor="thumbnail">
             <input
               type="file"
               id="thumbnail"
@@ -214,6 +211,7 @@ export default function Page() {
             ) : (
               <ImageSkeleton width={300} height={200} />
             )}
+          </label>
           </div>
 
           <div className="flex flex-col gap-2">
