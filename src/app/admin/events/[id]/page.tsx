@@ -185,9 +185,9 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
-  }
+  // if (noData) {
+  //   return <NoData />
+  // }
 
   return (
     <div
@@ -287,7 +287,7 @@ export default function Page({ params }: { params: { id: string } }) {
               <select
                 className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
                 {...register('facultyId')}>
-                <option value={0}>Không</option>
+                <option value={0}>Tất cả</option>
                 {FACULTIES.map(({ id, name }) => {
                   return (
                     <option key={id} value={id}>
@@ -331,7 +331,9 @@ export default function Page({ params }: { params: { id: string } }) {
 
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label htmlFor="thumbnail">
+            <label
+              htmlFor="thumbnail"
+              className="w-fit h-fit hover:cursor-pointer">
               <input
                 type="file"
                 id="thumbnail"
@@ -364,7 +366,7 @@ export default function Page({ params }: { params: { id: string } }) {
               variant="outlined"
               className="bg-white h-44 !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
-                className: 'max-w-[50%] h-fit',
+                className: 'w-full h-fit',
               }}
               labelProps={{
                 className: 'before:content-none after:content-none',

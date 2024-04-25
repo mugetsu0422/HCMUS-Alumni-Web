@@ -263,7 +263,9 @@ export default function Page() {
 
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label htmlFor="thumbnail" className="w-fit">
+            <label
+              htmlFor="thumbnail"
+              className="w-fit h-fit hover:cursor-pointer">
               <input
                 type="file"
                 id="thumbnail"
@@ -274,11 +276,6 @@ export default function Page() {
                   required: 'Vui lòng chọn ảnh thumbnail',
                 })}
               />
-              <ErrorInput
-                // This is the error message
-                errors={errors?.thumbnail?.message}
-              />
-
               {thumbnailPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -292,6 +289,10 @@ export default function Page() {
                 <ImageSkeleton width={300} height={200} />
               )}
             </label>
+            <ErrorInput
+              // This is the error message
+              errors={errors?.thumbnail?.message}
+            />
           </div>
 
           <div className="flex flex-col gap-2">

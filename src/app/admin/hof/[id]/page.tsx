@@ -120,11 +120,13 @@ export default function Page() {
               crossOrigin={undefined}
               variant="outlined"
               type="text"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
               {...register('title', {
                 required: 'Vui lòng nhập gương thành công',
               })}
-              label="Tên gương thành công"
-              className="bg-white"
             />
             <ErrorInput
               // This is the error message
@@ -142,8 +144,10 @@ export default function Page() {
               {...register('beginningYear', {
                 required: 'Vui lòng nhập khóa',
               })}
-              label="Khóa"
-              className="bg-white"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
@@ -158,8 +162,10 @@ export default function Page() {
               crossOrigin={undefined}
               variant="outlined"
               type="text"
-              label="Email gương thành công"
-              className="bg-white"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
           </div>
 
@@ -182,7 +188,9 @@ export default function Page() {
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label htmlFor="thumbnail">
+            <label
+              htmlFor="thumbnail"
+              className="w-fit h-fit hover:cursor-pointer">
               <input
                 type="file"
                 id="thumbnail"
@@ -192,10 +200,6 @@ export default function Page() {
                   onChange: onThumbnailChange,
                   required: 'Vui lòng chọn ảnh thumbnail',
                 })}
-              />
-              <ErrorInput
-                // This is the error message
-                errors={errors?.thumbnail?.message}
               />
               {thumbnailPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -210,6 +214,10 @@ export default function Page() {
                 <ImageSkeleton width={300} height={200} />
               )}
             </label>
+            <ErrorInput
+              // This is the error message
+              errors={errors?.thumbnail?.message}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -237,7 +245,7 @@ export default function Page() {
               size="lg"
               type="submit"
               className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Đăng
+              Cập nhật
             </Button>
           </div>
         </form>
