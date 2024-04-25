@@ -5,7 +5,7 @@ import React from 'react'
 export default function Thumbnail() {
   return (
     <img
-      src="/thumbnail.jpg"
+      src="/thumbnail-social-pages.jpg"
       alt="thumbnail event"
       className="w-full h-96 object-cover bg-contain blur-[2px]"
     />

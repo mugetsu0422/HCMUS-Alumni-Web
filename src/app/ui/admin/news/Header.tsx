@@ -50,62 +50,12 @@ export default function Header({ onFilter }: HeaderProps) {
             </MenuItem>
           </MenuList>
         </Menu>
-
-        <Menu>
-          <MenuHandler>
-            <Button
-              placeholder={undefined}
-              variant="text"
-              className="w-[7rem] text-center mr-1 py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-              Thẻ
-              <CaretDownFill />
-            </Button>
-          </MenuHandler>
-          <MenuList placeholder={undefined}>
-            <MenuItem
-              placeholder={undefined}
-              onClick={() => onFilter('tag', 'desc')}
-              className="text-center font-bold flex justify-center">
-              Mới nhất
-              <ArrowDown />
-            </MenuItem>
-            <MenuItem
-              placeholder={undefined}
-              onClick={() => onFilter('tag', 'asc')}
-              className="text-center font-bold flex justify-center">
-              Cũ nhất
-              <ArrowUp />
-            </MenuItem>
-          </MenuList>
-        </Menu>
-
-        <Menu>
-          <MenuHandler>
-            <Button
-              placeholder={undefined}
-              variant="text"
-              className="w-[10.5rem] text-center py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-              Khoa
-              <CaretDownFill />
-            </Button>
-          </MenuHandler>
-          <MenuList placeholder={undefined}>
-            <MenuItem
-              placeholder={undefined}
-              onClick={() => onFilter('faculty_id', 'desc')}
-              className="text-center font-bold flex justify-center">
-              Mới nhất
-              <ArrowDown />
-            </MenuItem>
-            <MenuItem
-              placeholder={undefined}
-              onClick={() => onFilter('faculty_id', 'asc')}
-              className="text-center font-bold flex justify-center">
-              Cũ nhất
-              <ArrowUp />
-            </MenuItem>
-          </MenuList>
-        </Menu>
+        <div className="w-[7rem] text-center mr-1 py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+          Thẻ
+        </div>
+        <div className="w-[10.5rem] text-center py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+          Khoa{' '}
+        </div>
 
         <Menu>
           <MenuHandler>

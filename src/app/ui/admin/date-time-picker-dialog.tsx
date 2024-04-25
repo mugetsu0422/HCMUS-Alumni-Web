@@ -105,11 +105,10 @@ export default function DateTimeLocalPickerDialog({
           onChange={(e) => onChange({ date: e.target.value })}
           // {...register('date', {})}
         />
-        <div className="flex gap-8">
-          <div className="flex flex-col">
-            <label className="text-xl font-bold text-black" htmlFor="hour">
-              Giờ
-            </label>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xl font-bold text-black"> Thời gian</label>
+          <div className="flex gap-1 items-center">
             <select
               name="hour"
               id="hour"
@@ -125,12 +124,7 @@ export default function DateTimeLocalPickerDialog({
                 )
               })}
             </select>
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-xl font-bold text-black" htmlFor="minute">
-              Phút
-            </label>
+            <p className="text-xl font-bold">:</p>
             <select
               name="minute"
               id="minute"

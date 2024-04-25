@@ -171,7 +171,7 @@ export default function Page() {
             <select
               className="h-full hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               {...register('facultyId')}>
-              <option value={0}>Không</option>
+              <option value={0}>Tất cả</option>
               {FACULTIES.map(({ id, name }) => {
                 return (
                   <option key={id} value={id}>
@@ -181,37 +181,37 @@ export default function Page() {
               })}
             </select>
           </div>
-          
+
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
-            <label htmlFor="thumbnail">
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
-              })}
-            />
-            <ErrorInput
-              // This is the error message
-              errors={errors?.thumbnail?.message}
-            />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
+            <label htmlFor="thumbnail" className="w-fit">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                  required: 'Vui lòng chọn ảnh thumbnail',
+                })}
               />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
-          </label>
+              <ErrorInput
+                // This is the error message
+                errors={errors?.thumbnail?.message}
+              />
+              {thumbnailPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={thumbnailPreview}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
+            </label>
           </div>
 
           <div className="flex flex-col gap-2">

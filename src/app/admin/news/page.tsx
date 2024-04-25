@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import NewsListItem from '../../ui/admin/news/news-list-item'
 import FilterHeader from '../../ui/admin/news/Header'
 import { Input, Button } from '@material-tailwind/react'
@@ -12,7 +12,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import Pagination from '../../ui/common/pagination'
-
+import FilterAdmin from '../../ui/common/filter'
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
   onResetSearchAndFilter: () => void
@@ -122,6 +122,34 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }
 
+  const onFilterFaculties = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+  const onFilterTag = (tag: string) => {
+    if (tag != '0') {
+      params.set('tag', tag)
+    } else {
+      params.delete('tag')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onResetFilter = () => {
+    params.delete('facultyId')
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
@@ -145,6 +173,16 @@ export default function Page() {
       <FuntionSection
         onSearch={onSearch}
         onResetSearchAndFilter={onResetSearchAndFilter}
+      />
+      <FilterAdmin
+        witdh={'1184px'}
+        onFilterTag={onFilterTag}
+        onFilterFaculties={onFilterFaculties}
+        onResetFilter={onResetFilter}
+        params={{
+          tagsId: params.get('tagsId'),
+          facultyId: params.get('facultyId'),
+        }}
       />
       <div className="overflow-x-auto">
         <FilterHeader onFilter={onFilter} />

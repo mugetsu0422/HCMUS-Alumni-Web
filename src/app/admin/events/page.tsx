@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { JWT_COOKIE, FACULTIES, TAGS } from '../../constant'
 import Cookies from 'js-cookie'
-import FilterAdmin from './../../ui/admin/events/filter'
+import FilterAdmin from '../../ui/common/filter'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
@@ -178,6 +178,7 @@ export default function Page() {
         onResetSearchAndFilter={onResetSearchAndFilter}
       />
       <FilterAdmin
+        witdh={'1650px'}
         onFilterTag={onFilterTag}
         onFilterFaculties={onFilterFaculties}
         onResetFilter={onResetFilter}

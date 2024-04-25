@@ -3,10 +3,11 @@ import React from 'react'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
-import { FACULTIES, TAGS } from '../../../constant'
+import { FACULTIES, TAGS } from '../../constant'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface SearchAndFilterFacultyProps {
+  witdh: string
   onFilterTag: (tagsId: string) => void
   onFilterFaculties: (facultyId: string) => void
   onResetFilter: () => void
@@ -14,6 +15,7 @@ interface SearchAndFilterFacultyProps {
 }
 
 export default function FilterAdmin({
+  witdh,
   onFilterFaculties,
   onResetFilter,
   onFilterTag,
@@ -27,7 +29,7 @@ export default function FilterAdmin({
   })
 
   return (
-    <div className="my-5 w-full max-w-[1650px] m-auto flex items-end gap-5">
+    <div className={`my-5 w-full max-w-[${witdh}] m-auto flex items-end gap-5`}>
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Khoa</p>
         <select
