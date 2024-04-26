@@ -127,7 +127,7 @@ export default function Page() {
       facultyId: data.facultyId,
       scheduledTime: openDialog
         ? new Date(
-            scheduledTime.date + 'T' + scheduledTime.time + ':00.000'
+            `${scheduledTime.date}T${scheduledTime.hour}:${scheduledTime.minute}:00.000`
           ).getTime()
         : null,
     }

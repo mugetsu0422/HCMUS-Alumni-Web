@@ -105,8 +105,8 @@ export default function NewsListItem({
   views,
   publishedAt,
   id,
-  faculty_id,
-  tag,
+  faculty,
+  tags,
 }) {
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
@@ -198,11 +198,14 @@ export default function NewsListItem({
       </p>
 
       <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black p-2 font-[600] flex flex-col gap-1">
-        {tag}
+        {tags &&
+          tags.map((tag) => {
+            return <span key={tag.name}>{tag.name}</span>
+          })}
       </p>
 
       <p className="w-[12rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
-        {faculty_id}
+        {faculty ? faculty.name : 'Tất cả'}
       </p>
       <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
         {moment(publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}

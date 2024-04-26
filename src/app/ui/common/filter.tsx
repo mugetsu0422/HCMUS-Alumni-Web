@@ -17,12 +17,11 @@ interface SearchAndFilterFacultyProps {
 export default function FilterAdmin({
   witdh,
   onFilterFaculties,
-  onResetFilter,
   onFilterTag,
   params,
 }: SearchAndFilterFacultyProps) {
   const { register, reset } = useForm({
-    defaultValues: {
+    values: {
       tagsId: params.tagsId || 0,
       facultyId: params.facultyId || 0,
     },
@@ -65,17 +64,6 @@ export default function FilterAdmin({
           })}
         </select>
       </div>
-
-      <Button
-        onClick={() => {
-          onResetFilter()
-          reset({ facultyId: 0 })
-        }}
-        placeholder={undefined}
-        className="bg-[--blue-02] w-fit normal-case text-sm flex items-center gap-1">
-        Xóa bộ lọc
-        <FontAwesomeIcon icon={faFilterCircleXmark} className="text-lg" />
-      </Button>
     </div>
   )
 }

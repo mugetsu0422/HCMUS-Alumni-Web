@@ -152,23 +152,6 @@ export default function Page() {
       .catch()
   }, [myParams])
 
-  useEffect(() => {
-    // Most viewed news
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/most-viewed?limit=${MOST_VIEWED_LIMIT}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { news } }) => {
-        setMostViewed(news)
-      })
-      .catch()
-  }, [])
-
   return (
     <>
       <Thumbnail />

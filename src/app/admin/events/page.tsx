@@ -16,12 +16,12 @@ import FilterAdmin from '../../ui/common/filter'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
-  onResetSearchAndFilter: () => void
+  onResetAll: () => void
 }
 
 function FuntionSection({
   onSearch,
-  onResetSearchAndFilter,
+  onResetAll,
 }: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -56,7 +56,7 @@ function FuntionSection({
       </Button>
       <Button
         onClick={() => {
-          onResetSearchAndFilter()
+          onResetAll()
           reset()
         }}
         placeholder={undefined}
@@ -92,7 +92,8 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }, 500)
-  const onResetSearchAndFilter = () => {
+  const onResetAll = () => {
+    resetCurPage()
     replace(pathname)
     setMyParams(``)
   }
@@ -116,7 +117,7 @@ export default function Page() {
     })
   }
 
-  const onFilter = (name: string, order: string) => {
+  const onOrder = (name: string, order: string) => {
     params.delete('page')
     setCurPage(1)
     params.set('orderBy', name)
@@ -137,9 +138,9 @@ export default function Page() {
   }
   const onFilterTag = (tag: string) => {
     if (tag != '0') {
-      params.set('tag', tag)
+      params.set('tagsId', tag)
     } else {
-      params.delete('tag')
+      params.delete('tagsId')
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
@@ -175,7 +176,7 @@ export default function Page() {
       </p>
       <FuntionSection
         onSearch={onSearch}
-        onResetSearchAndFilter={onResetSearchAndFilter}
+        onResetAll={onResetAll}
       />
       <FilterAdmin
         witdh={'1650px'}
@@ -188,7 +189,7 @@ export default function Page() {
         }}
       />
       <div className="overflow-x-auto">
-        <FilterHeader onFilter={onFilter} />
+        <FilterHeader onFilter={onOrder} />
         <div className="relative mb-10">
           {events.map(
             ({
@@ -199,8 +200,8 @@ export default function Page() {
               organizationLocation,
               organizationTime,
               status,
-              tag,
-              faculty_id,
+              tags,
+              faculty,
             }) => (
               <EventsListItem
                 key={id}
@@ -211,8 +212,8 @@ export default function Page() {
                 organizationLocation={organizationLocation}
                 organizationTime={organizationTime}
                 status={status}
-                tag={tag}
-                faculty_id={faculty_id}
+                tags={tags}
+                faculty={faculty}
               />
             )
           )}

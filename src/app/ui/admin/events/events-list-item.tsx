@@ -101,8 +101,8 @@ export default function EventsListItem({
   organizationLocation,
   organizationTime,
   status,
-  tag,
-  faculty_id,
+  tags,
+  faculty,
 }) {
   const router = useRouter()
   const [openDelete, setOpenDelete] = React.useState(false)
@@ -192,10 +192,13 @@ export default function EventsListItem({
         {title}
       </p>
       <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black py-2 font-[600] flex flex-col gap-1 items-center">
-        {tag}
+        {tags &&
+          tags.map((tag) => {
+            return <span key={tag.name}>{tag.name}</span>
+          })}
       </p>
       <p className="w-[12rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
-        {faculty_id}
+        {faculty ? faculty.name : 'Tất cả'}
       </p>
       <p className="w-[8rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
         {moment(organizationTime).format('DD/MM/YYYY HH:mm:ss')}
