@@ -75,6 +75,7 @@ export default function Page() {
     register,
     handleSubmit,
     trigger,
+    watch,
     formState: { errors },
   } = useForm()
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
@@ -239,7 +240,7 @@ export default function Page() {
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
-                className="bg-white !w-[300px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className="bg-white !w-[500px] !border-t-blue-gray-200 focus:!border-t-gray-900"
               />
               <ErrorInput
                 // This is the error message
@@ -262,6 +263,65 @@ export default function Page() {
                   )
                 })}
               </select>
+            </div>
+          </div>
+
+          <div className="flex gap-6 flex-wrap">
+            <div className="flex flex-col gap-2">
+              <label className="text-xl font-bold">Tham gia tối thiểu</label>
+              <Input
+                size="lg"
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                {...register('minimumParticipants', {
+                  required: 'Vui lòng nhập số lượng tối thiểu',
+                  validate: {
+                    nonNegative: (value) =>
+                      parseInt(value) >= 0 || 'Số lượng không được âm',
+                  },
+                })}
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[214px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput
+                // This is the error message
+                errors={errors?.minimumParticipants?.message}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xl font-bold">Tham gia tối đa</label>
+              <Input
+                size="lg"
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                {...register('maximumParticipants', {
+                  required: 'Vui lòng nhập số lượng tối đa',
+                  validate: {
+                    minMaxRelation: (value) =>
+                      parseInt(value) >=
+                        parseInt(watch('minimumParticipants')) ||
+                      'Số lượng tối đa phải lớn hơn hoặc bằng số lượng tối thiểu',
+
+                    nonNegative: (value) =>
+                      parseInt(value) >= 0 || 'Số lượng không được âm',
+                  },
+                })}
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[214px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput
+                // This is the error message
+                errors={errors?.maximumParticipants?.message}
+              />
             </div>
           </div>
 

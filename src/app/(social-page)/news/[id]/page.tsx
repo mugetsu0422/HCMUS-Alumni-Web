@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import MostViewed from '../../../ui/social-page/news/most-viewed'
 import { ClockFill, EyeFill, TagFill } from 'react-bootstrap-icons'
-import { Textarea } from '@material-tailwind/react'
-
+import { Textarea, Button } from '@material-tailwind/react'
+import Comments from '../../../ui/social-page/news/coments'
 import { nunito } from '../../../ui/fonts'
 import axios from 'axios'
 import { JWT_COOKIE, MOST_VIEWED_LIMIT, TAGS } from '../../../constant'
@@ -16,6 +16,12 @@ export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
   const [noData, setNoData] = useState(false)
   const [mostViewed, setMostViewed] = useState([])
+  const [comments, setComments] = useState('')
+
+  // Function to handle changes in the textarea
+  const handleCommentChange = (event) => {
+    setComments(event.target.value)
+  }
 
   useEffect(() => {
     axios
@@ -52,7 +58,7 @@ export default function Page({ params }: { params: { id: string } }) {
   // }
 
   return (
-    <div className="flex flex-col xl:flex-row m-auto w-[80%]">
+    <div className="flex flex-col xl:flex-row m-auto w-[80%] min-w-[500px]">
       <div className={`mt-10 flex flex-col gap-y-8 mx-auto w-[70%]`}>
         <div className="flex justify-between items-start">
           {news?.faculty ? (
@@ -108,8 +114,24 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
         </div>
         <div className="flex flex-col gap-y-2  mb-8">
-          <p className="text-xl">Bình luận</p>
-          <Textarea placeholder={undefined} label="Chia sẻ ý kiến của bạn" />
+          <Textarea
+            onChange={handleCommentChange}
+            placeholder={undefined}
+            label="Chia sẻ ý kiến của bạn"
+          />
+          <div className="flex justify-end gap-x-4 pt-2 mr-2">
+            <Button
+              placeholder={undefined}
+              size="md"
+              disabled={!comments.trim()}
+              type="submit"
+              className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+              Đăng
+            </Button>
+          </div>
+
+          <p className="text-xl">Bình luận - (#)</p>
+          <Comments name={'news'} />
         </div>
       </div>
     </div>

@@ -134,9 +134,9 @@ export default function Page() {
   }
   const onFilterTag = (tag: string) => {
     if (tag != '0') {
-      params.set('tag', tag)
+      params.set('tagsId', tag)
     } else {
-      params.delete('tag')
+      params.delete('tagsId')
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)

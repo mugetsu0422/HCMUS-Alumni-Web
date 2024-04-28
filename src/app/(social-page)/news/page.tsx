@@ -15,30 +15,7 @@ import Pagination from '../../ui/common/pagination'
 import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
-
-function FuntionSection({ onSearch, onResetSearchAndFilter, title }) {
-  const { register, reset } = useForm({
-    defaultValues: {
-      title: title,
-    },
-  })
-
-  return (
-    <div className="flex items-center gap-5 ml-5 lg:ml-0">
-      <div className="h-full w-[500px] mr-auto">
-        <Input
-          size="lg"
-          crossOrigin={undefined}
-          label="Tìm kiếm tìn tức..."
-          placeholder={undefined}
-          {...register('title', {
-            onChange: (e) => onSearch(e.target.value),
-          })}
-        />
-      </div>
-    </div>
-  )
-}
+import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 
 function NewsListItem({
   id,
@@ -101,6 +78,7 @@ export default function Page() {
     params.delete('page')
     setCurPage(1)
   }
+
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
       params.set('title', keyword)
@@ -111,10 +89,48 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }, 500)
-  const onResetSearchAndFilter = () => {
-    replace(pathname)
-    setMyParams(``)
+
+  const onFilter = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
   }
+
+  const onFilterFaculties = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onFilterTag = (tag: string) => {
+    if (tag != '0') {
+      params.set('tagsId', tag)
+    } else {
+      params.delete('tagsId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onResetFilter = () => {
+    params.delete('facultyId')
+    params.delete('tagsId')
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
@@ -152,23 +168,6 @@ export default function Page() {
       .catch()
   }, [myParams])
 
-  useEffect(() => {
-    // Most viewed news
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/most-viewed?limit=${MOST_VIEWED_LIMIT}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { news } }) => {
-        setMostViewed(news)
-      })
-      .catch()
-  }, [])
-
   return (
     <>
       <Thumbnail />
@@ -178,11 +177,19 @@ export default function Page() {
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
             TIN TỨC
           </p>
-          <FuntionSection
+
+          <SearchAndFilterFaculty
             onSearch={onSearch}
-            onResetSearchAndFilter={onResetSearchAndFilter}
-            title={params.get('title')}
+            onFilter={onFilter}
+            onResetFilter={onResetFilter}
+            onFilterTag={onFilterTag}
+            params={{
+              title: params.get('title'),
+              facultyId: params.get('facultyId'),
+              tagsId: params.get('tagsID'),
+            }}
           />
+
           {news.map(
             ({ id, title, summary, publishedAt, faculty, tags, thumbnail }) => (
               <NewsListItem

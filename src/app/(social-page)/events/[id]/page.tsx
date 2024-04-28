@@ -1,5 +1,4 @@
 'use client'
-
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from 'react'
 import {
@@ -9,16 +8,109 @@ import {
   TagFill,
 } from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
-import { Button } from '@material-tailwind/react'
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogHeader,
+  Avatar,
+} from '@material-tailwind/react'
 import axios from 'axios'
 import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import moment from 'moment'
+import { XLg } from 'react-bootstrap-icons'
+import Link from 'next/link'
+
+const listUser = [
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+  {
+    imgSrc: '/demo.jpg',
+    name: 'John Smith',
+    link: '#',
+  },
+]
+
+function DialogParticipants({ openDialog, setOpenDialog }) {
+  return (
+    <Dialog
+      size="xs"
+      placeholder={undefined}
+      open={openDialog}
+      handler={setOpenDialog}
+      className="p-4 w-[350px]">
+      <DialogHeader className="flex" placeholder={undefined}>
+        <p className={`${nunito.className} m-auto font-semibold`}>
+          Danh sách tham gia
+        </p>
+        <Button
+          className="p-2"
+          placeholder={undefined}
+          variant="text"
+          onClick={() => setOpenDialog()}>
+          <XLg className="text-lg" />
+        </Button>
+      </DialogHeader>
+      <DialogBody
+        placeholder={undefined}
+        className="flex flex-col gap-2 h-[400px] overflow-y-auto scrollbar-webkit-main">
+        {listUser.map(({ imgSrc, name, link }, idx) => (
+          <Link
+            href={`${link}`}
+            key={idx}
+            className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
+            <Avatar placeholder={undefined} src={imgSrc} alt="avatar" />
+            <p>{name}</p>
+          </Link>
+        ))}
+      </DialogBody>
+    </Dialog>
+  )
+}
 
 export default function Page({ params }: { params: { id: string } }) {
   const [event, setEvent] = useState(null)
   const [noData, setNoData] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false)
+
+  function handleOpen() {
+    setOpenDialog((e) => !e)
+  }
 
   useEffect(() => {
     axios
@@ -36,9 +128,9 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
-  }
+  // if (noData) {
+  //   return <NoData />
+  // }
 
   return (
     <div
@@ -47,7 +139,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <img
           src={event?.thumbnail}
           alt="image event"
-          className="sm:w-[450px] 2xl:w-[1000px] 2xl:h-[400px] object-cover object-center rounded-lg"
+          className="sm:w-[410px] sm:h-[250px] md:w-[500px] md:h-[350px]  xl:w-[550px] xl:h-[350px]  2xl:w-[40vw] 2xl:h-[400px] max-w-[1000px] object-cover object-center rounded-lg"
         />
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -89,7 +181,9 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
 
           <div className="w-full flex flex-col justify-center items-center lg:items-start gap-6 ">
-            <div className="flex gap-3">
+            <div
+              className="flex gap-3 hover:cursor-pointer"
+              onClick={() => handleOpen()}>
               <BarChartFill className="text-[--blue-02] text-[4.1rem]" />
               <div className="flex flex-col">
                 <p className="text-[20px] 2xl:text-[30px] font-extrabold">
@@ -98,7 +192,10 @@ export default function Page({ params }: { params: { id: string } }) {
                 <p className="text-lg">người tham gia</p>
               </div>
             </div>
-
+            <DialogParticipants
+              openDialog={openDialog}
+              setOpenDialog={setOpenDialog}
+            />
             <Button
               placeholder={undefined}
               className="w-52 bg-[--blue-02]"
@@ -109,7 +206,9 @@ export default function Page({ params }: { params: { id: string } }) {
         </div>
       </div>
       <div className="flex flex-col gap-2 w-full">
-        <p className="text-[26px] font-extrabold">Thông tin chi tiết</p>
+        <p className="lg:text-[26px] sm:text-lg font-extrabold">
+          Thông tin chi tiết
+        </p>
         <p className="text-pretty text-base">{event?.content}</p>
       </div>
     </div>

@@ -14,7 +14,7 @@ interface SearchAndFilterFacultyProps {
   params: { tagsId: string | null; facultyId: string | null }
 }
 
-export default function FilterAdmin({
+export default function Filter({
   witdh,
   onFilterFaculties,
   onResetFilter,
