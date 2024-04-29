@@ -140,12 +140,18 @@ export default function Page() {
               size="lg"
               crossOrigin={undefined}
               variant="outlined"
-              type="text"
+              type="number"
               {...register('beginningYear', {
                 required: 'Vui lòng nhập khóa',
+                pattern: {
+                  value: /^\d{4}$/,
+                  message: 'Vui lòng nhập đúng 4 chữ số',
+                },
               })}
-              minLength={4}
-              maxLength={4}
+              onInput={(e) => {
+                const input = e.target as HTMLInputElement
+                input.value = input.value.trim().slice(0, 4)
+              }} // Limit input to 4 digits
               className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
               labelProps={{
                 className: 'hidden',
