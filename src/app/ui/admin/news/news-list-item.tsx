@@ -105,6 +105,8 @@ export default function NewsListItem({
   views,
   publishedAt,
   id,
+  faculty,
+  tags,
 }) {
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
@@ -168,7 +170,7 @@ export default function NewsListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--blue-02] w-[1184px] m-auto items-center justify-between h-fit flex pl-6 py-2`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1184px] m-auto items-center justify-between h-fit flex pl-2 py-2`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -189,15 +191,26 @@ export default function NewsListItem({
       <img
         src={imgSrc}
         alt="news image"
-        className="h-[200px] w-[300px] object-cover object-center"
+        className="h-[120px] w-[180px] object-cover object-center rounded-lg"
       />
-      <p className="h-20 w-[500px] p-2 font-[600] text-black align-middle flex items-center">
+      <p className="h-20 w-[350px] p-2 font-[600] text-black align-middle flex items-center">
         {name}
       </p>
-      <p className="w-[8rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+
+      <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black p-2 font-[600] flex flex-col gap-1">
+        {tags &&
+          tags.map((tag) => {
+            return <span key={tag.name}>{tag.name}</span>
+          })}
+      </p>
+
+      <p className="w-[12rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
+        {faculty ? faculty.name : 'Tất cả'}
+      </p>
+      <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
         {moment(publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
       </p>
-      <p className="w-[7.5rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="w-[7.5rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
         {views}
       </p>
       <div className="flex justify-end px-2">

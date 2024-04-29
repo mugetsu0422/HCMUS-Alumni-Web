@@ -101,6 +101,8 @@ export default function EventsListItem({
   organizationLocation,
   organizationTime,
   status,
+  tags,
+  faculty,
 }) {
   const router = useRouter()
   const [openDelete, setOpenDelete] = React.useState(false)
@@ -163,7 +165,7 @@ export default function EventsListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--blue-02] w-[1500px] m-auto items-center justify-between h-fit flex pl-6 py-2`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1650px] m-auto items-center justify-between h-fit flex pl-4 py-2`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -184,19 +186,31 @@ export default function EventsListItem({
       <img
         src={thumbnail}
         alt="news image"
-        className="h-[200px] w-[300px] object-cover object-center"
+        className="h-[120px] w-[180px] object-cover object-center rounded-lg"
       />
-      <p className="h-24 w-80 p-2 font-[600] text-black align-middle flex items-center">
+      <p className="h-20 px-2 w-[350px] py-2 font-[600] text-black align-middle flex items-center">
         {title}
       </p>
-      <p className="w-[8rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black py-2 font-[600] flex flex-col gap-1 items-center">
+        {tags &&
+          tags.map((tag) => {
+            return <span key={tag.name}>{tag.name}</span>
+          })}
+      </p>
+      <p className="w-[12rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
+        {faculty ? faculty.name : 'Tất cả'}
+      </p>
+      <p className="w-[8rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
         {moment(organizationTime).format('DD/MM/YYYY HH:mm:ss')}
       </p>
-      <p className="w-[20rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="w-[10rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
         {organizationLocation}
       </p>
-      <p className=" w-[7.5rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className=" w-[5rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
         {participants}
+      </p>
+      <p className=" w-[7.5rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
+        {participants} / 200
       </p>
 
       <div className="flex justify-end px-2">

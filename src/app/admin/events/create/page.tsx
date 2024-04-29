@@ -75,6 +75,7 @@ export default function Page() {
     register,
     handleSubmit,
     trigger,
+    watch,
     formState: { errors },
   } = useForm()
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
@@ -209,6 +210,7 @@ export default function Page() {
                 variant="outlined"
                 min={today}
                 type="datetime-local"
+                step={900} // Set step to 900 seconds (15 minutes)
                 {...register('organizationTime', {
                   required: 'Vui lòng nhập thời gian diễn ra',
                 })}
@@ -238,7 +240,7 @@ export default function Page() {
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
-                className="bg-white !w-[300px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className="bg-white !w-[500px] !border-t-blue-gray-200 focus:!border-t-gray-900"
               />
               <ErrorInput
                 // This is the error message
@@ -252,7 +254,7 @@ export default function Page() {
               <select
                 className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
                 {...register('facultyId')}>
-                <option value={0}>Không</option>
+                <option value={0}>Tất cả</option>
                 {FACULTIES.map(({ id, name }) => {
                   return (
                     <option key={id} value={id}>
@@ -261,6 +263,65 @@ export default function Page() {
                   )
                 })}
               </select>
+            </div>
+          </div>
+
+          <div className="flex gap-6 flex-wrap">
+            <div className="flex flex-col gap-2">
+              <label className="text-xl font-bold">Tham gia tối thiểu</label>
+              <Input
+                size="lg"
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                {...register('minimumParticipants', {
+                  required: 'Vui lòng nhập số lượng tối thiểu',
+                  validate: {
+                    nonNegative: (value) =>
+                      parseInt(value) >= 0 || 'Số lượng không được âm',
+                  },
+                })}
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[214px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput
+                // This is the error message
+                errors={errors?.minimumParticipants?.message}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xl font-bold">Tham gia tối đa</label>
+              <Input
+                size="lg"
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                {...register('maximumParticipants', {
+                  required: 'Vui lòng nhập số lượng tối đa',
+                  validate: {
+                    minMaxRelation: (value) =>
+                      parseInt(value) >=
+                        parseInt(watch('minimumParticipants')) ||
+                      'Số lượng tối đa phải lớn hơn hoặc bằng số lượng tối thiểu',
+
+                    nonNegative: (value) =>
+                      parseInt(value) >= 0 || 'Số lượng không được âm',
+                  },
+                })}
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[214px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput
+                // This is the error message
+                errors={errors?.maximumParticipants?.message}
+              />
             </div>
           </div>
 
@@ -298,38 +359,38 @@ export default function Page() {
             <p className="text-xl font-bold">Ảnh thumbnail</p>
             <label
               htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
+              className="w-fit h-fit hover:cursor-pointer">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                  required: 'Vui lòng chọn ảnh thumbnail',
+                })}
+              />
+
+              {thumbnailPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={thumbnailPreview}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
             </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
-              })}
-            />
             <ErrorInput
               // This is the error message
               errors={errors?.thumbnail?.message}
             />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
-              />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
           </div>
           <div className="flex flex-col gap-2">
-            <label className={`relative max-w-[400px] text-xl font-bold`}>
+            <label className={`relative text-xl font-bold`}>
               Thông tin chi tiết
             </label>
             <Textarea
@@ -337,7 +398,7 @@ export default function Page() {
               variant="outlined"
               className="bg-white h-44 !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
-                className: 'max-w-[50%] h-fit',
+                className: 'h-fit',
               }}
               labelProps={{
                 className: 'before:content-none after:content-none',

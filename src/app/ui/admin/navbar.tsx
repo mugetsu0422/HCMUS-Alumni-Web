@@ -17,9 +17,9 @@ import {
   faEnvelope,
   faNewspaper,
   faUserPlus,
-  faCalendar,
-  faUserGroup,
-  faCircleQuestion,
+  faCalendarDays,
+  faCertificate,
+  faComments,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
@@ -41,19 +41,19 @@ const navListItems = [
   {
     label: 'Sự kiện',
     subMenu: null,
-    icon: faCalendar,
+    icon: faCalendarDays,
     link: '/admin/events',
   },
   {
     label: 'Gương thành công',
     subMenu: null,
-    icon: faUserGroup,
-    link: '#',
+    icon: faCertificate,
+    link: '/admin/hof',
   },
   {
     label: 'Tư vấn',
     subMenu: null,
-    icon: faCircleQuestion,
+    icon: faComments,
     link: '#',
   },
 ]
@@ -65,7 +65,7 @@ function NavList() {
         <div className="group cursor-pointer lg:py-3" key={label}>
           {subMenu ? (
             <>
-              <div className="text-[var(--text)] font-bold group-hover:text-[var(--blue-02)] flex items-center gap-2">
+              <div className="text-[--text-navbar] font-bold group-hover:text-[--blue-05] flex items-center gap-2">
                 <FontAwesomeIcon icon={icon} className="text-2xl" />
                 {label}
                 <ChevronDown className="group-hover:rotate-180" />
@@ -74,7 +74,7 @@ function NavList() {
                 {subMenu.map(({ title, link }) => (
                   <Link
                     key={title}
-                    className="text-[var(--text)] hover:text-[var(--blue-02)]"
+                    className="text-[--text-navbar] hover:text-[var(--blue-05)]"
                     href={link}>
                     {title}
                   </Link>
@@ -84,7 +84,7 @@ function NavList() {
           ) : (
             <Link
               href={link}
-              className="text-[var(--text)] font-bold group-hover:text-[var(--blue-02)] flex items-center gap-2">
+              className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
               <FontAwesomeIcon icon={icon} className="text-2xl" />
 
               {label}
@@ -156,13 +156,19 @@ export default function MyNavbar() {
         <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
           <Badge content={2} color="blue">
             <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon icon={faBell} className="text-2xl" />
+              <FontAwesomeIcon
+                icon={faBell}
+                className="text-2xl text-[--text-navbar]"
+              />
             </Button>
           </Badge>
 
           <Badge content={2} color="blue">
             <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon icon={faEnvelope} className="text-2xl " />
+              <FontAwesomeIcon
+                icon={faEnvelope}
+                className="text-2xl text-[--text-navbar] "
+              />
             </Button>
           </Badge>
 

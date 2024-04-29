@@ -77,7 +77,7 @@ export default function Page() {
   return (
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 py-4 px-10">
       <Toaster />
-      <p className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito}`}>
+      <p className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
         Yêu cầu xét duyệt cựu sinh viên - #{totalCount}
       </p>
       {totalCount === 0 ? null : (

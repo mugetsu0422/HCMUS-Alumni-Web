@@ -21,14 +21,14 @@ interface HeaderProps {
 
 export default function Header({ onFilter }: HeaderProps) {
   return (
-    <div className="w-[1184px] h-fit bg-[--blue-02] border-2 border-[--blue-02] m-auto py-1 ">
-      <div className="flex w-fit justify-evenly items-center ">
+    <div className="w-[1184px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 ">
+      <div className="flex w-fit justify-evenly items-center">
         <Menu>
           <MenuHandler>
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[700px] ml-4 text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-white">
+              className="w-[460px] ml-2 mr-1 text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
               Bài viết
               <CaretDownFill />
             </Button>
@@ -50,13 +50,19 @@ export default function Header({ onFilter }: HeaderProps) {
             </MenuItem>
           </MenuList>
         </Menu>
+        <div className="w-[7rem] text-center mr-1 py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+          Thẻ
+        </div>
+        <div className="w-[10.5rem] text-center py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+          Khoa{' '}
+        </div>
 
         <Menu>
           <MenuHandler>
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[9rem] text-center ml-8 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-white">
+              className="w-[8rem] text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
               Ngày đăng
               <CaretDownFill />
             </Button>
@@ -84,7 +90,7 @@ export default function Header({ onFilter }: HeaderProps) {
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[7rem] text-center p-1 flex items-center justify-center gap-2 font-bold normal-case text-base text-white">
+              className="w-[7rem] text-center p-1 flex items-center justify-center gap-2 font-bold normal-case text-base text-[#000000]">
               Lượt xem
               <CaretDownFill />
             </Button>

@@ -82,6 +82,7 @@ export default function Page({ params }: { params: { id: string } }) {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm()
 
@@ -134,11 +135,15 @@ export default function Page({ params }: { params: { id: string } }) {
 
     const postToast = toast.loading('Đang cập nhật')
     axios
-      .putForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`, event, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .putForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`,
+        event,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(() => {
         toast.success('Cập nhật thành công', {
           id: postToast,
@@ -162,7 +167,10 @@ export default function Page({ params }: { params: { id: string } }) {
         setThumbnailPreview(data.thumbnail)
         setValue('title', data.title)
         setValue('facultyId', data.faculty?.id || '0')
-        setValue('organizationTime', moment(data.organizationTime).format('YYYY-MM-DDTHH:mm'))
+        setValue(
+          'organizationTime',
+          moment(data.organizationTime).format('YYYY-MM-DDTHH:mm')
+        )
         setValue('organizationLocation', data.organizationLocation)
         setValue('content', data.content)
         setSelectedTags(
@@ -280,7 +288,7 @@ export default function Page({ params }: { params: { id: string } }) {
               <select
                 className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
                 {...register('facultyId')}>
-                <option value={0}>Không</option>
+                <option value={0}>Tất cả</option>
                 {FACULTIES.map(({ id, name }) => {
                   return (
                     <option key={id} value={id}>
@@ -289,6 +297,64 @@ export default function Page({ params }: { params: { id: string } }) {
                   )
                 })}
               </select>
+            </div>
+          </div>
+          <div className="flex gap-6 flex-wrap">
+            <div className="flex flex-col gap-2">
+              <label className="text-xl font-bold">Tham gia tối thiểu</label>
+              <Input
+                size="lg"
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                {...register('minimumParticipants', {
+                  required: 'Vui lòng nhập số lượng tối thiểu',
+                  validate: {
+                    nonNegative: (value) =>
+                      parseInt(value) >= 0 || 'Số lượng không được âm',
+                  },
+                })}
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[214px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput
+                // This is the error message
+                errors={errors?.minimumParticipants?.message}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-xl font-bold">Tham gia tối đa</label>
+              <Input
+                size="lg"
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                {...register('maximumParticipants', {
+                  required: 'Vui lòng nhập số lượng tối đa',
+                  validate: {
+                    minMaxRelation: (value) =>
+                      parseInt(value) >=
+                        parseInt(watch('minimumParticipants')) ||
+                      'Số lượng tối đa phải lớn hơn hoặc bằng số lượng tối thiểu',
+
+                    nonNegative: (value) =>
+                      parseInt(value) >= 0 || 'Số lượng không được âm',
+                  },
+                })}
+                containerProps={{ className: 'h-[50px]' }}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !w-[214px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput
+                // This is the error message
+                errors={errors?.maximumParticipants?.message}
+              />
             </div>
           </div>
 
@@ -326,30 +392,29 @@ export default function Page({ params }: { params: { id: string } }) {
             <p className="text-xl font-bold">Ảnh thumbnail</p>
             <label
               htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
-            </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-              })}
-            />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
+              className="w-fit h-fit hover:cursor-pointer">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                })}
               />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
+              {thumbnailPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={thumbnailPreview}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
+            </label>
           </div>
           <div className="flex flex-col gap-2">
             <label className={`relative max-w-[400px] text-xl font-bold`}>
@@ -360,7 +425,7 @@ export default function Page({ params }: { params: { id: string } }) {
               variant="outlined"
               className="bg-white h-44 !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
-                className: 'max-w-[50%] h-fit',
+                className: 'w-full h-fit',
               }}
               labelProps={{
                 className: 'before:content-none after:content-none',

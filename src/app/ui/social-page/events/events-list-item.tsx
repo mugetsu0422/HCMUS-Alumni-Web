@@ -19,9 +19,9 @@ export default function EventsListItem({
 }) {
   const router = useRouter()
   return (
-    <div className="flex w-[25rem] flex-col justify-start items-start gap-3">
-      <Link href={`/events/${id}`} className="w-full h-60 ">
-        <figure className="relative h-60 w-full">
+    <div className="flex flex-col xl:flex-row justify-between h-fit gap-6 min-w-[25rem] w-[80%]">
+      <Link href={`/events/${id}`} className="lg:w-[30rem] w-full h-64 lg:h-72">
+        <figure className="relative h-72 lg:w-[30rem]">
           <img
             src={thumbnail}
             alt="thumbnail"
@@ -34,39 +34,41 @@ export default function EventsListItem({
           )}
         </figure>
       </Link>
-      <div className="flex flex-col w-full h-[128px]">
-        <p className="text-xl font-semibold w-full line-clamp-2 text-ellipsis overflow-hidden">
+
+      <div className="flex flex-col min-w-[25rem] w-full items-left justify-between">
+        <p className="text-[24px] font-semibold w-full line-clamp-2 text-ellipsis overflow-hidden">
           {title}
         </p>
-        <p className="flex items-center gap-1 text-md w-full">
-          <GeoAltFill className="text-[--blue-02]" />
-          <span className="">Địa điểm:</span>
-          <span className="w-[70%] whitespace-nowrap text-ellipsis overflow-hidden">
-            {organizationLocation}
-          </span>
-        </p>
-        <p className="flex items-center gap-1 text-md">
-          <Clock className="text-[--blue-02]" /> Thời gian:{' '}
-          <span>{moment(organizationTime).format('DD-MM-YYYY HH:mm:ss')}</span>
-        </p>
-        <p className="flex items-center gap-1 text-md">
-          <BarChartFill className="text-[--blue-02]" /> Số người tham gia:{' '}
-          <span>{participants}</span>
-        </p>
+        <div className="flex flex-col gap-1">
+          <p className="flex items-start gap-1 text-md w-full">
+            <GeoAltFill className="text-[--blue-02]" />
+            <span className="">Địa điểm:</span>
+            <span className="w-[70%] whitespace-nowrap text-ellipsis overflow-hidden text-wrap">
+              {organizationLocation}
+            </span>
+          </p>
+          <p className="flex items-center gap-1 text-md">
+            <Clock className="text-[--blue-02]" /> Thời gian:{' '}
+            <span>
+              {moment(organizationTime).format('DD-MM-YYYY HH:mm:ss')}
+            </span>
+          </p>
+          <p className="flex items-center gap-1 text-md">
+            <BarChartFill className="text-[--blue-02]" /> Số người tham gia:{' '}
+            <span>{participants} / 100</span>
+          </p>
+          <p className="flex items-center gap-1 text-md">
+            <BarChartFill className="text-[--blue-02]" /> Số người tối thiểu:{' '}
+            <span>40</span>
+          </p>
+        </div>
+        <Button
+          placeholder={undefined}
+          size="md"
+          className="bg-[--blue-02] font-medium w-full text-[16px]">
+          Tham gia
+        </Button>
       </div>
-      <Button
-        placeholder={undefined}
-        onClick={() => router.push(`/events/${id}`)}
-        size="lg"
-        className="bg-[--secondary] text-black w-full">
-        Xem chi tiết
-      </Button>
-      <Button
-        placeholder={undefined}
-        size="lg"
-        className="bg-[--blue-02] w-full">
-        Tham gia
-      </Button>
     </div>
   )
 }

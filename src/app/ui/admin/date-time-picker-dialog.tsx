@@ -23,31 +23,33 @@ export default function DateTimeLocalPickerDialog({
   onSubmit
 }) {
   const hours = [
-    '00:00',
-    '01:00',
-    '02:00',
-    '03:00',
-    '04:00',
-    '05:00',
-    '06:00',
-    '07:00',
-    '08:00',
-    '09:00',
-    '10:00',
-    '11:00',
-    '12:00',
-    '13:00',
-    '14:00',
-    '15:00',
-    '16:00',
-    '17:00',
-    '18:00',
-    '19:00',
-    '20:00',
-    '21:00',
-    '22:00',
-    '23:00',
+    '00',
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
+    '16',
+    '17',
+    '18',
+    '19',
+    '20',
+    '21',
+    '22',
+    '23',
   ]
+  const mins = ['00', '15', '30', '45']
+
   const today = new Date()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
@@ -63,16 +65,18 @@ export default function DateTimeLocalPickerDialog({
   } = useForm({
     defaultValues: {
       date: tomorrowString,
-      time: hours[0],
+      hour: hours[0],
+      minute: mins[0],
     },
   })
 
   useEffect(() => {
     onChange({
       date: tomorrowString,
-      time: hours[0],
+      hour: hours[0],
+      minute: mins[0],
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -87,7 +91,7 @@ export default function DateTimeLocalPickerDialog({
         placeholder={undefined}>
         Lên lịch đăng bài
       </DialogHeader>
-      <DialogBody placeholder={undefined} className="flex flex-col">
+      <DialogBody placeholder={undefined} className="flex flex-col gap-4">
         <label className="text-xl font-bold text-black" htmlFor="date">
           Ngày
         </label>
@@ -98,28 +102,48 @@ export default function DateTimeLocalPickerDialog({
           min={todayString}
           defaultValue={tomorrowString}
           onFocus={(e) => e.target.showPicker()}
-          onChange={(e) => onChange({date: e.target.value})}
+          onChange={(e) => onChange({ date: e.target.value })}
           // {...register('date', {})}
         />
-        <label className="text-xl font-bold text-black" htmlFor="time">
-          Giờ
-        </label>
-        <select
-          name="time"
-          id="time"
-          className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
-          onChange={(e) => onChange({ time: e.target.value })}
-          // {...register('time', {})}
-        >
-          {hours.map((val) => {
-            return (
-              <option key={val} value={val}>
-                {val}
-              </option>
-            )
-          })}
-        </select>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xl font-bold text-black"> Thời gian</label>
+          <div className="flex gap-1 items-center">
+            <select
+              name="hour"
+              id="hour"
+              className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+              onChange={(e) => onChange({ hour: e.target.value })}
+              // {...register('time', {})}
+            >
+              {hours.map((val) => {
+                return (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                )
+              })}
+            </select>
+            <p className="text-xl font-bold">:</p>
+            <select
+              name="minute"
+              id="minute"
+              className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+              onChange={(e) => onChange({ minute: e.target.value })}
+              // {...register('time', {})}
+            >
+              {mins.map((val) => {
+                return (
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+        </div>
       </DialogBody>
+
       <DialogFooter
         className="border-t-2 border-gray-300"
         placeholder={undefined}>

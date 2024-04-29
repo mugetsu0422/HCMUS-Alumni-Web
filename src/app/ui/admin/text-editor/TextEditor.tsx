@@ -115,7 +115,7 @@ function TextEditor({
 
   return (
     <>
-      <label className="text-xl font-bold">Bài đăng</label>
+      <label className="text-xl font-bold">Nội dung</label>
       <EditorToolbar toolbarId={'t1'} />
       {enableEditor && (
         <ReactQuill
@@ -127,7 +127,7 @@ function TextEditor({
           formats={formats}
           className={clsx({
             '': readOnly,
-            'h-[30rem] overflow-y-auto': !readOnly,
+            'h-[30rem] overflow-y-auto bg-white': !readOnly,
           })}
           readOnly={readOnly}
         />
