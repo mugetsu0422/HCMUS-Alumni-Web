@@ -57,6 +57,7 @@ function TextEditor({
           await require('quill-blot-formatter')
         const ImageResize = await require('quill-image-resize-module-react')
           .default
+        const ImageCompress = await require('quill-image-compress').default
         resolve({
           Quill,
           BlotFormatter,
@@ -64,6 +65,7 @@ function TextEditor({
           ResizeAction,
           DeleteAction,
           ImageSpec,
+          ImageCompress,
         })
       })
         .then(
@@ -74,6 +76,7 @@ function TextEditor({
             ResizeAction,
             DeleteAction,
             ImageSpec,
+            ImageCompress,
           }) => {
             class CustomImageSpec extends ImageSpec {
               getActions() {
@@ -83,10 +86,21 @@ function TextEditor({
 
             Quill.register('modules/blotFormatter', BlotFormatter)
             Quill.register('modules/imageResize', ImageResize)
+            Quill.register('modules/imageCompress', ImageCompress)
             setmodules((modules) => ({
               ...modules,
               blotFormatter: {
                 specs: [CustomImageSpec],
+              },
+              imageCompress: {
+                quality: 0.85,
+                maxWidth: 1000,
+                maxHeight: 1000,
+                imageType: 'image/jpeg',
+                keepImageTypes: ['image/jpeg', 'image/png'],
+                debug: true,
+                suppressErrorLogging: false,
+                insertIntoEditor: undefined,
               },
             }))
             return
@@ -113,7 +127,7 @@ function TextEditor({
           formats={formats}
           className={clsx({
             '': readOnly,
-            'h-[30rem] overflow-y-auto': !readOnly,
+            'h-[30rem] overflow-y-auto bg-white': !readOnly,
           })}
           readOnly={readOnly}
         />

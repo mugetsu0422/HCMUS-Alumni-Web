@@ -117,6 +117,7 @@ export default function Filter({ setMyParams, status }) {
           onChange={(e) => handleSearch(e.target.value)}
           type="text"
         />
+
         <div className="h-10 flex ">
           <label htmlFor="criteria" className="font-semibold self-center pr-3">
             Theo
@@ -135,6 +136,7 @@ export default function Filter({ setMyParams, status }) {
             </option>
           </select>
         </div>
+
         <div className="h-10 flex ">
           <label htmlFor="facultyId" className="font-semibold self-center pr-3">
             Khoa
@@ -156,6 +158,7 @@ export default function Filter({ setMyParams, status }) {
           </select>
         </div>
       </div>
+
       <div className="flex mt-3 gap-2 flex-wrap">
         <Button
           onClick={handleResetForm}

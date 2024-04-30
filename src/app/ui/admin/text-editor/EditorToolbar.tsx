@@ -95,7 +95,7 @@ function QuillToolbar(props) {
   return (
     <>
       {props.toolbarId !== undefined && (
-        <div id={props.toolbarId}>
+        <div id={props.toolbarId} className="bg-white">
           <span className="ql-formats">
             <button className="ql-bold" />
             <button className="ql-italic" />

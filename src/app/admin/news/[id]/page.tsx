@@ -98,6 +98,7 @@ export default function Page({ params }: { params: { id: string } }) {
     }
     reader.readAsDataURL(file)
   }
+
   const onAddTags = useCallback(
     (newTag) => {
       setSelectedTags([...selectedTags, newTag])
@@ -180,13 +181,12 @@ export default function Page({ params }: { params: { id: string } }) {
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   if (noData) {
     return <NoData />
   }
   return (
     <div
-      className={`${nunito.className} max-w-[81.25%] max-h-[755px] m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
+      className={`${nunito.className} max-w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -267,7 +267,7 @@ export default function Page({ params }: { params: { id: string } }) {
             <select
               className="h-full hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               {...register('facultyId')}>
-              <option value={0}>Không</option>
+              <option value={0}>Tất cả</option>
               {FACULTIES.map(({ id, name }) => {
                 return (
                   <option key={id} value={id}>
@@ -282,34 +282,33 @@ export default function Page({ params }: { params: { id: string } }) {
             <p className="text-xl font-bold">Ảnh thumbnail</p>
             <label
               htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
-            </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="hidden"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-              })}
-            />
-            {news?.thumbnail ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={news?.thumbnail}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
+              className="w-fit h-fit hover:cursor-pointer">
+              <input
+                type="file"
+                id="thumbnail"
+                className="hidden"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                })}
               />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
+              {news?.thumbnail ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={news?.thumbnail}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
+            </label>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className={`relative max-w-[400px] text-xl font-bold`}>
+            <label className={`relative w-full text-xl font-bold`}>
               Tóm tắt
               <p className="absolute right-0 bottom-0 font-normal text-base">
                 {summaryCharCount}/{summaryMaxCharCount}
@@ -321,7 +320,7 @@ export default function Page({ params }: { params: { id: string } }) {
               variant="outlined"
               className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
-                className: 'max-w-[400px] h-[110px]',
+                className: 'w-full h-[110px]',
               }}
               labelProps={{
                 className: 'before:content-none after:content-none',
@@ -347,7 +346,10 @@ export default function Page({ params }: { params: { id: string } }) {
               className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog open={openCancelDialog} handleOpen={handleOpenCancelDialog}/>
+            <CancelDialog
+              open={openCancelDialog}
+              handleOpen={handleOpenCancelDialog}
+            />
             <Button
               placeholder={undefined}
               size="lg"

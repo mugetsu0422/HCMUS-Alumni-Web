@@ -2,19 +2,20 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Image from 'next/image'
-import { Button } from '@material-tailwind/react'
-import { ArrowRight, ArrowLeft } from 'react-bootstrap-icons'
+import { Button, Input } from '@material-tailwind/react'
 import { Calendar } from 'react-bootstrap-icons'
-import MostViewed from '../../ui/social-page/news/most-viewed'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
-import { JWT_COOKIE } from '../../constant'
+import { JWT_COOKIE, MOST_VIEWED_LIMIT, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import Link from 'next/link'
 import moment from 'moment'
 import Pagination from '../../ui/common/pagination'
+import { roboto } from '../../ui/fonts'
+import { useForm } from 'react-hook-form'
+import Thumbnail from '../../ui/social-page/thumbnail-image'
+import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 
 function NewsListItem({
   id,
@@ -69,13 +70,15 @@ export default function Page() {
 
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [news, setNews] = useState([])
+  const [mostViewed, setMostViewed] = useState([])
 
   const resetCurPage = () => {
     params.delete('page')
     setCurPage(1)
   }
+
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
       params.set('title', keyword)
@@ -86,10 +89,48 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }, 500)
-  const onResetSearchAndFilter = () => {
-    replace(pathname)
-    setMyParams(``)
+
+  const onFilter = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
   }
+
+  const onFilterFaculties = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onFilterTag = (tag: string) => {
+    if (tag != '0') {
+      params.set('tagsId', tag)
+    } else {
+      params.delete('tagsId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onResetFilter = () => {
+    params.delete('facultyId')
+    params.delete('tagsId')
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
@@ -110,15 +151,17 @@ export default function Page() {
   }
 
   useEffect(() => {
+    // News list
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&statusId=${POST_STATUS['Bình thường']}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(({ data: { totalPages, news } }) => {
-        console.log(news)
-
         setTotalPages(totalPages)
         setNews(news)
       })
@@ -127,8 +170,26 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex flex-col xl:flex-row m-auto justify-center gap-x-8">
+      <Thumbnail />
+      <div className="xl:w-[1264px] flex flex-col xl:flex-row justify-between gap-x-8 m-auto">
         <div className="flex flex-col gap-y-6 mt-10">
+          <p
+            className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+            TIN TỨC
+          </p>
+
+          <SearchAndFilterFaculty
+            onSearch={onSearch}
+            onFilter={onFilter}
+            onResetFilter={onResetFilter}
+            onFilterTag={onFilterTag}
+            params={{
+              title: params.get('title'),
+              facultyId: params.get('facultyId'),
+              tagsId: params.get('tagsID'),
+            }}
+          />
+
           {news.map(
             ({ id, title, summary, publishedAt, faculty, tags, thumbnail }) => (
               <NewsListItem
@@ -144,7 +205,6 @@ export default function Page() {
             )
           )}
         </div>
-        <MostViewed />
       </div>
       <Pagination
         totalPages={totalPages}

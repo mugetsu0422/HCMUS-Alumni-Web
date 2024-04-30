@@ -1,5 +1,15 @@
 'use client'
+import Link from 'next/link'
 import React from 'react'
+
+interface MostViewedProps {
+  className?: string
+  news?: {
+    id: string
+    title: string
+    views: number
+  }[]
+}
 
 const mostViewed = [
   {
@@ -24,16 +34,17 @@ const mostViewed = [
   },
 ]
 
-export default function MostViewed() {
+export default function MostViewed({ className, news }: MostViewedProps) {
   return (
-    <div className="xl:w-72 w-fit bg-gray-300 text-[--blue-05] font-medium py-6 px-4">
+    <div className={className}>
       <p className="my-6 text-xl font-extrabold text-[#008000]">
         Xem nhiều nhất
       </p>
       <ol className="flex sm:flex-wrap gap-y-4 list-disc">
-        {mostViewed.map(({ view, name }, idx) => (
-          <li className="ml-8" key={idx}>
-            {name} <text className="text-[--text]">({view}).</text>
+        {news?.map(({ id, views, title }) => (
+          <li className="ml-8 w-full" key={id}>
+            <Link href={`/news/${id}`}>{title}{' '}</Link>
+            <span className="text-[var(--text)]">({views}).</span>
           </li>
         ))}
       </ol>

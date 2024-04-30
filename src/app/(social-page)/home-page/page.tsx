@@ -85,7 +85,10 @@ function ChatDialog() {
             placeholder={undefined}
             variant="text"
             className="p-2 w-fit h-fit">
-            <FontAwesomeIcon icon={faImage} className="text-xl" />
+            <FontAwesomeIcon
+              icon={faImage}
+              className="text-xl text-[#64748B]"
+            />
           </Button>
         </div>
         <Textarea
@@ -104,7 +107,10 @@ function ChatDialog() {
             placeholder={undefined}
             variant="text"
             className="p-2 w-fit h-fit">
-            <FontAwesomeIcon icon={faPaperPlane} className="text-xl" />
+            <FontAwesomeIcon
+              icon={faPaperPlane}
+              className="text-xl text-[#64748B]"
+            />
           </Button>
         </div>
       </footer>

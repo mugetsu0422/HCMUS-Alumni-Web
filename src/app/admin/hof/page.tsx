@@ -15,18 +15,6 @@ import Pagination from '../../ui/common/pagination'
 import FilterHeader from '../../ui/admin/hof/filter-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 
-const hofTemp = [
-  {
-    id: '1',
-    title: 'Nguyễn Mai Hoàng Quang Huy',
-    beginning_year: '2016',
-    thumbnail: '/demo.jpg',
-    faculty: 'Sinh học - Công Nghệ Sinh Học',
-    views: 100,
-    status: { name: 'Bình thường' },
-  },
-]
-
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -63,8 +51,8 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
           reset()
         }}
         placeholder={undefined}
-        className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-        <ArrowCounterclockwise className="text-2xl font-bold" />
+        className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[#E4E4E7] text-white ">
+        <ArrowCounterclockwise className="text-2xl font-bold text-[#3F3F46]" />
       </Button>
     </div>
   )
@@ -78,7 +66,7 @@ export default function Page() {
 
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [hof, setHof] = useState([])
 
   const resetCurPage = () => {
@@ -115,6 +103,7 @@ export default function Page() {
       })
       .catch()
   }, [myParams])
+
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
@@ -124,6 +113,7 @@ export default function Page() {
       return curPage + 1
     })
   }
+
   const onPrevPage = () => {
     if (curPage == 1) return
     params.set('page', (curPage - 2).toString())
@@ -137,7 +127,7 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
       <p
-        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-02)]`}>
+        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
       <FuntionSection
@@ -147,7 +137,7 @@ export default function Page() {
       <FilterHeader setParams={setMyParams} setCurPage={setCurPage} />
 
       <div className="relative mb-10">
-        {hofTemp.map(
+        {hof.map(
           ({
             id,
             title,

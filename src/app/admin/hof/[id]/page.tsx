@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
 import {
@@ -15,8 +15,11 @@ import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import { FACULTIES } from '../../../constant'
+import { FACULTIES, JWT_COOKIE } from '../../../constant'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
+import NoData from '../../../ui/no-data'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 
 function CancelDialog({ open, handleOpen }) {
   const router = useRouter()
@@ -38,7 +41,7 @@ function CancelDialog({ open, handleOpen }) {
           className={`${nunito.className} bg-[var(--blue-05)] text-white normal-case text-md`}
           placeholder={undefined}
           onClick={() => {
-            router.push('/admin/news')
+            router.push('/admin/hof')
           }}>
           <span>Hủy</span>
         </Button>
@@ -47,25 +50,68 @@ function CancelDialog({ open, handleOpen }) {
   )
 }
 
-export default function Page() {
-  const [thumbnailPreview, setThumbnailPreview] = useState(null)
+export default function Page({ params }: { params: { id: string } }) {
   const [content, setContent] = useState(null)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
-  const [openDialog, setOpenDialog] = useState(false)
+  const [noData, setNoData] = useState(false)
+  const [hof, setHof] = useState(null)
 
   const {
     register,
     handleSubmit,
-    trigger,
+    setValue,
     formState: { errors },
   } = useForm()
-  const onSubmit = async (data) => {}
+
+  const onSubmit = async (data) => {
+    const news = {
+      title: data.title,
+      thumbnail: data.thumbnail[0] || null,
+      facultyId: data.facultyId,
+    }
+
+    const putToast = toast.loading('Đang cập nhật')
+    try {
+      // Post without content
+      await axios.putForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
+        news,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
+      // Update content
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/content`,
+        { content: content },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
+      toast.success('Cập nhật thành công', {
+        id: putToast,
+      })
+    } catch ({ message }) {
+      toast.error(message, {
+        id: putToast,
+      })
+    }
+  }
 
   const onThumbnailChange = (e) => {
     const file = e.target.files[0]
 
     if (!file) {
-      setThumbnailPreview(null)
+      setHof((news) => ({
+        ...news,
+        thumbnail: null,
+      }))
       return
     }
 
@@ -76,16 +122,41 @@ export default function Page() {
 
     const reader = new FileReader()
     reader.onload = () => {
-      setThumbnailPreview(reader.result as string)
+      setHof((hof) => ({
+        ...hof,
+        thumbnail: reader.result as string,
+      }))
     }
     reader.readAsDataURL(file)
   }
 
-  const handleOpenDialog = () => {
-    setOpenDialog(!openDialog)
-  }
   const handleOpenCancelDialog = () => {
     setOpenCancelDialog(!openCancelDialog)
+  }
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${params.id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setHof(data)
+        setValue('title', data.title)
+        setValue('title', data.title)
+        setValue('facultyId', data.faculty?.id || '0')
+        setValue('emailOfUser', data?.emailOfUser)
+        setContent(data.content)
+      })
+      .catch((e) => {
+        setNoData(true)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (noData) {
+    return <NoData />
   }
 
   return (
@@ -120,13 +191,13 @@ export default function Page() {
               crossOrigin={undefined}
               variant="outlined"
               type="text"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
               {...register('title', {
                 required: 'Vui lòng nhập gương thành công',
               })}
-              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
-              labelProps={{
-                className: 'hidden',
-              }}
             />
             <ErrorInput
               // This is the error message
@@ -170,10 +241,10 @@ export default function Page() {
               crossOrigin={undefined}
               variant="outlined"
               type="text"
-              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
               labelProps={{
-                className: 'hidden',
+                className: 'before:content-none after:content-none',
               }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
           </div>
 
@@ -198,35 +269,34 @@ export default function Page() {
             <p className="text-xl font-bold">Ảnh thumbnail</p>
             <label
               htmlFor="thumbnail"
-              className="hover:cursor-pointer shadow-md shadow-gray-900/10 rounded-lg hover:shadow-lg hover:shadow-gray-900/20 text-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
+              className="w-fit h-fit hover:cursor-pointer">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                  required: 'Vui lòng chọn ảnh thumbnail',
+                })}
+              />
+              {hof?.thumbnail ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={hof?.thumbnail}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
             </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
-              })}
-            />
             <ErrorInput
               // This is the error message
               errors={errors?.thumbnail?.message}
             />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
-              />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -235,7 +305,9 @@ export default function Page() {
               content={content}
               setContent={setContent}
             />
-            {/* <div className="ql-editor" dangerouslySetInnerHTML={{__html: content}}></div> */}
+            <div
+              className="ql-editor"
+              dangerouslySetInnerHTML={{ __html: content }}></div>
           </div>
           <div className="flex justify-end gap-x-4 pt-6 ">
             <Button
@@ -255,7 +327,7 @@ export default function Page() {
               size="lg"
               type="submit"
               className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
-              Đăng
+              Cập nhật
             </Button>
           </div>
         </form>

@@ -13,11 +13,14 @@ import {
   DialogHeader,
 } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import { FACULTIES } from '../../../constant'
+import { FACULTIES, JWT_COOKIE } from '../../../constant'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
+import DateTimeLocalPickerDialog from '../../../ui/admin/date-time-picker-dialog'
+import axios from 'axios'
 
 function CancelDialog({ open, handleOpen }) {
   const router = useRouter()
@@ -53,6 +56,7 @@ export default function Page() {
   const [content, setContent] = useState(null)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
+  const [scheduledTime, setScheduledTime] = useState(null)
 
   const {
     register,
@@ -60,7 +64,55 @@ export default function Page() {
     trigger,
     formState: { errors },
   } = useForm()
-  const onSubmit = async (data) => {}
+  const onSubmit = async (data) => {
+    const hof = {
+      title: data.tilte,
+      thumbnail: data.thumbnail[0],
+      content: data.content,
+      emailOfUser: data.emailOfUser,
+      facultyId: data.facultyId,
+      beginningYear: data.beginningYear,
+      scheduledTime: openDialog
+        ? new Date(
+            `${scheduledTime.date}T${scheduledTime.hour}:${scheduledTime.minute}:00.000`
+          ).getTime()
+        : null,
+    }
+    const postToast = toast.loading(openDialog ? 'Đang lên lịch' : 'Đang đăng')
+
+    try {
+      // Post without content
+      const res1 = await axios.postForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof`,
+        hof,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      const { data: id } = res1
+
+      // Update content
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${id}/content`,
+        { content: content },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
+      toast.success(openDialog ? 'Lên lịch thành công' : 'Đăng thành công', {
+        id: postToast,
+      })
+    } catch ({ message }) {
+      toast.error(message, {
+        id: postToast,
+      })
+    }
+  }
 
   const onThumbnailChange = (e) => {
     const file = e.target.files[0]
@@ -87,6 +139,13 @@ export default function Page() {
   }
   const handleOpenCancelDialog = () => {
     setOpenCancelDialog(!openCancelDialog)
+  }
+
+  const handleDateTime = (props) => {
+    setScheduledTime((state) => ({
+      ...state,
+      ...props,
+    }))
   }
 
   return (
@@ -124,10 +183,10 @@ export default function Page() {
               {...register('title', {
                 required: 'Vui lòng nhập gương thành công',
               })}
-              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
               labelProps={{
-                className: 'hidden',
+                className: 'before:content-none after:content-none',
               }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
@@ -144,13 +203,19 @@ export default function Page() {
               type="text"
               {...register('beginningYear', {
                 required: 'Vui lòng nhập khóa',
+                pattern: {
+                  value: /^\d{4}$/,
+                  message: 'Vui lòng nhập đúng 4 chữ số',
+                },
               })}
-              minLength={4}
-              maxLength={4}
-              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
+              onInput={(e) => {
+                const input = e.target as HTMLInputElement
+                input.value = input.value.trim().slice(0, 4)
+              }} //
               labelProps={{
-                className: 'hidden',
+                className: 'before:content-none after:content-none',
               }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
@@ -165,10 +230,10 @@ export default function Page() {
               crossOrigin={undefined}
               variant="outlined"
               type="text"
-              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
               labelProps={{
-                className: 'hidden',
+                className: 'before:content-none after:content-none',
               }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
           </div>
 
@@ -189,39 +254,40 @@ export default function Page() {
               })}
             </select>
           </div>
+
           <div className="flex flex-col gap-2">
             <p className="text-xl font-bold">Ảnh thumbnail</p>
+
             <label
               htmlFor="thumbnail"
-              className="rounded-xl text-white hover:cursor-pointer rounded-lgtext-white font-bold w-fit px-7 py-3.5 bg-[var(--blue-05)] normal-case text-md">
-              Tải ảnh lên
+              className="w-fit h-fit hover:cursor-pointer">
+              <input
+                type="file"
+                id="thumbnail"
+                className="opacity-0 absolute w-0"
+                accept="image/png, image/jpeg"
+                {...register('thumbnail', {
+                  onChange: onThumbnailChange,
+                  required: 'Vui lòng chọn ảnh thumbnail',
+                })}
+              />
+              {thumbnailPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="object-cover w-[300px] h-[200px]"
+                  src={thumbnailPreview}
+                  alt="preview-thumbnail"
+                  width={300}
+                  height={200}
+                />
+              ) : (
+                <ImageSkeleton width={300} height={200} />
+              )}
             </label>
-            <input
-              type="file"
-              id="thumbnail"
-              className="opacity-0 absolute w-0"
-              accept="image/png, image/jpeg"
-              {...register('thumbnail', {
-                onChange: onThumbnailChange,
-                required: 'Vui lòng chọn ảnh thumbnail',
-              })}
-            />
             <ErrorInput
               // This is the error message
               errors={errors?.thumbnail?.message}
             />
-            {thumbnailPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="object-cover w-[300px] h-[200px]"
-                src={thumbnailPreview}
-                alt="preview-thumbnail"
-                width={300}
-                height={200}
-              />
-            ) : (
-              <ImageSkeleton width={300} height={200} />
-            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -244,7 +310,7 @@ export default function Page() {
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
             />
-                        <Button
+            <Button
               onClick={async () => {
                 const output = await trigger(['title', 'thumbnail'], {
                   shouldFocus: true,
@@ -255,9 +321,15 @@ export default function Page() {
               }}
               placeholder={undefined}
               size="lg"
-              className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
+              className={`${nunito.className}  bg-[var(--blue-03)] text-[--blue-02] normal-case text-md`}>
               Lên lịch
             </Button>
+            <DateTimeLocalPickerDialog
+              open={openDialog}
+              handleOpen={handleOpenDialog}
+              onChange={handleDateTime}
+              onSubmit={handleSubmit(onSubmit)}
+            />
             <Button
               placeholder={undefined}
               size="lg"

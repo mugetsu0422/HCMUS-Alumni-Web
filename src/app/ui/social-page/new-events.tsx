@@ -13,8 +13,8 @@ function BigEvent() {
         width={650}
         height={528}
       />
-      <figcaption className="absolute bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-2xl`}>
+      <figcaption className="absolute bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
+        <div className={`text-2xl text-white`}>
           Ethiopian runners took the top four spots.
         </div>
       </figcaption>
@@ -32,8 +32,8 @@ function SmallEvent() {
         width={256}
         height={240}
       />
-      <figcaption className="absolute  bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-base`}>
+      <figcaption className="absolute  bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
+        <div className={`text-base text-white`}>
           Ethiopian runners took the top four spots.
         </div>
       </figcaption>
@@ -51,8 +51,8 @@ function MediumEvent() {
         width={614}
         height={240}
       />
-      <figcaption className="absolute  bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-base`}>
+      <figcaption className="absolute  bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
+        <div className={`text-base text-white`}>
           Ethiopian runners took the top four spots.
         </div>
       </figcaption>
