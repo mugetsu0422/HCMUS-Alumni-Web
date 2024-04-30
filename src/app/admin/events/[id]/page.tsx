@@ -173,6 +173,8 @@ export default function Page({ params }: { params: { id: string } }) {
         )
         setValue('organizationLocation', data.organizationLocation)
         setValue('content', data.content)
+        setValue('minimumParticipants', data.minimumParticipants)
+        setValue('maximumParticipants', data.maximumParticipants)
         setSelectedTags(
           data.tags.map((tag) => {
             const { id } = tag
@@ -274,7 +276,7 @@ export default function Page({ params }: { params: { id: string } }) {
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
-                className="bg-white !w-[300px] !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className="bg-white !w-[500px] !border-t-blue-gray-200 focus:!border-t-gray-900"
               />
               <ErrorInput
                 // This is the error message
