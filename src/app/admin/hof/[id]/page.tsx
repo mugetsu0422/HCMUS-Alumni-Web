@@ -64,18 +64,20 @@ export default function Page({ params }: { params: { id: string } }) {
   } = useForm()
 
   const onSubmit = async (data) => {
-    const news = {
+    const hof = {
       title: data.title,
       thumbnail: data.thumbnail[0] || null,
-      facultyId: data.facultyId,
+      emailOfUser: data.emailOfUser || null,
+      facultyId: data.facultyId || null,
+      beginningYear: data.beginningYear || null,
     }
 
     const putToast = toast.loading('Đang cập nhật')
     try {
       // Post without content
       await axios.putForm(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
-        news,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${params.id}`,
+        hof,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -85,7 +87,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
       // Update content
       await axios.put(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/content`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${params.id}/content`,
         { content: content },
         {
           headers: {
@@ -97,8 +99,9 @@ export default function Page({ params }: { params: { id: string } }) {
       toast.success('Cập nhật thành công', {
         id: putToast,
       })
-    } catch ({ message }) {
-      toast.error(message, {
+    } catch (e) {
+      console.error(e)
+      toast.error(e.message || 'Lỗi khi cập nhật', {
         id: putToast,
       })
     }
@@ -144,12 +147,14 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data }) => {
         setHof(data)
         setValue('title', data.title)
-        setValue('title', data.title)
+        setValue('beginningYear', data.beginningYear)
         setValue('facultyId', data.faculty?.id || '0')
-        setValue('emailOfUser', data?.emailOfUser)
+        setValue('emailOfUser', data.linkedUser?.email)
+        
         setContent(data.content)
       })
       .catch((e) => {
+        console.error(e)
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,9 +216,8 @@ export default function Page({ params }: { params: { id: string } }) {
               size="lg"
               crossOrigin={undefined}
               variant="outlined"
-              type="number"
+              type="text"
               {...register('beginningYear', {
-                required: 'Vui lòng nhập khóa',
                 pattern: {
                   value: /^\d{4}$/,
                   message: 'Vui lòng nhập đúng 4 chữ số',
@@ -223,10 +227,10 @@ export default function Page({ params }: { params: { id: string } }) {
                 const input = e.target as HTMLInputElement
                 input.value = input.value.trim().slice(0, 4)
               }} // Limit input to 4 digits
-              className="!border !border-gray-300 bg-white text-gray-900 shadow-lg shadow-gray-900/5 ring-4 ring-transparent placeholder:text-gray-500 placeholder:opacity-100 focus:!border-gray-900 focus:!border-t-gray-900 focus:ring-gray-900/10"
               labelProps={{
-                className: 'hidden',
+                className: 'before:content-none after:content-none',
               }}
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             />
             <ErrorInput
               // This is the error message
@@ -235,7 +239,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
 
           <div className="flex w-[422px] flex-col gap-2">
-            <label className="text-xl font-bold">Email gương thành công</label>
+            <label className="text-xl font-bold">Email người dùng</label>
             <Input
               size="lg"
               crossOrigin={undefined}
@@ -245,6 +249,17 @@ export default function Page({ params }: { params: { id: string } }) {
                 className: 'before:content-none after:content-none',
               }}
               className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              {...register('emailOfUser', {
+                pattern: {
+                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                  message:
+                    'Vui lòng nhập đúng định dạng email.\nVí dụ: example@gmail.com',
+                },
+              })}
+            />
+            <ErrorInput
+              // This is the error message
+              errors={errors?.emailOfUser?.message}
             />
           </div>
 
@@ -277,7 +292,6 @@ export default function Page({ params }: { params: { id: string } }) {
                 accept="image/png, image/jpeg"
                 {...register('thumbnail', {
                   onChange: onThumbnailChange,
-                  required: 'Vui lòng chọn ảnh thumbnail',
                 })}
               />
               {hof?.thumbnail ? (
@@ -305,9 +319,6 @@ export default function Page({ params }: { params: { id: string } }) {
               content={content}
               setContent={setContent}
             />
-            <div
-              className="ql-editor"
-              dangerouslySetInnerHTML={{ __html: content }}></div>
           </div>
           <div className="flex justify-end gap-x-4 pt-6 ">
             <Button

@@ -64,14 +64,13 @@ export default function Page() {
     trigger,
     formState: { errors },
   } = useForm()
-  const onSubmit = async (data) => {
+  const onSubmit = async (data) => {    
     const hof = {
-      title: data.tilte,
+      title: data.title,
       thumbnail: data.thumbnail[0],
-      content: data.content,
-      emailOfUser: data.emailOfUser,
-      facultyId: data.facultyId,
-      beginningYear: data.beginningYear,
+      emailOfUser: data.emailOfUser || null,
+      facultyId: data.facultyId || null,
+      beginningYear: data.beginningYear || null,
       scheduledTime: openDialog
         ? new Date(
             `${scheduledTime.date}T${scheduledTime.hour}:${scheduledTime.minute}:00.000`
@@ -107,8 +106,10 @@ export default function Page() {
       toast.success(openDialog ? 'Lên lịch thành công' : 'Đăng thành công', {
         id: postToast,
       })
-    } catch ({ message }) {
-      toast.error(message, {
+    } catch (error) {
+      console.error(error)
+      
+      toast.error(typeof error.request.response == 'string' && error.request.response, {
         id: postToast,
       })
     }
@@ -181,7 +182,7 @@ export default function Page() {
               variant="outlined"
               type="text"
               {...register('title', {
-                required: 'Vui lòng nhập gương thành công',
+                required: 'Vui lòng nhập tên gương thành công',
               })}
               labelProps={{
                 className: 'before:content-none after:content-none',
@@ -202,7 +203,6 @@ export default function Page() {
               variant="outlined"
               type="text"
               {...register('beginningYear', {
-                required: 'Vui lòng nhập khóa',
                 pattern: {
                   value: /^\d{4}$/,
                   message: 'Vui lòng nhập đúng 4 chữ số',
@@ -224,7 +224,7 @@ export default function Page() {
           </div>
 
           <div className="flex w-[422px] flex-col gap-2">
-            <label className="text-xl font-bold">Email gương thành công</label>
+            <label className="text-xl font-bold">Email người dùng</label>
             <Input
               size="lg"
               crossOrigin={undefined}
@@ -234,6 +234,17 @@ export default function Page() {
                 className: 'before:content-none after:content-none',
               }}
               className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              {...register('emailOfUser', {
+                pattern: {
+                  value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                  message:
+                    'Vui lòng nhập đúng định dạng email.\nVí dụ: example@gmail.com',
+                },
+              })}
+            />
+            <ErrorInput
+              // This is the error message
+              errors={errors?.emailOfUser?.message}
             />
           </div>
 

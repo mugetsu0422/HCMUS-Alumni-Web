@@ -98,7 +98,7 @@ function TextEditor({
                 maxHeight: 1000,
                 imageType: 'image/jpeg',
                 keepImageTypes: ['image/jpeg', 'image/png'],
-                debug: true,
+                debug: false,
                 suppressErrorLogging: false,
                 insertIntoEditor: undefined,
               },

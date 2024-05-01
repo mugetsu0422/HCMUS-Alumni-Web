@@ -98,19 +98,13 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
 }
 
 export default function HofListItem({
-  id,
-  title,
-  beginning_year,
-  thumbnail,
-  faculty,
-  views,
-  status,
+  hof,
 }) {
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
   const [isDeleted, setIsDeleted] = React.useState(false)
   const [isHidden, setIsHidden] = React.useState(
-    status.name === 'Ẩn' ? true : status.name === 'Bình thường' ? false : null
+    hof.status.name === 'Ẩn' ? true : hof.status.name === 'Bình thường' ? false : null
   )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
@@ -141,7 +135,7 @@ export default function HofListItem({
     axios
       .putForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${id}`,
-        { id: id, statusId: statusId },
+        { statusId: statusId },
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -157,10 +151,11 @@ export default function HofListItem({
         setIsHidden(!isHidden)
       })
       .catch((e) => {
+        console.error(e)
         if (isHidden) {
-          toast.success('Hiển thị thất bại')
+          toast.error('Hiển thị thất bại')
         } else {
-          toast.success('Ẩn thất bại')
+          toast.error('Ẩn thất bại')
         }
       })
   }
@@ -187,26 +182,26 @@ export default function HofListItem({
         }}
       />
       <img
-        src={thumbnail}
+        src={hof.thumbnail}
         alt="hall of fame image"
         className="h-[120px] w-[180px] object-cover object-center"
       />
       <p className="text-lg h-20 w-[320px]  p-2 font-[600] text-black  justify-center flex items-center">
-        {title}
+        {hof.title}
       </p>
       <p className="text-lg w-[10rem] text-center text-black p-2 font-[600] flex items-center justify-center">
-        {faculty}
+        {hof.faculty.name}
       </p>
       <p className="text-lg w-[8rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
-        {beginning_year}
+        {hof.beginningYear}
       </p>
       <p className="text-lg w-[7.5rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
-        {views}
+        {hof.views}
       </p>
       <div className="flex justify-end px-2">
         <Button
           variant="text"
-          onClick={() => handleEdit(id)}
+          onClick={() => handleEdit(hof.id)}
           placeholder={undefined}
           className="px-4">
           <PencilSquare className="text-2xl text-[--blue-05]" />
@@ -219,13 +214,13 @@ export default function HofListItem({
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
         <DeleteDialog
-          id={id}
+          id={hof.id}
           open={openDelete}
           handleOpen={handleOpenDetele}
           onDelete={onDelete}
         />
 
-        {status.name === 'Chờ' ? (
+        {hof.status.name === 'Chờ' ? (
           <div className="flex justify-center items-center px-4">
             <CalendarCheck className="text-2xl text-green-800" />
           </div>
@@ -244,7 +239,7 @@ export default function HofListItem({
         )}
 
         <HideOrShowDialog
-          id={id}
+          id={hof.id}
           open={openShow}
           handleOpen={handleOpenShow}
           isHidden={isHidden}

@@ -12,8 +12,9 @@ import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Pagination from '../../ui/common/pagination'
-import FilterHeader from '../../ui/admin/hof/filter-header'
+import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
+import FilterAdmin from '../../ui/admin/hof/filter'
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   const router = useRouter()
@@ -73,7 +74,6 @@ export default function Page() {
     params.delete('page')
     setCurPage(1)
   }
-
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
       params.set('title', keyword)
@@ -85,9 +85,47 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }, 500)
 
-  const onResetSearchAndFilter = () => {
+  const onResetAll = () => {
+    resetCurPage()
     replace(pathname)
     setMyParams(``)
+  }
+
+  const onNextPage = () => {
+    if (curPage == totalPages) return
+    params.set('page', curPage.toString())
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+    setCurPage((curPage) => {
+      return curPage + 1
+    })
+  }
+  const onPrevPage = () => {
+    if (curPage == 1) return
+    params.set('page', (curPage - 2).toString())
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+    setCurPage((curPage) => {
+      return curPage - 1
+    })
+  }
+  const onOrder = (name: string, order: string) => {
+    params.delete('page')
+    setCurPage(1)
+    params.set('orderBy', name)
+    params.set('order', order)
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+  const onFilterFaculties = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
   }
 
   useEffect(() => {
@@ -104,62 +142,27 @@ export default function Page() {
       .catch()
   }, [myParams])
 
-  const onNextPage = () => {
-    if (curPage == totalPages) return
-    params.set('page', curPage.toString())
-    replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
-    setCurPage((curPage) => {
-      return curPage + 1
-    })
-  }
-
-  const onPrevPage = () => {
-    if (curPage == 1) return
-    params.set('page', (curPage - 2).toString())
-    replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
-    setCurPage((curPage) => {
-      return curPage - 1
-    })
-  }
-
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
       <p
         className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
-      <FuntionSection
-        onSearch={onSearch}
-        onResetSearchAndFilter={onResetSearchAndFilter}
+      <FuntionSection onSearch={onSearch} onResetSearchAndFilter={onResetAll} />
+      <FilterAdmin
+        witdh={'1184px'}
+        onFilterFaculties={onFilterFaculties}
+        params={{
+          facultyId: params.get('facultyId'),
+        }}
       />
-      <FilterHeader setParams={setMyParams} setCurPage={setCurPage} />
-
-      <div className="relative mb-10">
-        {hof.map(
-          ({
-            id,
-            title,
-            beginning_year,
-            thumbnail,
-            faculty,
-            views,
-            status,
-          }) => (
-            <div key={title}>
-              <HofListItem
-                id={id}
-                title={title}
-                beginning_year={beginning_year}
-                thumbnail={thumbnail}
-                faculty={faculty}
-                views={views}
-                status={status}
-              />
-            </div>
-          )
-        )}
+      <div className="overflow-x-auto">
+        <SortHeader onOrder={onOrder} />
+        <div className="relative mb-10">
+          {hof.map((hof) => (
+            <HofListItem key={hof.id} hof={hof} />
+          ))}
+        </div>
       </div>
 
       <Pagination
