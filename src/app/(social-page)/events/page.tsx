@@ -11,6 +11,7 @@ import Cookies from 'js-cookie'
 import { roboto } from '../../ui/fonts'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function Page() {
   const pathname = usePathname()
@@ -34,7 +35,7 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }, 500)
   const onFilter = (facultyId: string) => {
@@ -44,7 +45,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
 
@@ -55,7 +56,7 @@ export default function Page() {
       params.delete('tagsId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
 
@@ -63,14 +64,14 @@ export default function Page() {
     params.delete('facultyId')
     params.delete('tagsId')
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
 
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage + 1
@@ -79,11 +80,33 @@ export default function Page() {
   const onPrevPage = () => {
     if (curPage == 1) return
     params.set('page', (curPage - 2).toString())
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage - 1
     })
+  }
+
+  const onParticipateEvent = async (id) => {
+    return await axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${id}/participants`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onCancelEventParticipation = async (id) => {
+    return await axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${id}/participants`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
 
   useEffect(() => {
@@ -98,8 +121,28 @@ export default function Page() {
         }
       )
       .then(({ data: { totalPages, events } }) => {
-        setTotalPages(totalPages)
-        setEvents(events)
+        const eventIds = events.map(({ id }) => id)
+
+        // Get list of events that users whether have participated in
+        axios
+          .get(
+            `${
+              process.env.NEXT_PUBLIC_SERVER_HOST
+            }/events/is-participated?eventIds=${eventIds.join(',')}`,
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              },
+            }
+          )
+          .then(({ data }) => {
+            for (let i = 0; i < events.length; i++) {
+              events[i].isParticipated = data[i].isParticipated
+            }
+
+            setTotalPages(totalPages)
+            setEvents(events)
+          })
       })
       .catch()
   }, [myParams])
@@ -108,6 +151,22 @@ export default function Page() {
     <>
       <Thumbnail />
       <div className="xl:w-[1264px] flex flex-col xl:flex-row justify-between gap-x-8 m-auto">
+        <Toaster
+          toastOptions={{
+            success: {
+              style: {
+                background: '#00a700',
+                color: 'white',
+              },
+            },
+            error: {
+              style: {
+                background: '#ea7b7b',
+                color: 'white',
+              },
+            },
+          }}
+        />
         <div className="flex flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
@@ -125,28 +184,14 @@ export default function Page() {
             }}
           />
           <div className="flex xl:w-[1264px] flex-col gap-6 justify-center mt-4">
-            {events.map(
-              ({
-                id,
-                title,
-                thumbnail,
-                participants,
-                organizationLocation,
-                organizationTime,
-                faculty,
-              }) => (
-                <EventsListItem
-                  key={id}
-                  id={id}
-                  title={title}
-                  thumbnail={thumbnail}
-                  participants={participants}
-                  organizationLocation={organizationLocation}
-                  organizationTime={organizationTime}
-                  faculty={faculty}
-                />
-              )
-            )}
+            {events.map((event) => (
+              <EventsListItem
+                key={event.id}
+                event={event}
+                onParticipate={onParticipateEvent}
+                onCancelParticipation={onCancelEventParticipation}
+              />
+            ))}
           </div>
         </div>
       </div>

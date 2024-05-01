@@ -14,15 +14,15 @@ import { JWT_COOKIE, FACULTIES, TAGS } from '../../constant'
 import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
 
+// Mode 3: Fetch all events
+const FETCH_MODE = 3
+
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
   onResetAll: () => void
 }
 
-function FuntionSection({
-  onSearch,
-  onResetAll,
-}: FunctionSectionProps) {
+function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
@@ -73,7 +73,8 @@ export default function Page() {
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
 
-  const [myParams, setMyParams] = useState(`?${params.toString()}`)
+  // lấy toàn bộ events
+  const [myParams, setMyParams] = useState(`?mode=${FETCH_MODE}&${params.toString()}`)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [events, setEvents] = useState([])
@@ -81,6 +82,9 @@ export default function Page() {
   const resetCurPage = () => {
     params.delete('page')
     setCurPage(1)
+  }
+  const onChangeMyParams=() => {
+    setMyParams(`?mode=${FETCH_MODE}&${params.toString()}`)
   }
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
@@ -90,18 +94,18 @@ export default function Page() {
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
   }, 500)
   const onResetAll = () => {
     resetCurPage()
     replace(pathname)
-    setMyParams(``)
+    setMyParams(`?mode=${FETCH_MODE}`)
   }
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
     setCurPage((curPage) => {
       return curPage + 1
     })
@@ -111,7 +115,7 @@ export default function Page() {
     if (curPage == 1) return
     params.set('page', (curPage - 2).toString())
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
     setCurPage((curPage) => {
       return curPage - 1
     })
@@ -123,7 +127,7 @@ export default function Page() {
     params.set('orderBy', name)
     params.set('order', order)
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
   }
 
   const onFilterFaculties = (facultyId: string) => {
@@ -134,7 +138,7 @@ export default function Page() {
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
   }
   const onFilterTag = (tag: string) => {
     if (tag != '0') {
@@ -144,7 +148,7 @@ export default function Page() {
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
   }
 
   const onResetFilter = () => {
@@ -152,7 +156,7 @@ export default function Page() {
     params.delete('tagsId')
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+    onChangeMyParams()
   }
 
   useEffect(() => {
@@ -175,10 +179,7 @@ export default function Page() {
         className={`${roboto.className} mx-auto w-[1650px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý sự kiện
       </p>
-      <FuntionSection
-        onSearch={onSearch}
-        onResetAll={onResetAll}
-      />
+      <FuntionSection onSearch={onSearch} onResetAll={onResetAll} />
       <FilterAdmin
         witdh={'1650px'}
         onFilterTag={onFilterTag}
@@ -203,6 +204,8 @@ export default function Page() {
               status,
               tags,
               faculty,
+              minimumParticipants,
+              maximumParticipants,
             }) => (
               <EventsListItem
                 key={id}
@@ -215,6 +218,8 @@ export default function Page() {
                 status={status}
                 tags={tags}
                 faculty={faculty}
+                minimumParticipants={minimumParticipants}
+                maximumParticipants={maximumParticipants}
               />
             )
           )}

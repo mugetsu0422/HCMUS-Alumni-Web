@@ -103,6 +103,8 @@ export default function EventsListItem({
   status,
   tags,
   faculty,
+  minimumParticipants,
+  maximumParticipants,
 }) {
   const router = useRouter()
   const [openDelete, setOpenDelete] = React.useState(false)
@@ -207,10 +209,10 @@ export default function EventsListItem({
         {organizationLocation}
       </p>
       <p className=" w-[5rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
-        {participants}
+        {minimumParticipants}
       </p>
       <p className=" w-[7.5rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
-        {participants} / 200
+        {participants} / {maximumParticipants}
       </p>
 
       <div className="flex justify-end px-2">
