@@ -14,6 +14,7 @@ import Cookies from 'js-cookie'
 import Pagination from '../../ui/common/pagination'
 import FilterHeader from '../../ui/admin/halloffame/filter-header'
 import HofListItem from '../../ui/admin/halloffame/hof-list-item'
+import Link from 'next/link'
 
 const hofTemp = [
   {
@@ -51,12 +52,15 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
           })}
         />
       </div>
-      <Button
-        onClick={() => router.push('/admin/hof/create')}
-        placeholder={undefined}
-        className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-        Tạo mới
-      </Button>
+
+      <Link href={'/admin/hof/create'}>
+        <Button
+          placeholder={undefined}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+          Tạo mới
+        </Button>
+      </Link>
+
       <Button
         onClick={() => {
           onResetSearchAndFilter()

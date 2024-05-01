@@ -13,6 +13,8 @@ import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
+import Link from 'next/link'
+
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
   onResetAll: () => void
@@ -47,12 +49,15 @@ function FuntionSection({
           className="text-[--secondary]"
         />
       </div>
-      <Button
-        onClick={() => router.push('/admin/news/create')}
-        placeholder={undefined}
-        className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-        Tạo mới
-      </Button>
+
+      <Link href={"/admin/news/create"}>
+        <Button
+          placeholder={undefined}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+          Tạo mới
+        </Button>
+      </Link>
+
       <Button
         onClick={() => {
           onResetAll()

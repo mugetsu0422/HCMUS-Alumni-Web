@@ -38,6 +38,7 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }, 500)
+
   const onFilter = (facultyId: string) => {
     if (facultyId != '0') {
       params.set('facultyId', facultyId)
