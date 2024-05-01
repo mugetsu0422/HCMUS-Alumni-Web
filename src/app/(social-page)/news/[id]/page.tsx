@@ -1,18 +1,17 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import MostViewed from '../../../ui/social-page/news/most-viewed'
 import { ClockFill, EyeFill, TagFill } from 'react-bootstrap-icons'
 import { Textarea, Button } from '@material-tailwind/react'
 import Comments from '../../../ui/social-page/news/comments'
 import { nunito } from '../../../ui/fonts'
 import axios from 'axios'
-import { JWT_COOKIE, MOST_VIEWED_LIMIT, TAGS } from '../../../constant'
+import { JWT_COOKIE, TAGS } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import moment from 'moment'
-import { useForm } from 'react-hook-form'
 import toast, { Toaster } from 'react-hot-toast'
+import RelativeNews from '../../../ui/social-page/news/relative-news'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
@@ -124,127 +123,127 @@ export default function Page({ params }: { params: { id: string } }) {
         setComments(comments.concat(fetchedComments))
       })
       .catch()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
-  if (noData) {
-    return <NoData />
-  }
+  // if (noData) {
+  //   return <NoData />
+  // }
 
-  if (!isLoading)
-    return (
-      <div className="flex flex-col xl:flex-row m-auto w-[80%]">
-        <Toaster
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
+  // if (!isLoading)
+  return (
+    <div className="flex flex-col xl:flex-row m-auto w-[80%]">
+      <Toaster
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
             },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
             },
-          }}
-        />
-        <div className={`mt-10 flex flex-col gap-y-8 mx-auto w-[70%]`}>
-          <div className="flex justify-between items-start">
-            {news?.faculty ? (
-              <p className="font-medium text-lg text-[--secondary]">
-                Khoa {news?.faculty.name}
-              </p>
-            ) : (
-              <p></p>
-            )}
-
-            <p className="font-medium text-lg flex items-center gap-x-1 text-[--secondary]">
-              <ClockFill className="text-[--blue-01]" />
-              {moment(news?.publsihedAt).format('DD/MM/YYYY')}
-              <span className="flex ml-2 items-center gap-x-2">
-                <EyeFill className="text-[--blue-01]" />
-                {news?.views}
-              </span>
+          },
+        }}
+      />
+      <div className={`mt-10 flex flex-col gap-y-8 mx-auto w-[70%]`}>
+        <div className="flex justify-between items-start">
+          {news?.faculty ? (
+            <p className="font-medium text-lg text-[--secondary]">
+              Khoa {news?.faculty.name}
             </p>
-          </div>
-          <div>
-            <div className="text-left text-[1.8rem] font-bold text-[--blue-01]">
-              {news?.title}
-            </div>
-          </div>
+          ) : (
+            <p></p>
+          )}
 
-          <div className="flex gap-x-2 items-center">
-            <TagFill className="text-[--blue-01] text-md" />
-            {news?.tags.map(({ name }) => {
-              return (
-                <span
-                  className="text-[--blue-02] font-semibold text-md"
-                  key={name}>
-                  {name}
-                </span>
-              )
-            })}
-          </div>
-
-          <div
-            className="w-full h-auto ql-editor"
-            dangerouslySetInnerHTML={{ __html: news?.content }}></div>
-
-          <div className="flex flex-col gap-y-1 text-black text-base">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-x-2">
-                <ClockFill />
-                Lần cuối cập nhật:{' '}
-                {moment(news?.updateAt)
-                  .local()
-                  .format('DD/MM/YYYY')}
-              </div>
-              <div>{news?.creator.fullName}</div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-y-2  mb-8">
-            <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
-              <Textarea
-                onChange={handleUploadCommentChange}
-                placeholder={undefined}
-                label="Chia sẻ ý kiến của bạn"
-              />
-              <div className="flex justify-end gap-x-4 pt-2 mr-2">
-                <Button
-                  placeholder={undefined}
-                  size="md"
-                  disabled={!uploadComment.trim()}
-                  type="submit"
-                  className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-                  Đăng
-                </Button>
-              </div>
-            </form>
-
-            <p className="text-xl font-semibold">
-              Bình luận{' '}
-              <span className="font-normal">
-                ({news?.childrenCommentNumber})
-              </span>
-            </p>
-            <Comments
-              comments={comments}
-              onUploadComment={onUploadComment}
-              onFetchChildrenComments={onFetchChildrenComments}
-            />
-
-            {comments.length != news?.childrenCommentNumber && (
-              <Button
-                onClick={onFetchComments}
-                className="bg-[--blue-02] normal-case text-sm gap-1"
-                placeholder={undefined}>
-                Tải thêm
-              </Button>
-            )}
+          <p className="font-medium text-lg flex items-center gap-x-1 text-[--secondary]">
+            <ClockFill className="text-[--blue-01]" />
+            {moment(news?.publsihedAt).format('DD/MM/YYYY')}
+            <span className="flex ml-2 items-center gap-x-2">
+              <EyeFill className="text-[--blue-01]" />
+              {news?.views}
+            </span>
+          </p>
+        </div>
+        <div>
+          <div className="text-left text-[1.8rem] font-bold text-[--blue-01]">
+            {news?.title}
           </div>
         </div>
+
+        <div className="flex gap-x-2 items-center">
+          <TagFill className="text-[--blue-01] text-md" />
+          {news?.tags.map(({ name }) => {
+            return (
+              <span
+                className="text-[--blue-02] font-semibold text-md"
+                key={name}>
+                {name}
+              </span>
+            )
+          })}
+        </div>
+
+        <div
+          className="w-full h-auto ql-editor"
+          dangerouslySetInnerHTML={{ __html: news?.content }}></div>
+
+        <div className="flex flex-col gap-y-1 text-black text-base">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-x-2">
+              <ClockFill />
+              Lần cuối cập nhật:{' '}
+              {moment(news?.updateAt)
+                .local()
+                .format('DD/MM/YYYY')}
+            </div>
+            <div>{news?.creator.fullName}</div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-y-2  mb-8">
+          <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+            <Textarea
+              onChange={handleUploadCommentChange}
+              placeholder={undefined}
+              label="Chia sẻ ý kiến của bạn"
+            />
+            <div className="flex justify-end gap-x-4 pt-2 mr-2">
+              <Button
+                placeholder={undefined}
+                size="md"
+                disabled={!uploadComment.trim()}
+                type="submit"
+                className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+                Đăng
+              </Button>
+            </div>
+          </form>
+
+          <p className="text-xl font-semibold">
+            Bình luận{' '}
+            <span className="font-normal">({news?.childrenCommentNumber})</span>
+          </p>
+          <Comments
+            comments={comments}
+            onUploadComment={onUploadComment}
+            onFetchChildrenComments={onFetchChildrenComments}
+          />
+
+          {comments.length != news?.childrenCommentNumber && (
+            <Button
+              onClick={onFetchComments}
+              className="bg-[--blue-02] normal-case text-sm gap-1"
+              placeholder={undefined}>
+              Tải thêm
+            </Button>
+          )}
+
+          <RelativeNews />
+        </div>
       </div>
-    )
+    </div>
+  )
 }
