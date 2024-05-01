@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button, Input } from '@material-tailwind/react'
-import { Calendar } from 'react-bootstrap-icons'
+import { Calendar, TagFill } from 'react-bootstrap-icons'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { JWT_COOKIE, MOST_VIEWED_LIMIT, POST_STATUS } from '../../constant'
@@ -47,8 +47,8 @@ function NewsListItem({
           <p>{moment(publishedAt).local().format('DD/MM/YYYY')}</p>
         </div>
         {faculty ? <p>Khoa {faculty.name}</p> : null}
-        <div className="flex gap-x-2">
-          Thẻ:
+        <div className="flex gap-x-2 items-center">
+          <TagFill className="text-[--blue-02]" />
           {tags.map(({ name }) => (
             <p
               key={name}
@@ -72,7 +72,6 @@ export default function Page() {
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [news, setNews] = useState([])
-  const [mostViewed, setMostViewed] = useState([])
 
   const resetCurPage = () => {
     params.delete('page')
@@ -86,7 +85,7 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
   }, 500)
 
@@ -97,7 +96,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
   }
 
@@ -108,7 +107,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
   }
 
@@ -119,7 +118,7 @@ export default function Page() {
       params.delete('tagsId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
   }
 
@@ -127,14 +126,14 @@ export default function Page() {
     params.delete('facultyId')
     params.delete('tagsId')
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
   }
 
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage + 1
@@ -143,7 +142,7 @@ export default function Page() {
   const onPrevPage = () => {
     if (curPage == 1) return
     params.set('page', (curPage - 2).toString())
-    replace(`${pathname}?${params.toString()}`)
+    replace(`${pathname}?${params.toString()}`, {scroll: false})
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage - 1
