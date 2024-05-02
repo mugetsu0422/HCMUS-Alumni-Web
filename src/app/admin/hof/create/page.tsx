@@ -57,6 +57,8 @@ export default function Page() {
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
   const [openDialog, setOpenDialog] = useState(false)
   const [scheduledTime, setScheduledTime] = useState(null)
+  const [summaryCharCount, setSummaryCharCount] = useState(0)
+  const summaryMaxCharCount = 150
 
   const {
     register,
@@ -64,10 +66,11 @@ export default function Page() {
     trigger,
     formState: { errors },
   } = useForm()
-  const onSubmit = async (data) => {    
+  const onSubmit = async (data) => {
     const hof = {
       title: data.title,
       thumbnail: data.thumbnail[0],
+      summary: data.summary,
       emailOfUser: data.emailOfUser || null,
       facultyId: data.facultyId || null,
       beginningYear: data.beginningYear || null,
@@ -108,10 +111,13 @@ export default function Page() {
       })
     } catch (error) {
       console.error(error)
-      
-      toast.error(typeof error.request.response == 'string' && error.request.response, {
-        id: postToast,
-      })
+
+      toast.error(
+        typeof error.request.response == 'string' && error.request.response,
+        {
+          id: postToast,
+        }
+      )
     }
   }
 
@@ -298,6 +304,30 @@ export default function Page() {
             <ErrorInput
               // This is the error message
               errors={errors?.thumbnail?.message}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Tóm tắt
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('summary', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
             />
           </div>
 

@@ -10,6 +10,7 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
+  Textarea,
 } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
@@ -55,6 +56,8 @@ export default function Page({ params }: { params: { id: string } }) {
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
   const [noData, setNoData] = useState(false)
   const [hof, setHof] = useState(null)
+  const [summaryCharCount, setSummaryCharCount] = useState(0)
+  const summaryMaxCharCount = 150
 
   const {
     register,
@@ -67,6 +70,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const hof = {
       title: data.title,
       thumbnail: data.thumbnail[0] || null,
+      summary: data.summary,
       emailOfUser: data.emailOfUser || null,
       facultyId: data.facultyId || null,
       beginningYear: data.beginningYear || null,
@@ -147,10 +151,12 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data }) => {
         setHof(data)
         setValue('title', data.title)
+        setValue('summary', data.summary)
+        setSummaryCharCount(data.summary.length)
         setValue('beginningYear', data.beginningYear)
         setValue('facultyId', data.faculty?.id || '0')
         setValue('emailOfUser', data.linkedUser?.email)
-        
+
         setContent(data.content)
       })
       .catch((e) => {
@@ -310,6 +316,30 @@ export default function Page({ params }: { params: { id: string } }) {
             <ErrorInput
               // This is the error message
               errors={errors?.thumbnail?.message}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Tóm tắt
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('summary', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
             />
           </div>
 

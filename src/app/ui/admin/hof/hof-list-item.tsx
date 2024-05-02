@@ -190,7 +190,7 @@ export default function HofListItem({
         {hof.title}
       </p>
       <p className="text-lg w-[10rem] text-center text-black p-2 font-[600] flex items-center justify-center">
-        {hof.faculty.name}
+        {hof.faculty?.name}
       </p>
       <p className="text-lg w-[8rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
         {hof.beginningYear}

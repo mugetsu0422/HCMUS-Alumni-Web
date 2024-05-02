@@ -6,10 +6,11 @@ import NoData from '../../../ui/no-data'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '../../../constant'
-import toast, { Toaster } from 'react-hot-toast'
+import { ClockFill, EyeFill } from 'react-bootstrap-icons'
+import moment from 'moment'
 
 export default function Page({ params }: { params: { id: string } }) {
-  const [hof, setHof] = useState()
+  const [hof, setHof] = useState(null)
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -29,6 +30,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setIsLoading(false)
       })
       .catch((error) => {
+        console.error(error)
         setNoData(true)
       })
 
@@ -39,63 +41,50 @@ export default function Page({ params }: { params: { id: string } }) {
     return <NoData />
   }
 
-  return (
-    <>
-      <div className="flex flex-col justify-center items-center m-auto my-10 max-w-[1000px] w-[80%] gap-6">
-        <Toaster
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
-        <img
-          //src={hof?.thumbnail}
-          alt="Hall of fame image"
-          className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
-        />
-        <p
-          className={`${nunito.className} 2xl:text-[28px] sm:text-lg lg:text-2xl font-bold`}>
-          {/* {hof?.name} */}
-        </p>
-        <div className="flex flex-col gap-4 ql-editor sm:text:md lg:text-base text-justify">
-          <p>
-            Từng có cơ hội làm việc cho Google nhưng Lê Yên Thanh từ chối để ở
-            lại Việt Nam đầu quân cho một số startup, sau đó khởi nghiệp với
-            BusMap. CEO sinh năm 1994 là một trong 6 đại diện của Việt Nam vừa
-            được vinh danh trong Forbes 30 under 30 châu Á năm 2022.
-          </p>
-          <p>
-            Sở hữu bảng thành tích “khủng”, được truyền thông ưu ái gọi là
-            “chàng trai vàng tin học” của Việt Nam nhưng Lê Yên Thanh thú nhận
-            “vì tham gia quá nhiều cuộc thi nên tôi cũng không nhớ chính xác
-            mình đã đạt tất cả bao nhiêu giải thưởng”.
-          </p>
-          <p>
-            Bắt đầu làm quen và yêu thích tin học từ những năm cấp 2, chàng trai
-            quê An Giang này từng đoạt giải nhất kỳ thi học sinh giỏi tin học
-            quốc gia và được tuyển thẳng vào đại học. Năm 2015, anh giành giải
-            nhì cuộc thi Nhân tài Đất Việt. Cùng năm đó, Lê Yên Thanh được vinh
-            danh là Gương mặt trẻ tiêu biểu của Việt Nam khi mới 21 tuổi.
-          </p>
-          <p>
-            Với vai trò là nhà sáng lập và CEO Phenikaa Mass – công ty cung cấp
-            các giải pháp công nghệ giao thông, Lê Yên Thanh vừa lọt Top 30
-            under 30 châu Á của tạp chí Forbes. Startup của Thanh trước đây mang
-            tên BusMap nhưng đã đổi thành Phenikaa Mass sau khi nhận đầu tư 1,5
-            triệu USD từ Phenikaa, tập đoàn do doanh nhân Hồ Xuân Năng sáng lập.
-          </p>
+  if (!isLoading)
+    return (
+      <>
+        <div className="flex flex-col justify-center items-center m-auto mb-10 max-w-[1000px] w-[80%] gap-6">
+          <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
+            <div className="w-full flex justify-end items-start">
+              <p className="font-medium text-lg flex items-center gap-x-1 text-[--secondary]">
+                <ClockFill className="text-[--blue-01]" />
+                {moment(hof.publsihedAt).format('DD/MM/YYYY')}
+                <span className="flex ml-2 items-center gap-x-2">
+                  <EyeFill className="text-[--blue-01]" />
+                  {hof.views}
+                </span>
+              </p>
+            </div>
+            <div className="w-full flex justify-center">
+              <img
+                src={hof.thumbnail}
+                alt="Hall of fame image"
+                className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
+              />
+            </div>
+            <p
+              className={`${nunito.className} 2xl:text-[28px] sm:text-lg lg:text-2xl font-bold text-center`}>
+              {hof.title}
+            </p>
+            <div
+              className="flex flex-col gap-4 ql-editor sm:text:md lg:text-base text-justify"
+              dangerouslySetInnerHTML={{ __html: hof.content }}></div>
+
+            <div className="flex flex-col gap-y-1 text-black text-base">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-x-2">
+                  <ClockFill />
+                  Lần cuối cập nhật:{' '}
+                  {moment(hof.updateAt)
+                    .local()
+                    .format('DD/MM/YYYY')}
+                </div>
+                <div>{hof.creator.fullName}</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </>
-  )
+      </>
+    )
 }

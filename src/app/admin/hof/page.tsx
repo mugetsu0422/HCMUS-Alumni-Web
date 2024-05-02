@@ -131,6 +131,16 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }
+  const onFilterBeginningYear = useDebouncedCallback((beginningYear) => {
+    if (beginningYear) {
+      params.set('beginningYear', beginningYear)
+    } else {
+      params.delete('beginningYear')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }, 500)
 
   useEffect(() => {
     axios
@@ -156,8 +166,10 @@ export default function Page() {
       <FilterAdmin
         witdh={'1184px'}
         onFilterFaculties={onFilterFaculties}
+        onFilterBeginningYear={onFilterBeginningYear}
         params={{
           facultyId: params.get('facultyId'),
+          beginningYear: params.get('beginningYear'),
         }}
       />
       <div className="overflow-x-auto">
