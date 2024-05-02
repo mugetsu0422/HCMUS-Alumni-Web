@@ -11,10 +11,11 @@ import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import moment from 'moment'
 import toast, { Toaster } from 'react-hot-toast'
-import RelativeNews from '../../../ui/social-page/news/relative-news'
+import RelatedNews from '../../../ui/social-page/news/related-news'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
+  const [relatedNews, setRelatedNews] = useState([])
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [uploadComment, setUploadComment] = useState('')
@@ -91,17 +92,31 @@ export default function Page({ params }: { params: { id: string } }) {
           },
         }
       )
+      const relatedNews = axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
 
-      Promise.all([news, comments]).then(([newsRes, commentRes]) => {
-        const { data: news } = newsRes
-        const {
-          data: { comments },
-        } = commentRes
+      Promise.all([news, comments, relatedNews]).then(
+        ([newsRes, commentRes, relatedNewsRes]) => {
+          const { data: news } = newsRes
+          const {
+            data: { comments },
+          } = commentRes
+          const {
+            data: { news: relatedNews },
+          } = relatedNewsRes
 
-        setNews(news)
-        setComments(comments)
-        setIsLoading(false)
-      })
+          setNews(news)
+          setComments(comments)
+          setRelatedNews(relatedNews)
+          setIsLoading(false)
+        }
+      )
     } catch (error) {
       setNoData(true)
     }
@@ -243,7 +258,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </Button>
             )}
 
-            <RelativeNews />
+            <RelatedNews news={relatedNews} />
           </div>
         </div>
       </div>
