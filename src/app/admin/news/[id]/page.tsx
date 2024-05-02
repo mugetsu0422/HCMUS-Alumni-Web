@@ -98,6 +98,7 @@ export default function Page({ params }: { params: { id: string } }) {
     }
     reader.readAsDataURL(file)
   }
+
   const onAddTags = useCallback(
     (newTag) => {
       setSelectedTags([...selectedTags, newTag])
@@ -180,9 +181,9 @@ export default function Page({ params }: { params: { id: string } }) {
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  // if (noData) {
-  //   return <NoData />
-  // }
+  if (noData) {
+    return <NoData />
+  }
   return (
     <div
       className={`${nunito.className} max-w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>

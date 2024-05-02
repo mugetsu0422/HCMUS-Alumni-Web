@@ -5,7 +5,7 @@ import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { roboto } from '../../ui/fonts'
 import Pagination from '../../ui/common/pagination'
 import EventsListItem from '../../ui/admin/events/events-list-item'
-import FilterHeader from '../../ui/admin/events/header-filter'
+import SortHeader from '../../ui/admin/events/sort-header'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { useForm } from 'react-hook-form'
@@ -156,14 +156,6 @@ export default function Page() {
     onChangeMyParams()
   }
 
-  const onResetFilter = () => {
-    params.delete('facultyId')
-    params.delete('tagsId')
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
-    onChangeMyParams()
-  }
-
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}`, {
@@ -189,14 +181,13 @@ export default function Page() {
         witdh={'1650px'}
         onFilterTag={onFilterTag}
         onFilterFaculties={onFilterFaculties}
-        onResetFilter={onResetFilter}
         params={{
           tagsId: params.get('tagsId'),
           facultyId: params.get('facultyId'),
         }}
       />
       <div className="overflow-x-auto">
-        <FilterHeader onFilter={onOrder} />
+        <SortHeader onOrder={onOrder} />
         <div className="relative mb-10">
           {events.map(
             ({

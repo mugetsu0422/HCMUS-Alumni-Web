@@ -159,10 +159,11 @@ export default function NewsListItem({
         setIsHidden(!isHidden)
       })
       .catch((e) => {
+        console.error(e)
         if (isHidden) {
-          toast.success('Hiển thị thất bại')
+          toast.error('Hiển thị thất bại')
         } else {
-          toast.success('Ẩn thất bại')
+          toast.error('Ẩn thất bại')
         }
       })
   }

@@ -16,10 +16,10 @@ import {
 } from '@material-tailwind/react'
 
 interface HeaderProps {
-  onFilter: (name: string, order: string) => void
+  onOrder: (name: string, order: string) => void
 }
 
-export default function Header({ onFilter }: HeaderProps) {
+export default function SortHeader({ onOrder }: HeaderProps) {
   return (
     <div className="w-[1184px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 ">
       <div className="flex w-fit justify-evenly items-center">
@@ -36,14 +36,14 @@ export default function Header({ onFilter }: HeaderProps) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onFilter('title', 'asc')}
+              onClick={() => onOrder('title', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onFilter('title', 'desc')}
+              onClick={() => onOrder('title', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
@@ -70,14 +70,14 @@ export default function Header({ onFilter }: HeaderProps) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onFilter('publishedAt', 'desc')}
+              onClick={() => onOrder('publishedAt', 'desc')}
               className="text-center font-bold flex justify-center">
               Mới nhất
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onFilter('publishedAt', 'asc')}
+              onClick={() => onOrder('publishedAt', 'asc')}
               className="text-center font-bold flex justify-center">
               Cũ nhất
               <ArrowUp />
@@ -98,14 +98,14 @@ export default function Header({ onFilter }: HeaderProps) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onFilter('views', 'desc')}
+              onClick={() => onOrder('views', 'desc')}
               className="text-center font-bold flex justify-center">
               Giảm dần
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onFilter('views', 'asc')}
+              onClick={() => onOrder('views', 'asc')}
               className="text-center font-bold flex justify-center">
               Tăng dần
               <ArrowUp />
