@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import NewsListItem from '../../ui/admin/news/news-list-item'
-import FilterHeader from '../../ui/admin/news/Header'
+import SortHeader from '../../ui/admin/news/sort-header'
 import { Input, Button } from '@material-tailwind/react'
 import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { JWT_COOKIE } from '../../constant'
@@ -20,10 +20,7 @@ interface FunctionSectionProps {
   onResetAll: () => void
 }
 
-function FuntionSection({
-  onSearch,
-  onResetAll,
-}: FunctionSectionProps) {
+function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
@@ -96,11 +93,13 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }, 500)
+
   const onResetAll = () => {
     resetCurPage()
     replace(pathname)
     setMyParams(``)
   }
+
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
@@ -149,14 +148,6 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }
 
-  const onResetFilter = () => {
-    params.delete('facultyId')
-    params.delete('tagsId')
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
-  }
-
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
@@ -177,22 +168,18 @@ export default function Page() {
         className={`${roboto.className} mx-auto max-w-[1184px] w-full text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý tin tức
       </p>
-      <FuntionSection
-        onSearch={onSearch}
-        onResetAll={onResetAll}
-      />
+      <FuntionSection onSearch={onSearch} onResetAll={onResetAll} />
       <FilterAdmin
         witdh={'1184px'}
         onFilterTag={onFilterTag}
         onFilterFaculties={onFilterFaculties}
-        onResetFilter={onResetFilter}
         params={{
           tagsId: params.get('tagsId'),
           facultyId: params.get('facultyId'),
         }}
       />
       <div className="overflow-x-auto">
-        <FilterHeader onFilter={onOrder} />
+        <SortHeader onOrder={onOrder} />
         <div className="relative mb-10">
           {news.map(
             ({

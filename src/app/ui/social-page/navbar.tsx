@@ -43,7 +43,7 @@ const navListItems = [
   {
     label: 'Tư vấn',
     icon: faComments,
-    urlLink: '#',
+    urlLink: '/counsel',
   },
 ]
 

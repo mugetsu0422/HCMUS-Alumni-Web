@@ -12,6 +12,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Pagination from '../../ui/common/pagination'
+<<<<<<< HEAD
 import FilterHeader from '../../ui/admin/halloffame/filter-header'
 import HofListItem from '../../ui/admin/halloffame/hof-list-item'
 import Link from 'next/link'
@@ -27,6 +28,11 @@ const hofTemp = [
     status: { name: 'Bình thường' },
   },
 ]
+=======
+import SortHeader from '../../ui/admin/hof/sort-header'
+import HofListItem from '../../ui/admin/hof/hof-list-item'
+import FilterAdmin from '../../ui/admin/hof/filter'
+>>>>>>> cff13e3d58364cb2d7188d7feb18de59ed715176
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   const router = useRouter()
@@ -89,7 +95,6 @@ export default function Page() {
     params.delete('page')
     setCurPage(1)
   }
-
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
       params.set('title', keyword)
@@ -101,24 +106,12 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }, 500)
 
-  const onResetSearchAndFilter = () => {
+  const onResetAll = () => {
+    resetCurPage()
     replace(pathname)
     setMyParams(``)
   }
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(({ data: { totalPages, hof } }) => {
-        setTotalPages(totalPages)
-        setHof(hof)
-      })
-      .catch()
-  }, [myParams])
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
@@ -137,6 +130,38 @@ export default function Page() {
       return curPage - 1
     })
   }
+  const onOrder = (name: string, order: string) => {
+    params.delete('page')
+    setCurPage(1)
+    params.set('orderBy', name)
+    params.set('order', order)
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+  const onFilterFaculties = (facultyId: string) => {
+    if (facultyId != '0') {
+      params.set('facultyId', facultyId)
+    } else {
+      params.delete('facultyId')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data: { totalPages, hof } }) => {
+        setTotalPages(totalPages)
+        setHof(hof)
+      })
+      .catch()
+  }, [myParams])
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
@@ -144,36 +169,21 @@ export default function Page() {
         className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
-      <FuntionSection
-        onSearch={onSearch}
-        onResetSearchAndFilter={onResetSearchAndFilter}
+      <FuntionSection onSearch={onSearch} onResetSearchAndFilter={onResetAll} />
+      <FilterAdmin
+        witdh={'1184px'}
+        onFilterFaculties={onFilterFaculties}
+        params={{
+          facultyId: params.get('facultyId'),
+        }}
       />
-      <FilterHeader setParams={setMyParams} setCurPage={setCurPage} />
-
-      <div className="relative mb-10">
-        {hofTemp.map(
-          ({
-            id,
-            title,
-            beginning_year,
-            thumbnail,
-            faculty,
-            views,
-            status,
-          }) => (
-            <div key={title}>
-              <HofListItem
-                id={id}
-                title={title}
-                beginning_year={beginning_year}
-                thumbnail={thumbnail}
-                faculty={faculty}
-                views={views}
-                status={status}
-              />
-            </div>
-          )
-        )}
+      <div className="overflow-x-auto">
+        <SortHeader onOrder={onOrder} />
+        <div className="relative mb-10">
+          {hof.map((hof) => (
+            <HofListItem key={hof.id} hof={hof} />
+          ))}
+        </div>
       </div>
 
       <Pagination
