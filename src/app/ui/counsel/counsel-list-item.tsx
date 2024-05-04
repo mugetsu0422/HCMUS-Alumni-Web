@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import {  Avatar,  Carousel,  Button} from '@material-tailwind/react'
+import { Avatar, Carousel, Button } from '@material-tailwind/react'
 import { nunito } from '../fonts'
 import { TagFill, Chat } from 'react-bootstrap-icons'
 import Link from 'next/link'
@@ -18,13 +18,18 @@ export default function CounselListItem({
   pictures,
 }) {
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded)
+  }
 
   function handleOpenCommentDialog() {
     setOpenCommentsDialog((e) => !e)
   }
 
   return (
-    <div className={`${nunito.className} flex flex-col w-full h-fit`}>
+    <div className={`${nunito.className} flex flex-col w-full h-fit my-4`}>
       {/* this is the header of a post */}
       <div className="flex gap-2 items-center">
         <Link href="#">
@@ -51,8 +56,19 @@ export default function CounselListItem({
         </div>
 
         {/* this is the content of the body */}
-        <div className="flex flex-col gap-2">
-          <p className="py-2">{content}</p>
+        <div className="flex flex-col gap-2 ">
+          <div className="overflow-hidden">
+            <div className={`${isExpanded ? 'block' : 'line-clamp-3'}`}>
+              {content}
+            </div>
+            {!isExpanded && (
+              <span
+                className="text-black font-semibold hover:underline hover:cursor-pointer rounded text-nowrap inline-flex"
+                onClick={toggleExpand}>
+                Xem thêm
+              </span>
+            )}
+          </div>
           <span className="border-b-[1px] border-[--secondary]"></span>
           <Carousel placeholder={undefined}>
             {pictures.map(({ id, pictureUrl }) => (
@@ -71,9 +87,9 @@ export default function CounselListItem({
           onClick={handleOpenCommentDialog}
           placeholder={undefined}
           variant="text"
-          className="flex gap-1 py-2 px-4">
-          <Chat className="text-base" />
-          <span>Bình luận</span>
+          className="flex gap-1 py-2 px-4 normal-case">
+          <Chat className="text-[16px]" />
+          <span className="text-[14px]">Bình luận</span>
         </Button>
 
         <CommentsDialog

@@ -1,7 +1,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Carousel,
@@ -28,6 +28,12 @@ export default function CommentsDialog({
   publishedAt,
   pictures,
 }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded)
+  }
+
   return (
     <Dialog
       placeholder={undefined}
@@ -75,7 +81,18 @@ export default function CommentsDialog({
 
           {/* this is the content of the body */}
           <div className="flex flex-col gap-2">
-            <p className="py-2 text-black">{content}</p>
+            <div className="overflow-hidden">
+              <div className={`${isExpanded ? 'block' : 'line-clamp-3'}`}>
+                {content}
+              </div>
+              {!isExpanded && (
+                <span
+                  className="text-black font-semibold hover:underline hover:cursor-pointer rounded text-nowrap inline-flex"
+                  onClick={toggleExpand}>
+                  Xem thêm
+                </span>
+              )}
+            </div>
             <span className="border-b-[1px] border-[--secondary]"></span>
             <Carousel placeholder={undefined}>
               {pictures.map(({ id, pictureUrl }) => (
