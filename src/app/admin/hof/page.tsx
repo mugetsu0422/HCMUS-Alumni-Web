@@ -15,6 +15,7 @@ import Pagination from '../../ui/common/pagination'
 import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
+import Link from 'next/link'
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   const router = useRouter()
@@ -40,12 +41,15 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
           })}
         />
       </div>
-      <Button
-        onClick={() => router.push('/admin/hof/create')}
-        placeholder={undefined}
-        className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-        Tạo mới
-      </Button>
+
+      <Link href={'/admin/hof/create'}>
+        <Button
+          placeholder={undefined}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+          Tạo mới
+        </Button>
+      </Link>
+
       <Button
         onClick={() => {
           onResetSearchAndFilter()
@@ -127,6 +131,16 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }
+  const onFilterBeginningYear = useDebouncedCallback((beginningYear) => {
+    if (beginningYear) {
+      params.set('beginningYear', beginningYear)
+    } else {
+      params.delete('beginningYear')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }, 500)
 
   useEffect(() => {
     axios
@@ -152,8 +166,10 @@ export default function Page() {
       <FilterAdmin
         witdh={'1184px'}
         onFilterFaculties={onFilterFaculties}
+        onFilterBeginningYear={onFilterBeginningYear}
         params={{
           facultyId: params.get('facultyId'),
+          beginningYear: params.get('beginningYear'),
         }}
       />
       <div className="overflow-x-auto">

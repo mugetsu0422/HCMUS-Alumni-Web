@@ -13,6 +13,7 @@ import axios from 'axios'
 import { JWT_COOKIE, FACULTIES, TAGS } from '../../constant'
 import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
+import Link from 'next/link'
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3
@@ -48,12 +49,14 @@ function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
         />
       </div>
 
-      <Button
-        onClick={() => router.push('/admin/events/create')}
-        placeholder={undefined}
-        className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-        Tạo mới
-      </Button>
+      <Link href={"/admin/events/create"}>
+        <Button
+          placeholder={undefined}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+          Tạo mới
+        </Button>
+      </Link>
+
       <Button
         onClick={() => {
           onResetAll()
@@ -74,7 +77,9 @@ export default function Page() {
   const params = new URLSearchParams(searchParams)
 
   // lấy toàn bộ events
-  const [myParams, setMyParams] = useState(`?mode=${FETCH_MODE}&${params.toString()}`)
+  const [myParams, setMyParams] = useState(
+    `?mode=${FETCH_MODE}&${params.toString()}`
+  )
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [events, setEvents] = useState([])
@@ -83,7 +88,7 @@ export default function Page() {
     params.delete('page')
     setCurPage(1)
   }
-  const onChangeMyParams=() => {
+  const onChangeMyParams = () => {
     setMyParams(`?mode=${FETCH_MODE}&${params.toString()}`)
   }
   const onSearch = useDebouncedCallback((keyword) => {

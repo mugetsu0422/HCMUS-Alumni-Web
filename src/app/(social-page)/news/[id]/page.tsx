@@ -1,21 +1,21 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import MostViewed from '../../../ui/social-page/news/most-viewed'
 import { ClockFill, EyeFill, TagFill } from 'react-bootstrap-icons'
 import { Textarea, Button } from '@material-tailwind/react'
 import Comments from '../../../ui/social-page/news/comments'
 import { nunito } from '../../../ui/fonts'
 import axios from 'axios'
-import { JWT_COOKIE, MOST_VIEWED_LIMIT, TAGS } from '../../../constant'
+import { JWT_COOKIE, TAGS } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import moment from 'moment'
-import { useForm } from 'react-hook-form'
 import toast, { Toaster } from 'react-hot-toast'
+import RelatedNews from '../../../ui/social-page/news/related-news'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
+  const [relatedNews, setRelatedNews] = useState([])
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [uploadComment, setUploadComment] = useState('')
@@ -92,17 +92,31 @@ export default function Page({ params }: { params: { id: string } }) {
           },
         }
       )
+      const relatedNews = axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
 
-      Promise.all([news, comments]).then(([newsRes, commentRes]) => {
-        const { data: news } = newsRes
-        const {
-          data: { comments },
-        } = commentRes
+      Promise.all([news, comments, relatedNews]).then(
+        ([newsRes, commentRes, relatedNewsRes]) => {
+          const { data: news } = newsRes
+          const {
+            data: { comments },
+          } = commentRes
+          const {
+            data: { news: relatedNews },
+          } = relatedNewsRes
 
-        setNews(news)
-        setComments(comments)
-        setIsLoading(false)
-      })
+          setNews(news)
+          setComments(comments)
+          setRelatedNews(relatedNews)
+          setIsLoading(false)
+        }
+      )
     } catch (error) {
       setNoData(true)
     }
@@ -124,7 +138,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setComments(comments.concat(fetchedComments))
       })
       .catch()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
   if (noData) {
@@ -133,7 +147,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   if (!isLoading)
     return (
-      <div className="flex flex-col xl:flex-row m-auto w-[80%]">
+      <div className="flex flex-col xl:flex-row m-auto max-w-[1000px] w-[80%]">
         <Toaster
           toastOptions={{
             success: {
@@ -150,7 +164,7 @@ export default function Page({ params }: { params: { id: string } }) {
             },
           }}
         />
-        <div className={`mt-10 flex flex-col gap-y-8 mx-auto w-[70%]`}>
+        <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
           <div className="flex justify-between items-start">
             {news?.faculty ? (
               <p className="font-medium text-lg text-[--secondary]">
@@ -243,6 +257,8 @@ export default function Page({ params }: { params: { id: string } }) {
                 Tải thêm
               </Button>
             )}
+
+            <RelatedNews news={relatedNews} />
           </div>
         </div>
       </div>
