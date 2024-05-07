@@ -174,6 +174,7 @@ export default function Page({ params }: { params: { id: string } }) {
           })
         )
         setValue('summary', data.summary)
+        setSummaryCharCount(data.summary.length)
         setContent(data.content)
       })
       .catch((e) => {

@@ -12,27 +12,10 @@ import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Pagination from '../../ui/common/pagination'
-<<<<<<< HEAD
-import FilterHeader from '../../ui/admin/halloffame/filter-header'
-import HofListItem from '../../ui/admin/halloffame/hof-list-item'
-import Link from 'next/link'
-
-const hofTemp = [
-  {
-    id: '1',
-    title: 'Nguyễn Mai Hoàng Quang Huy',
-    beginning_year: '2016',
-    thumbnail: '/demo.jpg',
-    faculty: 'Sinh học - Công Nghệ Sinh Học',
-    views: 100,
-    status: { name: 'Bình thường' },
-  },
-]
-=======
 import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
->>>>>>> cff13e3d58364cb2d7188d7feb18de59ed715176
+import Link from 'next/link'
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   const router = useRouter()
@@ -148,6 +131,16 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }
+  const onFilterBeginningYear = useDebouncedCallback((beginningYear) => {
+    if (beginningYear) {
+      params.set('beginningYear', beginningYear)
+    } else {
+      params.delete('beginningYear')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }, 500)
 
   useEffect(() => {
     axios
@@ -173,8 +166,10 @@ export default function Page() {
       <FilterAdmin
         witdh={'1184px'}
         onFilterFaculties={onFilterFaculties}
+        onFilterBeginningYear={onFilterBeginningYear}
         params={{
           facultyId: params.get('facultyId'),
+          beginningYear: params.get('beginningYear'),
         }}
       />
       <div className="overflow-x-auto">

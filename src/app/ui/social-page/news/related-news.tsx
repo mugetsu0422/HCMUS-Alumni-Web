@@ -5,11 +5,7 @@ import React from 'react'
 import { nunito } from '../../fonts'
 import NewsListItem from './news-litst-item'
 
-const news = [
-  
-]
-
-export default function RelativeNews() {
+export default function RelatedNews({ news }) {
   return (
     <div className="mt-8 flex flex-col items-start">
       <p
