@@ -2,11 +2,17 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Avatar, Carousel, Button } from '@material-tailwind/react'
+import { Avatar, Button } from '@material-tailwind/react'
 import { nunito } from '../fonts'
-import { TagFill, Chat } from 'react-bootstrap-icons'
+import {
+  TagFill,
+  Chat,
+  HandThumbsUp,
+  HandThumbsUpFill,
+} from 'react-bootstrap-icons'
 import Link from 'next/link'
 import CommentsDialog from './counsel-comments-dialog'
+import ImageGird from './image-grid'
 
 export default function CounselListItem({
   id,
@@ -19,9 +25,18 @@ export default function CounselListItem({
 }) {
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isLike, setIsLike] = useState(false)
+
+  //* Mốt gắn API thay vô đây
+  const CountLike = 10
+  const CountComments = 10
+
+  function handleLike() {
+    setIsLike((e) => !e)
+  }
 
   const toggleExpand = () => {
-    setIsExpanded(!isExpanded)
+    setIsExpanded((e) => !e)
   }
 
   function handleOpenCommentDialog() {
@@ -69,28 +84,59 @@ export default function CounselListItem({
               </span>
             )}
           </div>
-          <span className="border-b-[1px] border-[--secondary]"></span>
-          <Carousel placeholder={undefined}>
-            {pictures.map(({ id, pictureUrl }) => (
-              <img
-                key={id}
-                src={pictureUrl}
-                alt="image post"
-                className="w-full h-[550px] object-cover object-center"
-              />
-            ))}
-          </Carousel>
-          <span className="border-t-[1px] border-[--secondary]"></span>
+          {pictures.length > 0 && <ImageGird pictures={pictures} />}
         </div>
+
         {/* this is the footer of the body */}
-        <Button
-          onClick={handleOpenCommentDialog}
-          placeholder={undefined}
-          variant="text"
-          className="flex gap-1 py-2 px-4 normal-case">
-          <Chat className="text-[16px]" />
-          <span className="text-[14px]">Bình luận</span>
-        </Button>
+
+        {CountLike > 0 || CountComments > 0 ? (
+          <div className="flex flex-col">
+            <div className="flex justify-between my-3 mx-1">
+              {CountLike > 0 ? (
+                <div className="flex items-center gap-1">
+                  <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
+                  <p className="text-[16px]">{CountLike}</p>
+                </div>
+              ) : (
+                <div> </div>
+              )}
+
+              {CountComments > 0 && <div>{CountComments} Bình luận</div>}
+            </div>
+            <span className="border-t-[1px] border-[--secondary]"></span>
+          </div>
+        ) : (
+          ''
+        )}
+
+        <div className="flex gap-2">
+          <Button
+            onClick={handleLike}
+            placeholder={undefined}
+            variant="text"
+            className="flex gap-1 py-2 px-1 normal-case w-fit">
+            {isLike ? (
+              <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
+            ) : (
+              <HandThumbsUp className="text-[16px]" />
+            )}
+            <span
+              className={
+                isLike ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
+              }>
+              Thích
+            </span>
+          </Button>
+
+          <Button
+            onClick={handleOpenCommentDialog}
+            placeholder={undefined}
+            variant="text"
+            className="flex gap-1 py-2 px-4 normal-case w-fit">
+            <Chat className="text-[16px]" />
+            <span className="text-[14px]">Bình luận</span>
+          </Button>
+        </div>
 
         <CommentsDialog
           openCommentsDialog={openCommentsDialog}

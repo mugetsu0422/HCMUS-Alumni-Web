@@ -12,10 +12,11 @@ import {
   DialogHeader,
   DialogFooter,
 } from '@material-tailwind/react'
-import { TagFill, SendFill, XLg } from 'react-bootstrap-icons'
+import { TagFill, SendFill, XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import { nunito } from '../fonts'
 import Comments from '../social-page/news/comments'
+import ImageGird from './image-grid'
 
 export default function CommentsDialog({
   openCommentsDialog,
@@ -29,6 +30,9 @@ export default function CommentsDialog({
   pictures,
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const CountLike = 10
+  const CountComments = 10
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded)
@@ -93,22 +97,32 @@ export default function CommentsDialog({
                 </span>
               )}
             </div>
-            <span className="border-b-[1px] border-[--secondary]"></span>
-            <Carousel placeholder={undefined}>
-              {pictures.map(({ id, pictureUrl }) => (
-                <img
-                  key={id}
-                  src={pictureUrl}
-                  alt="image post"
-                  className="w-full h-[550px] object-cover object-center"
-                />
-              ))}
-            </Carousel>
-            <span className="border-t-[1px] border-[--secondary]"></span>
+            {pictures.length > 0 && <ImageGird pictures={pictures} />}
           </div>
         </div>
 
         {/* this is the comment */}
+
+        {CountLike > 0 || CountComments > 0 ? (
+          <div className="flex flex-col">
+            <div className="flex justify-between my-3 mx-1">
+              {CountLike > 0 ? (
+                <div className="flex items-center gap-1">
+                  <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
+                  <p className="text-[16px]">{CountLike}</p>
+                </div>
+              ) : (
+                <div> </div>
+              )}
+
+              {CountComments > 0 && <div>{CountComments} Bình luận</div>}
+            </div>
+            <span className="border-t-[1px] border-[--secondary]"></span>
+          </div>
+        ) : (
+          ''
+        )}
+
         <div className={`${nunito.className} mt-2`}>
           <p className="text-black font-bold text-lg">Bình luận</p>
           {/* <Comments
