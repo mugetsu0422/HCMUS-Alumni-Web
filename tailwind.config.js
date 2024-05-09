@@ -49,6 +49,22 @@ module.exports = withMT({
             borderRadius: '10px',
           },
         },
+
+        '.scrollbar-webkit-invisible': {
+          '&::-webkit-scrollbar': {
+            width: '10px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#ffffff00',
+            borderRadius: '10px',
+          },
+
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#ffffff00c1',
+            borderRadius: '10px',
+          },
+        },
       }
 
       addUtilities(newUtilities, ['responsive', 'hover'])

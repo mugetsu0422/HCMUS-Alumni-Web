@@ -17,8 +17,20 @@ import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
 
+const hofTemp = {
+  id: '1',
+  thumbnail: '/authentication.png',
+  title: 'Nguyễn Mai Hoàng Quang Huy',
+  summary:
+    'Từng có cơ hội làm việc cho Google nhưng Lê Yên Thanh từ chối để ở lại Việt Nam đầu quân cho một số startup, sau đó khởi nghiệp với BusMap',
+  publishedAt: '08-05-2024',
+  beginningYear: '2016',
+  faculty: { name: 'Sinh học - Công nghệ sinh học' },
+  views: '100',
+  status: { name: 'Bình thường' },
+}
+
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const { register, reset } = useForm({
@@ -28,7 +40,7 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   })
 
   return (
-    <div className="my-5 w-[1184px] m-auto flex items-center gap-5">
+    <div className="my-5 w-[1400px] m-auto flex items-center gap-5">
       <div className="h-full w-[500px] mr-auto">
         <Input
           size="lg"
@@ -159,12 +171,12 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
       <p
-        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-01)]`}>
+        className={`${roboto.className} mx-auto w-[1400px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
       <FuntionSection onSearch={onSearch} onResetSearchAndFilter={onResetAll} />
       <FilterAdmin
-        witdh={'1184px'}
+        witdh={'1400px'}
         onFilterFaculties={onFilterFaculties}
         onFilterBeginningYear={onFilterBeginningYear}
         params={{
@@ -178,6 +190,7 @@ export default function Page() {
           {hof.map((hof) => (
             <HofListItem key={hof.id} hof={hof} />
           ))}
+          <HofListItem hof={hofTemp} />
         </div>
       </div>
 

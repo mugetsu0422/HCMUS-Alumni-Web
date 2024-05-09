@@ -28,21 +28,18 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
       <DialogFooter placeholder={undefined}>
         <Button
           placeholder={undefined}
-          color="blue-gray"
-          variant="gradient"
           onClick={handleOpen}
-          className="mr-1">
-          <span>Hủy</span>
+          className="mr-1 bg-[--delete-filter] text-black">
+          Hủy
         </Button>
         <Button
           placeholder={undefined}
-          color="red"
-          className="mr-1"
+          className="mr-1 bg-[--delete]"
           onClick={() => {
             onDelete(id)
             handleOpen()
           }}>
-          <span>Xác nhận</span>
+          Xác nhận
         </Button>
       </DialogFooter>
     </Dialog>
@@ -72,21 +69,18 @@ function HideOrShowDialog({ id, open, handleOpen, status, onHideOrShow }) {
       <DialogFooter placeholder={undefined}>
         <Button
           placeholder={undefined}
-          color="blue-gray"
-          variant="gradient"
           onClick={handleOpen}
-          className="mr-1">
-          <span>Hủy</span>
+          className="mr-1 bg-[--delete-filter] text-black">
+          Hủy
         </Button>
         <Button
           placeholder={undefined}
-          color="red"
-          className="mr-1"
+          className="mr-1 bg-[--delete]"
           onClick={() => {
             onHideOrShow(id, statusId)
             handleOpen()
           }}>
-          <span>Xác nhận</span>
+          Xác nhận
         </Button>
       </DialogFooter>
     </Dialog>
@@ -167,7 +161,7 @@ export default function EventsListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1650px] m-auto items-center justify-between h-fit flex pl-4 py-2`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1650px] m-auto items-center justify-between h-fit flex pl-4 py-2 bg-gray-200`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{

@@ -13,7 +13,7 @@ interface SearchAndFilterFacultyProps {
   params: { facultyId: string | null; beginningYear: string | null }
 }
 
-export default function Filter({
+export default function FilterAdmin({
   witdh,
   onFilterFaculties,
   onFilterBeginningYear,
@@ -27,7 +27,7 @@ export default function Filter({
   })
 
   return (
-    <div className={`my-5 w-full max-w-[${witdh}] m-auto flex items-end gap-5`}>
+    <div className={`my-5 w-[${witdh}] m-auto flex items-end gap-5`}>
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Khoa</p>
         <select

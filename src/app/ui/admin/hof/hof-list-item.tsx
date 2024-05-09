@@ -34,16 +34,13 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
       <DialogFooter placeholder={undefined}>
         <Button
           placeholder={undefined}
-          color="blue-gray"
-          variant="gradient"
           onClick={handleOpen}
-          className="mr-1">
-          <span>Hủy</span>
+          className="mr-1 bg-[--delete-filter] text-black">
+          Hủy
         </Button>
         <Button
           placeholder={undefined}
-          color="red"
-          className="mr-1"
+          className="mr-1 bg-[--delete]"
           onClick={() => {
             onDelete(id)
             handleOpen()
@@ -76,35 +73,35 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
       <DialogFooter placeholder={undefined}>
         <Button
           placeholder={undefined}
-          color="blue-gray"
-          variant="gradient"
           onClick={handleOpen}
-          className="mr-1">
-          <span>Hủy</span>
+          className="mr-1 bg-[--delete-filter] text-black">
+          Hủy
         </Button>
         <Button
           placeholder={undefined}
           color="red"
-          className="mr-1"
+          className="mr-1 bg-[--delete] "
           onClick={() => {
             onHideOrShow(id, statusId)
             handleOpen()
           }}>
-          <span>Xác nhận</span>
+          Xác nhận
         </Button>
       </DialogFooter>
     </Dialog>
   )
 }
 
-export default function HofListItem({
-  hof,
-}) {
+export default function HofListItem({ hof }) {
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
   const [isDeleted, setIsDeleted] = React.useState(false)
   const [isHidden, setIsHidden] = React.useState(
-    hof.status.name === 'Ẩn' ? true : hof.status.name === 'Bình thường' ? false : null
+    hof.status.name === 'Ẩn'
+      ? true
+      : hof.status.name === 'Bình thường'
+        ? false
+        : null
   )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
@@ -163,7 +160,7 @@ export default function HofListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1184px] m-auto items-center justify-between h-fit flex pl-4 py-2`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1400px] m-auto items-center justify-between h-fit flex pl-2 py-2 bg-gray-200`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -186,16 +183,22 @@ export default function HofListItem({
         alt="hall of fame image"
         className="h-[120px] w-[180px] object-cover object-center"
       />
-      <p className="text-lg h-20 w-[320px]  p-2 font-[600] text-black  justify-center flex items-center">
+      <p className="text-lg h-20 w-[220px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex items-center">
         {hof.title}
       </p>
-      <p className="text-lg w-[10rem] text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg h-20 w-[380px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex overflow-y-auto scrollbar-webkit-invisible">
+        {hof.summary}
+      </p>
+      <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
+        {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
+      </p>
+      <p className="text-lg w-[10rem] text-center text-blackhuỳnh công hiếu p-2 font-[600] flex items-center justify-center">
         {hof.faculty?.name}
       </p>
-      <p className="text-lg w-[8rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[6rem]  text-center text-blackhuỳnh công hiếu p-2 font-[600] flex items-center justify-center">
         {hof.beginningYear}
       </p>
-      <p className="text-lg w-[7.5rem]  text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[7.5rem]  text-center text-blackhuỳnh công hiếu p-2 font-[600] flex items-center justify-center">
         {hof.views}
       </p>
       <div className="flex justify-end px-2">
@@ -203,14 +206,14 @@ export default function HofListItem({
           variant="text"
           onClick={() => handleEdit(hof.id)}
           placeholder={undefined}
-          className="px-4">
+          className="px-2 py-2">
           <PencilSquare className="text-2xl text-[--blue-05]" />
         </Button>
         <Button
           variant="text"
           onClick={handleOpenDetele}
           placeholder={undefined}
-          className="px-4">
+          className="px-2 py-2">
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
         <DeleteDialog
@@ -221,14 +224,14 @@ export default function HofListItem({
         />
 
         {hof.status.name === 'Chờ' ? (
-          <div className="flex justify-center items-center px-4">
+          <div className="flex justify-center items-center px-2 py-2">
             <CalendarCheck className="text-2xl text-green-800" />
           </div>
         ) : (
           <Button
             variant="text"
             onClick={handleOpenShow}
-            className="px-4"
+            className="px-2 py-2"
             placeholder={undefined}>
             {!isHidden ? (
               <Eye className="text-2xl  text-black" />
