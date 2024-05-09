@@ -1,7 +1,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   Avatar,
   Button,
@@ -14,7 +14,13 @@ import {
 import { nunito } from '../fonts'
 import { XLg } from 'react-bootstrap-icons'
 import ErrorInput from '../error-input'
-import { useForm } from 'react-hook-form'
+import { set, useForm } from 'react-hook-form'
+import { ReactTags } from 'react-tag-autocomplete'
+import styles from '../admin/react-tag-autocomplete.module.css'
+import { JWT_COOKIE, TAGS } from '../../constant'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import Cookies from 'js-cookie'
 
 export default function CreatePostDialog({
   openCreatePost,
@@ -29,36 +35,44 @@ export default function CreatePostDialog({
     formState: { errors },
   } = useForm()
 
-  const [uploadComment, setUploadComment] = useState('')
-  const [images, setImages] = useState([])
+  const [previewImages, setPreviewImages] = useState([])
+  const [imageFiles, setImageFiles] = useState([])
+  const [selectedTags, setSelectedTags] = useState([])
 
   const onDragOver = (event) => {
     event.preventDefault()
   }
-
   const onDrop = (event) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
 
     const files = event.dataTransfer.files
-    if (images.length + files.length > 5) {
-      alert('Bạn chỉ được chọn tối đa 5 ảnh!')
+
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > 1024 * 1024 * 5) {
+        toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
+        return
+      }
+    }
+    if (previewImages.length + files.length > 5) {
+      toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
       return
     }
 
     if (files.length > 0) {
-      const newImages = [...images]
+      const newImages = [...previewImages]
       for (const file of files) {
+        setImageFiles((prev) => prev.concat(file))
+
         const reader = new FileReader()
         reader.onload = (event) => {
           newImages.push({ src: event.target.result })
-          setImages(newImages)
+          setPreviewImages(newImages)
         }
         reader.readAsDataURL(file)
       }
     }
   }
-
   const onClickDropzone = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -69,32 +83,107 @@ export default function CreatePostDialog({
     input.addEventListener('change', (event) => {
       const files = (event.target as HTMLInputElement).files // Type cast here
       if (files.length > 0) {
-        if (images.length + files.length > 5) {
-          alert('Bạn chỉ được chọn tối đa 5 ảnh!')
+        for (let i = 0; i < files.length; i++) {
+          if (files[i].size > 1024 * 1024 * 5) {
+            toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
+            return
+          }
+        }
+        if (previewImages.length + files.length > 5) {
+          toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
           return
         }
-        const newImages = [...images]
+
+        const newImages = [...previewImages]
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
+
+          setImageFiles((prev) => prev.concat(file))
+
           const reader = new FileReader()
           reader.onload = (event) => {
             newImages.push({ src: event.target.result })
-            setImages(newImages)
+            setPreviewImages(newImages)
           }
           reader.readAsDataURL(file)
         }
       }
     })
   }
-
   const removeImage = (index, event) => {
     event.stopPropagation()
-    const newImages = images.filter((image, imageIndex) => imageIndex !== index)
-    setImages(newImages)
+    const newImages = previewImages.filter(
+      (image, imageIndex) => imageIndex !== index
+    )
+    setPreviewImages(newImages)
+    setImageFiles((prev) => prev.filter((_, i) => i !== index))
   }
+  const onAddTags = useCallback(
+    (newTag) => {
+      setSelectedTags([...selectedTags, newTag])
+    },
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
+    },
+    [selectedTags]
+  )
 
-  const handleUploadCommentChange = (event) => {
-    setUploadComment(event.target.value)
+  const onSubmit = (data) => {
+    const post = {
+      ...data,
+      tags: selectedTags.map((tag) => {
+        return { id: tag.value }
+      }),
+    }
+
+    const postToast = toast.loading('Đang đăng bài viết...')
+
+    // Upload post without images
+    axios
+      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel`, post, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data: { id } }) => {
+        // Update post if there are images
+        const form = new FormData()
+        for (const image of imageFiles) {
+          form.append('addedImages', image)
+        }
+
+        axios
+          .put(
+            `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${id}/images`,
+            form,
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              },
+            }
+          )
+          .then(() => {
+            toast.success('Đăng thành công', {
+              id: postToast,
+            })
+            handleOpenPost()
+          })
+          .catch((err) => {
+            console.error(err)
+            toast.error('Đăng thất bại', {
+              id: postToast,
+            })
+          })
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.error('Đăng thất bại', {
+          id: postToast,
+        })
+      })
   }
 
   return (
@@ -102,7 +191,7 @@ export default function CreatePostDialog({
       placeholder={undefined}
       open={openCreatePost}
       handler={handleOpenPost}
-      size="md">
+      size="lg">
       <DialogHeader
         placeholder={undefined}
         className={`${nunito.className} sticky top-0 flex items-center cursor-`}>
@@ -127,7 +216,7 @@ export default function CreatePostDialog({
           />
           <p className="text-lg font-bold text-black">{user.fullName}</p>
         </div>
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <Input
             size="lg"
             crossOrigin={undefined}
@@ -140,30 +229,72 @@ export default function CreatePostDialog({
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 focus:border-b-2"
           />
           <ErrorInput
             // This is the error message
             errors={errors?.title?.message}
           />
           <Textarea
-            onChange={handleUploadCommentChange}
             rows={8}
-            variant="standard"
-            placeholder="Bạn đang cần tư vấn?"
+            variant="static"
+            label="Nội dung"
+            {...register('content', {
+              required: 'Vui lòng nhập nội dung',
+            })}
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 focus:border-b-2"
+          />
+          <ErrorInput
+            // This is the error message
+            errors={errors?.content?.message}
+          />
+
+          <ReactTags
+            activateFirstOption={true}
+            placeholderText="Thêm thẻ"
+            selected={selectedTags}
+            suggestions={TAGS}
+            onAdd={onAddTags}
+            onDelete={onDeleteTags}
+            noOptionsText="No matching countries"
+            classNames={{
+              root: `${styles['react-tags']}`,
+              rootIsActive: `${styles['is-active']}`,
+              rootIsDisabled: `${styles['is-disabled']}`,
+              rootIsInvalid: `${styles['is-invalid']}`,
+              label: `${styles['react-tags__label']}`,
+              tagList: `${styles['react-tags__list']}`,
+              tagListItem: `${styles['react-tags__list-item']}`,
+              tag: `${styles['react-tags__tag']}`,
+              tagName: `${styles['react-tags__tag-name']}`,
+              comboBox: `${styles['react-tags__combobox']}`,
+              input: `${styles['react-tags__combobox-input']}`,
+              listBox: `${styles['react-tags__listbox']}`,
+              option: `${styles['react-tags__listbox-option']}`,
+              optionIsActive: `${styles['is-active']}`,
+              highlight: `${styles['react-tags__listbox-option-highlight']}`,
+            }}
           />
 
           <div className="container flex flex-col items-end relative mx-auto my-2">
             <div
-              className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center"
+              className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
               onDragOver={onDragOver}
               onDrop={onDrop}
               onClick={onClickDropzone}>
-              {images.length == 0 ? (
-                <p className="text-gray-500">Kéo và thả ảnh vào đây</p>
+              {previewImages.length == 0 ? (
+                <>
+                  <p className="text-gray-500">
+                    Chọn hoặc kéo và thả ảnh vào đây
+                  </p>
+                  <span className="text-red-700">(Tối đa 5 ảnh)</span>
+                </>
               ) : (
                 <div className="mt-4 flex flex-wrap gap-3 justify-center">
-                  {images.map((image, index) => (
+                  {previewImages.map((image, index) => (
                     <div
                       key={image.src}
                       className="relative flex flex-col items-end">
@@ -189,7 +320,6 @@ export default function CreatePostDialog({
           <Button
             placeholder={undefined}
             size="md"
-            disabled={!uploadComment.trim()}
             type="submit"
             className={`${nunito.className} w-full text-center py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
             Đăng

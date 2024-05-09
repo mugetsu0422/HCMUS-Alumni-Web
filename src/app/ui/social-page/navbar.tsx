@@ -124,12 +124,12 @@ export default function MyNavbar() {
         </div> */}
 
         <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
-          <Button placeholder={undefined} variant="text" size="sm">
+          {/* <Button placeholder={undefined} variant="text" size="sm">
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
               className="text-2xl text-[--text-navbar]"
             />
-          </Button>
+          </Button> */}
           <Badge content={2} color="blue">
             <Button placeholder={undefined} variant="text" size="sm">
               <FontAwesomeIcon

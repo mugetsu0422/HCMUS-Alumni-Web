@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { Avatar, Button } from '@material-tailwind/react'
 import { nunito } from '../fonts'
 import {
@@ -13,34 +13,144 @@ import {
 import Link from 'next/link'
 import CommentsDialog from './counsel-comments-dialog'
 import ImageGird from './image-grid'
+import moment from 'moment'
+import 'moment/locale/vi'
+import axios from 'axios'
+import { COMMENT_PAGE_SIZE, JWT_COOKIE, REACTION_TYPE } from '../../constant'
+import Cookies from 'js-cookie'
+import toast from 'react-hot-toast'
 
-export default function CounselListItem({
-  id,
-  title,
-  content,
-  tags,
-  creator,
-  publishedAt,
-  pictures,
-}) {
+interface CounselPostProps {
+  id: string
+  title: string
+  content: string
+  childrenCommentNumber: number
+  updateAt: string
+  publishedAt: string
+  tags: { id: string; name: string }[]
+  status: { name: string }
+  creator: { id: string; fullName: string; avatarUrl: string }
+  pictures: { id: string; pictureUrl: string }[]
+  isReacted: boolean
+  reactionCount: number
+}
+
+export default function CounselListItem({ post }: { post: CounselPostProps }) {
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isLike, setIsLike] = useState(false)
-
-  //* Mốt gắn API thay vô đây
-  const CountLike = 10
-  const CountComments = 10
-
-  function handleLike() {
-    setIsLike((e) => !e)
-  }
+  const [isReacted, setIsReacted] = useState(post.isReacted)
+  const [comments, setComments] = useState([])
+  const [reactionCount, setReactionCount] = useState(post.reactionCount)
 
   const toggleExpand = () => {
     setIsExpanded((e) => !e)
   }
-
   function handleOpenCommentDialog() {
     setOpenCommentsDialog((e) => !e)
+  }
+  const onFetchComments = async (page: number, pageSize: number) => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/comments?page=${page}&pageSize=${pageSize}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
+      setComments(comments.concat(res.data.comments))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  const onUploadComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    parentId: string | null = null,
+    content: string
+  ): void => {
+    e.preventDefault()
+    const comment = {
+      parentId: parentId,
+      content: content,
+    }
+
+    const postCommentToast = toast.loading('Đang đăng')
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/comments`,
+        comment,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Đăng thành công', { id: postCommentToast })
+      })
+      .catch(() => {
+        toast.error('Đăng thất bại', { id: postCommentToast })
+      })
+  }
+  const onFetchChildrenComments = async (
+    parentId: string,
+    page: number,
+    pageSize: number
+  ) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${parentId}/children?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    const {
+      data: { comments },
+    } = res
+    return comments
+  }
+  const onReactPost = () => {
+    setReactionCount((old) => old + 1)
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/react`,
+        { reactId: REACTION_TYPE['Like'] },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then()
+      .catch((err) => {
+        console.error(err)
+      })
+  }
+  const onCancelReactPost = () => {
+    setReactionCount((old) => old - 1)
+    axios
+      .delete(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/react`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then()
+      .catch((err) => {
+        console.error(err)
+      })
+  }
+  function handleReactionClick() {
+    if (isReacted) {
+      onCancelReactPost()
+    } else {
+      onReactPost()
+    }
+    setIsReacted((e) => !e)
   }
 
   return (
@@ -48,12 +158,18 @@ export default function CounselListItem({
       {/* this is the header of a post */}
       <div className="flex gap-2 items-center">
         <Link href="#">
-          <Avatar placeholder={undefined} src={creator.avatarUrl} size="lg" />
+          <Avatar
+            placeholder={undefined}
+            src={post.creator.avatarUrl}
+            size="lg"
+          />
         </Link>
 
         <div className="flex flex-col gap-1">
-          <p className="font-bold text-lg">{creator.fullName}</p>
-          <p className="text-sm text-[--secondary]">{publishedAt}</p>
+          <p className="font-bold text-lg">{post.creator.fullName}</p>
+          <p className="text-sm text-[--secondary]">
+            {moment(post.publishedAt).locale('vi').local().fromNow()}
+          </p>
         </div>
       </div>
 
@@ -61,20 +177,27 @@ export default function CounselListItem({
       <div>
         {/* this is the header of the body */}
         <div className="mt-3">
-          <p className="text-xl uppercase font-bold">{title}</p>
+          <p className="text-xl uppercase font-bold">{post.title}</p>
           <div className="flex items-center gap-2 text-[--secondary]">
-            <TagFill className="text-[--blue-02]" />
-            {tags.map(({ id, name }) => (
-              <span key={id}>{name}</span>
-            ))}
+            {post.tags.length != 0 && (
+              <>
+                <TagFill className="text-[--blue-02]" />
+                {post.tags.map(({ id, name }) => (
+                  <span key={id}>{name}</span>
+                ))}
+              </>
+            )}
           </div>
         </div>
 
         {/* this is the content of the body */}
         <div className="flex flex-col gap-2 ">
           <div className="overflow-hidden">
-            <div className={`${isExpanded ? 'block' : 'line-clamp-3'}`}>
-              {content}
+            <div
+              className={`${
+                isExpanded ? 'block' : 'line-clamp-3'
+              } whitespace-pre-line`}>
+              {post.content}
             </div>
             {!isExpanded && (
               <span
@@ -84,24 +207,26 @@ export default function CounselListItem({
               </span>
             )}
           </div>
-          {pictures.length > 0 && <ImageGird pictures={pictures} />}
+          {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
         </div>
 
         {/* this is the footer of the body */}
 
-        {CountLike > 0 || CountComments > 0 ? (
+        {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
           <div className="flex flex-col">
             <div className="flex justify-between my-3 mx-1">
-              {CountLike > 0 ? (
+              {reactionCount > 0 ? (
                 <div className="flex items-center gap-1">
                   <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-                  <p className="text-[16px]">{CountLike}</p>
+                  <p className="text-[16px]">{reactionCount}</p>
                 </div>
               ) : (
                 <div> </div>
               )}
 
-              {CountComments > 0 && <div>{CountComments} Bình luận</div>}
+              {post.childrenCommentNumber > 0 && (
+                <div>{post.childrenCommentNumber} Bình luận</div>
+              )}
             </div>
             <span className="border-t-[1px] border-[--secondary]"></span>
           </div>
@@ -111,25 +236,31 @@ export default function CounselListItem({
 
         <div className="flex gap-2">
           <Button
-            onClick={handleLike}
+            onClick={handleReactionClick}
             placeholder={undefined}
             variant="text"
             className="flex gap-1 py-2 px-1 normal-case w-fit">
-            {isLike ? (
+            {isReacted ? (
               <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
             ) : (
               <HandThumbsUp className="text-[16px]" />
             )}
             <span
               className={
-                isLike ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
+                isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
               }>
               Thích
             </span>
           </Button>
 
           <Button
-            onClick={handleOpenCommentDialog}
+            onClick={() => {
+              if (comments.length === 0 && post.childrenCommentNumber != 0) {
+                onFetchComments(0, COMMENT_PAGE_SIZE)
+              }
+
+              handleOpenCommentDialog()
+            }}
             placeholder={undefined}
             variant="text"
             className="flex gap-1 py-2 px-4 normal-case w-fit">
@@ -139,16 +270,13 @@ export default function CounselListItem({
         </div>
 
         <CommentsDialog
+          post={post}
+          comments={comments}
           openCommentsDialog={openCommentsDialog}
           handleOpenCommentDialog={handleOpenCommentDialog}
-          id={id}
-          key={id}
-          title={title}
-          content={content}
-          tags={tags}
-          publishedAt={publishedAt}
-          creator={creator}
-          pictures={pictures}
+          onUploadComment={onUploadComment}
+          onFetchChildrenComments={onFetchChildrenComments}
+          onFetchComments={onFetchComments}
         />
       </div>
     </div>
