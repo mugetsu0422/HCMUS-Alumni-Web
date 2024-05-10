@@ -160,7 +160,7 @@ export default function HofListItem({ hof }) {
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1400px] m-auto items-center justify-between h-fit flex pl-2 py-2 bg-gray-200`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1400px] m-auto items-center justify-between h-fit flex pl-2 py-2 bg-[--blue-04]`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -186,7 +186,7 @@ export default function HofListItem({ hof }) {
       <p className="text-lg h-20 w-[220px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex items-center">
         {hof.title}
       </p>
-      <p className="text-lg h-20 w-[380px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex overflow-y-auto scrollbar-webkit-invisible">
+      <p className="text-lg h-20 w-[380px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex overflow-y-auto scrollbar-webkit-main">
         {hof.summary}
       </p>
       <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">

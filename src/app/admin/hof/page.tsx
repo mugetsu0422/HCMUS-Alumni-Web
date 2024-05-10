@@ -27,7 +27,7 @@ const hofTemp = {
   beginningYear: '2016',
   faculty: { name: 'Sinh học - Công nghệ sinh học' },
   views: '100',
-  status: { name: 'Bình thường' },
+  status: { name: 'Chờ' },
 }
 
 function FuntionSection({ onSearch, onResetSearchAndFilter }) {
