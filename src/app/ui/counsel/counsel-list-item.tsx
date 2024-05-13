@@ -1,14 +1,30 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, { useEffect, useReducer, useRef, useState } from 'react'
-import { Avatar, Button } from '@material-tailwind/react'
+import React, {
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from 'react'
+import {
+  Avatar,
+  Button,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+} from '@material-tailwind/react'
 import { nunito } from '../fonts'
 import {
   TagFill,
   Chat,
   HandThumbsUp,
   HandThumbsUpFill,
+  ThreeDots,
+  Pencil,
+  Trash,
 } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import CommentsDialog from './counsel-comments-dialog'
@@ -19,6 +35,7 @@ import axios from 'axios'
 import { COMMENT_PAGE_SIZE, JWT_COOKIE, REACTION_TYPE } from '../../constant'
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
+import ReactDialog from './counsel-react-dialog'
 
 interface CounselPostProps {
   id: string
@@ -35,12 +52,42 @@ interface CounselPostProps {
   reactionCount: number
 }
 
+const useTruncatedElement = ({ ref }) => {
+  const [isTruncated, setIsTruncated] = useState(false)
+  const [isReadingMore, setIsReadingMore] = useState(false)
+
+  useLayoutEffect(() => {
+    const { offsetHeight, scrollHeight } = ref.current || {}
+
+    if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
+      setIsTruncated(true)
+    } else {
+      setIsTruncated(false)
+    }
+  }, [ref])
+
+  return {
+    isTruncated,
+    isReadingMore,
+    setIsReadingMore,
+  }
+}
+
 export default function CounselListItem({ post }: { post: CounselPostProps }) {
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
+  const [openReactDialog, setOpenReactDialog] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isReacted, setIsReacted] = useState(post.isReacted)
   const [comments, setComments] = useState([])
   const [reactionCount, setReactionCount] = useState(post.reactionCount)
+  const ref = React.useRef(null)
+  const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
+    ref,
+  })
+
+  function hanldeOpenReactDialog() {
+    setOpenReactDialog((e) => !e)
+  }
 
   const toggleExpand = () => {
     setIsExpanded((e) => !e)
@@ -157,21 +204,48 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
     <div
       className={`${nunito.className} flex flex-col w-full h-fit mt-4 mb-20`}>
       {/* this is the header of a post */}
-      <div className="flex gap-2 items-center">
-        <Link href="#">
-          <Avatar
-            placeholder={undefined}
-            src={post.creator.avatarUrl}
-            size="lg"
-          />
-        </Link>
+      <div className="flex justify-between items-center">
+        <div className="flex gap-2 items-center">
+          <Link href="#">
+            <Avatar
+              placeholder={undefined}
+              src={post.creator.avatarUrl}
+              size="lg"
+            />
+          </Link>
 
-        <div className="flex flex-col gap-1">
-          <p className="font-bold text-lg">{post.creator.fullName}</p>
-          <p className="text-sm text-[--secondary]">
-            {moment(post.publishedAt).locale('vi').local().fromNow()}
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="font-bold text-lg">{post.creator.fullName}</p>
+            <p className="text-sm text-[--secondary]">
+              {moment(post.publishedAt).locale('vi').local().fromNow()}
+            </p>
+          </div>
         </div>
+
+        <Menu placement="bottom-end">
+          <MenuHandler>
+            <Button
+              placeholder={undefined}
+              variant="text"
+              className="rounded-full px-2 py-1">
+              <ThreeDots className="text-xl text-black" />
+            </Button>
+          </MenuHandler>
+          <MenuList placeholder={undefined}>
+            <MenuItem
+              placeholder={undefined}
+              className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+              <Pencil />
+              <p>Chỉnh sửa bài viết</p>
+            </MenuItem>
+            <MenuItem
+              placeholder={undefined}
+              className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+              <Trash />
+              <p>Xóa bài viết</p>
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </div>
 
       {/* this is the body of a post */}
@@ -195,12 +269,13 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
         <div className="flex flex-col gap-2 ">
           <div className="overflow-hidden">
             <div
+              ref={ref}
               className={`${
                 isExpanded ? 'block' : 'line-clamp-3'
               } whitespace-pre-line`}>
               {post.content}
             </div>
-            {!isExpanded && (
+            {isTruncated && !isExpanded && (
               <span
                 className="text-black font-semibold hover:underline hover:cursor-pointer rounded text-nowrap inline-flex"
                 onClick={toggleExpand}>
@@ -219,14 +294,31 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
               {reactionCount > 0 ? (
                 <div className="flex items-center gap-1">
                   <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-                  <p className="text-[16px]">{reactionCount}</p>
+                  <p
+                    onClick={hanldeOpenReactDialog}
+                    className="text-[16px] hover:underline hover:cursor-pointer">
+                    {reactionCount}
+                  </p>
                 </div>
               ) : (
                 <div> </div>
               )}
 
               {post.childrenCommentNumber > 0 && (
-                <div>{post.childrenCommentNumber} Bình luận</div>
+                <div
+                  onClick={() => {
+                    if (
+                      comments.length === 0 &&
+                      post.childrenCommentNumber != 0
+                    ) {
+                      onFetchComments(0, COMMENT_PAGE_SIZE)
+                    }
+
+                    handleOpenCommentDialog()
+                  }}
+                  className="hover:underline hover:cursor-pointer">
+                  {post.childrenCommentNumber} Bình luận
+                </div>
               )}
             </div>
             <span className="border-t-[1px] border-[--secondary]"></span>
@@ -234,6 +326,11 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
         ) : (
           ''
         )}
+
+        <ReactDialog
+          openReactDialog={openReactDialog}
+          hanldeOpenReactDialog={hanldeOpenReactDialog}
+        />
 
         <div className="flex gap-2">
           <Button
