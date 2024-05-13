@@ -2,16 +2,8 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useCallback, useState } from 'react'
-import {
-  Avatar,
-  Button,
-  Input,
-  Textarea,
-  Dialog,
-  DialogBody,
-  DialogHeader,
-} from '@material-tailwind/react'
-import { XLg } from 'react-bootstrap-icons'
+import { Button, Input, Textarea } from '@material-tailwind/react'
+import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
 import ErrorInput from '../../../ui/error-input'
 import { set, useForm } from 'react-hook-form'
@@ -21,12 +13,7 @@ import { TAGS, JWT_COOKIE } from '../../../constant'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
-
-const user = {
-  imageUrl: '/demo.jpg',
-  fullName: 'Trương Samuel',
-  id: '1',
-}
+import { useRouter } from 'next/navigation'
 
 export default function CreatePostDialog({
   openCreatePost,
@@ -44,6 +31,7 @@ export default function CreatePostDialog({
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
+  const router = useRouter()
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -195,31 +183,27 @@ export default function CreatePostDialog({
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
-      <p className="m-auto text-2xl text-black font-bold">Tạo bài viết mới</p>
-      {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
-      <div className="flex items-center gap-2 mb-2">
-        <Avatar
-          src={user.imageUrl}
-          alt="user avatar"
-          size="md"
+      <div className="w-full flex">
+        <Button
+          onClick={() => router.push('/counsel')}
           placeholder={undefined}
-        />
-        <p className="text-lg font-bold text-black">{user.fullName}</p>
+          variant="text"
+          className="p-2 rounded-full">
+          <ArrowLeft className="text-xl" />
+        </Button>
+        <p className="m-auto text-2xl text-black font-bold">Tạo bài viết mới</p>
       </div>
+      {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
+
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <Input
           size="lg"
           crossOrigin={undefined}
-          variant="static"
           label="Tiêu đề"
           type="text"
           {...register('title', {
             required: 'Vui lòng nhập tiêu đề',
           })}
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 focus:border-b-2"
         />
         <ErrorInput
           // This is the error message
@@ -227,15 +211,10 @@ export default function CreatePostDialog({
         />
         <Textarea
           rows={8}
-          variant="static"
           label="Nội dung"
           {...register('content', {
             required: 'Vui lòng nhập nội dung',
           })}
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 focus:border-b-2"
         />
         <ErrorInput
           // This is the error message
@@ -277,7 +256,8 @@ export default function CreatePostDialog({
             onClick={onClickDropzone}>
             {previewImages.length == 0 ? (
               <>
-                <p className="text-gray-500">
+                <FileEarmarkImage className="text-[50px] text-[--secondary]" />
+                <p className="text-[--secondary]">
                   Chọn hoặc kéo và thả ảnh vào đây
                 </p>
                 <span className="text-red-700">(Tối đa 5 ảnh)</span>
@@ -309,9 +289,9 @@ export default function CreatePostDialog({
 
         <Button
           placeholder={undefined}
-          size="md"
+          size="lg"
           type="submit"
-          className={`${nunito.className} w-full text-center py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+          className={`${nunito.className} h-12 w-full text-center py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
           Đăng
         </Button>
       </form>

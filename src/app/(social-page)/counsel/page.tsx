@@ -8,7 +8,6 @@ import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import page from '../../page'
 import { useDebouncedCallback } from 'use-debounce'
 import SearchAndFilter from '../../ui/counsel/search-and-filter'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -146,7 +145,8 @@ export default function Page() {
             }>
             {posts.map((post) => (
               <CounselListItem key={post.id} post={post} />
-            ))}
+            ))}{' '}
+            âf
           </InfiniteScroll>
         )}
       </div>

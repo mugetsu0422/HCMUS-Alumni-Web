@@ -31,16 +31,22 @@ export default function SearchAndFilter({
 
   return (
     <div className="flex items-end gap-4 w-fit ml-5 lg:ml-0">
-      <Input
-        size="lg"
-        crossOrigin={undefined}
-        label="Tìm kiếm ..."
-        placeholder={undefined}
-        containerProps={{ className: '!w-[500px]' }}
-        {...register('title', {
-          onChange: (e) => onSearch(e.target.value),
-        })}
-      />
+      <div className="flex flex-col gap-2">
+        <p className="font-semibold text-md">Tìm kiếm</p>
+        <Input
+          size="lg"
+          crossOrigin={undefined}
+          placeholder={undefined}
+          containerProps={{ className: '!w-[500px]' }}
+          {...register('title', {
+            onChange: (e) => onSearch(e.target.value),
+          })}
+          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
+        />
+      </div>
 
       <div className="flex items-end gap-4">
         <div className="flex flex-col gap-2">

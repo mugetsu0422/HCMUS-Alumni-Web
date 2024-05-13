@@ -154,7 +154,8 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
   }
 
   return (
-    <div className={`${nunito.className} flex flex-col w-full h-fit my-4`}>
+    <div
+      className={`${nunito.className} flex flex-col w-full h-fit mt-4 mb-20`}>
       {/* this is the header of a post */}
       <div className="flex gap-2 items-center">
         <Link href="#">

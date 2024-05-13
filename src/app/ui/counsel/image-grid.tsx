@@ -162,57 +162,29 @@ export default function ImageGird({ pictures }) {
     )
   }
 
-  if (pictures.length == 4) {
+  if (pictures.length >= 4) {
     return (
       <>
         <div className="grid grid-cols-2 gap-1">
-          {pictures.map(({ id, pictureUrl }, idx) => (
-            <img
-              onClick={() => handleImageClick(idx)}
-              key={id}
-              src={pictureUrl}
-              alt="image post"
-              className={`w-full h-[275px] object-cover object-center hover:cursor-pointer`}
-            />
-          ))}
-        </div>
-        <DialogViewImage
-          setCurrentImageIndex={setCurrentImageIndex}
-          pictures={pictures}
-          openDialogViewImage={openDialogViewImage}
-          handleOpenDialogViewImage={handleOpenDialogViewImage}
-          currentImageIndex={currentImageIndex}
-        />
-      </>
-    )
-  }
-
-  if (pictures.length == 5) {
-    return (
-      <>
-        <div className="flex flex-col gap-1">
-          <div className="grid grid-cols-2 gap-1">
-            {pictures.slice(0, 2).map(({ id, pictureUrl }, idx) => (
+          {pictures.slice(0, 4).map(({ id, pictureUrl }, idx) => (
+            <div key={id} className="relative">
               <img
                 onClick={() => handleImageClick(idx)}
-                key={id}
                 src={pictureUrl}
                 alt="image post"
-                className={`w-full h-[275px] object-cover object-center hover:cursor-pointer`}
+                className={`w-full h-[275px] object-cover object-center hover:cursor-pointer z-0`}
               />
-            ))}
-          </div>
-          <div className="grid grid-cols-3 gap-1">
-            {pictures.slice(2, 5).map(({ id, pictureUrl }, idx) => (
-              <img
-                onClick={() => handleImageClick(idx + 2)}
-                key={id}
-                src={pictureUrl}
-                alt="image post"
-                className={`w-full h-[275px] object-cover object-center hover:cursor-pointer`}
-              />
-            ))}
-          </div>
+              {pictures.length == 5 && idx == 3 && (
+                <>
+                  <div className="bg-gray-500 opacity-40 z-10 w-full h-[275px] absolute top-0 "></div>
+                  <p
+                    className={`${nunito.className} text-[30px] font-semibold text-white opacity-100 absolute top-[45%] left-[45%] z-10`}>
+                    + 1
+                  </p>
+                </>
+              )}
+            </div>
+          ))}
         </div>
         <DialogViewImage
           setCurrentImageIndex={setCurrentImageIndex}
