@@ -7,14 +7,12 @@ import { FACULTIES, TAGS } from '../../../constant'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface SearchAndFilterFacultyProps {
-  witdh: string
   onFilterFaculties: (facultyId: string) => void
   onFilterBeginningYear: (beginningYear: string) => void
   params: { facultyId: string | null; beginningYear: string | null }
 }
 
 export default function FilterAdmin({
-  witdh,
   onFilterFaculties,
   onFilterBeginningYear,
   params,
@@ -27,7 +25,7 @@ export default function FilterAdmin({
   })
 
   return (
-    <div className={`my-5 w-[${witdh}] m-auto flex items-end gap-5`}>
+    <div className={`w-fit m-auto flex items-end gap-5`}>
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Khoa</p>
         <select

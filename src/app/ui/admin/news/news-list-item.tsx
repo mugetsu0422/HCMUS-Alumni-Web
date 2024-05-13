@@ -46,7 +46,7 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
             onDelete(id)
             handleOpen()
           }}>
-          Xác nhận
+          Xóa
         </Button>
       </DialogFooter>
     </Dialog>
@@ -85,7 +85,7 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
             onHideOrShow(id, statusId)
             handleOpen()
           }}>
-          Xác nhận
+          {header}
         </Button>
       </DialogFooter>
     </Dialog>
@@ -165,7 +165,7 @@ export default function NewsListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1184px] m-auto items-center justify-between h-fit flex pl-2 py-2 bg-gray-200`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1184px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -186,7 +186,7 @@ export default function NewsListItem({
       <img
         src={imgSrc}
         alt="news image"
-        className="h-[120px] w-[180px] object-cover object-center rounded-lg"
+        className="h-[120px] w-[180px] object-cover object-center rounded-lg  p-1 border-solid border border-black"
       />
       <p className="h-20 w-[350px] p-2 font-[600] text-black align-middle flex items-center">
         {name}

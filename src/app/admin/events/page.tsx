@@ -20,10 +20,17 @@ const FETCH_MODE = 3
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
+  onFilterTag: (keyword: string) => void
+  onFilterFaculties: (keyword: string) => void
   onResetAll: () => void
 }
 
-function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
+function FuntionSection({
+  onSearch,
+  onResetAll,
+  onFilterTag,
+  onFilterFaculties,
+}: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
@@ -34,38 +41,54 @@ function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
   })
 
   return (
-    <div className="my-3 w-full max-w-[1650px] m-auto flex items-center gap-5">
-      <div className="h-full w-[593px] mr-auto">
-        <Input
-          size="lg"
-          crossOrigin={undefined}
-          label="Tìm kiếm sự kiện..."
-          placeholder={undefined}
-          icon={<Search />}
-          defaultValue={params.get('title')}
-          {...register('title', {
-            onChange: (e) => onSearch(e.target.value),
-          })}
+    <div className="my-5 w-full max-w-[1650px] m-auto flex items-end justify-between gap-5">
+      <div className="flex gap-5">
+        <div className="h-full w-[593px] mr-auto flex flex-col gap-2">
+          <p className="font-semibold text-md">Tìm kiếm sự kiện </p>
+          <Input
+            size="lg"
+            crossOrigin={undefined}
+            placeholder={undefined}
+            icon={<Search />}
+            defaultValue={params.get('title')}
+            {...register('title', {
+              onChange: (e) => onSearch(e.target.value),
+            })}
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+          />
+        </div>
+
+        <FilterAdmin
+          onFilterTag={onFilterTag}
+          onFilterFaculties={onFilterFaculties}
+          params={{
+            tagsId: params.get('tagsId'),
+            facultyId: params.get('facultyId'),
+          }}
         />
       </div>
+      <div className="flex gap-5">
+        <Link href={'/admin/events/create'}>
+          <Button
+            placeholder={undefined}
+            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+            Tạo mới
+          </Button>
+        </Link>
 
-      <Link href={"/admin/events/create"}>
         <Button
+          onClick={() => {
+            onResetAll()
+            reset()
+          }}
           placeholder={undefined}
-          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-          Tạo mới
+          className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[#E4E4E7] text-white ">
+          <ArrowCounterclockwise className="text-2xl font-bold text-[#3F3F46]" />
         </Button>
-      </Link>
-
-      <Button
-        onClick={() => {
-          onResetAll()
-          reset()
-        }}
-        placeholder={undefined}
-        className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[#E4E4E7] text-white ">
-        <ArrowCounterclockwise className="text-2xl font-bold text-[#3F3F46]" />
-      </Button>
+      </div>
     </div>
   )
 }
@@ -176,16 +199,13 @@ export default function Page() {
         className={`${roboto.className} mx-auto w-[1650px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý sự kiện
       </p>
-      <FuntionSection onSearch={onSearch} onResetAll={onResetAll} />
-      <FilterAdmin
-        witdh={'1650px'}
-        onFilterTag={onFilterTag}
+      <FuntionSection
         onFilterFaculties={onFilterFaculties}
-        params={{
-          tagsId: params.get('tagsId'),
-          facultyId: params.get('facultyId'),
-        }}
+        onFilterTag={onFilterTag}
+        onSearch={onSearch}
+        onResetAll={onResetAll}
       />
+
       <div className="overflow-x-auto">
         <SortHeader onOrder={onOrder} />
         <div className="relative mb-10">

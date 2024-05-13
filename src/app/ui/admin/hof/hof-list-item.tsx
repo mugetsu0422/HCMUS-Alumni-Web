@@ -45,7 +45,7 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
             onDelete(id)
             handleOpen()
           }}>
-          <span>Xác nhận</span>
+          <span>Xóa</span>
         </Button>
       </DialogFooter>
     </Dialog>
@@ -85,7 +85,7 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
             onHideOrShow(id, statusId)
             handleOpen()
           }}>
-          Xác nhận
+          {header}
         </Button>
       </DialogFooter>
     </Dialog>
@@ -160,7 +160,7 @@ export default function HofListItem({ hof }) {
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1400px] m-auto items-center justify-between h-fit flex pl-2 py-2 bg-[--blue-04]`}>
+      className={`${nunito.className} border-2 border-t-0 g border-[--secondary] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -181,24 +181,25 @@ export default function HofListItem({ hof }) {
       <img
         src={hof.thumbnail}
         alt="hall of fame image"
-        className="h-[120px] w-[180px] object-cover object-center"
+        className=" h-[120px] w-[180px] object-cover object-center p-1 border-solid border border-black"
       />
-      <p className="text-lg h-20 w-[220px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex items-center">
+
+      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-center flex items-center">
         {hof.title}
       </p>
-      <p className="text-lg h-20 w-[380px]  p-2 font-[600] text-blackhuỳnh công hiếu  justify-center flex overflow-y-auto scrollbar-webkit-main">
+      <p className="text-lg h-20 w-[380px] font-[600] text-black justify-center flex overflow-y-auto scrollbar-webkit-main">
         {hof.summary}
       </p>
-      <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
         {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
       </p>
-      <p className="text-lg w-[10rem] text-center text-blackhuỳnh công hiếu p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[10rem] text-center text-black font-[600] flex items-center justify-center">
         {hof.faculty?.name}
       </p>
-      <p className="text-lg w-[6rem]  text-center text-blackhuỳnh công hiếu p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[6rem]  text-center text-black font-[600] flex items-center justify-center">
         {hof.beginningYear}
       </p>
-      <p className="text-lg w-[7.5rem]  text-center text-blackhuỳnh công hiếu p-2 font-[600] flex items-center justify-center">
+      <p className="text-lg w-[7.5rem]  text-center text-black font-[600] flex items-center justify-center">
         {hof.views}
       </p>
       <div className="flex justify-end px-2">

@@ -40,28 +40,12 @@ module.exports = withMT({
             height: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
+            background: '#f1f1f100',
             borderRadius: '10px',
           },
 
           '&::-webkit-scrollbar-thumb': {
             backgroundColor: '#c1c1c1',
-            borderRadius: '10px',
-          },
-        },
-
-        '.scrollbar-webkit-invisible': {
-          '&::-webkit-scrollbar': {
-            width: '10px',
-            height: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#ffffff00',
-            borderRadius: '10px',
-          },
-
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#ffffff00c1',
             borderRadius: '10px',
           },
         },

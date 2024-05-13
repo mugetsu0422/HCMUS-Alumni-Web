@@ -21,7 +21,7 @@ interface HeaderFilterProps {
 
 export default function SortHeader({ onOrder }: HeaderFilterProps) {
   return (
-    <div className="w-[1650px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 ">
+    <div className="w-[1650px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 rounded-t-lg">
       <div className="flex w-fit justify-start items-center gap-x-1">
         <Menu>
           <MenuHandler>
@@ -54,10 +54,10 @@ export default function SortHeader({ onOrder }: HeaderFilterProps) {
         <div className="w-[8rem] text-center mr-[10px] py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
           Thẻ
         </div>
-        <div  className="w-[12rem] text-center mr-2 py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+        <div className="w-[12rem] text-center mr-2 py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
           Khoa
         </div>
-      
+
         <Menu>
           <MenuHandler>
             <Button
