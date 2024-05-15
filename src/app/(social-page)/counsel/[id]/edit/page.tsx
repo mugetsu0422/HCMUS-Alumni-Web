@@ -4,18 +4,18 @@
 import React, { useCallback, useState } from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
-import { nunito } from '../../../ui/fonts'
-import ErrorInput from '../../../ui/error-input'
+import { nunito } from '../../../../ui/fonts'
+import ErrorInput from '../../../../ui/error-input'
 import { set, useForm } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
-import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
-import { TAGS, JWT_COOKIE } from '../../../constant'
+import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
+import { TAGS, JWT_COOKIE } from '../../../../constant'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 
-export default function CreatePostDialog() {
+export default function Page() {
   const {
     register,
     handleSubmit,
@@ -186,7 +186,9 @@ export default function CreatePostDialog() {
           className="p-2 rounded-full">
           <ArrowLeft className="text-xl" />
         </Button>
-        <p className="m-auto text-2xl text-black font-bold">Tạo bài viết mới</p>
+        <p className="m-auto text-2xl text-black font-bold">
+          Chỉnh sửa bài viết
+        </p>
       </div>
       {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
 

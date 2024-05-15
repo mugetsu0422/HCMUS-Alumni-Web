@@ -36,6 +36,7 @@ import { COMMENT_PAGE_SIZE, JWT_COOKIE, REACTION_TYPE } from '../../constant'
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
 import ReactDialog from './counsel-react-dialog'
+import { useRouter } from 'next/navigation'
 
 interface CounselPostProps {
   id: string
@@ -84,16 +85,16 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
   const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
     ref,
   })
+  const router = useRouter()
 
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
   }
-
-  const toggleExpand = () => {
-    setIsExpanded((e) => !e)
-  }
   function handleOpenCommentDialog() {
     setOpenCommentsDialog((e) => !e)
+  }
+  const toggleExpand = () => {
+    setIsExpanded((e) => !e)
   }
   const onFetchComments = async (page: number, pageSize: number) => {
     try {
@@ -216,9 +217,11 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
 
           <div className="flex flex-col gap-1">
             <p className="font-bold text-lg">{post.creator.fullName}</p>
-            <p className="text-sm text-[--secondary]">
+            <Link
+              href={`/counsel/${post.id}`}
+              className="text-sm text-[--secondary] hover:underline">
               {moment(post.publishedAt).locale('vi').local().fromNow()}
-            </p>
+            </Link>
           </div>
         </div>
 
@@ -233,6 +236,7 @@ export default function CounselListItem({ post }: { post: CounselPostProps }) {
           </MenuHandler>
           <MenuList placeholder={undefined}>
             <MenuItem
+              onClick={() => router.push(`/counsel/${post.id}/edit`)}
               placeholder={undefined}
               className={`${nunito.className} text-black text-base flex items-center gap-2`}>
               <Pencil />

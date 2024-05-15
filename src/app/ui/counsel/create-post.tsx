@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Avatar, Button } from '@material-tailwind/react'
 
 import Link from 'next/link'
@@ -12,12 +12,6 @@ const user = {
 }
 
 export default function CreatePost() {
-  const [openCreatePost, setOpenCreatePost] = useState(false)
-
-  function handleOpenPost() {
-    setOpenCreatePost((e) => !e)
-  }
-
   return (
     <div className="flex gap-4 items-center">
       <Avatar
@@ -30,7 +24,6 @@ export default function CreatePost() {
         href="/counsel/create"
         className=" w-full bg-blue-gray-50 rounded-full">
         <Button
-          onClick={handleOpenPost}
           placeholder={undefined}
           size="sm"
           variant="text"
