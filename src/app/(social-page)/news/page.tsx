@@ -134,6 +134,7 @@ export default function Page() {
           </p>
 
           <SearchAndFilterFaculty
+            name="tin tức"
             onSearch={onSearch}
             onFilter={onFilter}
             onResetFilter={onResetFilter}
