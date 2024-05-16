@@ -96,6 +96,7 @@ export default function CommentsDialog({
   return (
     <Dialog
       size="lg"
+      className='h-[90dvh] flex flex-col'
       placeholder={undefined}
       open={openCommentsDialog}
       handler={handleOpenCommentDialog}>
@@ -116,7 +117,7 @@ export default function CommentsDialog({
 
       <DialogBody
         placeholder={undefined}
-        className={`${nunito.className} h-[70dvh] overflow-y-auto scrollbar-webkit-main`}>
+        className={`${nunito.className} overflow-y-auto scrollbar-webkit-main`}>
         <div className="flex gap-2 items-center">
           <Link href="#">
             <Avatar
@@ -227,14 +228,14 @@ export default function CommentsDialog({
         placeholder={undefined}
         className="sticky bottom-0 h-fit py-3 bg-white">
         <form
-          className="flex flex-start items-center w-full"
+          className="flex flex-start items-start w-full gap-2"
           onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
           <Avatar placeholder={undefined} src={'/demo.jpg'} alt="avatar user" />
           <Textarea
             rows={1}
             resize={true}
             placeholder="Bình luận của bạn"
-            className="min-h-full !border-0 focus:border-transparent w-full"
+            className="min-h-full !border-0 focus:border-transparent w-full bg-[var(--comment-input)]"
             containerProps={{
               className: 'grid h-full',
             }}

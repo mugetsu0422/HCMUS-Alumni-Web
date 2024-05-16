@@ -6,6 +6,7 @@ export const ADMIN_VERIFY_ALUMNI_PAGE_LIMIT = 10
 export const ADMIN_NEWS_PAGE_LIMIT = 10
 export const COMMENT_PAGE_SIZE = 50
 export const CHILDREN_COMMENTS_PAGE_SIZE = 50
+export const REACTION_PAGE_SIZE = 50
 export const FACULTIES = [
   { id: '1', name: 'Công nghệ Thông tin' },
   { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },

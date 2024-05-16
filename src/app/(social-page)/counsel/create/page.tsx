@@ -11,23 +11,21 @@ import { ReactTags } from 'react-tag-autocomplete'
 import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
 import { TAGS, JWT_COOKIE } from '../../../constant'
 import axios from 'axios'
-import toast from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function CreatePostDialog() {
   const {
     register,
     handleSubmit,
-    trigger,
-    watch,
     formState: { errors },
   } = useForm()
 
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
-  const router = useRouter()
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -178,14 +176,33 @@ export default function CreatePostDialog() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
+      <Toaster
+        containerStyle={{ zIndex: 99999 }}
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
+            },
+          },
+        }}
+      />
       <div className="w-full flex">
-        <Button
-          onClick={() => router.push('/counsel')}
-          placeholder={undefined}
-          variant="text"
-          className="p-2 rounded-full">
-          <ArrowLeft className="text-xl" />
-        </Button>
+        <Link href={'/counsel'}>
+          <Button
+            placeholder={undefined}
+            variant="text"
+            className="p-2 rounded-full">
+            <ArrowLeft className="text-xl" />
+          </Button>
+        </Link>
+
         <p className="m-auto text-2xl text-black font-bold">Tạo bài viết mới</p>
       </div>
       {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
@@ -286,7 +303,7 @@ export default function CreatePostDialog() {
           placeholder={undefined}
           size="lg"
           type="submit"
-          className={`${nunito.className} h-12 w-full text-center py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
+          className={`${nunito.className} h-12 w-full text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
           Đăng
         </Button>
       </form>

@@ -1,17 +1,19 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Avatar,
   Button,
   Dialog,
   DialogBody,
   DialogHeader,
+  Spinner,
 } from '@material-tailwind/react'
 import { XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import { nunito } from '../fonts'
 import 'moment/locale/vi'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 const user = [
   {
@@ -67,9 +69,24 @@ const user = [
 ]
 
 export default function ReactDialog({
+  users,
+  reactionCount,
+  onFetchReation,
   openReactDialog,
   hanldeOpenReactDialog,
 }) {
+  const reactionPage = useRef(0)
+  const [hasMore, setHasMore] = useState(true)
+
+  const onFetchMore = () => {
+    if (users.length >= reactionCount) {
+      setHasMore(false)
+      return
+    }
+    reactionPage.current++
+    onFetchReation(reactionPage.current)
+  }
+
   return (
     <Dialog
       size="xs"
@@ -90,21 +107,34 @@ export default function ReactDialog({
       </DialogHeader>
 
       <DialogBody
+        id="scrollableReaction"
         placeholder={undefined}
         className={`${nunito.className} flex flex-col gap-4 h-[50dvh] overflow-y-auto scrollbar-webkit-main`}>
-        {user.map(({ id, fullName, avatarUrl }) => (
-          <div key={id} className="flex items-center justify-between">
-            <div className="flex gap-3 items-center">
-              <Avatar
-                placeholder={undefined}
-                src={avatarUrl}
-                alt="user avatar"
-              />
-              <p className="text-base text-black font-semibold">{fullName}</p>
+        <InfiniteScroll
+          className="flex flex-col gap-2"
+          dataLength={users.length}
+          next={onFetchMore}
+          hasMore={hasMore}
+          loader={
+            <div className="h-10 flex justify-center ">
+              <Spinner className="h-8 w-8"></Spinner>
             </div>
-            <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-          </div>
-        ))}
+          }
+          scrollableTarget="scrollableParticipants">
+          {users.map(({ creator: { id, fullName, avatarUrl } }) => (
+            <div key={id} className="flex items-center justify-between">
+              <div className="flex gap-3 items-center">
+                <Avatar
+                  placeholder={undefined}
+                  src={avatarUrl}
+                  alt="user-avatar"
+                />
+                <p className="text-base text-black font-semibold">{fullName}</p>
+              </div>
+              <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
+            </div>
+          ))}
+        </InfiniteScroll>
       </DialogBody>
     </Dialog>
   )

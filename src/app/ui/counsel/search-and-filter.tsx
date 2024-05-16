@@ -30,7 +30,7 @@ export default function SearchAndFilter({
   })
 
   return (
-    <div className="flex items-end gap-4 w-fit ml-5 lg:ml-0">
+    <div className="flex items-end gap-4 w-fit ml-5 lg:ml-0 flex-wrap">
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Tìm kiếm</p>
         <Input
