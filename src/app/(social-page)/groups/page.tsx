@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
+import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGroup'
 
 const groups = [
   {
@@ -21,7 +22,7 @@ const groups = [
       name: 'Đặng Nguyễn Duy',
       avatarUrl: '/demo.jpg',
     },
-    type: 'Công khai',
+    privacy: 'Công khai',
     avatarUrl: '/authentication.png',
     coverUrl: '/authentication.png',
     website: '',
@@ -29,6 +30,26 @@ const groups = [
     publicAt: '05-04-2023',
     numberMember: 500,
     isJoined: true,
+    description:
+      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
+
+    friendsInGroup: [
+      {
+        id: '1',
+        fullName: 'Trương Sammuel',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '2',
+        fullName: 'Đặng Nguyễn Duy',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '3',
+        fullName: 'Huỳnh Cao Nguyên',
+        avatarUrl: '/demo.jpg',
+      },
+    ],
   },
   {
     id: '23',
@@ -38,7 +59,7 @@ const groups = [
       name: 'Đặng Nguyễn Duy',
       avatarUrl: '/demo.jpg',
     },
-    type: 'Công khai',
+    privacy: 'Công khai',
     avatarUrl: '/authentication.png',
     coverUrl: '/authentication.png',
     website: '',
@@ -46,6 +67,26 @@ const groups = [
     publicAt: '05-04-2023',
     numberMember: 500,
     isJoined: false,
+    description:
+      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
+
+    friendsInGroup: [
+      {
+        id: '1',
+        fullName: 'Trương Sammuel',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '2',
+        fullName: 'Đặng Nguyễn Duy',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '3',
+        fullName: 'Huỳnh Cao Nguyên',
+        avatarUrl: '/demo.jpg',
+      },
+    ],
   },
   {
     id: '3',
@@ -55,7 +96,7 @@ const groups = [
       name: 'Đặng Nguyễn Duy',
       avatarUrl: '/demo.jpg',
     },
-    type: 'Công khai',
+    privacy: 'Công khai',
     avatarUrl: '/authentication.png',
     coverUrl: '/authentication.png',
     website: '',
@@ -63,6 +104,25 @@ const groups = [
     publicAt: '05-04-2023',
     numberMember: 500,
     isJoined: false,
+    description:
+      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
+    friendsInGroup: [
+      {
+        id: '1',
+        fullName: 'Trương Sammuel',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '2',
+        fullName: 'Đặng Nguyễn Duy',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '3',
+        fullName: 'Huỳnh Cao Nguyên',
+        avatarUrl: '/demo.jpg',
+      },
+    ],
   },
   {
     id: '4',
@@ -72,7 +132,7 @@ const groups = [
       name: 'Đặng Nguyễn Duy',
       avatarUrl: '/demo.jpg',
     },
-    type: 'Công khai',
+    privacy: 'Công khai',
     avatarUrl: '/authentication.png',
     coverUrl: '/authentication.png',
     website: '',
@@ -80,6 +140,25 @@ const groups = [
     publicAt: '05-04-2023',
     numberMember: 500,
     isJoined: true,
+    description:
+      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
+    friendsInGroup: [
+      {
+        id: '1',
+        fullName: 'Trương Sammuel',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '2',
+        fullName: 'Đặng Nguyễn Duy',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '3',
+        fullName: 'Huỳnh Cao Nguyên',
+        avatarUrl: '/demo.jpg',
+      },
+    ],
   },
   {
     id: '5',
@@ -89,7 +168,7 @@ const groups = [
       name: 'Đặng Nguyễn Duy',
       avatarUrl: '/demo.jpg',
     },
-    type: 'Công khai',
+    privacy: 'Công khai',
     avatarUrl: '/authentication.png',
     coverUrl: '/authentication.png',
     website: '',
@@ -97,12 +176,29 @@ const groups = [
     publicAt: '05-04-2023',
     numberMember: 500,
     isJoined: false,
+    description:
+      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
+    friendsInGroup: [
+      {
+        id: '1',
+        fullName: 'Trương Sammuel',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '2',
+        fullName: 'Đặng Nguyễn Duy',
+        avatarUrl: '/demo.jpg',
+      },
+      {
+        id: '3',
+        fullName: 'Huỳnh Cao Nguyên',
+        avatarUrl: '/demo.jpg',
+      },
+    ],
   },
 ]
 
 export default function Page() {
-  const pathname = usePathname()
-  const { replace } = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
@@ -114,23 +210,6 @@ export default function Page() {
     params.delete('page')
     setCurPage(1)
   }
-
-  const onSearch = useDebouncedCallback((keyword) => {
-    if (keyword) {
-      params.set('name', keyword)
-    } else {
-      params.delete('name')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
-  }, 500)
-
-  const { register, reset } = useForm({
-    defaultValues: {
-      name: params.get('name'),
-    },
-  })
 
   useEffect(() => {
     // News groups
@@ -158,52 +237,10 @@ export default function Page() {
           className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
           NHÓM
         </p>
-
-        <div className="flex flex-col gap-2">
-          <p className="font-semibold text-md">Tìm kiếm nhóm</p>
-          <Input
-            size="lg"
-            crossOrigin={undefined}
-            placeholder={undefined}
-            containerProps={{ className: '!w-[500px]' }}
-            {...register('name', {
-              onChange: (e) => onSearch(e.target.value),
-            })}
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-          />
-        </div>
-
-        {groups.map(
-          ({
-            id,
-            name,
-            creator,
-            type,
-            avatarUrl,
-            coverUrl,
-            website,
-            status,
-            numberMember,
-            isJoined,
-          }) => (
-            <GroupsListItem
-              key={id}
-              id={id}
-              name={name}
-              creator={creator}
-              type={type}
-              avatarUrl={avatarUrl}
-              coverUrl={coverUrl}
-              website={website}
-              status={status}
-              numberMember={numberMember}
-              isJoined={isJoined}
-            />
-          )
-        )}
+        <SearchAndFilterGroups />
+        {groups.map((group) => (
+          <GroupsListItem key={group.id} group={group} />
+        ))}
       </div>
     </>
   )
