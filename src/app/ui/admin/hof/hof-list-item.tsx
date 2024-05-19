@@ -188,7 +188,7 @@ export default function HofListItem({ hof }) {
         {hof.title}
       </p>
       <p className="text-lg h-20 w-[380px] font-[600] text-black justify-center flex overflow-y-auto scrollbar-webkit-main">
-        {hof.summary}
+        {hof.position}
       </p>
       <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
         {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}

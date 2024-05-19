@@ -17,19 +17,6 @@ import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
 
-// const hofTemp = {
-//   id: '1',
-//   thumbnail: '/authentication.png',
-//   title: 'Nguyễn Mai Hoàng Quang Huy',
-//   summary:
-//     'Từng có cơ hội làm việc cho Google nhưng Lê Yên Thanh từ chối để ở lại Việt Nam đầu quân cho một số startup, sau đó khởi nghiệp với BusMap',
-//   publishedAt: '08-05-2024',
-//   beginningYear: '2016',
-//   faculty: { name: 'Sinh học - Công nghệ sinh học' },
-//   views: '100',
-//   status: { name: 'Chờ' },
-// }
-
 function FuntionSection({
   onSearch,
   onResetSearchAndFilter,

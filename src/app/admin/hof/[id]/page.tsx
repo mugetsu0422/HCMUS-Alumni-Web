@@ -166,9 +166,9 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // if (noData) {
-  //   return <NoData />
-  // }
+  if (noData) {
+    return <NoData />
+  }
 
   return (
     <div
@@ -338,6 +338,30 @@ export default function Page({ params }: { params: { id: string } }) {
                 className: 'before:content-none after:content-none',
               }}
               {...register('summary', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Thông tin nổi bật
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('position', {
                 onChange: (e) => setSummaryCharCount(e.target.value.length),
               })}
             />

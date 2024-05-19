@@ -332,6 +332,30 @@ export default function Page() {
           </div>
 
           <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Thông tin nổi bật
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('position', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
             <TextEditor
               readOnly={false}
               content={content}
