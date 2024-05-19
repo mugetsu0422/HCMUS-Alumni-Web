@@ -4,6 +4,7 @@ import React, {
   FormEventHandler,
   createContext,
   useContext,
+  useRef,
   useState,
 } from 'react'
 import { Avatar, Button, Spinner, Textarea } from '@material-tailwind/react'
@@ -12,6 +13,7 @@ import { Chat } from 'react-bootstrap-icons'
 import moment from 'moment'
 import clsx from 'clsx'
 import 'moment/locale/vi'
+import { CHILDREN_COMMENTS_PAGE_SIZE } from '../../../constant'
 
 const CommentsConxtext = createContext<CommentsContextProps>(null)
 
@@ -32,7 +34,11 @@ type UploadCommentHandler = (
   parentId: string | null,
   content: string
 ) => any
-type FetchChildrenCommentsHandler = (parentId: string) => any
+type FetchChildrenCommentsHandler = (
+  parentId: string,
+  page: number,
+  pageSize: number
+) => any
 
 interface CommentsContextProps {
   onUploadComment: UploadCommentHandler
@@ -75,7 +81,7 @@ function ChildrenComments({ comment }: ChildrenCommentsProps) {
         />
         <p>{comment?.creator.fullName}</p>
       </div>
-      <p className="sm:pl-8 lg:pl-12">{comment?.content}</p>
+      <p className="sm:pl-8 lg:pl-12 whitespace-pre-line">{comment?.content}</p>
       <Button
         onClick={() => setIsOpenInputComments((e) => !e)}
         placeholder={undefined}
@@ -117,6 +123,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
   const [isOpenInputComments, setIsOpenInputComments] = useState(false)
   const [uploadComment, setUploadComment] = useState('')
   const [childrenComments, setChildrenComments] = useState([])
+  const childrenCommentPage = useRef(0)
   const [isLoading, setIsLoading] = useState(false)
   const { onUploadComment, onFetchChildrenComments } =
     useContext(CommentsConxtext)
@@ -125,13 +132,30 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
   const handleUploadCommentChange = (event) => {
     setUploadComment(event.target.value)
   }
-  const onShowChildrenComments = async () => {
+  const onShowChildrenComments = async (page: number, pageSize: number) => {
     setIsLoading(true)
 
-    const childrenComments = await onFetchChildrenComments(comment.id)
-    setChildrenComments(childrenComments)
+    const fetchedChildrenComments = await onFetchChildrenComments(
+      comment.id,
+      page,
+      pageSize
+    )
 
+    setIsLoading(false)
+    setChildrenComments(childrenComments.concat(fetchedChildrenComments))
     setIsOpenComments((e) => !e)
+  }
+  const onShowMoreChildrenComments = async (page: number, pageSize: number) => {
+    setIsLoading(true)
+
+    const fetchedChildrenComments = await onFetchChildrenComments(
+      comment.id,
+      page,
+      pageSize
+    )
+
+    setIsLoading(false)
+    setChildrenComments(childrenComments.concat(fetchedChildrenComments))
   }
 
   return (
@@ -151,11 +175,15 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
             placeholder={undefined}
           />
           <div className="w-full">
-            <p className="text-lg font-bold">{comment.creator.fullName}</p>
+            <p className="text-lg font-bold text-black">
+              {comment.creator.fullName}
+            </p>
             <p className="text-[var(--secondary)]">
               {moment(comment.createAt).locale('vi').local().fromNow()}
             </p>
-            <p className="">{comment.content}</p>
+            <p className="text-black font-normal whitespace-pre-line">
+              {comment.content}
+            </p>
             <Button
               onClick={() => setIsOpenInputComments((e) => !e)}
               placeholder={undefined}
@@ -190,7 +218,9 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
             )}
             {comment.childrenCommentNumber > 0 && !isOpenComments && (
               <div
-                onClick={onShowChildrenComments}
+                onClick={() =>
+                  onShowChildrenComments(0, CHILDREN_COMMENTS_PAGE_SIZE)
+                }
                 className="w-fit flex gap-2 text-[--secondary] hover:underline hover:cursor-pointer">
                 Xem {comment.childrenCommentNumber} phản hồi
                 {isLoading && <Spinner className="w-4" />}
@@ -208,6 +238,25 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
               />
             )
           })}
+          {isOpenComments &&
+            childrenComments.length != comment.childrenCommentNumber && (
+              <div
+                onClick={() =>
+                  onShowMoreChildrenComments(
+                    ++childrenCommentPage.current,
+                    CHILDREN_COMMENTS_PAGE_SIZE
+                  )
+                }
+                className="group w-full flex gap-2 text-[--secondary] justify-between">
+                <span className="group-hover:underline group-hover:cursor-pointer flex gap-3">
+                  Xem thêm phản hồi
+                  {isLoading && <Spinner className="w-4" />}
+                </span>
+                <span>
+                  {childrenComments.length}/{comment.childrenCommentNumber}
+                </span>
+              </div>
+            )}
         </div>
       </div>
       {/* {isOpenInputComments && depth >= 2 && (
