@@ -165,7 +165,7 @@ export default function NewsListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1184px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
+      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1220px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -183,12 +183,14 @@ export default function NewsListItem({
           },
         }}
       />
-      <img
-        src={imgSrc}
-        alt="news image"
-        className="h-[120px] w-[180px] object-cover object-center rounded-lg  p-1 border-solid border border-black"
-      />
-      <p className="h-20 w-[350px] p-2 font-[600] text-black align-middle flex items-center">
+      <div className="h-[120px] w-[180px]">
+        <img
+          src={imgSrc}
+          alt="news image"
+          className="h-full w-full object-cover object-center rounded-lg p-1 border-solid border border-black"
+        />
+      </div>
+      <p className="h-20 w-[250px] p-2 font-[600] text-black align-middle flex items-center">
         {name}
       </p>
 
@@ -199,7 +201,7 @@ export default function NewsListItem({
           })}
       </p>
 
-      <p className="w-[12rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
+      <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
         {faculty ? faculty.name : 'Tất cả'}
       </p>
       <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">

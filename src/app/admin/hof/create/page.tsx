@@ -70,6 +70,7 @@ export default function Page() {
     const hof = {
       title: data.title,
       thumbnail: data.thumbnail[0],
+      position: data.position,
       summary: data.summary,
       emailOfUser: data.emailOfUser || null,
       facultyId: data.facultyId || null,
