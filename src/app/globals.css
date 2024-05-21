@@ -22,6 +22,7 @@
     --cocoa-brown: #1e1515;
     --cocoa-brown-20: #1e151533;
     --layer: #183b5642; /* Màu nền của chữ sau bản tin */
+    --comment-input: #f0f2f5;
 }
 
 @media (prefers-color-scheme: dark) {
