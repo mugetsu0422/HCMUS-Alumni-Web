@@ -16,14 +16,14 @@ import {
 } from '@material-tailwind/react'
 export default function SortHeader({ onOrder }) {
   return (
-    <div className="w-[1184px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 ">
+    <div className="w-[1400px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 rounded-t-lg">
       <div className="flex w-fit justify-evenly items-center ">
         <Menu>
           <MenuHandler>
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[520px] ml-4 text-center mr-2 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+              className="w-[380px] ml-2 text-center mr-1 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
               Gương thành công
               <CaretDownFill />
             </Button>
@@ -45,13 +45,44 @@ export default function SortHeader({ onOrder }) {
             </MenuItem>
           </MenuList>
         </Menu>
+        <p className="w-[350px] ml-2 text-center mr-2 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+          Nổi bật
+        </p>
 
         <Menu>
           <MenuHandler>
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[9rem] text-center ml-2 mr-5 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+              className="w-[8rem] text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+              Ngày đăng
+              <CaretDownFill />
+            </Button>
+          </MenuHandler>
+          <MenuList placeholder={undefined}>
+            <MenuItem
+              placeholder={undefined}
+              onClick={() => onOrder('publishedAt', 'desc')}
+              className="text-center font-bold flex justify-center">
+              Mới nhất
+              <ArrowDown />
+            </MenuItem>
+            <MenuItem
+              placeholder={undefined}
+              onClick={() => onOrder('publishedAt', 'asc')}
+              className="text-center font-bold flex justify-center">
+              Cũ nhất
+              <ArrowUp />
+            </MenuItem>
+          </MenuList>
+        </Menu>
+
+        <Menu>
+          <MenuHandler>
+            <Button
+              placeholder={undefined}
+              variant="text"
+              className="w-[9rem] text-center ml-2 mr-2 p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
               Khoa
               <CaretDownFill />
             </Button>
@@ -79,8 +110,8 @@ export default function SortHeader({ onOrder }) {
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[9rem] text-center p-1 mr-2 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-              Niên khóa
+              className="w-[6rem] text-center p-1 mr-2 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+              Khóa
               <CaretDownFill />
             </Button>
           </MenuHandler>

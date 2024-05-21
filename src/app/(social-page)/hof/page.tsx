@@ -48,7 +48,7 @@ function SearchAndFilter({
   })
 
   return (
-    <div className="flex flex-col gap-4 w-fit ml-5 lg:ml-0">
+    <div className="flex items-end gap-2 w-fit ml-5 lg:ml-0">
       <Input
         size="lg"
         crossOrigin={undefined}
@@ -106,7 +106,7 @@ function SearchAndFilter({
         <Button
           onClick={() => {
             onResetFilter()
-            reset({ facultyId: 0, beginningYear: null})
+            reset({ facultyId: 0, beginningYear: null })
           }}
           placeholder={undefined}
           className="bg-[--blue-02] w-fit normal-case text-sm flex items-center gap-1">
@@ -137,7 +137,8 @@ function HofListItem({ hof }) {
         {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
         {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
       </p>
-      <p>{hof.summary}</p>
+      <p className="w-full text-center text-black font-semibold">{hof.position}</p>
+      <p className="text-sm">{hof.summary}</p>
     </div>
   )
 }
@@ -231,6 +232,7 @@ export default function Page() {
       .then(({ data: { totalPages, hof } }) => {
         setTotalPages(totalPages)
         setHof(hof)
+        console.log(hof)
       })
       .catch()
   }, [myParams])

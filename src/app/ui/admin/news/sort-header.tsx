@@ -21,7 +21,7 @@ interface HeaderProps {
 
 export default function SortHeader({ onOrder }: HeaderProps) {
   return (
-    <div className="w-[1184px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 ">
+    <div className="w-[1220px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 rounded-t-lg">
       <div className="flex w-fit justify-evenly items-center">
         <Menu>
           <MenuHandler>
@@ -90,7 +90,7 @@ export default function SortHeader({ onOrder }: HeaderProps) {
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[7rem] text-center p-1 flex items-center justify-center gap-2 font-bold normal-case text-base text-[#000000]">
+              className="w-[10rem] text-center p-1 flex items-center justify-center gap-2 font-bold normal-case text-base text-[#000000]">
               Lượt xem
               <CaretDownFill />
             </Button>

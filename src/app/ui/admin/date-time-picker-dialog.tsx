@@ -152,14 +152,14 @@ export default function DateTimeLocalPickerDialog({
             onClick={handleOpen}
             placeholder={undefined}
             size="lg"
-            className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
+            className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
             Hủy
           </Button>
           <Button
             onClick={onSubmit}
             placeholder={undefined}
             size="lg"
-            className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
+            className={`${nunito.className} bg-green-800 normal-case text-md`}>
             Lên lịch
           </Button>
         </div>

@@ -33,18 +33,18 @@ function CancelDialog({ open, handleOpen }) {
       </DialogBody>
       <DialogFooter placeholder={undefined}>
         <Button
-          className={`${nunito.className} mr-4 bg-[var(--secondary)] text-black normal-case text-md`}
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
           placeholder={undefined}
           onClick={handleOpen}>
-          <span>Không</span>
+          Không
         </Button>
         <Button
-          className={`${nunito.className} bg-[var(--blue-05)] text-white normal-case text-md`}
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           placeholder={undefined}
           onClick={() => {
             router.push('/admin/news')
           }}>
-          <span>Hủy</span>
+          Hủy
         </Button>
       </DialogFooter>
     </Dialog>
@@ -70,6 +70,7 @@ export default function Page() {
     const hof = {
       title: data.title,
       thumbnail: data.thumbnail[0],
+      position: data.position,
       summary: data.summary,
       emailOfUser: data.emailOfUser || null,
       facultyId: data.facultyId || null,
@@ -332,6 +333,30 @@ export default function Page() {
           </div>
 
           <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Thông tin nổi bật
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('position', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
             <TextEditor
               readOnly={false}
               content={content}
@@ -344,7 +369,7 @@ export default function Page() {
               onClick={handleOpenCancelDialog}
               placeholder={undefined}
               size="lg"
-              className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
+              className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
             <CancelDialog
@@ -362,7 +387,7 @@ export default function Page() {
               }}
               placeholder={undefined}
               size="lg"
-              className={`${nunito.className}  bg-[var(--blue-03)] text-[--blue-02] normal-case text-md`}>
+              className={`${nunito.className}  bg-green-800 text-[white] normal-case text-md`}>
               Lên lịch
             </Button>
             <DateTimeLocalPickerDialog

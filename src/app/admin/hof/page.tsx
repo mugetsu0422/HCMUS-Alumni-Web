@@ -7,7 +7,7 @@ import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import { JWT_COOKIE } from '../../constant'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ArrowCounterclockwise } from 'react-bootstrap-icons'
+import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -17,8 +17,12 @@ import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
 
-function FuntionSection({ onSearch, onResetSearchAndFilter }) {
-  const router = useRouter()
+function FuntionSection({
+  onSearch,
+  onResetSearchAndFilter,
+  onFilterFaculties,
+  onFilterBeginningYear,
+}) {
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const { register, reset } = useForm({
@@ -28,37 +32,54 @@ function FuntionSection({ onSearch, onResetSearchAndFilter }) {
   })
 
   return (
-    <div className="my-5 w-[1184px] m-auto flex items-center gap-5">
-      <div className="h-full w-[500px] mr-auto">
-        <Input
-          size="lg"
-          crossOrigin={undefined}
-          label="Tìm kiếm bài viết..."
-          placeholder={undefined}
-          defaultValue={params.get('title')}
-          {...register('title', {
-            onChange: (e) => onSearch(e.target.value),
-          })}
+    <div className="my-5 w-full max-w-[1400px] m-auto justify-between flex items-end gap-5 flex-wrap">
+      <div className="flex gap-5 w-fit justify-start flex-wrap">
+        <div className="h-full w-[500px] mr-auto flex flex-col gap-2">
+          <p className="font-semibold text-md">Tìm kiếm bài viết</p>
+          <Input
+            size="lg"
+            crossOrigin={undefined}
+            placeholder={undefined}
+            icon={<Search />}
+            defaultValue={params.get('title')}
+            {...register('title', {
+              onChange: (e) => onSearch(e.target.value),
+            })}
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+          />
+        </div>
+
+        <FilterAdmin
+          onFilterFaculties={onFilterFaculties}
+          onFilterBeginningYear={onFilterBeginningYear}
+          params={{
+            facultyId: params.get('facultyId'),
+            beginningYear: params.get('beginningYear'),
+          }}
         />
       </div>
 
-      <Link href={'/admin/hof/create'}>
+      <div className="flex gap-5">
+        <Link href={'/admin/hof/create'}>
+          <Button
+            placeholder={undefined}
+            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+            Tạo mới
+          </Button>
+        </Link>
         <Button
+          onClick={() => {
+            onResetSearchAndFilter()
+            reset()
+          }}
           placeholder={undefined}
-          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-          Tạo mới
-        </Button>
-      </Link>
-
-      <Button
-        onClick={() => {
-          onResetSearchAndFilter()
-          reset()
-        }}
-        placeholder={undefined}
-        className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[#E4E4E7] text-white ">
-        <ArrowCounterclockwise className="text-2xl font-bold text-[#3F3F46]" />
-      </Button>
+          className="rounded-full p-3 h-full font-bold normal-case text-base min-w-fit bg-[#E4E4E7] text-white ">
+          <ArrowCounterclockwise className="text-2xl font-bold text-[#3F3F46]" />
+        </Button>{' '}
+      </div>
     </div>
   )
 }
@@ -159,19 +180,17 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
       <p
-        className={`${roboto.className} mx-auto w-[1184px] text-3xl font-bold text-[var(--blue-01)]`}>
+        className={`${roboto.className} mx-auto w-full max-w-[1400px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
-      <FuntionSection onSearch={onSearch} onResetSearchAndFilter={onResetAll} />
-      <FilterAdmin
-        witdh={'1184px'}
+
+      <FuntionSection
+        onSearch={onSearch}
+        onResetSearchAndFilter={onResetAll}
         onFilterFaculties={onFilterFaculties}
         onFilterBeginningYear={onFilterBeginningYear}
-        params={{
-          facultyId: params.get('facultyId'),
-          beginningYear: params.get('beginningYear'),
-        }}
       />
+
       <div className="overflow-x-auto">
         <SortHeader onOrder={onOrder} />
         <div className="relative mb-10">

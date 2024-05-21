@@ -52,18 +52,18 @@ function CancelDialog({ open, handleOpen }) {
       </DialogBody>
       <DialogFooter placeholder={undefined}>
         <Button
-          className={`${nunito.className} mr-4 bg-[var(--secondary)] text-black normal-case text-md`}
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
           placeholder={undefined}
           onClick={handleOpen}>
-          <span>Không</span>
+          Không
         </Button>
         <Button
-          className={`${nunito.className} bg-[var(--blue-05)] text-white normal-case text-md`}
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           placeholder={undefined}
           onClick={() => {
             router.push('/admin/events')
           }}>
-          <span>Hủy</span>
+          Hủy
         </Button>
       </DialogFooter>
     </Dialog>
@@ -412,7 +412,7 @@ export default function Page() {
               onClick={handleOpenCancelDialog}
               placeholder={undefined}
               size="lg"
-              className={`${nunito.className} bg-[var(--secondary)] text-black normal-case text-md`}>
+              className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
             <CancelDialog
