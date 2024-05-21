@@ -186,7 +186,7 @@ export default function HofListItem({ hof }) {
         />
       </div>
 
-      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-center flex items-center text-wrap">
+      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-start flex items-center text-wrap">
         {hof.title}
       </p>
       <p className="text-lg h-20 w-[325px] font-[600] text-black justify-center flex items-center overflow-y-auto scrollbar-webkit-main">
