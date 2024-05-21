@@ -137,7 +137,7 @@ function HofListItem({ hof }) {
         {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
         {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
       </p>
-      <p className="text-sm">{hof.position}demo thông tin nổi bật</p>
+      <p className="w-full text-center text-black font-semibold">{hof.position}</p>
       <p className="text-sm">{hof.summary}</p>
     </div>
   )

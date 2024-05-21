@@ -72,15 +72,17 @@ export default function Page({ params }: { params: { id: string } }) {
                 className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
               />
             </div>
-            <p
-              className={`${nunito.className} 2xl:text-[28px] sm:text-lg lg:text-2xl font-bold text-center`}>
-              {hof.title}
-            </p>
-            <p className="font-semibold text-center">
-              {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
-              {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
-            </p>
-            {hof.position && <p>{hof.position}</p>}
+            <div className="flex gap-2 flex-col w-4/5 m-auto">
+              <p
+                className={`${nunito.className} 2xl:text-[28px] sm:text-lg lg:text-2xl font-bold text-center`}>
+                {hof.title}
+              </p>
+              <p className="font-semibold text-center">
+                {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
+                {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
+              </p>
+              <p className="font-semibold text-center">{hof.position}</p>
+            </div>
             <div
               className="flex flex-col gap-4 ql-editor sm:text:md lg:text-base text-justify"
               dangerouslySetInnerHTML={{ __html: hof.content }}></div>
