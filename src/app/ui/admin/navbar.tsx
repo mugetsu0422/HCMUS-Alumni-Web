@@ -20,6 +20,7 @@ import {
   faCalendarDays,
   faCertificate,
   faComments,
+  faUserPen,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
@@ -55,6 +56,12 @@ const navListItems = [
     subMenu: null,
     icon: faComments,
     link: '#',
+  },
+  {
+    label: 'Quản lý quyền',
+    subMenu: null,
+    icon: faUserPen,
+    link: '/admin/role-permission',
   },
 ]
 

@@ -7,7 +7,7 @@ import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import { JWT_COOKIE } from '../../constant'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { ArrowCounterclockwise } from 'react-bootstrap-icons'
+import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -16,19 +16,6 @@ import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
-
-// const hofTemp = {
-//   id: '1',
-//   thumbnail: '/authentication.png',
-//   title: 'Nguyễn Mai Hoàng Quang Huy',
-//   summary:
-//     'Từng có cơ hội làm việc cho Google nhưng Lê Yên Thanh từ chối để ở lại Việt Nam đầu quân cho một số startup, sau đó khởi nghiệp với BusMap',
-//   publishedAt: '08-05-2024',
-//   beginningYear: '2016',
-//   faculty: { name: 'Sinh học - Công nghệ sinh học' },
-//   views: '100',
-//   status: { name: 'Chờ' },
-// }
 
 function FuntionSection({
   onSearch,
@@ -45,14 +32,15 @@ function FuntionSection({
   })
 
   return (
-    <div className="my-5 w-[1400px] m-auto justify-between flex items-end gap-5">
-      <div className="flex gap-5 w-fit justify-start">
+    <div className="my-5 w-full max-w-[1400px] m-auto justify-between flex items-end gap-5 flex-wrap">
+      <div className="flex gap-5 w-fit justify-start flex-wrap">
         <div className="h-full w-[500px] mr-auto flex flex-col gap-2">
           <p className="font-semibold text-md">Tìm kiếm bài viết</p>
           <Input
             size="lg"
             crossOrigin={undefined}
             placeholder={undefined}
+            icon={<Search />}
             defaultValue={params.get('title')}
             {...register('title', {
               onChange: (e) => onSearch(e.target.value),
@@ -192,7 +180,7 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
       <p
-        className={`${roboto.className} mx-auto w-[1400px] text-3xl font-bold text-[var(--blue-01)]`}>
+        className={`${roboto.className} mx-auto w-full max-w-[1400px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
       </p>
 
