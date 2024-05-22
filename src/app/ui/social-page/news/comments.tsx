@@ -7,9 +7,18 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Avatar, Button, Spinner, Textarea } from '@material-tailwind/react'
+import {
+  Avatar,
+  Button,
+  Spinner,
+  Textarea,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+} from '@material-tailwind/react'
 import { nunito } from '../../fonts'
-import { Chat } from 'react-bootstrap-icons'
+import { Chat, ThreeDots, Pencil, Trash } from 'react-bootstrap-icons'
 import moment from 'moment'
 import clsx from 'clsx'
 import 'moment/locale/vi'
@@ -125,6 +134,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
   const [childrenComments, setChildrenComments] = useState([])
   const childrenCommentPage = useRef(0)
   const [isLoading, setIsLoading] = useState(false)
+  const [openEditComment, setOpenEditComment] = useState(false)
   const { onUploadComment, onFetchChildrenComments } =
     useContext(CommentsConxtext)
 
@@ -174,23 +184,100 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
             alt="avatar user"
             placeholder={undefined}
           />
-          <div className="w-full">
-            <p className="text-lg font-bold text-black">
-              {comment.creator.fullName}
-            </p>
-            <p className="text-[var(--secondary)]">
-              {moment(comment.createAt).locale('vi').local().fromNow()}
-            </p>
-            <p className="text-black font-normal whitespace-pre-line">
-              {comment.content}
-            </p>
-            <Button
-              onClick={() => setIsOpenInputComments((e) => !e)}
-              placeholder={undefined}
-              variant="text"
-              className="py-2 px-0 gap-2 w-fit flex items-center normal-case">
-              <Chat className="font-bold text-lg" /> Bình luận
-            </Button>
+          <div className="w-full ">
+            <div className="flex items-center gap-1 w-full">
+              <div className="w-fit h-fit bg-[#f0f2f5] p-3 rounded-lg">
+                <p className="text-lg font-bold text-black">
+                  {comment.creator.fullName}
+                </p>
+                {openEditComment ? (
+                  <>
+                    <form
+                      onSubmit={(e) =>
+                        onUploadComment(e, comment.id, uploadComment)
+                      }
+                      className="sm:w-[350px] lg:w-[650px] 2xl:w-[910px]">
+                      <Textarea
+                        defaultValue={comment.content}
+                        //value={}
+                        placeholder="Bình luận"
+                        resize={true}
+                        onChange={handleUploadCommentChange}
+                        className="mt-2 h-[100px] w-full bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                        labelProps={{
+                          className:
+                            'w-[93%] before:content-none after:content-none w-fit',
+                        }}
+                      />
+                      <div className="flex justify-end gap-x-4 pt-2 mr-2">
+                        <Button
+                          onClick={() => setOpenEditComment((e) => !e)}
+                          placeholder={undefined}
+                          size="md"
+                          variant="text"
+                          className={`${nunito.className} py-2 px-4 text-black normal-case text-md`}>
+                          Hủy
+                        </Button>
+                        <Button
+                          placeholder={undefined}
+                          size="md"
+                          type="submit"
+                          disabled={!uploadComment.trim()}
+                          className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+                          Đăng
+                        </Button>
+                      </div>
+                    </form>
+                  </>
+                ) : (
+                  <p className="text-black font-normal whitespace-pre-line">
+                    {comment.content}
+                  </p>
+                )}
+              </div>
+
+              {!openEditComment && (
+                <Menu placement="bottom-end">
+                  <MenuHandler>
+                    <Button
+                      placeholder={undefined}
+                      variant="text"
+                      className="rounded-full h-fit p-2">
+                      <ThreeDots className="text-lg text-black" />
+                    </Button>
+                  </MenuHandler>
+                  <MenuList placeholder={undefined}>
+                    <MenuItem
+                      onClick={() => setOpenEditComment((e) => !e)}
+                      placeholder={undefined}
+                      className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+                      <Pencil />
+                      <p>Chỉnh sửa bình luận</p>
+                    </MenuItem>
+                    <MenuItem
+                      //onClick={onDeletePost}
+                      placeholder={undefined}
+                      className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+                      <Trash />
+                      <p>Xóa bình luận</p>
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              )}
+            </div>
+
+            <div className="flex gap-4 items-center">
+              <p className="text-[var(--secondary)]">
+                {moment(comment.createAt).locale('vi').local().fromNow()}
+              </p>
+              <div
+                onClick={() => setIsOpenInputComments((e) => !e)}
+                className="py-2 px-4 gap-2 w-fit flex items-center normal-case hover:cursor-pointer hover:underline">
+                <Chat className="font-bold text-lg" />
+                <p>Bình luận</p>
+              </div>
+            </div>
+
             {isOpenInputComments && (
               <form
                 onSubmit={(e) => onUploadComment(e, comment.id, uploadComment)}>
