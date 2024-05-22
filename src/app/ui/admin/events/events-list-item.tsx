@@ -179,11 +179,13 @@ export default function EventsListItem({
           },
         }}
       />
-      <img
-        src={thumbnail}
-        alt="news image"
-        className="h-[120px] w-[180px] object-cover object-center rounded-lg  p-1 border-solid border border-black"
-      />
+      <div className="h-[120px] w-[180px]">
+        <img
+          src={thumbnail}
+          alt="news image"
+          className="h-full w-full object-cover object-center rounded-lg  p-1 border-solid border border-black"
+        />
+      </div>
       <p className="h-20 px-2 w-[350px] py-2 font-[600] text-black align-middle flex items-center">
         {title}
       </p>

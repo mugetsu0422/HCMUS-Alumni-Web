@@ -25,7 +25,7 @@ export default function FilterAdmin({
   })
 
   return (
-    <div className={`w-fit m-auto flex items-end gap-5`}>
+    <div className={`w-fit flex items-end gap-5`}>
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Khoa</p>
         <select

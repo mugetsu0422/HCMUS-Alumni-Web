@@ -38,8 +38,8 @@ function FuntionSection({
   })
 
   return (
-    <div className="my-5 w-full max-w-[1184px] justify-between flex items-end gap-5 m-auto">
-      <div className="flex gap-5 w-fit justify-start">
+    <div className="my-5 w-full max-w-[1220px] justify-between flex flex-wrap items-end gap-5 m-auto">
+      <div className="flex gap-5 w-fit justify-start flex-wrap">
         <div className="h-full w-[500px] mr-auto flex flex-col gap-2">
           <p className="font-semibold text-md">Tìm kiếm tin tức</p>
 
@@ -185,7 +185,7 @@ export default function Page() {
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
       <p
-        className={`${roboto.className} mx-auto max-w-[1184px] w-full text-3xl font-bold text-[var(--blue-01)]`}>
+        className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý tin tức
       </p>
       <FuntionSection

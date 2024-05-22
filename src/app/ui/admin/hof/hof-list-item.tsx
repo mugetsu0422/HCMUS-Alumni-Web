@@ -178,22 +178,24 @@ export default function HofListItem({ hof }) {
           },
         }}
       />
-      <img
-        src={hof.thumbnail}
-        alt="hall of fame image"
-        className=" h-[120px] w-[180px] object-cover object-center p-1 border-solid border border-black"
-      />
+      <div className="h-[120px] w-[180px]">
+        <img
+          src={hof.thumbnail}
+          alt="hall of fame image"
+          className="h-full w-full object-cover object-center p-1 border-solid border border-black"
+        />
+      </div>
 
-      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-center flex items-center">
+      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-start flex items-center text-wrap">
         {hof.title}
       </p>
-      <p className="text-lg h-20 w-[380px] font-[600] text-black justify-center flex overflow-y-auto scrollbar-webkit-main">
-        {hof.summary}
+      <p className="text-lg h-20 w-[325px] font-[600] text-black justify-center flex items-center overflow-y-auto scrollbar-webkit-main">
+        {hof.position}
       </p>
       <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
         {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
       </p>
-      <p className="text-lg w-[10rem] text-center text-black font-[600] flex items-center justify-center">
+      <p className="text-lg w-[8rem] text-center text-black font-[600] flex items-center justify-center">
         {hof.faculty?.name}
       </p>
       <p className="text-lg w-[6rem]  text-center text-black font-[600] flex items-center justify-center">

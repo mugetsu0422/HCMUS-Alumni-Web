@@ -212,9 +212,13 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.error('Đăng thất bại', { id: postCommentToast })
       })
   }
-  const onFetchChildrenComments = async (parentId: string) => {
+  const onFetchChildrenComments = async (
+    parentId: string,
+    page: number,
+    pageSize: number
+  ) => {
     const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/comments/${parentId}/children`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/comments/${parentId}/children?page=${page}&pageSize=${pageSize}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -279,9 +283,11 @@ export default function Page({ params }: { params: { id: string } }) {
 
   // Fetch more comments
   useEffect(() => {
+    if (!commentPage) return
+
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments?page=${commentPage}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments?page=${commentPage}&pageSize=50`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
