@@ -232,7 +232,6 @@ export default function Page() {
       .then(({ data: { totalPages, hof } }) => {
         setTotalPages(totalPages)
         setHof(hof)
-        console.log(hof)
       })
       .catch()
   }, [myParams])
