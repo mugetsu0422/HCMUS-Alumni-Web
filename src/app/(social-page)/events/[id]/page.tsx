@@ -17,7 +17,7 @@ import {
   Spinner,
   Textarea,
 } from '@material-tailwind/react'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
@@ -26,7 +26,7 @@ import { XLg } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import Comments from '../../../ui/social-page/news/comments'
+import Comments from '../../../ui/common/comments'
 
 const PARTICIPANT_FETCH_LIMIT = 50
 
@@ -233,7 +233,41 @@ export default function Page({ params }: { params: { id: string } }) {
   const onFetchComments = () => {
     setCommentPage((commentPage) => commentPage + 1)
   }
+  const onEditComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    commentId: string,
+    content: string
+  ): Promise<AxiosResponse<any, any>> => {
+    e.preventDefault()
+    const comment = {
+      content: content,
+    }
 
+    return axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/comments/${commentId}`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onDeleteComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    commentId: string
+  ): Promise<AxiosResponse<any, any>> => {
+    e.preventDefault()
+
+    return axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/comments/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
   const handleOpenParticipantsDialog = () => {
     setOpenParticipantsDialog((e) => !e)
   }
@@ -457,10 +491,12 @@ export default function Page({ params }: { params: { id: string } }) {
           <Comments
             comments={comments}
             onUploadComment={onUploadComment}
+            onEditComment={onEditComment}
+            onDeleteComment={onDeleteComment}
             onFetchChildrenComments={onFetchChildrenComments}
           />
 
-          {comments.length != event?.childrenCommentNumber && (
+          {comments.length < event?.childrenCommentNumber && (
             <Button
               onClick={onFetchComments}
               className="bg-[--blue-02] normal-case text-sm gap-1"
