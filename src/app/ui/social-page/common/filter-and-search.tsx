@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 
 interface SearchAndFilterFacultyProps {
+  name: string
   onFilterTag: (tagsId: string) => void
   onSearch: (keyword: string) => void
   onFilter: (facultyId: string) => void
@@ -19,6 +20,7 @@ interface SearchAndFilterFacultyProps {
 }
 
 export default function SearchAndFilterFaculty({
+  name,
   onSearch,
   onFilter,
   onResetFilter,
@@ -34,17 +36,23 @@ export default function SearchAndFilterFaculty({
   })
 
   return (
-    <div className="flex flex-col gap-4 w-fit ml-5 lg:ml-0">
-      <Input
-        size="lg"
-        crossOrigin={undefined}
-        label="Tìm kiếm ..."
-        placeholder={undefined}
-        containerProps={{ className: '!w-[500px]' }}
-        {...register('title', {
-          onChange: (e) => onSearch(e.target.value),
-        })}
-      />
+    <div className="flex items-end gap-4 w-fit ml-5 lg:ml-0">
+      <div className="flex flex-col gap-2">
+        <p className="font-semibold text-md">Tìm kiếm {name}</p>
+        <Input
+          size="lg"
+          crossOrigin={undefined}
+          placeholder={undefined}
+          containerProps={{ className: '!w-[500px]' }}
+          {...register('title', {
+            onChange: (e) => onSearch(e.target.value),
+          })}
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
+          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+        />
+      </div>
 
       <div className="flex items-end gap-4">
         <div className="flex flex-col gap-2">

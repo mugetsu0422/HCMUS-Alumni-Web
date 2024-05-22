@@ -174,6 +174,7 @@ export default function Page() {
             SỰ KIỆN
           </p>
           <SearchAndFilterFaculty
+            name="sự kiện"
             onSearch={onSearch}
             onFilter={onFilter}
             onResetFilter={onResetFilter}

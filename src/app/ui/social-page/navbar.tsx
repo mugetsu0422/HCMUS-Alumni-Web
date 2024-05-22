@@ -21,6 +21,7 @@ import {
   faBell,
   faMagnifyingGlass,
   faEnvelope,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
@@ -44,6 +45,11 @@ const navListItems = [
     label: 'Tư vấn',
     icon: faComments,
     urlLink: '/counsel',
+  },
+  {
+    label: 'Nhóm',
+    icon: faUsers,
+    urlLink: '/groups',
   },
 ]
 
