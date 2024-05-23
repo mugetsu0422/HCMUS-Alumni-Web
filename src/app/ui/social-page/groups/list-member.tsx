@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { Input, Avatar } from '@material-tailwind/react'
 import { Search, Dot } from 'react-bootstrap-icons'
 
@@ -70,6 +70,8 @@ const members = [
 ]
 
 export default function ListMember() {
+  const [listMember, setListMember] = useState([])
+
   return (
     <div className="mt-8 w-full xl:w-[60%] m-auto">
       <p className="font-bold text-[20px] mb-4 flex items-center">

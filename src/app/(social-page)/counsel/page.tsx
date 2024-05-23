@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import CounselListItem from '../../ui/counsel/counsel-list-item'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
+import PostListItem from '../../ui/common/post-list-item'
 
 import CreatePost from '../../ui/counsel/create-post'
 import axios from 'axios'
@@ -13,32 +13,6 @@ import SearchAndFilter from '../../ui/counsel/search-and-filter'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
-
-// const data = [
-//   {
-//     id: '1',
-//     title: 'Tư vấn hỗ trợ giải đáp thắc mắc trong học tập',
-//     childrenCommentNumber: 10,
-//     updateAt: '02-05-2024',
-//     content:
-//       'Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ. Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ.Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ.',
-//     tags: [
-//       { id: '6', name: 'Học tập' },
-//       { id: '2', name: 'Trường học' },
-//     ],
-//     publishedAt: '01-05-2024',
-//     pictures: [
-//       { id: '1', pictureUrl: '/authentication.png' },
-//       { id: '2', pictureUrl: '/logo.png' },
-//       { id: '3', pictureUrl: '/demo.jpg' },
-//       { id: '4', pictureUrl: '/authentication.png' },
-//     ],
-//     creator: { id: '1', fullName: 'Trương Samuel', avatarUrl: '/demo.jpg' },
-//     status: { name: 'Bình thường' },
-//     isReacted: true,
-//     reactionCount: 10,
-//   },
-// ]
 
 export default function Page() {
   const pathname = usePathname()
@@ -168,7 +142,7 @@ export default function Page() {
               </div>
             }>
             {posts.map((post) => (
-              <CounselListItem key={post.id} post={post} />
+              <PostListItem key={post.id} post={post} name="counsel" />
             ))}
           </InfiniteScroll>
         )}
