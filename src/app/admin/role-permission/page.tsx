@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState } from 'react'
 import { CaretDownFill, XLg, CheckLg } from 'react-bootstrap-icons'
-import { nunito } from '../../ui/fonts'
-import { Input } from '@material-tailwind/react'
+import { nunito, roboto } from '../../ui/fonts'
+import { Button, Input, Switch } from '@material-tailwind/react'
 import axios from 'axios'
 import { JWT_COOKIE } from '../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
+import Link from 'next/link'
 
 // All permissions in the system
-const permissionCategories = [
+const a = [
   {
     category: 'Quản lý người dùng',
     permissions: [
@@ -91,28 +92,52 @@ const permissionCategories = [
 ]
 const getTotalPermissionsCount = () => {
   let totalPermissionsCount = 0
-  permissionCategories.forEach((category) => {
+  a.forEach((category) => {
     totalPermissionsCount += category.permissions.length
   })
   return totalPermissionsCount
 }
 
-export default function Page() {
-  const [roles, setRoles] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  // Create a board which rows are roles and columns are permissions
-  //          Permission 1  Permission 2  Permission 3
-  // Role 1   true          false         true
-  // Role 2   false         true          false
-  const [board, setBoard] = useState(null)
-  const [permissionHeaderVisibility, setPermissionHeaderVisibility] = useState(
-    new Array(permissionCategories.length).fill(false)
-  )
+const roleNameToCategoryName = (roleName) => {
+  switch (roleName) {
+    case 'User':
+      return 'Quản lý người dùng'
+    case 'AlumniVerify':
+      return 'Quản lý xác thực cựu sinh viên'
+    case 'News':
+      return 'Quản lý tin tức'
+    case 'Event':
+      return 'Quản lý sự kiện'
+    case 'Hof':
+      return 'Quản lý Gương thành công'
+    case 'Counsel':
+      return 'Quản lý Tư vấn/Cố vấn'
+    case 'Group':
+      return 'Quản lý Nhóm'
+    case 'Profile':
+      return 'Quản lý Hồ sơ cá nhân'
+    case 'Message':
+      return 'Quản lý Tin nhắn'
+    default:
+      return null
+  }
+}
 
-  const toggleCheckbox = (roleIndex: number, permissionIndex: number) => {
-    const newBoard = [...board]
-    newBoard[roleIndex][permissionIndex] = !newBoard[roleIndex][permissionIndex]
-    setBoard(newBoard)
+export default function Page() {
+  const [permissionCategories, setPermissionCategories] = useState([])
+  const [allRoles, setAllRoles] = useState([])
+  const [selectedRoleId, setSelectedRoleId] = useState(0)
+  const [selectedRole, setSelectedRole] = useState(null)
+  const [selectedRolePermissionMap, setSelectedRolePermissionMap] =
+    useState<Map<any, any>>()
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [permissionHeaderVisibility, setPermissionHeaderVisibility] =
+    useState(null)
+
+  const toggleCheckbox = (permissionIndex: number) => {
+    const newMap = new Map(selectedRolePermissionMap)
+    newMap.set(permissionIndex, !newMap.get(permissionIndex))
+    setSelectedRolePermissionMap(newMap)
   }
 
   const toggleVisibility = (mainIndex: number) => {
@@ -125,26 +150,25 @@ export default function Page() {
     e.preventDefault()
     const putToast = toast.loading('Đang cập nhật quyền...')
 
-    const updatedRoles = roles.map((role) => {
-      return {
-        id: role.id,
-        name: role.name,
-        permissions: board[role.id - 1]
-          .map((val: boolean, idx: number) => {
-            if (val) {
-              return { id: idx + 1 }
-            }
-          })
-          .filter((val: any) => val),
-      }
-    })
+    const updatedRoles = {
+      ...selectedRole,
+      permissions: Array.from(selectedRolePermissionMap.entries())
+        .filter(([_, value]) => value === true)
+        .map(([permissionIndex, _]) => ({
+          id: permissionIndex,
+        })),
+    }
 
     axios
-      .put(`${process.env.NEXT_PUBLIC_SERVER_HOST}/roles`, updatedRoles, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/roles/${selectedRoleId}`,
+        updatedRoles,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then((res) => {
         toast.success('Cập nhật quyền thành công', {
           id: putToast,
@@ -156,43 +180,116 @@ export default function Page() {
           id: putToast,
         })
       })
-
-    // Do whatever you want with the selected values here
   }
 
   useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/roles`, {
+    const allRolesPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/roles`,
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then((res) => {
-        setRoles(res.data.roles)
+      }
+    )
 
-        const tempBoard = new Array(res.data.roles.length)
-        const permissionsCount = getTotalPermissionsCount()
-        for (let i = 0; i < tempBoard.length; i++) {
-          tempBoard[i] = new Array(permissionsCount).fill(false)
-        }
-        for (const role of res.data.roles) {
-          for (const permission of role.permissions) {
-            tempBoard[role.id - 1][permission.id - 1] = true
+    const permissionPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/roles/permissions`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    Promise.all([allRolesPromise, permissionPromise])
+      .then(
+        ([
+          {
+            data: { roles },
+          },
+          {
+            data: { permissions },
+          },
+        ]) => {
+          // Split the permissions into categories based on their names
+          const splitPermissions = (permissions) => {
+            const permissionMap = new Map()
+            for (const permission of permissions) {
+              const name = permission.name.split('.')[0]
+              let categoryName = roleNameToCategoryName(name)
+
+              // If the category already exists in the map, add the permission to it
+              if (permissionMap.has(categoryName)) {
+                permissionMap.get(categoryName).push(permission)
+              } else {
+                // If the category doesn't exist, create a new entry in the map
+                permissionMap.set(categoryName, [permission])
+              }
+            }
+            return permissionMap
           }
-        }
-        setBoard(tempBoard)
 
-        setIsLoading(false)
-      })
+          const rolePermissionMap = new Map()
+          permissions.forEach((permission) => {
+            rolePermissionMap.set(permission.id, false)
+          })
+          setSelectedRolePermissionMap(rolePermissionMap)
+
+          // Split the permissions into categories and update the state
+          const permissionMap = splitPermissions(permissions)
+          const permissionCategories = []
+          permissionMap.forEach((val, key) => {
+            permissionCategories.push({
+              category: key,
+              permissions: val,
+            })
+          })
+          setPermissionCategories(permissionCategories)
+          setPermissionHeaderVisibility(
+            new Array(permissionCategories.length).fill(true)
+          )
+
+          setAllRoles(roles)
+
+          // Set the loading state to false
+          setIsInitialLoading(false)
+        }
+      )
       .catch((err) => {
-        console.log(err)
+        console.error(err)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (!isLoading)
+  useEffect(() => {
+    if (!selectedRoleId) return
+
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/roles/${selectedRoleId}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setSelectedRole(data)
+
+        const newMap = new Map(selectedRolePermissionMap)
+        newMap.forEach((_, key, map) => map.set(key, false))
+        data.permissions.forEach(({ id }) => {
+          newMap.set(id, true)
+        })
+        setSelectedRolePermissionMap(newMap)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRoleId])
+
+  if (!isInitialLoading)
     return (
-      <div className={`${nunito.className} container mx-auto p-4 z-50`}>
+      <div
+        className={`${nunito.className} container flex flex-col gap-5 mx-auto px-8 my-[3vw]`}>
         <Toaster
           toastOptions={{
             success: {
@@ -209,19 +306,45 @@ export default function Page() {
             },
           }}
         />
+        <p
+          className={`${roboto.className} mx-auto w-full text-3xl font-bold text-[var(--blue-01)]`}>
+          Quản lý vai trò
+        </p>
+        <div className="flex gap-5 h-[2.8rem]">
+          <div>
+            <label
+              htmlFor="criteria"
+              className="font-semibold self-center pr-3">
+              Vai trò
+            </label>
+            <select
+              className="h-full hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+              onChange={(e) => setSelectedRoleId(parseInt(e.target.value))}>
+              <option value="0">Không</option>
+              {allRoles.map(({ id, name }) => {
+                return (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+
+          <Link href={'/admin/role-permission/create'}>
+            <Button
+              placeholder={undefined}
+              className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+              Tạo mới
+            </Button>
+          </Link>
+        </div>
         <table className="table-auto w-full border-collapse border border-gray-400">
-          <thead className="sticky top-0">
+          <thead className="">
             <tr>
               <th className="border border-gray-400 p-2 w-40 bg-[--blue-02] text-white">
                 Quyền
               </th>
-              {roles.map((role, index) => (
-                <th
-                  key={index}
-                  className="border border-gray-400 p-2 w-40 bg-[--blue-02] text-white">
-                  {role.name}
-                </th>
-              ))}
             </tr>
           </thead>
           <tbody>
@@ -230,9 +353,7 @@ export default function Page() {
                 <tr
                   onClick={() => toggleVisibility(categoryIdx)}
                   className="cursor-pointer w-full">
-                  <td
-                    className="border border-gray-400 p-2 bg-[--blue-04] font-bold"
-                    colSpan={roles.length + 1}>
+                  <td className="border border-gray-400 p-2 bg-[--blue-04] font-bold">
                     <p className="flex items-center gap-1">
                       {category.category}
                       <CaretDownFill
@@ -247,35 +368,30 @@ export default function Page() {
                 </tr>
                 {permissionHeaderVisibility[categoryIdx] &&
                   category.permissions.map(
-                    ({ name, id: permissionIndex }, subIndex) => (
+                    ({ description, id: permissionId }, subIndex) => (
                       <tr key={subIndex} className="text-base">
                         <td className="border font-semibold border-gray-400 p-2 pl-6 w-40 ">
-                          {name}
+                          {selectedRole ? (
+                            <Switch
+                              className="checked:bg-[var(--blue-02)]"
+                              circleProps={{
+                                className:
+                                  'peer-checked:border-[var(--blue-02)]',
+                              }}
+                              labelProps={{
+                                className: 'text-black font-normal',
+                              }}
+                              crossOrigin={undefined}
+                              checked={selectedRolePermissionMap.get(
+                                permissionId
+                              )}
+                              onChange={() => toggleCheckbox(permissionId)}
+                              label={description}
+                            />
+                          ) : (
+                            <p>{description}</p>
+                          )}
                         </td>
-                        {roles.map((role, roleIndex) => (
-                          <td
-                            key={roleIndex}
-                            className="border border-gray-400 p-2 text-center w-40  ">
-                            <label className="flex items-center justify-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                value={board[roleIndex][permissionIndex - 1]}
-                                onChange={() =>
-                                  toggleCheckbox(roleIndex, permissionIndex - 1)
-                                }
-                                className="hidden"
-                              />
-                              <div
-                                className={`w-6 h-6 rounded bg-white flex items-center justify-center`}>
-                                {!board[roleIndex][permissionIndex - 1] ? (
-                                  <XLg className="text-[#ee1b24] text-xl" />
-                                ) : (
-                                  <CheckLg className="text-[#03a751] text-xl" />
-                                )}
-                              </div>
-                            </label>
-                          </td>
-                        ))}
                       </tr>
                     )
                   )}
@@ -284,11 +400,14 @@ export default function Page() {
           </tbody>
         </table>
         <form onSubmit={handleSubmit} className="flex justify-end">
-          <button
+          <Button
+            disabled={!selectedRole}
+            placeholder={undefined}
+            size="lg"
             type="submit"
-            className="mt-4 px-6 py-2 bg-[var(--blue-02)] text-white rounded font-bold text-xl">
+            className={`${nunito.className} bg-[var(--blue-05)] normal-case text-md`}>
             Lưu
-          </button>
+          </Button>
         </form>
       </div>
     )

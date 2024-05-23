@@ -158,7 +158,7 @@ export default function Page() {
 
   return (
     <div
-      className={`${nunito.className} max-w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
+      className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
