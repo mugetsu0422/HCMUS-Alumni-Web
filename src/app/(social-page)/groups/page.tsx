@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { roboto } from '../../ui/fonts'
-import { Input } from '@material-tailwind/react'
+import { Button } from '@material-tailwind/react'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
@@ -12,6 +12,7 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGroup'
+import { Plus } from 'react-bootstrap-icons'
 
 const groups = [
   {
@@ -32,24 +33,6 @@ const groups = [
     isJoined: true,
     description:
       'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
   },
   {
     id: '23',
@@ -69,24 +52,6 @@ const groups = [
     isJoined: false,
     description:
       'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
   },
   {
     id: '3',
@@ -106,23 +71,6 @@ const groups = [
     isJoined: false,
     description:
       'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
   },
   {
     id: '4',
@@ -142,23 +90,6 @@ const groups = [
     isJoined: true,
     description:
       'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
   },
   {
     id: '5',
@@ -178,27 +109,11 @@ const groups = [
     isJoined: false,
     description:
       'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
   },
 ]
 
 export default function Page() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
@@ -238,6 +153,14 @@ export default function Page() {
           NHÓM
         </p>
         <SearchAndFilterGroups />
+        <Button
+          onClick={() => router.push('/groups/create')}
+          placeholder={undefined}
+          size="md"
+          className="bg-[--blue-03] text-[--blue-05] normal-case flex items-center justify-center gap-2">
+          <Plus className="text-xl" />
+          Tạo nhóm mới
+        </Button>
         {groups.map((group) => (
           <GroupsListItem key={group.id} group={group} />
         ))}

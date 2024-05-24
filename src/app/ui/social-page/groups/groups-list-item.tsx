@@ -29,27 +29,6 @@ export default function GroupsListItem({ group }) {
           <p className="text-[#65676b] text-[13px] line-clamp-2">
             {group.description}
           </p>
-          {!group.isJoined && (
-            <>
-              <p className="flex items-center text-[#65676b]">
-                {group.friendsInGroup
-                  .slice(0, 3)
-                  .map(({ id, avatarUrl }, idx) => (
-                    <Avatar
-                      key={id}
-                      src={avatarUrl}
-                      alt="avatar user"
-                      placeholder={undefined}
-                      size="xs"
-                      className={`border border-white relative -mr-2 last:mr-1`}
-                    />
-                  ))}
-                {group.friendsInGroup.length > 3
-                  ? `${group.friendsInGroup.length - 3} người bạn là thành viên`
-                  : 'người bạn là thành viên'}
-              </p>
-            </>
-          )}
         </div>
       </div>
 

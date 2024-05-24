@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Discuss from '../../../ui/social-page/groups/discuss'
 import ListMember from '../../../ui/social-page/groups/list-member'
 import { nunito } from '../../../ui/fonts'
+import { GlobeAmericas } from 'react-bootstrap-icons'
+import MemberRequest from '../../../ui/social-page/groups/member-request'
 
 const groups = {
   id: '1',
@@ -17,14 +19,14 @@ const groups = {
     name: 'Đặng Nguyễn Duy',
     avatarUrl: '/demo.jpg',
   },
-  privacy: 'Nhóm kín',
+  privacy: 'Công khai',
   avatarUrl: '/demo.jpg',
   coverUrl: '/thumbnail-social-pages.jpg',
   website: '',
   status: 'Công khai',
   publicAt: '05-04-2023',
   numberMember: 500,
-  isJoined: false,
+  isJoined: true,
 }
 
 const tabs = [
@@ -34,29 +36,35 @@ const tabs = [
   {
     label: 'Thành viên',
   },
+  {
+    label: 'Xét duyệt',
+  },
 ]
 
 export default function Page() {
   const [activeTab, setActiveTab] = React.useState('Thảo luận')
 
   return (
-    <div className={`${nunito.className} max-w-[1050px] min-w-[500px] w-[80%] m-auto mb-10`}>
+    <div
+      className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
       <div className="relative">
         <img
           src={groups.coverUrl}
           alt="group cover"
           className="w-full h-60 object-cover object-center"
         />
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-4">
           <div>
             <p className="flex items-center text-[22px] xl:text-[26px] font-bold ">
               {groups.name}
             </p>
 
             <p className="flex items-center">
-              {groups.privacy != 'Công khai' && (
+              {groups.privacy != 'Công khai' ? (
                 <FontAwesomeIcon icon={faLock} className="mr-2" />
-              )}{' '}
+              ) : (
+                <GlobeAmericas className="mr-2" />
+              )}
               {groups.privacy} <Dot /> {groups.numberMember} thành viên tham gia
             </p>
           </div>
@@ -120,6 +128,7 @@ export default function Page() {
       </div>
       {activeTab === 'Thảo luận' && <Discuss />}
       {activeTab === 'Thành viên' && <ListMember />}
+      {activeTab === 'Xét duyệt' && <MemberRequest />}
     </div>
   )
 }

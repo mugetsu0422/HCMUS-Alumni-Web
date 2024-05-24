@@ -245,6 +245,7 @@ export default function PostListItem({
 
           <div className="flex flex-col gap-1">
             <p className="font-bold text-lg">{post.creator.fullName}</p>
+            {/* Change link href  */}
             <Link
               href={`/${name}/${post.id}`}
               className="text-sm text-[--secondary] hover:underline">
@@ -263,6 +264,7 @@ export default function PostListItem({
             </Button>
           </MenuHandler>
           <MenuList placeholder={undefined}>
+            {/*  */}
             {post.permissions.edit && (
               <Link href={`/${name}/${post.id}/edit`}>
                 <MenuItem

@@ -167,7 +167,11 @@ export default function Discuss() {
               </div>
             }>
             {posts.map((post) => (
-              <PostListItem key={post.id} post={post} name="groups" />
+              <PostListItem
+                key={post.id}
+                post={post}
+                name={`groups/${group.id}`}
+              />
             ))}
           </InfiniteScroll>
         )}
