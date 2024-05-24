@@ -67,7 +67,7 @@ function CancelDialog({ open, handleOpen }) {
           className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           placeholder={undefined}
           onClick={() => {
-            router.push('/admin/role-permission')
+            router.push('/admin/roles')
           }}>
           <span>Hủy</span>
         </Button>

@@ -9,7 +9,6 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
 import { nunito } from '../../fonts'
 import {
   Trash3,
@@ -23,6 +22,7 @@ import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
+import Link from 'next/link'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -106,11 +106,6 @@ export default function HofListItem({ hof }) {
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
-
-  const router = useRouter()
-  function handleEdit(id: string) {
-    router.push(`/admin/hof/${id}`)
-  }
 
   const onDelete = (id) => {
     axios
@@ -205,13 +200,11 @@ export default function HofListItem({ hof }) {
         {hof.views}
       </p>
       <div className="flex justify-end px-2">
-        <Button
-          variant="text"
-          onClick={() => handleEdit(hof.id)}
-          placeholder={undefined}
-          className="px-2 py-2">
-          <PencilSquare className="text-2xl text-[--blue-05]" />
-        </Button>
+        <Link href={`/admin/hof/${hof.id}`}>
+          <Button variant="text" placeholder={undefined} className="px-2 py-2">
+            <PencilSquare className="text-2xl text-[--blue-05]" />
+          </Button>
+        </Link>
         <Button
           variant="text"
           onClick={handleOpenDetele}

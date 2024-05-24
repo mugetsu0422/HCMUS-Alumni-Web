@@ -61,7 +61,7 @@ const navListItems = [
     label: 'Quản lý vai trò',
     subMenu: null,
     icon: faUserPen,
-    link: '/admin/role-permission',
+    link: '/admin/roles',
   },
 ]
 

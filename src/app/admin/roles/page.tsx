@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import NewsListItem from '../../ui/admin/news/news-list-item'
-import SortHeader from '../../ui/admin/news/sort-header'
+import SortHeader from '../../ui/admin/roles/sort-header'
 import { Input, Button } from '@material-tailwind/react'
 import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { JWT_COOKIE } from '../../constant'
@@ -14,26 +13,19 @@ import { useForm } from 'react-hook-form'
 import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
+import RolesListItem from '../../ui/admin/roles/roles-list-item'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
-  onFilterTag: (keyword: string) => void
-  onFilterFaculties: (keyword: string) => void
   onResetAll: () => void
 }
 
-function FuntionSection({
-  onSearch,
-  onResetAll,
-  onFilterTag,
-  onFilterFaculties,
-}: FunctionSectionProps) {
-  const router = useRouter()
+function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const { register, reset } = useForm({
     defaultValues: {
-      title: params.get('title'),
+      name: params.get('name'),
     },
   })
 
@@ -48,8 +40,8 @@ function FuntionSection({
             crossOrigin={undefined}
             placeholder={undefined}
             icon={<Search />}
-            defaultValue={params.get('title')}
-            {...register('title', {
+            defaultValue={params.get('name')}
+            {...register('name', {
               onChange: (e) => onSearch(e.target.value),
             })}
             labelProps={{
@@ -58,18 +50,9 @@ function FuntionSection({
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
           />
         </div>
-
-        <FilterAdmin
-          onFilterTag={onFilterTag}
-          onFilterFaculties={onFilterFaculties}
-          params={{
-            tagsId: params.get('tagsId'),
-            facultyId: params.get('facultyId'),
-          }}
-        />
       </div>
       <div className="flex gap-5">
-        <Link href={'/admin/news/create'}>
+        <Link href={'/admin/roles/create'}>
           <Button
             placeholder={undefined}
             className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
@@ -100,7 +83,7 @@ export default function Page() {
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
-  const [news, setNews] = useState([])
+  const [roles, setRoles] = useState([])
 
   const resetCurPage = () => {
     params.delete('page')
@@ -108,9 +91,9 @@ export default function Page() {
   }
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
-      params.set('title', keyword)
+      params.set('name', keyword)
     } else {
-      params.delete('title')
+      params.delete('name')
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
@@ -150,37 +133,16 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }
 
-  const onFilterFaculties = (facultyId: string) => {
-    if (facultyId != '0') {
-      params.set('facultyId', facultyId)
-    } else {
-      params.delete('facultyId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
-  }
-  const onFilterTag = (tag: string) => {
-    if (tag != '0') {
-      params.set('tagsId', tag)
-    } else {
-      params.delete('tagsId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
-  }
-
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/roles${myParams}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(({ data: { totalPages, news } }) => {
+      .then(({ data: { totalPages, roles } }) => {
         setTotalPages(totalPages)
-        setNews(news)
+        setRoles(roles)
       })
       .catch()
   }, [myParams])
@@ -189,42 +151,16 @@ export default function Page() {
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
-        Quản lý tin tức
+        Quản lý vai trò
       </p>
-      <FuntionSection
-        onSearch={onSearch}
-        onResetAll={onResetAll}
-        onFilterTag={onFilterTag}
-        onFilterFaculties={onFilterFaculties}
-      />
+      <FuntionSection onSearch={onSearch} onResetAll={onResetAll} />
 
       <div className="overflow-x-auto">
         <SortHeader onOrder={onOrder} />
         <div className="relative mb-10">
-          {news.map(
-            ({
-              id,
-              title,
-              thumbnail,
-              views,
-              status,
-              publishedAt,
-              faculty,
-              tags,
-            }) => (
-              <NewsListItem
-                key={id}
-                name={title}
-                imgSrc={thumbnail}
-                status={status}
-                views={views}
-                id={id}
-                publishedAt={publishedAt}
-                faculty={faculty}
-                tags={tags}
-              />
-            )
-          )}
+          {roles.map((role) => (
+            <RolesListItem key={role.id} role={role} />
+          ))}
         </div>
       </div>
       <Pagination
