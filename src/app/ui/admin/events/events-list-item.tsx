@@ -10,13 +10,13 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
 
 import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import moment from 'moment'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
+import Link from 'next/link'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -100,7 +100,6 @@ export default function EventsListItem({
   minimumParticipants,
   maximumParticipants,
 }) {
-  const router = useRouter()
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
   const [isDeleted, setIsDeleted] = React.useState(false)
@@ -152,10 +151,6 @@ export default function EventsListItem({
           toast.success('Ẩn thất bại')
         }
       })
-  }
-
-  function handleEdit(id: string) {
-    router.push(`/admin/events/${id}`)
   }
 
   if (isDeleted) return null
@@ -212,13 +207,11 @@ export default function EventsListItem({
       </p>
 
       <div className="flex justify-end px-2">
-        <Button
-          variant="text"
-          onClick={() => handleEdit(id)}
-          placeholder={undefined}
-          className="px-4">
-          <PencilSquare className="text-2xl text-[--blue-05]" />
-        </Button>
+        <Link href={`/admin/events/${id}`}>
+          <Button variant="text" placeholder={undefined} className="px-4">
+            <PencilSquare className="text-2xl text-[--blue-05]" />
+          </Button>
+        </Link>
         <Button
           variant="text"
           onClick={handleOpenDetele}
