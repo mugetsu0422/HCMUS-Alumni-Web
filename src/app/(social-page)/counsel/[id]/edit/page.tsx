@@ -31,6 +31,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [deleteImageIds, setDeleteImageIds] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const router = useRouter()
+  const [options, setOptions] = useState([''])
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -205,6 +206,32 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const [votes, setVote] = useState([])
+
+  const addVote = (vote) => {
+    setVote([...vote, vote])
+  }
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...options]
+    newOptions[index] = value
+    setOptions(newOptions)
+  }
+
+  const handleAddOption = () => {
+    setOptions([...options, ''])
+  }
+
+  const handleRemoveOption = (index) => {
+    const newOptions = options.filter((_, i) => i !== index)
+    setOptions(newOptions)
+  }
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault()
+  //   setVote({ options })
+  //   setOptions([''])
+  // }
+
   if (noData) {
     return <NoData />
   }
@@ -294,6 +321,39 @@ export default function Page({ params }: { params: { id: string } }) {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
+
+        <form
+          //onSubmit={handleSubmit}
+          className="w-full   rounded-lg ">
+          <div className="mb-4">
+            <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
+              Chỉnh sửa bình chọn
+            </div>
+            {options.map((option, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder={`Lựa chọn ${index + 1}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveOption(index)}
+                  className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-nowrap">
+                  Xóa lựa chọn
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddOption}
+              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
+              Thêm lựa chọn
+            </button>
+          </div>
+        </form>
 
         <div className="container flex flex-col items-end relative mx-auto my-2">
           <div

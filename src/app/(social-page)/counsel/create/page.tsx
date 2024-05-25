@@ -1,9 +1,16 @@
+/* eslint-disable jsx-a11y/alt-text */
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useCallback, useState } from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
-import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
+import {
+  XLg,
+  ArrowLeft,
+  FileEarmarkImage,
+  BarChartLine,
+  Image,
+} from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
 import ErrorInput from '../../../ui/error-input'
 import { set, useForm } from 'react-hook-form'
@@ -26,6 +33,16 @@ export default function CreatePostDialog() {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
+  const [openAddingPost, setOpenAddingPost] = useState(false)
+  const [openAddinImage, setOpenAddinImage] = useState(false)
+
+  const handleOpenAdingPost = () => {
+    setOpenAddingPost((e) => !e)
+  }
+
+  const handleOpenAdingImage = () => {
+    setOpenAddinImage((e) => !e)
+  }
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -260,44 +277,48 @@ export default function CreatePostDialog() {
           }}
         />
 
-        <div className="container flex flex-col items-end relative mx-auto my-2">
-          <div
-            className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
+        {/* const handleOpenAdingPost = () => {
+    setOpenAddingPost((e) => !e)
+  }
+
+  const handleOpenAdingImage = () => {
+    setOpenAddinImage((e) => !e)
+  } */}
+
+        {!openAddingPost && (
+          <Button
+            onClick={handleOpenAdingPost}
+            placeholder={undefined}
+            className="bg-[--blue-02] normal-case flex gap-2 items-center justify-center">
+            <BarChartLine className="text-xl" />
+            Tạo bình chọn
+          </Button>
+        )}
+
+        {openAddingPost && (
+          <VotingPostForm handleOpenAdingPost={handleOpenAdingPost} />
+        )}
+
+        {!openAddinImage && (
+          <Button
+            onClick={handleOpenAdingImage}
+            placeholder={undefined}
+            className="bg-[--blue-02] normal-case flex gap-2 items-center justify-center">
+            <Image className="text-xl" />
+            Chọn ảnh
+          </Button>
+        )}
+
+        {openAddinImage && (
+          <AddImaePost
+            handleOpenAdingImage={handleOpenAdingImage}
             onDragOver={onDragOver}
             onDrop={onDrop}
-            onClick={onClickDropzone}>
-            {previewImages.length == 0 ? (
-              <>
-                <FileEarmarkImage className="text-[50px] text-[--secondary]" />
-                <p className="text-[--secondary]">
-                  Chọn hoặc kéo và thả ảnh vào đây
-                </p>
-                <span className="text-red-700">(Tối đa 5 ảnh)</span>
-              </>
-            ) : (
-              <div className="mt-4 flex flex-wrap gap-3 justify-center">
-                {previewImages.map((image, index) => (
-                  <div
-                    key={image.src}
-                    className="relative flex flex-col items-end">
-                    <Button
-                      placeholder={undefined}
-                      className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                      onClick={(event) => removeImage(index, event)} // Pass event object
-                    >
-                      <XLg />
-                    </Button>
-                    <img
-                      src={image.src}
-                      alt="Ảnh được kéo thả"
-                      className="w-48 h-48 object-cover rounded-md"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+            onClickDropzone={onClickDropzone}
+            removeImage={removeImage}
+            previewImages={previewImages}
+          />
+        )}
 
         <Button
           placeholder={undefined}
@@ -308,5 +329,140 @@ export default function CreatePostDialog() {
         </Button>
       </form>
     </div>
+  )
+}
+
+function AddImaePost({
+  onDragOver,
+  onDrop,
+  onClickDropzone,
+  removeImage,
+  previewImages,
+  handleOpenAdingImage,
+}) {
+  return (
+    <div>
+      <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
+        Thêm ảnh
+        <Button
+          variant="text"
+          placeholder={undefined}
+          className="z-10 mr-1 p-2 cursor-pointer"
+          onClick={handleOpenAdingImage} // Pass event object
+        >
+          <XLg className="text-lg" />
+        </Button>
+      </div>
+      <div className="container flex flex-col items-end relative mx-auto my-2">
+        <div
+          className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          onClick={onClickDropzone}>
+          {previewImages.length == 0 ? (
+            <>
+              <FileEarmarkImage className="text-[50px] text-[--secondary]" />
+              <p className="text-[--secondary]">
+                Chọn hoặc kéo và thả ảnh vào đây
+              </p>
+              <span className="text-red-700">(Tối đa 5 ảnh)</span>
+            </>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+              {previewImages.map((image, index) => (
+                <div
+                  key={image.src}
+                  className="relative flex flex-col items-end">
+                  <Button
+                    placeholder={undefined}
+                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    onClick={(event) => removeImage(index, event)} // Pass event object
+                  >
+                    <XLg />
+                  </Button>
+                  <img
+                    src={image.src}
+                    alt="Ảnh được kéo thả"
+                    className="w-48 h-48 object-cover rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function VotingPostForm({ handleOpenAdingPost }) {
+  const [title, setTitle] = useState('')
+  const [options, setOptions] = useState([''])
+  const [posts, setPosts] = useState([])
+
+  const addPost = (post) => {
+    setPosts([...posts, post])
+  }
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...options]
+    newOptions[index] = value
+    setOptions(newOptions)
+  }
+
+  const handleAddOption = () => {
+    setOptions([...options, ''])
+  }
+
+  const handleRemoveOption = (index) => {
+    const newOptions = options.filter((_, i) => i !== index)
+    setOptions(newOptions)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    addPost({ options })
+    setOptions([''])
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+      <div className="mb-4">
+        <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
+          Tạo bình chọn
+          <Button
+            variant="text"
+            placeholder={undefined}
+            className="z-10 mr-1 p-2 cursor-pointer"
+            onClick={handleOpenAdingPost} // Pass event object
+          >
+            <XLg className="text-lg" />
+          </Button>
+        </div>
+        {options.map((option, index) => (
+          <div key={index} className="flex items-center mb-2">
+            <input
+              type="text"
+              value={option}
+              onChange={(e) => handleOptionChange(index, e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder={`Lựa chọn ${index + 1}`}
+            />
+            <button
+              type="button"
+              onClick={() => handleRemoveOption(index)}
+              className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-nowrap">
+              Xóa lựa chọn
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={handleAddOption}
+          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
+          Thêm lựa chọn
+        </button>
+      </div>
+    </form>
   )
 }
