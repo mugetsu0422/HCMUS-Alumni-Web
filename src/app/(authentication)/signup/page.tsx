@@ -73,7 +73,7 @@ function Step1() {
               pattern: {
                 value:
                   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                message: 'Hãy nhập đúng định dạng email',
+                message: 'Hãy nhập đúng định dạng email. Ví dụ: test@gmail.com',
               },
             })}
             labelProps={{

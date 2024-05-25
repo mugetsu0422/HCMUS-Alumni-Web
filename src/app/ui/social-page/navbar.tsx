@@ -8,6 +8,7 @@ import {
   Avatar,
   Button,
   Input,
+  MenuItem,
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,45 +30,46 @@ const navListItems = [
   {
     label: 'Tin tức',
     icon: faNewspaper,
-    urlLink: '/news',
+    link: '/news',
   },
   {
     label: 'Sự kiện',
     icon: faCalendarDays,
-    urlLink: '/events',
+    link: '/events',
   },
   {
     label: 'Gương thành công',
     icon: faCertificate,
-    urlLink: '/hof',
+    link: '/hof',
   },
   {
     label: 'Tư vấn',
     icon: faComments,
-    urlLink: '/counsel',
+    link: '/counsel',
   },
   {
     label: 'Nhóm',
     icon: faUsers,
-    urlLink: '/groups',
+    link: '/groups',
   },
 ]
 
 function NavList() {
   return (
-    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
-      {navListItems.map(({ label, icon, urlLink }) => (
-        <div className="group cursor-pointer lg:py-3" key={label}>
-          <Link
-            href={urlLink}
-            className="text-[--text-navbar] font-semibold group-hover:text-[--blue-05] flex items-center gap-2">
-            <FontAwesomeIcon
-              className="mr-auto text-[--text-navbar] group-hover:text-[--blue-05] text-2xl lg:block hidden"
-              icon={icon}
-            />
-            {label}
-          </Link>
-        </div>
+    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
+      {navListItems.map(({ label, icon, link }) => (
+        <li className="group cursor-pointer lg:py-3" key={label}>
+            <Link
+              href={link}
+              className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
+              <MenuItem
+                placeholder={undefined}
+                className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
+                <FontAwesomeIcon icon={icon} className="text-2xl" />
+                {label}
+              </MenuItem>
+            </Link>
+        </li>
       ))}
     </ul>
   )
