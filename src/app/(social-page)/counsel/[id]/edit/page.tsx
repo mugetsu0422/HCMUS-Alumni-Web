@@ -232,9 +232,10 @@ export default function Page({ params }: { params: { id: string } }) {
   //   setOptions([''])
   // }
 
-  if (noData) {
-    return <NoData />
-  }
+  // if (noData) {
+  //   return <NoData />
+  // }
+
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
@@ -321,94 +322,15 @@ export default function Page({ params }: { params: { id: string } }) {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
+        <VotingPostForm />
 
-        <form
-          //onSubmit={handleSubmit}
-          className="w-full   rounded-lg ">
-          <div className="mb-4">
-            <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
-              Chỉnh sửa bình chọn
-            </div>
-            {options.map((option, index) => (
-              <div key={index} className="flex items-center mb-2">
-                <input
-                  type="text"
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder={`Lựa chọn ${index + 1}`}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOption(index)}
-                  className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-nowrap">
-                  Xóa lựa chọn
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={handleAddOption}
-              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-              Thêm lựa chọn
-            </button>
-          </div>
-        </form>
-
-        <div className="container flex flex-col items-end relative mx-auto my-2">
-          <div
-            className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-            onClick={onClickDropzone}>
-            {previewImages.length === 0 && currentImages.length === 0 ? (
-              <>
-                <FileEarmarkImage className="text-[50px] text-[--secondary]" />
-                <p className="text-[--secondary]">
-                  Chọn hoặc kéo và thả ảnh vào đây
-                </p>
-                <span className="text-red-700">(Tối đa 5 ảnh)</span>
-              </>
-            ) : (
-              <div className="mt-4 flex flex-wrap gap-3 justify-center">
-                {currentImages.map(({ id, pictureUrl }, index) => (
-                  <div key={id} className="relative flex flex-col items-end">
-                    <Button
-                      placeholder={undefined}
-                      className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                      onClick={(event) => removeCurrentImage(index, id, event)} // Pass event object
-                    >
-                      <XLg />
-                    </Button>
-                    <img
-                      src={pictureUrl}
-                      alt="Ảnh được kéo thả"
-                      className="w-48 h-48 object-cover rounded-md"
-                    />
-                  </div>
-                ))}
-                {previewImages.map((image, index) => (
-                  <div
-                    key={image.src}
-                    className="relative flex flex-col items-end">
-                    <Button
-                      placeholder={undefined}
-                      className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                      onClick={(event) => removeImage(index, event)} // Pass event object
-                    >
-                      <XLg />
-                    </Button>
-                    <img
-                      src={image.src}
-                      alt="Ảnh được kéo thả"
-                      className="w-48 h-48 object-cover rounded-md"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <AddImaePost
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          onClickDropzone={onClickDropzone}
+          removeImage={removeImage}
+          previewImages={previewImages}
+        />
 
         <Button
           placeholder={undefined}
@@ -419,5 +341,125 @@ export default function Page({ params }: { params: { id: string } }) {
         </Button>
       </form>
     </div>
+  )
+}
+
+function AddImaePost({
+  onDragOver,
+  onDrop,
+  onClickDropzone,
+  removeImage,
+  previewImages,
+}) {
+  return (
+    <div>
+      <div className="flex text-gray-700 text-xl font-bold mb-2 ">Thêm ảnh</div>
+      <div className="container flex flex-col items-end relative mx-auto my-2">
+        <div
+          className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          onClick={onClickDropzone}>
+          {previewImages.length == 0 ? (
+            <>
+              <FileEarmarkImage className="text-[50px] text-[--secondary]" />
+              <p className="text-[--secondary]">
+                Chọn hoặc kéo và thả ảnh vào đây
+              </p>
+              <span className="text-red-700">(Tối đa 5 ảnh)</span>
+            </>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+              {previewImages.map((image, index) => (
+                <div
+                  key={image.src}
+                  className="relative flex flex-col items-end">
+                  <Button
+                    placeholder={undefined}
+                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    onClick={(event) => removeImage(index, event)} // Pass event object
+                  >
+                    <XLg />
+                  </Button>
+                  <img
+                    src={image.src}
+                    alt="Ảnh được kéo thả"
+                    className="w-48 h-48 object-cover rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function VotingPostForm() {
+  const [title, setTitle] = useState('')
+  const [options, setOptions] = useState([''])
+  const [posts, setPosts] = useState([])
+
+  const addPost = (post) => {
+    setPosts([...posts, post])
+  }
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...options]
+    newOptions[index] = value
+    setOptions(newOptions)
+  }
+
+  const handleAddOption = () => {
+    setOptions([...options, ''])
+  }
+
+  const handleRemoveOption = (index) => {
+    const newOptions = options.filter((_, i) => i !== index)
+    setOptions(newOptions)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    addPost({ options })
+    setOptions([''])
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+      <div className="mb-4">
+        <div className="flex text-gray-700 text-xl font-bold mb-2 ">
+          Tạo bình chọn
+        </div>
+        {options.map((option, index) => (
+          <div key={index} className="flex items-center mb-2">
+            <Input
+              crossOrigin={undefined}
+              disabled={true}
+              type="text"
+              value={option}
+              onChange={(e) => handleOptionChange(index, e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              label={`Lựa chọn ${index + 1}`}
+            />
+            <Button
+              placeholder={undefined}
+              disabled={true}
+              onClick={() => handleRemoveOption(index)}
+              className="ml-2 bg-red-500 text-white rounded text-nowrap normal-case text-[13px]">
+              Xóa lựa chọn
+            </Button>
+          </div>
+        ))}
+        <Button
+          placeholder={undefined}
+          disabled={true}
+          onClick={handleAddOption}
+          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
+          Thêm lựa chọn
+        </Button>
+      </div>
+    </form>
   )
 }

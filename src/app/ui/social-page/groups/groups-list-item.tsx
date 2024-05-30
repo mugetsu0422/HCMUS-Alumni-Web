@@ -37,7 +37,7 @@ export default function GroupsListItem({ group }) {
           onClick={() => router.push(`/groups/${group.id}`)}
           size="sm"
           placeholder={undefined}
-          className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px]">
+          className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-28">
           Xem nhóm
         </Button>
       ) : (
@@ -45,7 +45,7 @@ export default function GroupsListItem({ group }) {
           onClick={() => router.push(`/groups/${group.id}`)}
           size="sm"
           placeholder={undefined}
-          className="h-fit bg-[--blue-04] text-[--blue-05] normal-case text-[14px]">
+          className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-28">
           Tham gia
         </Button>
       )}

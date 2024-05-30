@@ -160,6 +160,7 @@ export default function CreatePostDialog() {
           form.append('addedImages', image)
         }
 
+        
         axios
           .put(
             `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${id}/images`,
@@ -277,36 +278,8 @@ export default function CreatePostDialog() {
           }}
         />
 
-        {/* const handleOpenAdingPost = () => {
-    setOpenAddingPost((e) => !e)
-  }
-
-  const handleOpenAdingImage = () => {
-    setOpenAddinImage((e) => !e)
-  } */}
-
-        {!openAddingPost && (
-          <Button
-            onClick={handleOpenAdingPost}
-            placeholder={undefined}
-            className="bg-[--blue-02] normal-case flex gap-2 items-center justify-center">
-            <BarChartLine className="text-xl" />
-            Tạo bình chọn
-          </Button>
-        )}
-
         {openAddingPost && (
           <VotingPostForm handleOpenAdingPost={handleOpenAdingPost} />
-        )}
-
-        {!openAddinImage && (
-          <Button
-            onClick={handleOpenAdingImage}
-            placeholder={undefined}
-            className="bg-[--blue-02] normal-case flex gap-2 items-center justify-center">
-            <Image className="text-xl" />
-            Chọn ảnh
-          </Button>
         )}
 
         {openAddinImage && (
@@ -320,11 +293,31 @@ export default function CreatePostDialog() {
           />
         )}
 
+        {!openAddingPost && (
+          <Button
+            onClick={handleOpenAdingPost}
+            placeholder={undefined}
+            className="bg-[--blue-02] w-96 m-auto normal-case flex gap-2 items-center justify-center">
+            <BarChartLine className="text-xl" />
+            Tạo bình chọn
+          </Button>
+        )}
+
+        {!openAddinImage && (
+          <Button
+            onClick={handleOpenAdingImage}
+            placeholder={undefined}
+            className="bg-[--blue-02] w-96 m-auto normal-case flex gap-2 items-center justify-center">
+            <Image className="text-xl" />
+            Chọn ảnh
+          </Button>
+        )}
+
         <Button
           placeholder={undefined}
           size="lg"
           type="submit"
-          className={`${nunito.className} h-12 w-full text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
+          className={`${nunito.className} w-96 m-auto h-12  text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
           Đăng
         </Button>
       </form>
@@ -441,27 +434,28 @@ function VotingPostForm({ handleOpenAdingPost }) {
         </div>
         {options.map((option, index) => (
           <div key={index} className="flex items-center mb-2">
-            <input
+            <Input
+              crossOrigin={undefined}
               type="text"
               value={option}
               onChange={(e) => handleOptionChange(index, e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder={`Lựa chọn ${index + 1}`}
+              label={`Lựa chọn ${index + 1}`}
             />
-            <button
-              type="button"
+            <Button
+              placeholder={undefined}
               onClick={() => handleRemoveOption(index)}
-              className="ml-2 bg-red-500 text-white px-2 py-1 rounded text-nowrap">
-              Xóa lựa chọn
-            </button>
+              className="ml-2 bg-red-500 rounded text-nowrap normal-case text-[13px]">
+              <p className="text-black"> Xóa lựa chọn </p>
+            </Button>
           </div>
         ))}
-        <button
-          type="button"
+        <Button
+          placeholder={undefined}
           onClick={handleAddOption}
-          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
+          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
           Thêm lựa chọn
-        </button>
+        </Button>
       </div>
     </form>
   )

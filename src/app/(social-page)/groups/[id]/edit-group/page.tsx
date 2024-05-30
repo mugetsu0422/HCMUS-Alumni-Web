@@ -8,13 +8,10 @@ import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import ErrorInput from '../../../ui/error-input'
-import { nunito } from '../../../ui/fonts'
-import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
-import { JWT_COOKIE } from '../../../constant'
-import { useForm } from 'react-hook-form'
-import moment from 'moment'
-import page from './../../../admin/page'
+import ErrorInput from '../../../../ui/error-input'
+import { nunito } from '../../../../ui/fonts'
+import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
+import { JWT_COOKIE } from '../../../../constant'
 
 const privacyValue = [
   {
@@ -30,45 +27,6 @@ const privacyValue = [
 export default function Page() {
   const [previewImage, setPreviewImage] = useState(null)
   const [imageFile, setImageFile] = useState(null)
-  //const [privacy, setPrivacy] = useState('')
-
-  const {
-    register,
-    handleSubmit,
-    trigger,
-    watch,
-    formState: { errors },
-  } = useForm()
-
-  const onSubmit = async (data) => {
-    const group = {
-      name: data.name,
-      description: data.description,
-      privacy: { name: data.privacy },
-      cover: imageFile,
-    }
-
-    console.log(imageFile)
-    console.log(group)
-    const groupToast = toast.loading('Đang tạo')
-
-    axios
-      .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups`, group, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(() => {
-        toast.success('Đăng thành công', {
-          id: groupToast,
-        })
-      })
-      .catch(({ message }) => {
-        toast.error(message, {
-          id: groupToast,
-        })
-      })
-  }
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -139,25 +97,9 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[800px] w-[80%] m-auto`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
       <div className="w-full flex">
-        <Link href={'/groups'}>
+        {/* <Link href={`/groups/${1}`}> */}
+        <Link href={`/groups/1`}>
           {/*Replace with the exact id */}
           <Button
             placeholder={undefined}
@@ -167,42 +109,41 @@ export default function Page() {
           </Button>
         </Link>
 
-        <p className="m-auto text-2xl text-black font-bold">Tạo nhóm mới</p>
+        <p className="m-auto text-2xl text-black font-bold">Chỉnh sửa nhóm</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <form
+        //onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <label htmlFor="name" className="text-xl font-bold">
+          <label htmlFor="facultyId" className="text-xl font-bold">
             Tên nhóm
           </label>
           <Input
             size="lg"
             crossOrigin={undefined}
             type="text"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-            {...register('name', {
-              required: 'Vui lòng nhập tiêu đề',
-            })}
+            //   {...register('title', {
+            //     required: 'Vui lòng nhập tiêu đề',
+            //   })}
           />
-          <ErrorInput
-            // This is the error message
-            errors={errors?.name?.message}
-          />
+          {/* <ErrorInput
+          // This is the error message
+          errors={errors?.title?.message}
+        /> */}
         </div>
 
         <div className="flex flex-col gap-2 w-full">
-          <label htmlFor="privacy" className="text-xl font-bold">
-            Quyền riêng tư
+          <label htmlFor="facultyId" className="text-xl font-bold">
+            Riêng tư
           </label>
           <select
-            className="hover:cursor-pointer pl-3 w-full text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
-            {...register('privacy')}>
+            className="h-[50px] hover:cursor-pointer pl-3 w-full text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+            // {...register('facultyId')}
+          >
             {privacyValue.map(({ id, name }) => {
               return (
-                <option key={id} value={name}>
+                <option key={id} value={id}>
                   {name}
                 </option>
               )
@@ -220,14 +161,14 @@ export default function Page() {
               className: 'before:content-none after:content-none',
             }}
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-            {...register('description', {
-              required: 'Vui lòng nhập tiêu đề',
-            })}
+            //   {...register('title', {
+            //     required: 'Vui lòng nhập tiêu đề',
+            //   })}
           />
-          <ErrorInput
-            // This is the error message
-            errors={errors?.description?.message}
-          />
+          {/* <ErrorInput
+          // This is the error message
+          errors={errors?.title?.message}
+        /> */}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -286,7 +227,7 @@ export default function Page() {
           size="lg"
           type="submit"
           className={`${nunito.className} h-12 w-full text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
-          Tạo nhóm
+          Cập nhật
         </Button>
       </form>
     </div>

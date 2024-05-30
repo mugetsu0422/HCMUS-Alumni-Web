@@ -1,8 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import React from 'react'
-import { Avatar, Button, Tabs, TabsHeader, Tab } from '@material-tailwind/react'
-import { Dot, BoxArrowInRight } from 'react-bootstrap-icons'
+import {
+  Avatar,
+  Button,
+  Tabs,
+  TabsHeader,
+  Tab,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+} from '@material-tailwind/react'
+import { Dot, BoxArrowInRight, Gear, PencilSquare } from 'react-bootstrap-icons'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Discuss from '../../../ui/social-page/groups/discuss'
@@ -10,6 +20,7 @@ import ListMember from '../../../ui/social-page/groups/list-member'
 import { nunito } from '../../../ui/fonts'
 import { GlobeAmericas } from 'react-bootstrap-icons'
 import MemberRequest from '../../../ui/social-page/groups/member-request'
+import Link from 'next/link'
 
 const groups = {
   id: '1',
@@ -19,7 +30,7 @@ const groups = {
     name: 'Đặng Nguyễn Duy',
     avatarUrl: '/demo.jpg',
   },
-  privacy: 'Công khai',
+  privacy: 'Riêng tư',
   avatarUrl: '/demo.jpg',
   coverUrl: '/thumbnail-social-pages.jpg',
   website: '',
@@ -115,13 +126,33 @@ export default function Page() {
               </Tabs>
             </div>
             {groups.isJoined && (
-              <Button
-                placeholder={undefined}
-                variant="text"
-                className="py-2 px-4 flex gap-1 items-center">
-                Rời khỏi nhóm
-                <BoxArrowInRight className="text-lg" />
-              </Button>
+              <Menu placement="bottom-end">
+                <MenuHandler>
+                  <Button
+                    placeholder={undefined}
+                    variant="text"
+                    className="py-2 px-4 flex gap-1 items-center text-black">
+                    <Gear className="text-xl" />
+                  </Button>
+                </MenuHandler>
+                <MenuList placeholder={undefined}>
+                  <MenuItem
+                    placeholder={undefined}
+                    className="flex items-center gap-1 text-black py-3">
+                    <BoxArrowInRight className="text-lg" />
+                    Rời khỏi nhóm
+                  </MenuItem>
+
+                  <MenuItem placeholder={undefined}>
+                    <Link
+                      href={`/groups/${groups.id}/edit-group`}
+                      className="flex items-center gap-1 text-black py-1">
+                      <PencilSquare className="text-lg" />
+                      Chỉnh sửa thông tin nhóm
+                    </Link>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             )}
           </div>
         </div>

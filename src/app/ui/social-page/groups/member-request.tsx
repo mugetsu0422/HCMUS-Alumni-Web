@@ -100,7 +100,7 @@ export default function MemberRequest() {
                 size="md"
                 type="submit"
                 className="bg-[var(--blue-05)] normal-case">
-                Chấp nhận
+                Phê duyệt
               </Button>
             </div>
           </div>
