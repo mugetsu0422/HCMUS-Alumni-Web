@@ -16,12 +16,13 @@ import {
 import { TagFill, SendFill, XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import { nunito } from '../fonts'
-import Comments from '../social-page/news/comments'
+import Comments from '../common/comments'
 import ImageGird from './image-grid'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { useForm } from 'react-hook-form'
 import { COMMENT_PAGE_SIZE } from '../../constant'
+import { useTruncatedElement } from '../../../hooks/use-truncated-element'
 
 // interface CounselPostProps {
 //   id: string
@@ -71,10 +72,11 @@ export default function CommentsDialog({
   openCommentsDialog,
   handleOpenCommentDialog,
   onUploadComment,
+  onEditComment,
+  onDeleteComment,
   onFetchChildrenComments,
   onFetchComments,
 }) {
-  const [isExpanded, setIsExpanded] = useState(false)
   const [uploadComment, setUploadComment] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const commentPage = useRef(0)
@@ -82,9 +84,6 @@ export default function CommentsDialog({
   // Function to handle changes in the textarea
   const handleUploadCommentChange = (event) => {
     setUploadComment(event.target.value)
-  }
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded)
   }
   const onShowMoreComments = (page: number, pageSize: number) => {
     setIsLoading(true)
@@ -96,7 +95,7 @@ export default function CommentsDialog({
   return (
     <Dialog
       size="lg"
-      className='h-[90dvh] flex flex-col'
+      className="h-[90dvh] flex flex-col"
       placeholder={undefined}
       open={openCommentsDialog}
       handler={handleOpenCommentDialog}>
@@ -157,19 +156,15 @@ export default function CommentsDialog({
           {/* this is the content of the body */}
           <div className="flex flex-col gap-2">
             <div className="overflow-hidden">
-              <div
-                className={`${
-                  isExpanded ? 'block' : 'line-clamp-3'
-                } whitespace-pre-line text-black font-normal`}>
+              <div className={` whitespace-pre-line text-black font-normal`}>
                 {post.content}
               </div>
-              {!isExpanded && (
-                <span
-                  className="text-black font-semibold hover:underline hover:cursor-pointer rounded text-nowrap inline-flex"
-                  onClick={toggleExpand}>
-                  Xem thêm
-                </span>
-              )}
+
+              {/* <span
+                className="text-black font-semibold hover:underline hover:cursor-pointer rounded text-nowrap inline-flex"
+                onClick={toggleExpand}>
+                Xem thêm
+              </span> */}
             </div>
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
@@ -204,9 +199,11 @@ export default function CommentsDialog({
           <Comments
             comments={comments}
             onUploadComment={onUploadComment}
+            onEditComment={onEditComment}
+            onDeleteComment={onDeleteComment}
             onFetchChildrenComments={onFetchChildrenComments}
           />
-          {comments.length != post.childrenCommentNumber && (
+          {comments.length < post.childrenCommentNumber && (
             <div
               onClick={() => {
                 onShowMoreComments(++commentPage.current, COMMENT_PAGE_SIZE)
@@ -235,7 +232,7 @@ export default function CommentsDialog({
             rows={1}
             resize={true}
             placeholder="Bình luận của bạn"
-            className="min-h-full !border-0 focus:border-transparent w-full bg-[var(--comment-input)]"
+            className="min-h-full !border-0 focus:border-transparent w-full !bg-[var(--comment-input)]"
             containerProps={{
               className: 'grid h-full',
             }}

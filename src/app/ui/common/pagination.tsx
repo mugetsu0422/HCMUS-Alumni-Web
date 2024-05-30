@@ -18,7 +18,7 @@ export default function Pagination({
   onNextPage,
   onPrevPage,
 }: PaginationProps) {
-  return (
+  return totalPages ? (
     <div className="flex items-center gap-4 justify-center mb-6">
       <Button
         placeholder={undefined}
@@ -43,5 +43,5 @@ export default function Pagination({
         />
       </Button>
     </div>
-  )
+  ) : null
 }

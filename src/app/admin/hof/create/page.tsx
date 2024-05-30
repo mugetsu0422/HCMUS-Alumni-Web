@@ -70,6 +70,7 @@ export default function Page() {
     const hof = {
       title: data.title,
       thumbnail: data.thumbnail[0],
+      position: data.position,
       summary: data.summary,
       emailOfUser: data.emailOfUser || null,
       facultyId: data.facultyId || null,
@@ -157,7 +158,7 @@ export default function Page() {
 
   return (
     <div
-      className={`${nunito.className} max-w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
+      className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -326,6 +327,30 @@ export default function Page() {
                 className: 'before:content-none after:content-none',
               }}
               {...register('summary', {
+                onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Thông tin nổi bật
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {summaryCharCount}/{summaryMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={summaryMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('position', {
                 onChange: (e) => setSummaryCharCount(e.target.value.length),
               })}
             />

@@ -22,7 +22,7 @@ import {
   Pencil,
 } from 'react-bootstrap-icons'
 import Link from 'next/link'
-import Comments from '../../../ui/social-page/news/comments'
+import Comments from '../../../ui/common/comments'
 import { nunito } from '../../../ui/fonts'
 import ImageGird from '../../../ui/counsel/image-grid'
 import moment from 'moment'
@@ -34,7 +34,7 @@ import {
   REACTION_TYPE,
 } from '../../../constant'
 import ReactionDialog from '../../../ui/counsel/counsel-react-dialog'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import toast, { Toaster } from 'react-hot-toast'
@@ -207,6 +207,41 @@ export default function Page({ params }: { params: { id: string } }) {
         console.error(err)
         toast.error('Xóa bài viết thất bại')
       })
+  }
+  const onEditComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    commentId: string,
+    content: string
+  ): Promise<AxiosResponse<any, any>> => {
+    e.preventDefault()
+    const comment = {
+      content: content,
+    }
+
+    return axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${commentId}`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onDeleteComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    commentId: string
+  ): Promise<AxiosResponse<any, any>> => {
+    e.preventDefault()
+
+    return axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
 
   useEffect(() => {
@@ -435,7 +470,7 @@ export default function Page({ params }: { params: { id: string } }) {
                 rows={1}
                 resize={true}
                 placeholder="Bình luận của bạn"
-                className="min-h-full !border-0 focus:border-transparent w-full bg-[var(--comment-input)]"
+                className="min-h-full !border-0 focus:border-transparent w-full !bg-[var(--comment-input)]"
                 containerProps={{
                   className: 'grid h-full',
                 }}
@@ -458,9 +493,11 @@ export default function Page({ params }: { params: { id: string } }) {
             <Comments
               comments={comments}
               onUploadComment={onUploadComment}
+              onEditComment={onEditComment}
+              onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
             />
-            {comments.length != post.childrenCommentNumber && (
+            {comments.length < post.childrenCommentNumber && (
               <div
                 onClick={onShowMoreComments}
                 className="group w-full flex gap-2 text-[--secondary] justify-between">

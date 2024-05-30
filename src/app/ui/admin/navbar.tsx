@@ -1,16 +1,22 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Navbar,
   Collapse,
   Badge,
   Avatar,
   Button,
+  Card,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
+  Typography,
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronDown } from 'react-bootstrap-icons'
+import { ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faBell,
@@ -20,15 +26,30 @@ import {
   faCalendarDays,
   faCertificate,
   faComments,
+  faUserPen,
 } from '@fortawesome/free-solid-svg-icons'
+import { inter } from '../fonts'
 
 // nav list component
 const navListItems = [
   {
-    label: 'Xét duyệt',
+    label: 'Tài khoản',
     subMenu: [
-      { title: 'Chưa xét duyệt', link: '/admin/alumni-verification/pending' },
-      { title: 'Đã xét duyệt', link: '/admin/alumni-verification/resolved' },
+      { title: 'Cấp tài khoản', link: '/admin/users/create' },
+      {
+        title: 'Xét duyệt cựu sinh viên',
+        link: '/admin/alumni-verification/pending',
+        subMenu: [
+          {
+            title: 'Chưa xét duyệt',
+            link: '/admin/alumni-verification/pending',
+          },
+          {
+            title: 'Đã xét duyệt',
+            link: '/admin/alumni-verification/resolved',
+          },
+        ],
+      },
     ],
     icon: faUserPlus,
   },
@@ -56,41 +77,184 @@ const navListItems = [
     icon: faComments,
     link: '#',
   },
+  {
+    label: 'Vai trò',
+    link: '/admin/roles',
+    subMenu: null,
+    icon: faUserPen,
+  },
 ]
+
+function NavListMenu({ label, icon, navListMenuItems }) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    window.addEventListener(
+      'resize',
+      () => (window.innerWidth >= 960 ? setIsMobile(false) : setIsMobile(true)) // 960 = lg (tailwind)
+    )
+  }, [isMobile])
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
+  const [openSubMenuMobile, setOpenSubMenuMobile] = useState(false)
+
+  const renderItemsForWeb = navListMenuItems.map(({ title, link, subMenu }) => {
+    return subMenu ? (
+      <Menu
+        allowHover
+        key={title}
+        placement="right-start"
+        open={openSubMenuWeb}
+        handler={setOpenSubMenuWeb}
+        offset={15}>
+        <MenuHandler
+          className={`${inter.className} flex items-center justify-between gap-2 text-base hover:text-[var(--blue-05)]`}>
+          <MenuItem placeholder={undefined}>
+            {title}
+            <ChevronUp
+              className={`h-3.5 w-3.5 transition-transform ${
+                openSubMenuWeb ? 'rotate-90' : ''
+              }`}
+            />
+          </MenuItem>
+        </MenuHandler>
+        <MenuList
+          placeholder={undefined}
+          className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
+          {subMenu.map(({ title, link }) => (
+            <Link
+              href={link}
+              key={title}
+              className="focus-visible:outline-none">
+              <MenuItem
+                placeholder={undefined}
+                className={`${inter.className} font-medium text-base hover:text-[var(--blue-05)]`}>
+                {title}
+              </MenuItem>
+            </Link>
+          ))}
+        </MenuList>
+      </Menu>
+    ) : (
+      <Link href={link} key={title}>
+        <MenuItem
+          placeholder={undefined}
+          className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
+          {title}
+        </MenuItem>
+      </Link>
+    )
+  })
+  const renderItemsForMobile = navListMenuItems.map(
+    ({ title, link, subMenu }) => {
+      return subMenu ? (
+        <Menu
+          allowHover
+          key={title}
+          placement="bottom-start"
+          open={openSubMenuMobile}
+          handler={setOpenSubMenuMobile}
+          offset={15}>
+          <MenuHandler
+            className={`${inter.className} w-fit flex items-center justify-between gap-2 text-base hover:text-[var(--blue-05)]`}>
+            <MenuItem placeholder={undefined}>
+              {title}
+              <ChevronUp
+                className={`h-3.5 w-3.5 transition-transform ${
+                  openSubMenuMobile ? 'rotate-180' : ''
+                }`}
+              />
+            </MenuItem>
+          </MenuHandler>
+          <MenuList
+            placeholder={undefined}
+            className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
+            {subMenu.map(({ title, link }) => (
+              <Link
+                href={link}
+                key={title}
+                className="focus-visible:outline-none">
+                <MenuItem
+                  placeholder={undefined}
+                  className={`${inter.className} font-medium text-base hover:text-[var(--blue-05)]`}>
+                  {title}
+                </MenuItem>
+              </Link>
+            ))}
+          </MenuList>
+        </Menu>
+      ) : (
+        <Link href={link} key={title}>
+          <MenuItem
+            placeholder={undefined}
+            className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
+            {title}
+          </MenuItem>
+        </Link>
+      )
+    }
+  )
+
+  return (
+    <React.Fragment>
+      <Menu allowHover open={isMenuOpen} handler={setIsMenuOpen}>
+        <MenuHandler>
+          <div className="font-normal">
+            <MenuItem
+              placeholder={undefined}
+              className="hidden items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:flex lg:rounded-full">
+              <FontAwesomeIcon icon={icon} className="text-2xl" />
+              {label}
+              <ChevronDown
+                className={`h-3 w-3 transition-transform ${
+                  isMenuOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </MenuItem>
+          </div>
+        </MenuHandler>
+        <MenuList
+          placeholder={undefined}
+          className="hidden w-fit lg:grid bg-white rounded-xl font-medium border-2 border-[var(--blue-02)]">
+          <ul className="font-medium text-base text-[--text-navbar] focus-visible:outline-none">
+            {renderItemsForWeb}
+          </ul>
+        </MenuList>
+      </Menu>
+      <MenuItem
+        placeholder={undefined}
+        className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:hidden">
+        <FontAwesomeIcon icon={icon} className="text-2xl" />
+        {label}
+      </MenuItem>
+      <ul className="ml-6 flex w-full flex-col gap-1 lg:hidden text-[--text-navbar] font-medium text-base hover:text-[var(--blue-05)]">
+        {renderItemsForMobile}
+      </ul>
+    </React.Fragment>
+  )
+}
 
 function NavList() {
   return (
-    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col gap-3 lg:gap-6 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
+    <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
       {navListItems.map(({ label, subMenu, icon, link }) => (
-        <div className="group cursor-pointer lg:py-3" key={label}>
+        <li className="group cursor-pointer lg:py-3" key={label}>
           {subMenu ? (
-            <>
-              <div className="text-[--text-navbar] font-bold group-hover:text-[--blue-05] flex items-center gap-2">
-                <FontAwesomeIcon icon={icon} className="text-2xl" />
-                {label}
-                <ChevronDown className="group-hover:rotate-180" />
-              </div>
-              <div className="w-[fit] px-5 py-3 ml-3 lg:ml-0 hidden group-hover:flex lg:absolute  flex-col gap-3 bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--blue-02)]">
-                {subMenu.map(({ title, link }) => (
-                  <Link
-                    key={title}
-                    className="text-[--text-navbar] hover:text-[var(--blue-05)]"
-                    href={link}>
-                    {title}
-                  </Link>
-                ))}
-              </div>
-            </>
+            <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
               href={link}
               className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
-              <FontAwesomeIcon icon={icon} className="text-2xl" />
-
-              {label}
+              <MenuItem
+                placeholder={undefined}
+                className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
+                <FontAwesomeIcon icon={icon} className="text-2xl" />
+                {label}
+              </MenuItem>
             </Link>
           )}
-        </div>
+        </li>
       ))}
     </ul>
   )
@@ -102,7 +266,7 @@ export default function MyNavbar() {
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener(
       'resize',
       () => window.innerWidth >= 960 && setIsNavOpen(false) // 960 = lg (tailwind)
@@ -113,7 +277,7 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className="px-3 lg:pl-6 py-5 lg:py-0 ">
+      className={`px-3 lg:pl-6 py-5 lg:py-0 `}>
       <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
         <Link href="/">
           <Image

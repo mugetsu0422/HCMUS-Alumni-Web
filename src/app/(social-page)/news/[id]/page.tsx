@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react'
 import { ClockFill, EyeFill, TagFill } from 'react-bootstrap-icons'
 import { Textarea, Button } from '@material-tailwind/react'
-import Comments from '../../../ui/social-page/news/comments'
+import Comments from '../../../ui/common/comments'
 import { nunito } from '../../../ui/fonts'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { JWT_COOKIE, TAGS } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
@@ -51,9 +51,45 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err)
         toast.error('Đăng thất bại', { id: postCommentToast })
       })
+  }
+  const onEditComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    commentId: string,
+    content: string
+  ): Promise<AxiosResponse<any, any>> => {
+    e.preventDefault()
+    const comment = {
+      content: content,
+    }
+
+    return axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/comments/${commentId}`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onDeleteComment = (
+    e: React.FormEvent<HTMLFormElement>,
+    commentId: string
+  ): Promise<AxiosResponse<any, any>> => {
+    e.preventDefault()
+
+    return axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/comments/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
   const onFetchChildrenComments = async (
     parentId: string,
@@ -252,10 +288,12 @@ export default function Page({ params }: { params: { id: string } }) {
             <Comments
               comments={comments}
               onUploadComment={onUploadComment}
+              onEditComment={onEditComment}
+              onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
             />
 
-            {comments.length != news?.childrenCommentNumber && (
+            {comments.length < news?.childrenCommentNumber && (
               <Button
                 onClick={onFetchComments}
                 className="bg-[--blue-02] normal-case text-sm gap-1"

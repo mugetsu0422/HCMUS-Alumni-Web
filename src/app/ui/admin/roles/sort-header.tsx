@@ -28,33 +28,30 @@ export default function SortHeader({ onOrder }: HeaderProps) {
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[460px] ml-2 mr-1 text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-              Bài viết
+              className="w-[250px] text-center ml-2 p-2 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+              Vai trò
               <CaretDownFill />
             </Button>
           </MenuHandler>
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('title', 'asc')}
+              onClick={() => onOrder('name', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('title', 'desc')}
+              onClick={() => onOrder('name', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
             </MenuItem>
           </MenuList>
         </Menu>
-        <div className="w-[7rem] text-center mr-1 py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-          Thẻ
-        </div>
-        <div className="w-[10.5rem] text-center py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-          Khoa{' '}
+        <div className="w-[500px] text-center py-1 px-0 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+          Mô tả
         </div>
 
         <Menu>
@@ -62,52 +59,24 @@ export default function SortHeader({ onOrder }: HeaderProps) {
             <Button
               placeholder={undefined}
               variant="text"
-              className="w-[8rem] text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
-              Ngày đăng
+              className="w-[200px] text-center p-1 flex items-center justify-center gap-1 font-bold normal-case text-base text-[#000000]">
+              Lần cuối cập nhật
               <CaretDownFill />
             </Button>
           </MenuHandler>
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('publishedAt', 'desc')}
+              onClick={() => onOrder('updateAt', 'desc')}
               className="text-center font-bold flex justify-center">
               Mới nhất
               <ArrowDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('publishedAt', 'asc')}
+              onClick={() => onOrder('updateAt', 'asc')}
               className="text-center font-bold flex justify-center">
               Cũ nhất
-              <ArrowUp />
-            </MenuItem>
-          </MenuList>
-        </Menu>
-
-        <Menu>
-          <MenuHandler>
-            <Button
-              placeholder={undefined}
-              variant="text"
-              className="w-[10rem] text-center p-1 flex items-center justify-center gap-2 font-bold normal-case text-base text-[#000000]">
-              Lượt xem
-              <CaretDownFill />
-            </Button>
-          </MenuHandler>
-          <MenuList placeholder={undefined}>
-            <MenuItem
-              placeholder={undefined}
-              onClick={() => onOrder('views', 'desc')}
-              className="text-center font-bold flex justify-center">
-              Giảm dần
-              <ArrowDown />
-            </MenuItem>
-            <MenuItem
-              placeholder={undefined}
-              onClick={() => onOrder('views', 'asc')}
-              className="text-center font-bold flex justify-center">
-              Tăng dần
               <ArrowUp />
             </MenuItem>
           </MenuList>

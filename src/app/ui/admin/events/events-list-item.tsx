@@ -10,13 +10,13 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
 
 import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import moment from 'moment'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
+import Link from 'next/link'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -100,7 +100,6 @@ export default function EventsListItem({
   minimumParticipants,
   maximumParticipants,
 }) {
-  const router = useRouter()
   const [openDelete, setOpenDelete] = React.useState(false)
   const [openShow, setOpenShow] = React.useState(false)
   const [isDeleted, setIsDeleted] = React.useState(false)
@@ -154,10 +153,6 @@ export default function EventsListItem({
       })
   }
 
-  function handleEdit(id: string) {
-    router.push(`/admin/events/${id}`)
-  }
-
   if (isDeleted) return null
   return (
     <div
@@ -179,11 +174,13 @@ export default function EventsListItem({
           },
         }}
       />
-      <img
-        src={thumbnail}
-        alt="news image"
-        className="h-[120px] w-[180px] object-cover object-center rounded-lg  p-1 border-solid border border-black"
-      />
+      <div className="h-[120px] w-[180px]">
+        <img
+          src={thumbnail}
+          alt="news image"
+          className="h-full w-full object-cover object-center rounded-lg  p-1 border-solid border border-black"
+        />
+      </div>
       <p className="h-20 px-2 w-[350px] py-2 font-[600] text-black align-middle flex items-center">
         {title}
       </p>
@@ -210,13 +207,11 @@ export default function EventsListItem({
       </p>
 
       <div className="flex justify-end px-2">
-        <Button
-          variant="text"
-          onClick={() => handleEdit(id)}
-          placeholder={undefined}
-          className="px-4">
-          <PencilSquare className="text-2xl text-[--blue-05]" />
-        </Button>
+        <Link href={`/admin/events/${id}`}>
+          <Button variant="text" placeholder={undefined} className="px-4">
+            <PencilSquare className="text-2xl text-[--blue-05]" />
+          </Button>
+        </Link>
         <Button
           variant="text"
           onClick={handleOpenDetele}

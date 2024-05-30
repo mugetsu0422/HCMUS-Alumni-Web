@@ -9,7 +9,6 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
 import { nunito } from '../../fonts'
 import {
   Trash3,
@@ -23,6 +22,7 @@ import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
+import Link from 'next/link'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -107,11 +107,6 @@ export default function HofListItem({ hof }) {
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
 
-  const router = useRouter()
-  function handleEdit(id: string) {
-    router.push(`/admin/hof/${id}`)
-  }
-
   const onDelete = (id) => {
     axios
       .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${id}`, {
@@ -178,22 +173,24 @@ export default function HofListItem({ hof }) {
           },
         }}
       />
-      <img
-        src={hof.thumbnail}
-        alt="hall of fame image"
-        className=" h-[120px] w-[180px] object-cover object-center p-1 border-solid border border-black"
-      />
+      <div className="h-[120px] w-[180px]">
+        <img
+          src={hof.thumbnail}
+          alt="hall of fame image"
+          className="h-full w-full object-cover object-center p-1 border-solid border border-black"
+        />
+      </div>
 
-      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-center flex items-center">
+      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-start flex items-center text-wrap">
         {hof.title}
       </p>
-      <p className="text-lg h-20 w-[380px] font-[600] text-black justify-center flex overflow-y-auto scrollbar-webkit-main">
-        {hof.summary}
+      <p className="text-lg h-20 w-[325px] font-[600] text-black justify-center flex items-center overflow-y-auto scrollbar-webkit-main">
+        {hof.position}
       </p>
       <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
         {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
       </p>
-      <p className="text-lg w-[10rem] text-center text-black font-[600] flex items-center justify-center">
+      <p className="text-lg w-[8rem] text-center text-black font-[600] flex items-center justify-center">
         {hof.faculty?.name}
       </p>
       <p className="text-lg w-[6rem]  text-center text-black font-[600] flex items-center justify-center">
@@ -203,13 +200,11 @@ export default function HofListItem({ hof }) {
         {hof.views}
       </p>
       <div className="flex justify-end px-2">
-        <Button
-          variant="text"
-          onClick={() => handleEdit(hof.id)}
-          placeholder={undefined}
-          className="px-2 py-2">
-          <PencilSquare className="text-2xl text-[--blue-05]" />
-        </Button>
+        <Link href={`/admin/hof/${hof.id}`}>
+          <Button variant="text" placeholder={undefined} className="px-2 py-2">
+            <PencilSquare className="text-2xl text-[--blue-05]" />
+          </Button>
+        </Link>
         <Button
           variant="text"
           onClick={handleOpenDetele}

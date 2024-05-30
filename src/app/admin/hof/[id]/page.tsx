@@ -57,7 +57,8 @@ export default function Page({ params }: { params: { id: string } }) {
   const [noData, setNoData] = useState(false)
   const [hof, setHof] = useState(null)
   const [summaryCharCount, setSummaryCharCount] = useState(0)
-  const summaryMaxCharCount = 150
+  const [positionCharCount, setPositionCharCount] = useState(0)
+  const mediumTextMaxCharCount = 150
 
   const {
     register,
@@ -69,6 +70,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const onSubmit = async (data) => {
     const hof = {
       title: data.title,
+      position: data.position,
       thumbnail: data.thumbnail[0] || null,
       summary: data.summary,
       emailOfUser: data.emailOfUser || null,
@@ -151,8 +153,10 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data }) => {
         setHof(data)
         setValue('title', data.title)
+        setValue('position', data.position)
+        setPositionCharCount(data.position ? data.position.length : 0)
         setValue('summary', data.summary)
-        setSummaryCharCount(data.summary.length)
+        setSummaryCharCount(data.summary ? data.summary.length : 0)
         setValue('beginningYear', data.beginningYear)
         setValue('facultyId', data.faculty?.id || '0')
         setValue('emailOfUser', data.linkedUser?.email)
@@ -166,13 +170,13 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // if (noData) {
-  //   return <NoData />
-  // }
+  if (noData) {
+    return <NoData />
+  }
 
   return (
     <div
-      className={`${nunito.className} max-w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
+      className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -323,11 +327,11 @@ export default function Page({ params }: { params: { id: string } }) {
             <label className={`relative text-xl font-bold`}>
               Tóm tắt
               <p className="absolute right-0 bottom-0 font-normal text-base">
-                {summaryCharCount}/{summaryMaxCharCount}
+                {summaryCharCount}/{mediumTextMaxCharCount}
               </p>
             </label>
             <Textarea
-              maxLength={summaryMaxCharCount}
+              maxLength={mediumTextMaxCharCount}
               size="lg"
               variant="outlined"
               className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
@@ -339,6 +343,30 @@ export default function Page({ params }: { params: { id: string } }) {
               }}
               {...register('summary', {
                 onChange: (e) => setSummaryCharCount(e.target.value.length),
+              })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className={`relative text-xl font-bold`}>
+              Thông tin nổi bật
+              <p className="absolute right-0 bottom-0 font-normal text-base">
+                {positionCharCount}/{mediumTextMaxCharCount}
+              </p>
+            </label>
+            <Textarea
+              maxLength={mediumTextMaxCharCount}
+              size="lg"
+              variant="outlined"
+              className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              containerProps={{
+                className: 'h-[110px]',
+              }}
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('position', {
+                onChange: (e) => setPositionCharCount(e.target.value.length),
               })}
             />
           </div>
