@@ -16,10 +16,10 @@ import toast, { Toaster } from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { TAGS, JWT_COOKIE } from '../../../../constant'
-import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
-import ErrorInput from '../../../../ui/error-input'
-import { nunito } from '../../../../ui/fonts'
+import { TAGS, JWT_COOKIE } from '../../../../../constant'
+import styles from '../../../../../ui/admin/react-tag-autocomplete.module.css'
+import ErrorInput from '../../../../../ui/error-input'
+import { nunito } from '../../../../../ui/fonts'
 
 export default function Page() {
   const {
@@ -31,16 +31,6 @@ export default function Page() {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
-  const [openAddingPost, setOpenAddingPost] = useState(false)
-  const [openAddinImage, setOpenAddinImage] = useState(false)
-
-  const handleOpenAdingPost = () => {
-    setOpenAddingPost((e) => !e)
-  }
-
-  const handleOpenAdingImage = () => {
-    setOpenAddinImage((e) => !e)
-  }
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -190,7 +180,7 @@ export default function Page() {
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[600px] w-[80%] m-auto`}>
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
       <div className="w-full flex">
         <Link href={'/groups/1'}>
           {/*Replace with the exact id */}
@@ -202,7 +192,9 @@ export default function Page() {
           </Button>
         </Link>
 
-        <p className="m-auto text-2xl text-black font-bold">Tạo bài viết mới</p>
+        <p className="m-auto text-2xl text-black font-bold">
+          Chỉnh sửa bài viết
+        </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -258,46 +250,21 @@ export default function Page() {
           }}
         />
 
-        {openAddingPost && (
-          <VotingPostForm handleOpenAdingPost={handleOpenAdingPost} />
-        )}
+        <VotingPostForm />
 
-        {openAddinImage && (
-          <AddImaePost
-            handleOpenAdingImage={handleOpenAdingImage}
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-            onClickDropzone={onClickDropzone}
-            removeImage={removeImage}
-            previewImages={previewImages}
-          />
-        )}
-
-        {!openAddingPost && (
-          <Button
-            onClick={handleOpenAdingPost}
-            placeholder={undefined}
-            className="bg-[--blue-02] w-full m-auto normal-case flex gap-2 items-center justify-center">
-            <BarChartLine className="text-xl" />
-            Tạo bình chọn
-          </Button>
-        )}
-
-        {!openAddinImage && (
-          <Button
-            onClick={handleOpenAdingImage}
-            placeholder={undefined}
-            className="bg-[--blue-02] w-full m-auto normal-case flex gap-2 items-center justify-center">
-            <Image className="text-xl" />
-            Chọn ảnh
-          </Button>
-        )}
+        <AddImaePost
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          onClickDropzone={onClickDropzone}
+          removeImage={removeImage}
+          previewImages={previewImages}
+        />
 
         <Button
           placeholder={undefined}
           size="lg"
           type="submit"
-          className={`${nunito.className} h-12 w-full m-auto text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
+          className={`${nunito.className} h-12 w-full text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
           Đăng
         </Button>
       </form>
@@ -311,21 +278,10 @@ function AddImaePost({
   onClickDropzone,
   removeImage,
   previewImages,
-  handleOpenAdingImage,
 }) {
   return (
     <div>
-      <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
-        Thêm ảnh
-        <Button
-          variant="text"
-          placeholder={undefined}
-          className="z-10 mr-1 p-2 cursor-pointer"
-          onClick={handleOpenAdingImage} // Pass event object
-        >
-          <XLg className="text-lg" />
-        </Button>
-      </div>
+      <div className="flex text-gray-700 text-xl font-bold mb-2 ">Thêm ảnh</div>
       <div className="container flex flex-col items-end relative mx-auto my-2">
         <div
           className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
@@ -368,7 +324,7 @@ function AddImaePost({
   )
 }
 
-function VotingPostForm({ handleOpenAdingPost }) {
+function VotingPostForm() {
   const [title, setTitle] = useState('')
   const [options, setOptions] = useState([''])
   const [posts, setPosts] = useState([])
@@ -401,22 +357,14 @@ function VotingPostForm({ handleOpenAdingPost }) {
   return (
     <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
       <div className="mb-4">
-        <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
+        <div className="flex text-gray-700 text-xl font-bold mb-2 ">
           Tạo bình chọn
-          <Button
-            variant="text"
-            placeholder={undefined}
-            className="z-10 mr-1 p-2 cursor-pointer"
-            onClick={handleOpenAdingPost} // Pass event object
-          >
-            <XLg className="text-lg" />
-          </Button>
         </div>
         {options.map((option, index) => (
           <div key={index} className="flex items-center mb-2">
             <Input
-              size="lg"
               crossOrigin={undefined}
+              disabled={true}
               type="text"
               value={option}
               onChange={(e) => handleOptionChange(index, e.target.value)}
@@ -425,16 +373,18 @@ function VotingPostForm({ handleOpenAdingPost }) {
             />
             <Button
               placeholder={undefined}
+              disabled={true}
               onClick={() => handleRemoveOption(index)}
-              className="ml-2 px-3 py-2 bg-red-400 rounded text-nowrap normal-case ">
-              <p className="text-black"> Xóa lựa chọn </p>
+              className="ml-2 bg-red-500 text-white rounded text-nowrap normal-case text-[13px]">
+              Xóa lựa chọn
             </Button>
           </div>
         ))}
         <Button
           placeholder={undefined}
+          disabled={true}
           onClick={handleAddOption}
-          className="mt-2 bg-blue-500 text-white px-3 py-2 rounded normal-case">
+          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
           Thêm lựa chọn
         </Button>
       </div>

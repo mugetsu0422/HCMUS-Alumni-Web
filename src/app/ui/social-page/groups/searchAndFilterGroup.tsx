@@ -1,15 +1,17 @@
 'use client'
 
-import { Input } from '@material-tailwind/react'
+import { Input, Select, Option } from '@material-tailwind/react'
 import React from 'react'
 
 const filterPrivacy = [
-  { id: '1', name: 'Public' },
-  { id: '2', name: 'Private' },
+  { id: '0', name: 'Tất cả' },
+  { id: '1', name: 'Công khai' },
+  { id: '2', name: 'Nhóm kín' },
 ]
 const filterIsJoined = [
-  { id: '1', name: true },
-  { id: '2', name: false },
+  { id: '0', name: 'Tất cả' },
+  { id: '1', name: 'Đã tham gia' },
+  { id: '2', name: 'Khám phá' },
 ]
 
 export default function SearchAndFilterGroups() {
@@ -35,10 +37,9 @@ export default function SearchAndFilterGroups() {
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Tìm kiếm nhóm</p>
         <Input
-          size="lg"
           crossOrigin={undefined}
           placeholder={undefined}
-          containerProps={{ className: '!w-[500px]' }}
+          containerProps={{ className: '!w-[420px]' }}
           // {...register('name', {
           //   onChange: (e) => onSearch(e.target.value),
           // })}
@@ -50,41 +51,47 @@ export default function SearchAndFilterGroups() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="font-semibold text-md">Sự riêng tư</p>
-        <select
-          className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+        <p className="font-semibold text-md">Quyền riêng tư</p>
+        <Select
+          placeholder={undefined}
+          className="bg-white !border-blue-gray-200 focus:!border-gray-900 hover:cursor-pointer pl-3 text-black"
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
           // {...register('facultyId', {
           //   onChange: (e) => onFilter(e.target.value),
           // })}
         >
-          <option value={0}>Tất cả</option>
           {filterPrivacy.map(({ id, name }) => {
             return (
-              <option key={id} value={id}>
-                {name == 'Public' ? 'Công khai' : 'Nhóm kín'}
-              </option>
+              <Option key={id} value={id} className="text-[14px]">
+                {name}
+              </Option>
             )
           })}
-        </select>
+        </Select>
       </div>
 
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Nhóm của tôi</p>
-        <select
-          className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+        <Select
+          placeholder={undefined}
+          className="bg-white !border-blue-gray-200 focus:!border-gray-900 hover:cursor-pointer pl-3 text-black"
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
           // {...register('facultyId', {
           //   onChange: (e) => onFilter(e.target.value),
           // })}
         >
-          <option value={0}>Tất cả</option>
           {filterIsJoined.map(({ id, name }) => {
             return (
-              <option key={id} value={id}>
-                {name ? 'Đã tham gia' : 'Khám phá'}
-              </option>
+              <Option key={id} value={id} className="text-[14px]">
+                {name}
+              </Option>
             )
           })}
-        </select>
+        </Select>
       </div>
     </div>
   )

@@ -11,10 +11,14 @@ import React, {
 import {
   Avatar,
   Button,
+  Radio,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
+  List,
+  ListItem,
+  ListItemPrefix,
 } from '@material-tailwind/react'
 import { nunito } from '../fonts'
 import {
@@ -62,6 +66,15 @@ interface PostProps {
     delete: boolean
   }
 }
+const options = [
+  {
+    name: 'Option 1 Option 1 Option 1Option 1Option 1Option 1 Option 1 Option 1 Option 1Option 1 Option 1Option 1 Option 1 Option 1 Option 1 Option 1',
+    id: 1,
+  },
+  { name: 'Option 2', id: 2 },
+  { name: 'Option 3', id: 3 },
+  { name: 'Option 4', id: 4 },
+]
 
 export default function PostListItem({
   post,
@@ -81,6 +94,14 @@ export default function PostListItem({
   const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
     ref,
   })
+
+  const [votes, setVotes] = useState(Array(options.length).fill(0))
+
+  const handleVote = (id) => {
+    const newVotes = [...votes]
+    newVotes[id] += 1
+    setVotes(newVotes)
+  }
 
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
@@ -361,7 +382,35 @@ export default function PostListItem({
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
 
-          {/* this is the footer of the body */}
+        {/* this is the footer of the body */}
+
+        <List
+          placeholder={undefined}
+          className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+          {options.map(({ name, id }) => (
+            <ListItem placeholder={undefined} key={id} className="p-0 mb-2">
+              <label
+                htmlFor={`option-${post.title}-${id}`}
+                className="flex w-full cursor-pointer items-center px-3 py-2 bg-white rounded-lg shadow">
+                <ListItemPrefix placeholder={undefined} className="mr-3">
+                  <Radio
+                    color="blue"
+                    crossOrigin={undefined}
+                    name={`option-${post.title}`}
+                    id={`option-${post.title}-${id}`}
+                    ripple={false}
+                    className="hover:before:opacity-0"
+                    containerProps={{
+                      className: 'p-0',
+                    }}
+                    onClick={() => handleVote(id)}
+                  />
+                </ListItemPrefix>
+                <p className="text-black">{name}</p>
+              </label>
+            </ListItem>
+          ))}
+        </List>
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">

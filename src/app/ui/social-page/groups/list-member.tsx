@@ -1,7 +1,15 @@
 'use client'
 import React, { useState } from 'react'
-import { Input, Avatar } from '@material-tailwind/react'
-import { Search, Dot } from 'react-bootstrap-icons'
+import {
+  Input,
+  Avatar,
+  Button,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+} from '@material-tailwind/react'
+import { Search, Dot, ThreeDots, Pencil, Trash } from 'react-bootstrap-icons'
 
 const admingroups = [
   {
@@ -109,11 +117,42 @@ export default function ListMember() {
       <div className="flex flex-col gap-4 mt-4">
         <p className="font-bold">Thành viên trong nhóm</p>
         {members.map(({ id, fullName, avararUrl }) => (
-          <div key={id} className="flex gap-2 items-center">
-            <Avatar placeholder={undefined} src={avararUrl} alt="user avatar" />
-            <div>
+          <div key={id} className="flex justify-between">
+            <div className="flex gap-2 items-center">
+              <Avatar
+                placeholder={undefined}
+                src={avararUrl}
+                alt="user avatar"
+              />
               <p>{fullName}</p>
             </div>
+
+            <Menu placement="bottom-end">
+              <MenuHandler>
+                <Button
+                  placeholder={undefined}
+                  variant="text"
+                  className="rounded-full h-fit p-2">
+                  <ThreeDots className="text-lg text-black" />
+                </Button>
+              </MenuHandler>
+              <MenuList placeholder={undefined}>
+                <MenuItem
+                  //onClick={() => setOpenEditComment((e) => !e)}
+                  placeholder={undefined}
+                  className={`text-black text-base flex items-center gap-2`}>
+                  <Pencil />
+                  <p>Chỉnh sửa quyền</p>
+                </MenuItem>
+                <MenuItem
+                  //onClick={onDeletePost}
+                  placeholder={undefined}
+                  className={`text-black text-base flex items-center gap-2`}>
+                  <Trash />
+                  <p>Xóa thành viên</p>
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </div>
         ))}
       </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { roboto } from '../../ui/fonts'
-import { Input } from '@material-tailwind/react'
+import { Button } from '@material-tailwind/react'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
@@ -12,199 +12,16 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGroup'
-
-const groups = [
-  {
-    id: '1',
-    name: 'Sinh viên lớp 20CLC11',
-    creator: {
-      id: '1',
-      name: 'Đặng Nguyễn Duy',
-      avatarUrl: '/demo.jpg',
-    },
-    privacy: 'Công khai',
-    avatarUrl: '/authentication.png',
-    coverUrl: '/authentication.png',
-    website: '',
-    status: 'Bình thường',
-    publicAt: '05-04-2023',
-    numberMember: 500,
-    isJoined: true,
-    description:
-      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
-  },
-  {
-    id: '23',
-    name: 'Sinh viên lớp 20CLC11',
-    creator: {
-      id: '1',
-      name: 'Đặng Nguyễn Duy',
-      avatarUrl: '/demo.jpg',
-    },
-    privacy: 'Công khai',
-    avatarUrl: '/authentication.png',
-    coverUrl: '/authentication.png',
-    website: '',
-    status: 'Bình thường',
-    publicAt: '05-04-2023',
-    numberMember: 500,
-    isJoined: false,
-    description:
-      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Sinh viên lớp 20CLC11',
-    creator: {
-      id: '1',
-      name: 'Đặng Nguyễn Duy',
-      avatarUrl: '/demo.jpg',
-    },
-    privacy: 'Công khai',
-    avatarUrl: '/authentication.png',
-    coverUrl: '/authentication.png',
-    website: '',
-    status: 'Bình thường',
-    publicAt: '05-04-2023',
-    numberMember: 500,
-    isJoined: false,
-    description:
-      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
-  },
-  {
-    id: '4',
-    name: 'Sinh viên lớp 20CLC11',
-    creator: {
-      id: '1',
-      name: 'Đặng Nguyễn Duy',
-      avatarUrl: '/demo.jpg',
-    },
-    privacy: 'Công khai',
-    avatarUrl: '/authentication.png',
-    coverUrl: '/authentication.png',
-    website: '',
-    status: 'Bình thường',
-    publicAt: '05-04-2023',
-    numberMember: 500,
-    isJoined: true,
-    description:
-      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
-  },
-  {
-    id: '5',
-    name: 'Sinh viên lớp 20CLC11 Sinh viên lớp 20CLC11 Sinh viên lớp 20CLC11 Sinh viên lớp 20CLC11',
-    creator: {
-      id: '1',
-      name: 'Đặng Nguyễn Duy',
-      avatarUrl: '/demo.jpg',
-    },
-    privacy: 'Công khai',
-    avatarUrl: '/authentication.png',
-    coverUrl: '/authentication.png',
-    website: '',
-    status: 'Bình thường',
-    publicAt: '05-04-2023',
-    numberMember: 500,
-    isJoined: false,
-    description:
-      'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-    friendsInGroup: [
-      {
-        id: '1',
-        fullName: 'Trương Sammuel',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '2',
-        fullName: 'Đặng Nguyễn Duy',
-        avatarUrl: '/demo.jpg',
-      },
-      {
-        id: '3',
-        fullName: 'Huỳnh Cao Nguyên',
-        avatarUrl: '/demo.jpg',
-      },
-    ],
-  },
-]
+import { Plus } from 'react-bootstrap-icons'
 
 export default function Page() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [totalPages, setTotalPages] = useState(1)
-  //const [groups, setGroups] = useState([])
+  const [groups, setGroups] = useState([])
 
   const resetCurPage = () => {
     params.delete('page')
@@ -224,7 +41,7 @@ export default function Page() {
       )
       .then(({ data: { totalPages, groups } }) => {
         setTotalPages(totalPages)
-        //setGroups(groups)
+        setGroups(groups)
       })
       .catch()
   }, [myParams])
@@ -233,11 +50,22 @@ export default function Page() {
     <>
       <Thumbnail />
       <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
-        <p
-          className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
-          NHÓM
-        </p>
+        <div className="flex justify-between">
+          <p
+            className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+            NHÓM
+          </p>
+          <Button
+            onClick={() => router.push('/groups/create')}
+            placeholder={undefined}
+            size="md"
+            className="text-white bg-[--blue-05] px-4 normal-case flex items-center justify-center gap-2">
+            <Plus className="text-xl font-semibold" />
+            Tạo nhóm mới
+          </Button>
+        </div>
         <SearchAndFilterGroups />
+
         {groups.map((group) => (
           <GroupsListItem key={group.id} group={group} />
         ))}

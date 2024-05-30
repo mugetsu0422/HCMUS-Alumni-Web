@@ -21,7 +21,7 @@ const group = {
     name: 'Đặng Nguyễn Duy',
     avatarUrl: '/demo.jpg',
   },
-  privacy: 'Công Khai',
+  privacy: 'Nhóm kín',
   avatarUrl: '/authentication.png',
   coverUrl: '/authentication.png',
   website: '',
@@ -167,7 +167,11 @@ export default function Discuss() {
               </div>
             }>
             {posts.map((post) => (
-              <PostListItem key={post.id} post={post} name="groups" />
+              <PostListItem
+                key={post.id}
+                post={post}
+                name={`groups/${group.id}`}
+              />
             ))}
           </InfiniteScroll>
         )}
