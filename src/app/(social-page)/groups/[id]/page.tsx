@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  Avatar,
   Button,
   Tabs,
   TabsHeader,
@@ -21,24 +20,11 @@ import { nunito } from '../../../ui/fonts'
 import { GlobeAmericas } from 'react-bootstrap-icons'
 import MemberRequest from '../../../ui/social-page/groups/member-request'
 import Link from 'next/link'
-
-const groups = {
-  id: '1',
-  name: 'Sinh viên lớp 20CLC11',
-  creator: {
-    id: '1',
-    name: 'Đặng Nguyễn Duy',
-    avatarUrl: '/demo.jpg',
-  },
-  privacy: 'Riêng tư',
-  avatarUrl: '/demo.jpg',
-  coverUrl: '/thumbnail-social-pages.jpg',
-  website: '',
-  status: 'Công khai',
-  publicAt: '05-04-2023',
-  numberMember: 500,
-  isJoined: true,
-}
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
+import axios, { AxiosResponse } from 'axios'
+import { JWT_COOKIE } from '../../../constant'
+import Cookies from 'js-cookie'
 
 const tabs = [
   {
@@ -52,35 +38,69 @@ const tabs = [
   },
 ]
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = React.useState('Thảo luận')
+
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const searchParams = useSearchParams()
+  const [group, setGroup] = useState(null)
+  const [noData, setNoData] = useState(false)
+
+  // const [myParams, setMyParams] = useState(`?${params.toString()}`)
+  // const curPage = useRef(0)
+  // const [totalPages, setTotalPages] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const detailsPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([detailsPromise])
+      .then(([detailsRes]) => {
+        const { data: groups } = detailsRes
+        setGroup(groups)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error(error)
+        setNoData(true)
+      })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div
       className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
       <div className="relative">
         <img
-          src={groups.coverUrl}
+          src={group.coverUrl}
           alt="group cover"
           className="w-full h-60 object-cover object-center"
         />
         <div className="flex items-center justify-between mt-4">
           <div>
             <p className="flex items-center text-[22px] xl:text-[26px] font-bold ">
-              {groups.name}
+              {group.name}
             </p>
 
             <p className="flex items-center">
-              {groups.privacy != 'Công khai' ? (
+              {group.privacy != 'Công khai' ? (
                 <FontAwesomeIcon icon={faLock} className="mr-2" />
               ) : (
                 <GlobeAmericas className="mr-2" />
               )}
-              {groups.privacy} <Dot /> {groups.numberMember} thành viên tham gia
+              {group.privacy} <Dot /> {group.numberMember} thành viên tham gia
             </p>
           </div>
 
-          {groups.isJoined ? (
+          {group.isJoined ? (
             <Button
               placeholder={undefined}
               className="normal-case px-4 py-2 text-[14px] h-fit bg-[#e4e6eb] text-black ">
@@ -125,7 +145,7 @@ export default function Page() {
                 </TabsHeader>
               </Tabs>
             </div>
-            {groups.isJoined && (
+            {group.isJoined && (
               <Menu placement="bottom-end">
                 <MenuHandler>
                   <Button
@@ -145,7 +165,7 @@ export default function Page() {
 
                   <MenuItem placeholder={undefined}>
                     <Link
-                      href={`/groups/${groups.id}/edit-group`}
+                      href={`/groups/${group.id}/edit-group`}
                       className="flex items-center gap-1 text-black py-1">
                       <PencilSquare className="text-lg" />
                       Chỉnh sửa thông tin nhóm

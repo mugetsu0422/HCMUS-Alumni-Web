@@ -160,7 +160,6 @@ export default function CreatePostDialog() {
           form.append('addedImages', image)
         }
 
-        
         axios
           .put(
             `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${id}/images`,

@@ -7,11 +7,12 @@ import { useRouter } from 'next/navigation'
 
 export default function GroupsListItem({ group }) {
   const router = useRouter()
+
   return (
     <div className="flex justify-between items-center gap-4 w-full">
       <div className="flex gap-4">
         <Avatar
-          src={group.avatarUrl}
+          src={group.coverUrl}
           alt="group avatar"
           placeholder={undefined}
           size="lg"
@@ -21,12 +22,17 @@ export default function GroupsListItem({ group }) {
           {!group.isJoined && (
             <>
               <p className="flex items-center text-[#65676b]">
-                {group.privacy} <Dot className="text-black" />{' '}
-                {group.numberMember} thành viên
+                {group.privacy === 'PUBLIC' ? 'Công khai' : 'Riêng tư'}
+                {group.numberMember > 0 && (
+                  <>
+                    <Dot className="text-black" />
+                    {group.numberMember} thành viên
+                  </>
+                )}
               </p>
             </>
           )}
-          <p className="text-[#65676b] text-[13px] line-clamp-2">
+          <p className="text-[#65676b] text-[13px] line-clamp-2 w-[90%] xl:w-[100%]">
             {group.description}
           </p>
         </div>

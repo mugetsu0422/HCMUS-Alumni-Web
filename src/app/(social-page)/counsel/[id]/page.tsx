@@ -39,30 +39,6 @@ import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import toast, { Toaster } from 'react-hot-toast'
 
-// const data = {
-//   id: '1',
-//   title: 'Tư vấn hỗ trợ giải đáp thắc mắc trong học tập',
-//   childrenCommentNumber: 10,
-//   updateAt: '02-05-2024',
-//   content:
-//     'Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ. Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ.Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ.',
-//   tags: [
-//     { id: '6', name: 'Học tập' },
-//     { id: '2', name: 'Trường học' },
-//   ],
-//   publishedAt: '01-05-2024',
-//   pictures: [
-//     { id: '1', pictureUrl: '/authentication.png' },
-//     { id: '2', pictureUrl: '/logo.png' },
-//     { id: '3', pictureUrl: '/demo.jpg' },
-//     { id: '4', pictureUrl: '/authentication.png' },
-//   ],
-//   creator: { id: '1', fullName: 'Trương Samuel', avatarUrl: '/demo.jpg' },
-//   status: { name: 'Bình thường' },
-//   isReacted: true,
-//   reactionCount: 10,
-// }
-
 export default function Page({ params }: { params: { id: string } }) {
   const [post, setPost] = useState(null)
   const [noData, setNoData] = useState(false)

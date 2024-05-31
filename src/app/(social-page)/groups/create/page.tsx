@@ -20,10 +20,12 @@ const privacyValue = [
   {
     id: '1',
     name: 'Công khai',
+    value: 'PUBLIC',
   },
   {
     id: '2',
     name: 'Riêng tư',
+    value: 'PRIVATE',
   },
 ]
 
@@ -44,12 +46,10 @@ export default function Page() {
     const group = {
       name: data.name,
       description: data.description,
-      privacy: { name: data.privacy },
+      privacy: data.privacy,
       cover: imageFile,
     }
 
-    console.log(imageFile)
-    console.log(group)
     const groupToast = toast.loading('Đang tạo')
 
     axios
@@ -59,7 +59,7 @@ export default function Page() {
         },
       })
       .then(() => {
-        toast.success('Đăng thành công', {
+        toast.success('Tạo thành công', {
           id: groupToast,
         })
       })
@@ -200,9 +200,9 @@ export default function Page() {
           <select
             className="hover:cursor-pointer pl-3 w-full text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
             {...register('privacy')}>
-            {privacyValue.map(({ id, name }) => {
+            {privacyValue.map(({ id, name, value }) => {
               return (
-                <option key={id} value={name}>
+                <option key={id} value={value}>
                   {name}
                 </option>
               )

@@ -15,6 +15,8 @@ import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGr
 import { Plus } from 'react-bootstrap-icons'
 
 export default function Page() {
+  const pathname = usePathname()
+  const { replace } = useRouter()
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
@@ -22,6 +24,53 @@ export default function Page() {
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [totalPages, setTotalPages] = useState(1)
   const [groups, setGroups] = useState([])
+
+  const { register, reset } = useForm({
+    defaultValues: {
+      name: params.get('name'),
+    },
+  })
+
+  const onSearch = useDebouncedCallback((keyword) => {
+    if (keyword) {
+      params.set('name', keyword)
+    } else {
+      params.delete('name')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }, 500)
+
+  const onResetFilter = () => {
+    params.delete('privacy')
+    params.delete('isJoined')
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onFilterPrivacy = (privacy: string) => {
+    if (privacy != '0') {
+      params.set('privacy', privacy)
+    } else {
+      params.delete('privacy')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }
+
+  const onFilterMyGroup = (isJoined: string) => {
+    if (isJoined != '0') {
+      params.set('isJoined', isJoined)
+    } else {
+      params.delete('isJoined')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }
 
   const resetCurPage = () => {
     params.delete('page')
@@ -64,7 +113,17 @@ export default function Page() {
             Tạo nhóm mới
           </Button>
         </div>
-        <SearchAndFilterGroups />
+        <SearchAndFilterGroups
+          onSearch={onSearch}
+          onFilterPrivacy={onFilterPrivacy}
+          onResetFilter={onResetFilter}
+          onFilterMyGroup={onFilterMyGroup}
+          params={{
+            name: params.get('name'),
+            privacy: params.get('privacy'),
+            isJoined: params.get('isJoined'),
+          }}
+        />
 
         {groups.map((group) => (
           <GroupsListItem key={group.id} group={group} />
