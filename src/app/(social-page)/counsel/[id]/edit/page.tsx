@@ -238,7 +238,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] w-[80%] m-auto`}>
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -324,7 +324,7 @@ export default function Page({ params }: { params: { id: string } }) {
         />
         <VotingPostForm />
 
-        <AddImaePost
+        <AddImagePost
           onDragOver={onDragOver}
           onDrop={onDrop}
           onClickDropzone={onClickDropzone}
@@ -344,7 +344,7 @@ export default function Page({ params }: { params: { id: string } }) {
   )
 }
 
-function AddImaePost({
+function AddImagePost({
   onDragOver,
   onDrop,
   onClickDropzone,

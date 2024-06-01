@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
 import ErrorInput from '../../../ui/error-input'
-import { set, useForm } from 'react-hook-form'
+import { set, useFieldArray, useForm } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
 import { TAGS, JWT_COOKIE } from '../../../constant'
@@ -25,23 +25,41 @@ import Link from 'next/link'
 
 export default function CreatePostDialog() {
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      title: '',
+      content: '',
+      votes: Array(3).fill({ name: '' }),
+    },
+  })
+  const voteFieldArray = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormProvider)
+    name: 'votes', // unique name for your Field Array
+  })
 
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
-  const [openAddingPost, setOpenAddingPost] = useState(false)
-  const [openAddinImage, setOpenAddinImage] = useState(false)
+  const [openAddingPoll, setOpenAddingPoll] = useState(false)
+  const [openAddingImage, setOpenAddingImage] = useState(false)
 
   const handleOpenAdingPost = () => {
-    setOpenAddingPost((e) => !e)
+    if (openAddingPoll) {
+      voteFieldArray.remove()
+    }
+    setOpenAddingPoll((e) => !e)
   }
 
   const handleOpenAdingImage = () => {
-    setOpenAddinImage((e) => !e)
+    if (openAddingImage) {
+      setPreviewImages([])
+      setImageFiles([])
+    }
+    setOpenAddingImage((e) => !e)
   }
 
   const onDragOver = (event) => {
@@ -192,7 +210,7 @@ export default function CreatePostDialog() {
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] w-[80%] m-auto`}>
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -277,12 +295,17 @@ export default function CreatePostDialog() {
           }}
         />
 
-        {openAddingPost && (
-          <VotingPostForm handleOpenAdingPost={handleOpenAdingPost} />
+        {openAddingPoll && (
+          <VotingPostForm
+            handleOpenAdingPost={handleOpenAdingPost}
+            register={register}
+            voteFieldArray={voteFieldArray}
+            errors={errors}
+          />
         )}
 
-        {openAddinImage && (
-          <AddImaePost
+        {openAddingImage && (
+          <AddImagePost
             handleOpenAdingImage={handleOpenAdingImage}
             onDragOver={onDragOver}
             onDrop={onDrop}
@@ -292,7 +315,7 @@ export default function CreatePostDialog() {
           />
         )}
 
-        {!openAddingPost && (
+        {!openAddingPoll && (
           <Button
             onClick={handleOpenAdingPost}
             placeholder={undefined}
@@ -302,7 +325,7 @@ export default function CreatePostDialog() {
           </Button>
         )}
 
-        {!openAddinImage && (
+        {!openAddingImage && (
           <Button
             onClick={handleOpenAdingImage}
             placeholder={undefined}
@@ -324,7 +347,7 @@ export default function CreatePostDialog() {
   )
 }
 
-function AddImaePost({
+function AddImagePost({
   onDragOver,
   onDrop,
   onClickDropzone,
@@ -387,38 +410,16 @@ function AddImaePost({
   )
 }
 
-function VotingPostForm({ handleOpenAdingPost }) {
-  const [title, setTitle] = useState('')
-  const [options, setOptions] = useState([''])
-  const [posts, setPosts] = useState([])
-
-  const addPost = (post) => {
-    setPosts([...posts, post])
-  }
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options]
-    newOptions[index] = value
-    setOptions(newOptions)
-  }
-
-  const handleAddOption = () => {
-    setOptions([...options, ''])
-  }
-
-  const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index)
-    setOptions(newOptions)
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    addPost({ options })
-    setOptions([''])
-  }
+function VotingPostForm({
+  handleOpenAdingPost,
+  register,
+  voteFieldArray,
+  errors,
+}) {
+  const { fields, append, remove } = voteFieldArray
 
   return (
-    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+    <div className="w-full rounded-lg ">
       <div className="mb-4">
         <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
           Tạo bình chọn
@@ -431,31 +432,40 @@ function VotingPostForm({ handleOpenAdingPost }) {
             <XLg className="text-lg" />
           </Button>
         </div>
-        {options.map((option, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <Input
-              crossOrigin={undefined}
-              type="text"
-              value={option}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              label={`Lựa chọn ${index + 1}`}
-            />
-            <Button
-              placeholder={undefined}
-              onClick={() => handleRemoveOption(index)}
-              className="ml-2 bg-red-500 rounded text-nowrap normal-case text-[13px]">
-              <p className="text-black"> Xóa lựa chọn </p>
-            </Button>
-          </div>
-        ))}
+        {fields.map((field, index) => {
+          return (
+            <>
+              <div key={index} className="flex items-center mb-2">
+                <Input
+                  crossOrigin={undefined}
+                  type="text"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  label={`Lựa chọn ${index + 1}`}
+                  {...register(`votes.${index}.name`, {
+                    required: 'Vui lòng nhập tên lựa chọn',
+                  })}
+                />
+                <Button
+                  placeholder={undefined}
+                  onClick={() => remove(index)}
+                  className="ml-2 bg-red-500 rounded text-nowrap normal-case text-[13px]">
+                  <p className="text-black"> Xóa lựa chọn </p>
+                </Button>
+              </div>
+              <ErrorInput
+                // This is the error message
+                errors={errors?.votes?.[index]?.name?.message}
+              />
+            </>
+          )
+        })}
         <Button
           placeholder={undefined}
-          onClick={handleAddOption}
+          onClick={() => append({ name: '' })}
           className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
           Thêm lựa chọn
         </Button>
       </div>
-    </form>
+    </div>
   )
 }
