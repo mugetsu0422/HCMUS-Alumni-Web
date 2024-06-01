@@ -9,7 +9,7 @@ import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 const filterPrivacy = [
   { id: '0', name: 'Tất cả', value: '' },
   { id: '1', name: 'Công khai', value: 'PUBLIC' },
-  { id: '2', name: 'Nhóm kín', value: 'PRIVATE' },
+  { id: '2', name: 'Riêng tư', value: 'PRIVATE' },
 ]
 const filterIsJoined = [
   { id: '0', name: 'Tất cả', value: '' },

@@ -25,6 +25,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import axios, { AxiosResponse } from 'axios'
 import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
+import NoData from '../../../ui/no-data'
 
 const tabs = [
   {
@@ -75,111 +76,114 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return (
-    <div
-      className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
-      <div className="relative">
-        <img
-          src={group.coverUrl}
-          alt="group cover"
-          className="w-full h-60 object-cover object-center"
-        />
-        <div className="flex items-center justify-between mt-4">
-          <div>
-            <p className="flex items-center text-[22px] xl:text-[26px] font-bold ">
-              {group.name}
-            </p>
+  if (noData) return <NoData />
 
-            <p className="flex items-center">
-              {group.privacy != 'Công khai' ? (
-                <FontAwesomeIcon icon={faLock} className="mr-2" />
-              ) : (
-                <GlobeAmericas className="mr-2" />
-              )}
-              {group.privacy} <Dot /> {group.numberMember} thành viên tham gia
-            </p>
-          </div>
-
-          {group.isJoined ? (
-            <Button
-              placeholder={undefined}
-              className="normal-case px-4 py-2 text-[14px] h-fit bg-[#e4e6eb] text-black ">
-              Đã tham gia
-            </Button>
-          ) : (
-            <Button
-              placeholder={undefined}
-              className="normal-case px-4 py-2 text-[14px] bg-[--blue-04] text-[--blue-05]">
-              Tham gia
-            </Button>
-          )}
-        </div>
-        {/*  */}
-
-        <div className="flex flex-col gap-1 mt-6">
-          <div className="border border-[--delete-filter]"></div>
-          <div className="flex justify-between items-center">
+  if (!isLoading)
+    return (
+      <div
+        className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
+        <div className="relative">
+          <img
+            src={group.coverUrl}
+            alt="group cover"
+            className="w-full h-60 object-cover object-center"
+          />
+          <div className="flex items-center justify-between mt-4">
             <div>
-              <Tabs value="Thảo luận" className="bg-white z-0">
-                <TabsHeader
-                  placeholder={undefined}
-                  className="rounded-none border-b border-blue-gray-50 bg-transparent p-0 z-0"
-                  indicatorProps={{
-                    className:
-                      'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
-                  }}>
-                  {tabs.map(({ label }) => (
-                    <Tab
-                      key={label}
-                      placeholder={undefined}
-                      value={label}
-                      onClick={() => setActiveTab(label)}
-                      className={
-                        activeTab === label
-                          ? 'text-gray-900 text-nowrap w-fit px-6 py-4 text-[--blue-05]'
-                          : 'text-nowrap w-fit px-6 py-4'
-                      }>
-                      {label}
-                    </Tab>
-                  ))}
-                </TabsHeader>
-              </Tabs>
-            </div>
-            {group.isJoined && (
-              <Menu placement="bottom-end">
-                <MenuHandler>
-                  <Button
-                    placeholder={undefined}
-                    variant="text"
-                    className="py-2 px-4 flex gap-1 items-center text-black">
-                    <Gear className="text-xl" />
-                  </Button>
-                </MenuHandler>
-                <MenuList placeholder={undefined}>
-                  <MenuItem
-                    placeholder={undefined}
-                    className="flex items-center gap-1 text-black py-3">
-                    <BoxArrowInRight className="text-lg" />
-                    Rời khỏi nhóm
-                  </MenuItem>
+              <p className="flex items-center text-[22px] xl:text-[26px] font-bold ">
+                {group.name}
+              </p>
 
-                  <MenuItem placeholder={undefined}>
-                    <Link
-                      href={`/groups/${group.id}/edit-group`}
-                      className="flex items-center gap-1 text-black py-1">
-                      <PencilSquare className="text-lg" />
-                      Chỉnh sửa thông tin nhóm
-                    </Link>
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+              <p className="flex items-center">
+                {group.privacy != 'Công khai' ? (
+                  <FontAwesomeIcon icon={faLock} className="mr-2" />
+                ) : (
+                  <GlobeAmericas className="mr-2" />
+                )}
+                {group.privacy} <Dot /> {group.numberMember} thành viên tham gia
+              </p>
+            </div>
+
+            {group.isJoined ? (
+              <Button
+                placeholder={undefined}
+                className="normal-case px-4 py-2 text-[14px] h-fit bg-[#e4e6eb] text-black ">
+                Đã tham gia
+              </Button>
+            ) : (
+              <Button
+                placeholder={undefined}
+                className="normal-case px-4 py-2 text-[14px] bg-[--blue-04] text-[--blue-05]">
+                Tham gia
+              </Button>
             )}
           </div>
+          {/*  */}
+
+          <div className="flex flex-col gap-1 mt-6">
+            <div className="border border-[--delete-filter]"></div>
+            <div className="flex justify-between items-center">
+              <div>
+                <Tabs value="Thảo luận" className="bg-white z-0">
+                  <TabsHeader
+                    placeholder={undefined}
+                    className="rounded-none border-b border-blue-gray-50 bg-transparent p-0 z-0"
+                    indicatorProps={{
+                      className:
+                        'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
+                    }}>
+                    {tabs.map(({ label }) => (
+                      <Tab
+                        key={label}
+                        placeholder={undefined}
+                        value={label}
+                        onClick={() => setActiveTab(label)}
+                        className={
+                          activeTab === label
+                            ? 'text-gray-900 text-nowrap w-fit px-6 py-4 text-[--blue-05]'
+                            : 'text-nowrap w-fit px-6 py-4'
+                        }>
+                        {label}
+                      </Tab>
+                    ))}
+                  </TabsHeader>
+                </Tabs>
+              </div>
+              {group.isJoined && (
+                <Menu placement="bottom-end">
+                  <MenuHandler>
+                    <Button
+                      placeholder={undefined}
+                      variant="text"
+                      className="py-2 px-4 flex gap-1 items-center text-black">
+                      <Gear className="text-xl" />
+                    </Button>
+                  </MenuHandler>
+                  <MenuList placeholder={undefined}>
+                    <MenuItem
+                      placeholder={undefined}
+                      className="flex items-center gap-1 text-black py-3">
+                      <BoxArrowInRight className="text-lg" />
+                      Rời khỏi nhóm
+                    </MenuItem>
+
+                    <MenuItem placeholder={undefined}>
+                      <Link
+                        href={`/groups/${group.id}/edit-group`}
+                        className="flex items-center gap-1 text-black py-1">
+                        <PencilSquare className="text-lg" />
+                        Chỉnh sửa thông tin nhóm
+                      </Link>
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              )}
+            </div>
+          </div>
         </div>
+        {activeTab === 'Thảo luận' && <Discuss />}
+        {activeTab === 'Thành viên' && <ListMember />}
+        {activeTab === 'Xét duyệt' && <MemberRequest />}
       </div>
-      {activeTab === 'Thảo luận' && <Discuss />}
-      {activeTab === 'Thành viên' && <ListMember />}
-      {activeTab === 'Xét duyệt' && <MemberRequest />}
-    </div>
-  )
+    )
 }

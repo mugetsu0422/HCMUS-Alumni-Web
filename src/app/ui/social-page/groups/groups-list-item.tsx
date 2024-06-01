@@ -1,12 +1,30 @@
 'use client'
 import React from 'react'
 import { nunito } from '../../fonts'
-import { Button, Avatar } from '@material-tailwind/react'
+import { Button, Avatar, Spinner } from '@material-tailwind/react'
 import { Dot } from 'react-bootstrap-icons'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
-export default function GroupsListItem({ group }) {
+export default function GroupsListItem({ group, onJoinGroup }) {
   const router = useRouter()
+  const [isJoining, setIsJoining] = React.useState(false)
+  const [isJoined, setIsJoined] = React.useState(group.userRole ? true : false)
+
+  const onClickJoinButton = () => {
+    setIsJoining(true)
+    onJoinGroup(group.id)
+      .then((data) => {
+        setIsJoined(true)
+      })
+      .catch((error) => {
+        console.error(error)
+        toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+      })
+      .finally(() => {
+        setIsJoining(false)
+      })
+  }
 
   return (
     <div className="flex justify-between items-center gap-4 w-full">
@@ -38,20 +56,22 @@ export default function GroupsListItem({ group }) {
         </div>
       </div>
 
-      {group.isJoined ? (
+      {isJoined ? (
         <Button
           onClick={() => router.push(`/groups/${group.id}`)}
           size="sm"
           placeholder={undefined}
-          className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-28">
+          className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-32 flex justify-center items-center gap-2">
           Xem nhóm
         </Button>
       ) : (
         <Button
-          onClick={() => router.push(`/groups/${group.id}`)}
+          disabled={isJoining}
+          onClick={onClickJoinButton}
           size="sm"
           placeholder={undefined}
-          className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-28">
+          className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-32 flex justify-center items-center gap-2">
+          {isJoining && <Spinner className="h-[14px] w-[14px]" />}
           Tham gia
         </Button>
       )}
