@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Tabs,
@@ -39,6 +39,11 @@ const tabs = [
   },
 ]
 
+const PRIVACY = {
+  PUBLIC: 'Công khai',
+  PRIVATE: 'Riêng tư',
+}
+
 export default function Page({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = React.useState('Thảo luận')
 
@@ -47,11 +52,42 @@ export default function Page({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams()
   const [group, setGroup] = useState(null)
   const [noData, setNoData] = useState(false)
-
-  // const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  // const curPage = useRef(0)
-  // const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Diccussion
+  const curPostPage = useRef(0)
+  const [postTotalPage, setPostTotalPage] = useState(1)
+  const [posts, setPosts] = useState([])
+  const [postsAreLoading, setPostsAreLoading] = useState(true)
+  const [postsHasMore, setPostsHasMore] = useState(true)
+
+  const onFetchMorePosts = () => {
+    curPostPage.current++
+    if (curPostPage.current >= postTotalPage) {
+      setPostsHasMore(false)
+      return
+    }
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${group.id}/posts?page=${curPostPage.current}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { posts: loadedPosts } }) => {
+        setPosts(posts.concat(loadedPosts))
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }
+
+  // Members
+
+  // Member requests
 
   useEffect(() => {
     const detailsPromise = axios.get(
@@ -62,10 +98,24 @@ export default function Page({ params }: { params: { id: string } }) {
         },
       }
     )
-    Promise.all([detailsPromise])
-      .then(([detailsRes]) => {
+    const postsPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([detailsPromise, postsPromise])
+      .then(([detailsRes, postsRes]) => {
         const { data: groups } = detailsRes
+        const {
+          data: { totalPages, posts },
+        } = postsRes
         setGroup(groups)
+        setPostTotalPage(totalPages)
+        setPosts(posts)
+        setPostsAreLoading(false)
         setIsLoading(false)
       })
       .catch((error) => {
@@ -95,16 +145,17 @@ export default function Page({ params }: { params: { id: string } }) {
               </p>
 
               <p className="flex items-center">
-                {group.privacy != 'Công khai' ? (
+                {group.privacy != 'PUBLIC' ? (
                   <FontAwesomeIcon icon={faLock} className="mr-2" />
                 ) : (
                   <GlobeAmericas className="mr-2" />
                 )}
-                {group.privacy} <Dot /> {group.numberMember} thành viên tham gia
+                {PRIVACY[group.privacy]} <Dot /> {group.participantCount} thành
+                viên tham gia
               </p>
             </div>
 
-            {group.isJoined ? (
+            {group.userRole ? (
               <Button
                 placeholder={undefined}
                 className="normal-case px-4 py-2 text-[14px] h-fit bg-[#e4e6eb] text-black ">
@@ -149,7 +200,7 @@ export default function Page({ params }: { params: { id: string } }) {
                   </TabsHeader>
                 </Tabs>
               </div>
-              {group.isJoined && (
+              {group.userRole && (
                 <Menu placement="bottom-end">
                   <MenuHandler>
                     <Button
@@ -181,7 +232,14 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-        {activeTab === 'Thảo luận' && <Discuss />}
+        {activeTab === 'Thảo luận' && (
+          <Discuss
+            group={group}
+            posts={posts}
+            onFetchMore={onFetchMorePosts}
+            hasMore={postsHasMore}
+          />
+        )}
         {activeTab === 'Thành viên' && <ListMember />}
         {activeTab === 'Xét duyệt' && <MemberRequest />}
       </div>

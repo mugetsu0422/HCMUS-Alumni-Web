@@ -29,6 +29,8 @@ export default function Page() {
 
   const resetCurPage = () => {
     params.delete('page')
+    curPage.current = 0
+    setHasMore(true)
   }
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
@@ -59,7 +61,7 @@ export default function Page() {
   }
   const onFetchMore = () => {
     curPage.current++
-    if (curPage.current + 1 >= totalPages) {
+    if (curPage.current >= totalPages) {
       setHasMore(false)
       return
     }

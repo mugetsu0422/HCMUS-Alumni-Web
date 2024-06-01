@@ -7,7 +7,7 @@ import { GlobeAmericas } from 'react-bootstrap-icons'
 
 export default function Introduce({ privacy, description }) {
   return (
-    <div className="bg-[#ebeef0] w-[30%] flex flex-col gap-4 p-4 rounded-lg">
+    <div className="bg-[#ebeef0] w-[30%] h-fit flex flex-col gap-4 p-4 rounded-lg">
       <p className="font-bold text-lg">Giới thiệu</p>
 
       <p>{description}</p>
