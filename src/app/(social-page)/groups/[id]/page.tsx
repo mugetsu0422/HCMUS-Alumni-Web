@@ -58,7 +58,6 @@ export default function Page({ params }: { params: { id: string } }) {
   const curPostPage = useRef(0)
   const [postTotalPage, setPostTotalPage] = useState(1)
   const [posts, setPosts] = useState([])
-  const [postsAreLoading, setPostsAreLoading] = useState(true)
   const [postsHasMore, setPostsHasMore] = useState(true)
 
   const onFetchMorePosts = () => {
@@ -112,10 +111,12 @@ export default function Page({ params }: { params: { id: string } }) {
         const {
           data: { totalPages, posts },
         } = postsRes
+        if(!totalPages) {
+          setPostsHasMore(false)
+        }
         setGroup(groups)
         setPostTotalPage(totalPages)
         setPosts(posts)
-        setPostsAreLoading(false)
         setIsLoading(false)
       })
       .catch((error) => {

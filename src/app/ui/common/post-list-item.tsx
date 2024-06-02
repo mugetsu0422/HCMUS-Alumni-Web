@@ -91,19 +91,21 @@ export default function PostListItem({
   const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
     ref,
   })
-  const [totalVoteCount, setTotalVoteCount] = useState(
-    post.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
-  )
-  const [votes, setVotes] = useState(post.votes)
+  const [totalVoteCount, setTotalVoteCount] = useState(() => {
+    if (!post.votes) return 0
+    return post.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
+  })
   const [votesCount, setVotesCount] = useState(() => {
     const map = new Map()
-    votes.forEach(({ id: { voteId }, voteCount }) => {
+    if (!post.votes) return map
+    post.votes.forEach(({ id: { voteId }, voteCount }) => {
       map.set(voteId, voteCount)
     })
     return map
   })
   const [selectedVoteId, setSelectedVoteId] = useState(() => {
-    const vote = votes.find(({ isVoted }) => isVoted)
+    if (!post.votes) return null
+    const vote = post.votes.find(({ isVoted }) => isVoted)
     return vote ? vote.id.voteId : null
   })
 
@@ -452,7 +454,7 @@ export default function PostListItem({
           <List
             placeholder={undefined}
             className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {votes.map(({ name, id: { voteId } }) => (
+            {post.votes && post.votes.map(({ name, id: { voteId } }) => (
               <div
                 key={voteId}
                 className="p-0 mb-2 border-2 rounded-lg relative">
