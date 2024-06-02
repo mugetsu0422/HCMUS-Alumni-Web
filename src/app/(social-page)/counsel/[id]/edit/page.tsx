@@ -32,6 +32,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [selectedTags, setSelectedTags] = useState([])
   const router = useRouter()
   const [options, setOptions] = useState([''])
+  const [votes, setVotes] = useState([])
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -188,7 +189,7 @@ export default function Page({ params }: { params: { id: string } }) {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(({ data: { title, content, tags, pictures } }) => {
+      .then(({ data: { title, content, tags, pictures, votes } }) => {
         setValue('title', title)
         setValue('content', content)
         setSelectedTags(
@@ -197,6 +198,7 @@ export default function Page({ params }: { params: { id: string } }) {
             return TAGS.find(({ value }) => value === id)
           })
         )
+        setVotes(votes)
         setCurrentImages(pictures)
       })
       .catch((err) => {
@@ -206,35 +208,9 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [votes, setVote] = useState([])
-
-  const addVote = (vote) => {
-    setVote([...vote, vote])
+  if (noData) {
+    return <NoData />
   }
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options]
-    newOptions[index] = value
-    setOptions(newOptions)
-  }
-
-  const handleAddOption = () => {
-    setOptions([...options, ''])
-  }
-
-  const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index)
-    setOptions(newOptions)
-  }
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault()
-  //   setVote({ options })
-  //   setOptions([''])
-  // }
-
-  // if (noData) {
-  //   return <NoData />
-  // }
 
   return (
     <div
@@ -322,7 +298,7 @@ export default function Page({ params }: { params: { id: string } }) {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
-        <VotingPostForm />
+        <VotingPostForm votes={votes} />
 
         <AddImagePost
           onDragOver={onDragOver}
@@ -396,57 +372,26 @@ function AddImagePost({
   )
 }
 
-function VotingPostForm() {
-  const [title, setTitle] = useState('')
-  const [options, setOptions] = useState([''])
-  const [posts, setPosts] = useState([])
-
-  const addPost = (post) => {
-    setPosts([...posts, post])
-  }
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options]
-    newOptions[index] = value
-    setOptions(newOptions)
-  }
-
-  const handleAddOption = () => {
-    setOptions([...options, ''])
-  }
-
-  const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index)
-    setOptions(newOptions)
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    addPost({ options })
-    setOptions([''])
-  }
-
+function VotingPostForm({ votes }) {
   return (
-    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+    <div className="w-full   rounded-lg ">
       <div className="mb-4">
         <div className="flex text-gray-700 text-xl font-bold mb-2 ">
           Tạo bình chọn
         </div>
-        {options.map((option, index) => (
+        {votes.map(({ name }, index) => (
           <div key={index} className="flex items-center mb-2">
             <Input
               crossOrigin={undefined}
               disabled={true}
               type="text"
-              value={option}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
+              value={name}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               label={`Lựa chọn ${index + 1}`}
             />
             <Button
               placeholder={undefined}
               disabled={true}
-              onClick={() => handleRemoveOption(index)}
               className="ml-2 bg-red-500 text-white rounded text-nowrap normal-case text-[13px]">
               Xóa lựa chọn
             </Button>
@@ -455,11 +400,10 @@ function VotingPostForm() {
         <Button
           placeholder={undefined}
           disabled={true}
-          onClick={handleAddOption}
           className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
           Thêm lựa chọn
         </Button>
       </div>
-    </form>
+    </div>
   )
 }

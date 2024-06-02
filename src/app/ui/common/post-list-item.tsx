@@ -59,6 +59,12 @@ interface PostProps {
   status: { name: string }
   creator: { id: string; fullName: string; avatarUrl: string }
   pictures: { id: string; pictureUrl: string }[]
+  votes: {
+    id: { voteId: number }
+    name: string
+    voteCount: number
+    isVoted: boolean
+  }[]
   isReacted: boolean
   reactionCount: number
   permissions: {
@@ -66,15 +72,6 @@ interface PostProps {
     delete: boolean
   }
 }
-const options = [
-  {
-    name: 'Option 1 Option 1 Option 1Option 1Option 1Option 1 Option 1 Option 1 Option 1Option 1 Option 1Option 1 Option 1 Option 1 Option 1 Option 1',
-    id: 1,
-  },
-  { name: 'Option 2', id: 2 },
-  { name: 'Option 3', id: 3 },
-  { name: 'Option 4', id: 4 },
-]
 
 export default function PostListItem({
   post,
@@ -94,13 +91,49 @@ export default function PostListItem({
   const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
     ref,
   })
+  const [totalVoteCount, setTotalVoteCount] = useState(
+    post.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
+  )
+  const [votes, setVotes] = useState(post.votes)
+  const [votesCount, setVotesCount] = useState(() => {
+    const map = new Map()
+    votes.forEach(({ id: { voteId }, voteCount }) => {
+      map.set(voteId, voteCount)
+    })
+    return map
+  })
+  const [selectedVoteId, setSelectedVoteId] = useState(() => {
+    const vote = votes.find(({ isVoted }) => isVoted)
+    return vote ? vote.id.voteId : null
+  })
 
-  const [votes, setVotes] = useState(Array(options.length).fill(0))
-
-  const handleVote = (id) => {
-    const newVotes = [...votes]
-    newVotes[id] += 1
-    setVotes(newVotes)
+  const handleVote = async (voteId: number) => {
+    try {
+      if (selectedVoteId === null) {
+        // Post
+        await onVote(voteId)
+        setTotalVoteCount((old) => old + 1)
+        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) + 1))
+        setVotesCount(temp)
+      } else if (selectedVoteId !== voteId) {
+        // Update
+        await onChangeVote(selectedVoteId, voteId)
+        votesCount.set(selectedVoteId, votesCount.get(selectedVoteId) - 1)
+        votesCount.set(voteId, votesCount.get(voteId) + 1)
+        const temp = new Map(votesCount)
+        setVotesCount(temp)
+      } else {
+        // Delete
+        setTotalVoteCount((old) => old - 1)
+        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
+        setVotesCount(temp)
+        await onRemoveVote(selectedVoteId)
+      }
+      setSelectedVoteId(voteId === selectedVoteId ? null : voteId)
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+    }
   }
 
   function hanldeOpenReactDialog() {
@@ -261,7 +294,7 @@ export default function PostListItem({
     }
 
     return axios.put(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${commentId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/comments/${commentId}`,
       comment,
       {
         headers: {
@@ -277,7 +310,39 @@ export default function PostListItem({
     e.preventDefault()
 
     return axios.delete(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${commentId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/comments/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onVote = (voteId: number) => {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/votes/${voteId}`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onChangeVote = (oldVoteId: number, newVoteId: number) => {
+    return axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/votes/${oldVoteId}`,
+      { updatedVoteId: newVoteId },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onRemoveVote = (voteId: number) => {
+    return axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/votes/${voteId}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -382,35 +447,48 @@ export default function PostListItem({
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
 
-        {/* this is the footer of the body */}
+          {/* this is the footer of the body */}
 
-        <List
-          placeholder={undefined}
-          className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-          {options.map(({ name, id }) => (
-            <ListItem placeholder={undefined} key={id} className="p-0 mb-2">
-              <label
-                htmlFor={`option-${post.title}-${id}`}
-                className="flex w-full cursor-pointer items-center px-3 py-2 bg-white rounded-lg shadow">
-                <ListItemPrefix placeholder={undefined} className="mr-3">
-                  <Radio
-                    color="blue"
-                    crossOrigin={undefined}
-                    name={`option-${post.title}`}
-                    id={`option-${post.title}-${id}`}
-                    ripple={false}
-                    className="hover:before:opacity-0"
-                    containerProps={{
-                      className: 'p-0',
-                    }}
-                    onClick={() => handleVote(id)}
-                  />
-                </ListItemPrefix>
-                <p className="text-black">{name}</p>
-              </label>
-            </ListItem>
-          ))}
-        </List>
+          <List
+            placeholder={undefined}
+            className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+            {votes.map(({ name, id: { voteId } }) => (
+              <div
+                key={voteId}
+                className="p-0 mb-2 border-2 rounded-lg relative">
+                <div
+                  className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left scale-x-[${
+                    totalVoteCount ? votesCount.get(voteId) / totalVoteCount : 0
+                  }]`}></div>
+                <label
+                  htmlFor={`option-${post.title}-${voteId}`}
+                  className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
+                  <div className="flex w-full gap-2">
+                    <Radio
+                      color="blue"
+                      crossOrigin={undefined}
+                      name={`option-${post.title}`}
+                      id={`option-${post.title}-${voteId}`}
+                      ripple={false}
+                      className="hover:before:opacity-0"
+                      containerProps={{
+                        className: 'p-0',
+                      }}
+                      onClick={() => handleVote(voteId)}
+                      checked={selectedVoteId === voteId}
+                    />
+                    <span className="text-black">{name}</span>
+                  </div>
+                  <span className="text-[var(--blue-02)]">
+                    {totalVoteCount
+                      ? (votesCount.get(voteId) / totalVoteCount) * 100
+                      : votesCount.get(voteId)}
+                    %
+                  </span>
+                </label>
+              </div>
+            ))}
+          </List>
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">
