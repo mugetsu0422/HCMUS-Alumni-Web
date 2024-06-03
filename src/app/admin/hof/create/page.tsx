@@ -111,14 +111,9 @@ export default function Page() {
         id: postToast,
       })
     } catch (error) {
-      console.error(error)
-
-      toast.error(
-        typeof error.request.response == 'string' && error.request.response,
-        {
-          id: postToast,
-        }
-      )
+      toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        id: postToast,
+      })
     }
   }
 

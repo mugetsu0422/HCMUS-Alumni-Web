@@ -174,7 +174,7 @@ export default function Page() {
         setTotalPages(totalPages)
         setHof(hof)
       })
-      .catch()
+      .catch((error) => {})
   }, [myParams])
 
   return (
