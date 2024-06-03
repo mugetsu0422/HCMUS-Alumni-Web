@@ -143,7 +143,7 @@ export default function Page({ params }: { params: { id: string } }) {
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra!')
+      toast.error(error.response.data.error.message || 'Lỗi không xác định')
     }
   }
   // Fetch event participants
@@ -160,9 +160,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data }) => {
         setParticipants(participants.concat(data.participants))
       })
-      .catch((e) => {
-        console.log(e)
-      })
+      .catch((e) => {})
   }
   // Fetch more participants
   const onLoadMoreParticipants = async (page: number) => {
@@ -208,8 +206,10 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onFetchChildrenComments = async (
@@ -331,7 +331,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data: { comments: fetchedComments } }) => {
         setComments(comments.concat(fetchedComments))
       })
-      .catch()
+      .catch((errror) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
