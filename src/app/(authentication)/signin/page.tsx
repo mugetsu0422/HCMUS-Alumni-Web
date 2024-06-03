@@ -29,16 +29,15 @@ export default function Page() {
   const onSubmit = (data) => {
     axios
       .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
-      .then(({ data: { jwt } }) => {
+      .then(({ data: { jwt, permissions } }) => {
         notify()
         const decoded: { roles?: string[] } = jwtDecode(jwt)
-        const { roles = null } = decoded
 
         Cookies.set('jwt', jwt, { expires: 3 })
-        Cookies.set('roles', (roles), { expires: 3 })
+        Cookies.set('permissions', permissions, { expires: 3 })
       })
-      .catch((e) => {
-        error(e.response.data.msg)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
 
@@ -94,7 +93,8 @@ export default function Page() {
                 pattern: {
                   value:
                     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                  message: 'Hãy nhập đúng định dạng email. Ví dụ: test@gmail.com',
+                  message:
+                    'Hãy nhập đúng định dạng email. Ví dụ: test@gmail.com',
                 },
               })}
             />

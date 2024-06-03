@@ -48,8 +48,8 @@ function Step1() {
       .then((res) => {
         handleNext()
       })
-      .catch((e) => {
-        toast.error('Email đã tồn tại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
         return
       })
   }
@@ -200,9 +200,9 @@ function Step2() {
               })
           })
       })
-      .catch((e) => {
+      .catch((error) => {
         // failed
-        toast.error('Mã xác thực không hợp lệ hoặc đã hết hạn')
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const countdownRenderer = ({ seconds }) => {
@@ -221,8 +221,8 @@ function Step2() {
         { email: inputs.email }
       )
       .then((res) => {})
-      .catch((e) => {
-        console.error(e)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
     setIsCodeExpired(false)
     timer.current = Date.now()

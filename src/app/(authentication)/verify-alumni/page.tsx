@@ -308,9 +308,8 @@ function Step2() {
       .then((res) => {
         toast.success('Thiết lập thành công')
       })
-      .catch((e) => {
-        console.error(e)
-        toast.error(e.message)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onBack = () => {
