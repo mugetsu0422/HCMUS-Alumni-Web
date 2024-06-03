@@ -51,9 +51,10 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onEditComment = (
@@ -179,7 +180,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data: { comments: fetchedComments } }) => {
         setComments(comments.concat(fetchedComments))
       })
-      .catch()
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
