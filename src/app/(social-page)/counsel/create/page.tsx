@@ -193,16 +193,17 @@ export default function CreatePostDialog() {
               id: postToast,
             })
           })
-          .catch((err) => {
-            console.error(err)
-            toast.error('Đăng thất bại', {
-              id: postToast,
-            })
+          .catch((error) => {
+            toast.error(
+              error.response.data.error.message || 'Lỗi không xác định',
+              {
+                id: postToast,
+              }
+            )
           })
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Đăng thất bại', {
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
           id: postToast,
         })
       })

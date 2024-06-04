@@ -78,9 +78,7 @@ export default function Page() {
       .then(({ data: { posts: loadedPosts } }) => {
         setPosts(posts.concat(loadedPosts))
       })
-      .catch((err) => {
-        console.error(err)
-      })
+      .catch((err) => {})
   }
 
   useEffect(() => {
@@ -97,9 +95,7 @@ export default function Page() {
 
         setIsLoading(false)
       })
-      .catch((err) => {
-        console.error(err)
-      })
+      .catch((err) => {})
   }, [myParams])
 
   return (
