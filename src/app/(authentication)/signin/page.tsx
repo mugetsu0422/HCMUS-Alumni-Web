@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import {
   Card,
@@ -15,52 +15,127 @@ import ErrorInput from '../../ui/error-input'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
+import { useRouter } from 'next/navigation'
 
-export default function Page() {
-  // sau này sẽ xử lý thêm dữ kiện đăng nhập ở đây
-  const notify = () => toast.success('Đăng nhập thành công')
-  const error = (msg) => toast.error(msg)
+function ForceChangePasswordForm({
+  forceChangePasswordForm,
+  onForceChangePasswordSubmit,
+}) {
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm()
+  return (
+    <>
+      <Typography
+        variant="h2"
+        color="blue-gray"
+        placeholder={undefined}
+        className="my-8">
+        ĐỔI MẬT KHẨU
+      </Typography>
+      <form
+        onSubmit={handleSubmit(onForceChangePasswordSubmit)}
+        className="mb-2 w-80 max-w-screen-lg sm:w-96">
+        <div>
+          <div className="mb-4 flex flex-col gap-3">
+            <Typography
+              placeholder={undefined}
+              variant="h6"
+              color="blue-gray"
+              className={`${roboto.className}`}>
+              Mật khẩu hiện tại{' '}
+              <span className="text-red-700 font-bold text-lg">*</span>
+            </Typography>
+            <Input
+              type="password"
+              size="lg"
+              className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              crossOrigin={undefined}
+              {...register('currentPassword', {
+                required: 'Vui lòng nhập mật khẩu hiện tại',
+              })}
+            />
+            <ErrorInput errors={errors?.currentPassword?.message} />
+          </div>
+
+          <div className="mb-4 flex flex-col gap-3">
+            <Typography
+              placeholder={undefined}
+              variant="h6"
+              color="blue-gray"
+              className={` ${roboto.className}`}>
+              Mật khẩu mới{' '}
+              <span className="text-red-700 font-bold text-lg">*</span>
+            </Typography>
+            <Input
+              type="password"
+              size="lg"
+              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              crossOrigin={undefined}
+              {...register('newPassword', {
+                required: 'Vui lòng nhập mật khẩu',
+              })}
+            />
+            <ErrorInput errors={errors?.newPassword?.message} />
+          </div>
+
+          <div className="mb-4 flex flex-col gap-3">
+            <Typography
+              placeholder={undefined}
+              variant="h6"
+              color="blue-gray"
+              className={` ${roboto.className}`}>
+              Nhập lại mật khẩu mới{' '}
+              <span className="text-red-700 font-bold text-lg">*</span>
+            </Typography>
+            <Input
+              type="password"
+              size="lg"
+              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              crossOrigin={undefined}
+              {...register('confirmNewPassword', {
+                required: 'Vui lòng xác nhận lại mật khẩu',
+                validate: (value) =>
+                  value === getValues('newPassword') ||
+                  'Xác nhận mật khẩu mới không khớp',
+              })}
+            />
+            <ErrorInput errors={errors?.confirmNewPassword?.message} />
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          placeholder={undefined}
+          ripple={true}
+          className={` ${roboto.className} mt-6 w-full bg-blue-800 text-white rounded-md py-4`}>
+          Đổi mật khẩu
+        </Button>
+      </form>
+    </>
+  )
+}
+
+function SigninForm({ signinForm, onSigninFormSubmit }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
-
-  const onSubmit = (data) => {
-    axios
-      .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
-      .then(({ data: { jwt } }) => {
-        notify()
-        const decoded: { roles?: string[] } = jwtDecode(jwt)
-        const { roles = null } = decoded
-
-        Cookies.set('jwt', jwt, { expires: 3 })
-        Cookies.set('roles', (roles), { expires: 3 })
-      })
-      .catch((e) => {
-        error(e.response.data.msg)
-      })
-  }
-
+  } = signinForm
   return (
-    <div
-      className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+    <>
       <Typography
         variant="h2"
         color="blue-gray"
@@ -70,7 +145,7 @@ export default function Page() {
       </Typography>
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSigninFormSubmit)}
         className="mb-2 w-80 max-w-screen-lg sm:w-96">
         <div>
           <div className="mb-4 flex flex-col gap-3">
@@ -94,7 +169,8 @@ export default function Page() {
                 pattern: {
                   value:
                     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                  message: 'Hãy nhập đúng định dạng email. Ví dụ: test@gmail.com',
+                  message:
+                    'Hãy nhập đúng định dạng email. Ví dụ: test@gmail.com',
                 },
               })}
             />
@@ -122,7 +198,7 @@ export default function Page() {
               }}
               crossOrigin={undefined}
               {...register('pass', {
-                required: 'Vui lòng nhập password',
+                required: 'Vui lòng nhập mật khẩu',
               })}
             />
             <ErrorInput
@@ -180,6 +256,105 @@ export default function Page() {
           </Link>
         </div>
       </form>
+    </>
+  )
+}
+
+export default function Page() {
+  const router = useRouter()
+  const [isForceChangePassword, setIsForceChangePassword] = useState(false)
+  const [email, setEmail] = useState('')
+
+  // sau này sẽ xử lý thêm dữ kiện đăng nhập ở đây
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+  const signinForm = useForm()
+  const forceChangePasswordForm = useForm()
+
+  const onSigninFormSubmit = (data) => {
+    axios
+      .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
+      .then(({ data: { jwt, permissions, forcePasswordChange = null } }) => {
+        console.log(forcePasswordChange)
+        if (forcePasswordChange) {
+          setEmail(data.email)
+          setIsForceChangePassword(true)
+        } else {
+          const decoded: { roles?: string[] } = jwtDecode(jwt)
+
+          Cookies.set('jwt', jwt, { expires: 3 })
+          Cookies.set('permissions', permissions, { expires: 3 })
+          router.push('/home-page')
+        }
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      })
+  }
+
+  const onForceChangePasswordSubmit = async (data) => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/reset-password`,
+        {
+          email: email,
+          oldPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        }
+      )
+
+      const {
+        data: { jwt, permissions },
+      } = await axios.postForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`,
+        {
+          email: email,
+          pass: data.newPassword,
+        }
+      )
+      const decoded: { roles?: string[] } = jwtDecode(jwt)
+
+      Cookies.set('jwt', jwt, { expires: 3 })
+      Cookies.set('permissions', permissions, { expires: 3 })
+      router.push('/home-page')
+    } catch (error) {
+      toast.error(error.response.data.error.message || 'Lỗi không xác định')
+    }
+  }
+
+  return (
+    <div
+      className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
+      <Toaster
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
+            },
+          },
+        }}
+      />
+      {isForceChangePassword ? (
+        <ForceChangePasswordForm
+          forceChangePasswordForm={forceChangePasswordForm}
+          onForceChangePasswordSubmit={onForceChangePasswordSubmit}
+        />
+      ) : (
+        <SigninForm
+          signinForm={signinForm}
+          onSigninFormSubmit={onSigninFormSubmit}
+        />
+      )}
     </div>
   )
 }

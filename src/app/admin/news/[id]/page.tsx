@@ -149,8 +149,8 @@ export default function Page({ params }: { params: { id: string } }) {
       toast.success('Cập nhật thành công', {
         id: putToast,
       })
-    } catch ({ message }) {
-      toast.error(message, {
+    } catch (error) {
+      toast.error(error.response.data.error.message || 'Lỗi không xác định', {
         id: putToast,
       })
     }

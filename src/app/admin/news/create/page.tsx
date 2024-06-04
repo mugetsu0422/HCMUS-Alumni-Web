@@ -160,8 +160,8 @@ export default function Page() {
       toast.success(openDialog ? 'Lên lịch thành công' : 'Đăng thành công', {
         id: postToast,
       })
-    } catch ({ message }) {
-      toast.error(message, {
+    } catch (error) {
+      toast.error(error.response.data.error.message || 'Lỗi không xác định', {
         id: postToast,
       })
     }

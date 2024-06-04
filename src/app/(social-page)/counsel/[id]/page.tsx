@@ -39,30 +39,6 @@ import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import toast, { Toaster } from 'react-hot-toast'
 
-// const data = {
-//   id: '1',
-//   title: 'Tư vấn hỗ trợ giải đáp thắc mắc trong học tập',
-//   childrenCommentNumber: 10,
-//   updateAt: '02-05-2024',
-//   content:
-//     'Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ. Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ.Bài viết này sẽ giúp các bạn giải đáp thắc mắc trong quá trình học tập tại trường. Ai có thắc mắc gì thì commnet ở bên dưới để đươc hỗ trợ.',
-//   tags: [
-//     { id: '6', name: 'Học tập' },
-//     { id: '2', name: 'Trường học' },
-//   ],
-//   publishedAt: '01-05-2024',
-//   pictures: [
-//     { id: '1', pictureUrl: '/authentication.png' },
-//     { id: '2', pictureUrl: '/logo.png' },
-//     { id: '3', pictureUrl: '/demo.jpg' },
-//     { id: '4', pictureUrl: '/authentication.png' },
-//   ],
-//   creator: { id: '1', fullName: 'Trương Samuel', avatarUrl: '/demo.jpg' },
-//   status: { name: 'Bình thường' },
-//   isReacted: true,
-//   reactionCount: 10,
-// }
-
 export default function Page({ params }: { params: { id: string } }) {
   const [post, setPost] = useState(null)
   const [noData, setNoData] = useState(false)
@@ -108,8 +84,10 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onShowMoreComments = () => {
@@ -146,8 +124,8 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
@@ -162,8 +140,8 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -189,9 +167,7 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       setReaction(reaction.concat(res.data.users))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onDeletePost = () => {
     axios
@@ -203,9 +179,8 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Xóa bài viết thành công')
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Xóa bài viết thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (
@@ -271,7 +246,6 @@ export default function Page({ params }: { params: { id: string } }) {
         setIsLoading(false)
       })
       .catch((error) => {
-        console.error(error)
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -293,7 +267,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data: { comments: fetchedComments } }) => {
         setComments(comments.concat(fetchedComments))
       })
-      .catch()
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 

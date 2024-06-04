@@ -106,8 +106,8 @@ export default function Page() {
           id: postToast,
         })
       })
-      .catch(({ message }) => {
-        toast.error(message, {
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
           id: postToast,
         })
       })

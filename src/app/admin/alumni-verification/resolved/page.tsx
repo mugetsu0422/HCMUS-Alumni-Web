@@ -34,7 +34,7 @@ export default function Page() {
       .then((res) => {
         setTotalCount(res.data)
       })
-      .catch((e) => {})
+      .catch((error) => {})
   }, [])
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Page() {
           offset.current = 0
         }
       })
-      .catch()
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myParams])
 
@@ -75,14 +75,15 @@ export default function Page() {
 
   return (
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 p-4 px-10">
-      <p className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
+      <p
+        className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
         Cựu sinh viên đã xét duyệt - #{items.length}
       </p>
       {totalCount === 0 ? null : (
         <Filter setMyParams={setMyParams} status={status} />
       )}
       <div className="flex flex-wrap gap-5 justify-between mt-5">
-        <CardInformation offset={offset} items={items}/>
+        <CardInformation offset={offset} items={items} />
       </div>
       {offset.current + ADMIN_VERIFY_ALUMNI_PAGE_LIMIT >= itemNumber.current ||
       itemNumber.current == 0 ? null : (

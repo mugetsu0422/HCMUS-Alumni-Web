@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
@@ -21,7 +22,7 @@ import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
 import ErrorInput from '../../../../ui/error-input'
 import { nunito } from '../../../../ui/fonts'
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
   const {
     register,
     handleSubmit,
@@ -146,12 +147,16 @@ export default function Page() {
 
     // Upload post without images
     axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups`, post, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(({ data: { id } }) => {
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`,
+        post,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: postData }) => {
         // Update post if there are images
         const form = new FormData()
         for (const image of imageFiles) {
@@ -160,7 +165,7 @@ export default function Page() {
 
         axios
           .put(
-            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}/images`,
+            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${postData}/images`,
             form,
             {
               headers: {
@@ -175,14 +180,14 @@ export default function Page() {
           })
           .catch((err) => {
             console.error(err)
-            toast.error('Đăng thất bại', {
+            toast.error(err.response?.data?.error?.message, {
               id: postToast,
             })
           })
       })
       .catch((err) => {
         console.error(err)
-        toast.error('Đăng thất bại', {
+        toast.error(err.response?.data?.error?.message, {
           id: postToast,
         })
       })
@@ -191,9 +196,24 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[600px] w-[80%] m-auto`}>
+      <Toaster
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
+            },
+          },
+        }}
+      />
       <div className="w-full flex">
-        <Link href={'/groups/1'}>
-          {/*Replace with the exact id */}
+        <Link href={`/groups/${params.id}`}>
           <Button
             placeholder={undefined}
             variant="text"
@@ -263,7 +283,7 @@ export default function Page() {
         )}
 
         {openAddinImage && (
-          <AddImaePost
+          <AddImagePost
             handleOpenAdingImage={handleOpenAdingImage}
             onDragOver={onDragOver}
             onDrop={onDrop}
@@ -305,7 +325,7 @@ export default function Page() {
   )
 }
 
-function AddImaePost({
+function AddImagePost({
   onDragOver,
   onDrop,
   onClickDropzone,

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Cookies from 'js-cookie'
 import {
   Dialog,
@@ -9,12 +9,15 @@ import {
   DialogFooter,
   Button,
   Input,
+  Checkbox,
 } from '@material-tailwind/react'
 import { useRouter } from 'next/router'
-import { useForm } from 'react-hook-form'
-import { Toaster } from 'react-hot-toast'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import toast, { Toaster } from 'react-hot-toast'
 import ErrorInput from '../../../ui/error-input'
 import { nunito } from '../../../ui/fonts'
+import axios from 'axios'
+import { JWT_COOKIE } from '../../../constant'
 
 function CancelDialog({ open, handleOpen }) {
   const router = useRouter()
@@ -48,20 +51,57 @@ function CancelDialog({ open, handleOpen }) {
 export default function Page() {
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
   const [roles, setRoles] = useState([])
+  const [selectedRoles, setSelectedRoles] = useState(new Set())
 
   const {
+    control,
     register,
     handleSubmit,
-    trigger,
     formState: { errors },
   } = useForm()
 
+  const onClickRoleCheckbox = (roleId: number) => {
+    if (selectedRoles.has(roleId)) {
+      selectedRoles.delete(roleId)
+    } else {
+      selectedRoles.add(roleId)
+    }
+  }
+
   const onSubmit = (data) => {
-    console.log(data)
+    const user = {
+      email: data.email,
+      fullName: data.fullName,
+      roles: Array.from(selectedRoles).map((roleId) => ({ id: roleId })),
+    }
+
+    axios
+      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user`, user, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then((data) => {
+        toast.success('Cấp tài khoản thành công')
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      })
   }
 
   useEffect(() => {
     // Fetch roles
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/roles?pageSize=50`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data: { totalPages, roles } }) => {
+        setRoles(roles)
+      })
+      .catch((error) => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -139,21 +179,38 @@ export default function Page() {
 
           <div className="flex flex-col gap-2">
             <label className="text-xl font-bold">Vai trò</label>
-            <select
-              className="h-full hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
-              {...register('roleId', {
-                required: 'Vui lòng chọn vai trò',
-              })}>
-              <option value="">Không</option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
+            {roles.map((role, index) => (
+              <div key={role.id} className="flex items-center mb-2">
+                <Checkbox
+                  crossOrigin={undefined}
+                  type="checkbox"
+                  className="shadow appearance-none border rounded w-5 h-5 leading-tight focus:outline-none focus:shadow-outline"
+                  label={role.name}
+                  value={role.id}
+                  onChange={(e) => onClickRoleCheckbox(role.id)}
+                  labelProps={{ className: 'text-black' }}
+                />
+              </div>
+            ))}
+            <Controller
+              name="dummy"
+              control={control}
+              render={() => <input type="text" className="hidden" />}
+              rules={{
+                validate: {
+                  checkRoleCheckboxGroup: () => {
+                    if (selectedRoles.size === 0) {
+                      return 'Vui lòng chọn ít nhất 1 vai trò'
+                    }
+                    return true
+                  },
+                },
+              }}
+            />
+
             <ErrorInput
               // This is the error message
-              errors={errors?.roleId?.message}
+              errors={errors?.dummy?.message}
             />
           </div>
 

@@ -105,9 +105,8 @@ export default function Page({ params }: { params: { id: string } }) {
       toast.success('Cập nhật thành công', {
         id: putToast,
       })
-    } catch (e) {
-      console.error(e)
-      toast.error(e.message || 'Lỗi khi cập nhật', {
+    } catch (error) {
+      toast.error(error.response.data.error.message || 'Lỗi không xác định', {
         id: putToast,
       })
     }
@@ -164,7 +163,6 @@ export default function Page({ params }: { params: { id: string } }) {
         setContent(data.content)
       })
       .catch((e) => {
-        console.error(e)
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps

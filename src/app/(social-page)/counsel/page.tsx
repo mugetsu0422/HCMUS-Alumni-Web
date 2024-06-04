@@ -29,6 +29,8 @@ export default function Page() {
 
   const resetCurPage = () => {
     params.delete('page')
+    curPage.current = 0
+    setHasMore(true)
   }
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
@@ -59,7 +61,7 @@ export default function Page() {
   }
   const onFetchMore = () => {
     curPage.current++
-    if (curPage.current + 1 >= totalPages) {
+    if (curPage.current >= totalPages) {
       setHasMore(false)
       return
     }
@@ -76,9 +78,7 @@ export default function Page() {
       .then(({ data: { posts: loadedPosts } }) => {
         setPosts(posts.concat(loadedPosts))
       })
-      .catch((err) => {
-        console.error(err)
-      })
+      .catch((err) => {})
   }
 
   useEffect(() => {
@@ -95,9 +95,7 @@ export default function Page() {
 
         setIsLoading(false)
       })
-      .catch((err) => {
-        console.error(err)
-      })
+      .catch((err) => {})
   }, [myParams])
 
   return (

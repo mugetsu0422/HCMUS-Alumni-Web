@@ -235,8 +235,10 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                             setIsEditingComment(true)
                             await onEditComment(e, comment.id, editComment)
                           } catch (error) {
-                            console.error(error)
-                            toast.error('Lỗi khi chỉnh sửa bình luận')
+                            toast.error(
+                              error.response.data.error.message ||
+                                'Lỗi không xác định'
+                            )
                           } finally {
                             setIsEditingComment(false)
                           }
@@ -308,8 +310,10 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                               await onDeleteComment(e, comment.id)
                               setIsDeleted(true)
                             } catch (error) {
-                              console.error(error)
-                              toast.error('Lỗi khi xoá bình luận')
+                              toast.error(
+                                error.response.data.error.message ||
+                                  'Lỗi không xác định'
+                              )
                             }
                           }}
                           placeholder={undefined}

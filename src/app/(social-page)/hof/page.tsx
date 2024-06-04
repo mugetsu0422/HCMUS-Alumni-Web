@@ -137,7 +137,9 @@ function HofListItem({ hof }) {
         {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
         {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
       </p>
-      <p className="w-full text-center text-black font-semibold">{hof.position}</p>
+      <p className="w-full text-center text-black font-semibold">
+        {hof.position}
+      </p>
       <p className="text-sm">{hof.summary}</p>
     </div>
   )
@@ -233,7 +235,7 @@ export default function Page() {
         setTotalPages(totalPages)
         setHof(hof)
       })
-      .catch()
+      .catch((error) => {})
   }, [myParams])
 
   return (

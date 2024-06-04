@@ -133,7 +133,7 @@ export default function Page({ params }: { params: { id: string } }) {
       }),
     }
 
-    const postToast = toast.loading('Đang cập nhật')
+    const putToast = toast.loading('Đang cập nhật')
     axios
       .putForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`,
@@ -146,12 +146,12 @@ export default function Page({ params }: { params: { id: string } }) {
       )
       .then(() => {
         toast.success('Cập nhật thành công', {
-          id: postToast,
+          id: putToast,
         })
       })
-      .catch(({ message }) => {
-        toast.error(message, {
-          id: postToast,
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: putToast,
         })
       })
   }

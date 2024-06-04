@@ -123,8 +123,8 @@ export default function NewsListItem({
         toast.success('Xoá thành công')
         setIsDeleted(true)
       })
-      .catch((e) => {
-        toast.success('Xoá thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
 
@@ -147,13 +147,8 @@ export default function NewsListItem({
         }
         setIsHidden(!isHidden)
       })
-      .catch((e) => {
-        console.error(e)
-        if (isHidden) {
-          toast.error('Hiển thị thất bại')
-        } else {
-          toast.error('Ẩn thất bại')
-        }
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
 

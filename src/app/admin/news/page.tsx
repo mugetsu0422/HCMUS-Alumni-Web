@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
+import toast, { Toaster } from 'react-hot-toast'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
@@ -182,11 +183,27 @@ export default function Page() {
         setTotalPages(totalPages)
         setNews(news)
       })
-      .catch()
+      .catch((error) => {})
   }, [myParams])
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
+      <Toaster
+        toastOptions={{
+          success: {
+            style: {
+              background: '#00a700',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ea7b7b',
+              color: 'white',
+            },
+          },
+        }}
+      />
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý tin tức
