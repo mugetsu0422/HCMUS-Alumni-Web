@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
-import PostListItem from '../../ui/common/post-list-item'
 
 import CreatePost from '../../ui/counsel/create-post'
 import axios from 'axios'
@@ -13,6 +12,7 @@ import SearchAndFilter from '../../ui/counsel/search-and-filter'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
+import PostListItem from '../../ui/social-page/counsel/post-list-item'
 
 export default function Page() {
   const pathname = usePathname()
@@ -144,7 +144,7 @@ export default function Page() {
               </div>
             }>
             {posts.map((post) => (
-              <PostListItem key={post.id} post={post} name="counsel" />
+              <PostListItem key={post.id} post={post} />
             ))}
           </InfiniteScroll>
         )}

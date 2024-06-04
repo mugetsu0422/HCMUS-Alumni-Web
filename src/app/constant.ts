@@ -36,3 +36,18 @@ export const POST_STATUS = {
 export const REACTION_TYPE = {
   Like: 1,
 }
+export const GROUP_PRIVACY = {
+  PUBLIC: 'Công khai',
+  PRIVATE: 'Riêng tư',
+}
+export const GROUP_TABS = [
+  {
+    label: 'Thảo luận',
+  },
+  {
+    label: 'Thành viên',
+  },
+  {
+    label: 'Xét duyệt',
+  },
+]

@@ -15,60 +15,60 @@ import { nunito } from '../fonts'
 import 'moment/locale/vi'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-const user = [
-  {
-    id: '1',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '2',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '3',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '4',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '5',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '6',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '17',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '8',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '9',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-  {
-    id: '10',
-    fullName: 'Trương Samuel',
-    avatarUrl: '/demo.jpg',
-  },
-]
+// const user = [
+//   {
+//     id: '1',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '2',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '3',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '4',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '5',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '6',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '17',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '8',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '9',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+//   {
+//     id: '10',
+//     fullName: 'Trương Samuel',
+//     avatarUrl: '/demo.jpg',
+//   },
+// ]
 
-export default function ReactDialog({
+export default function ReactionDialog({
   users,
   reactionCount,
   onFetchReation,

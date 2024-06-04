@@ -1,59 +1,43 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+
 import {
-  Button,
-  Tabs,
-  TabsHeader,
-  Tab,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
   Dialog,
   DialogHeader,
   DialogBody,
   DialogFooter,
+  Button,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
+  Tab,
+  Tabs,
+  TabsHeader,
+  tabs,
 } from '@material-tailwind/react'
+import { useRouter } from 'next/navigation'
+import { nunito } from '../../../ui/fonts'
+import NoData from '../../../ui/no-data'
+import { useEffect, useState } from 'react'
+import { Toaster } from 'react-hot-toast'
+import { faLock } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+  GlobeAmericas,
   Dot,
-  BoxArrowInRight,
   Gear,
+  BoxArrowInRight,
+  Link,
   PencilSquare,
   Trash,
 } from 'react-bootstrap-icons'
-import { faLock } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Discuss from '../../../ui/social-page/groups/discuss'
 import ListMember from '../../../ui/social-page/groups/list-member'
-import { nunito } from '../../../ui/fonts'
-import { GlobeAmericas } from 'react-bootstrap-icons'
 import MemberRequest from '../../../ui/social-page/groups/member-request'
-import Link from 'next/link'
-import axios, { AxiosResponse } from 'axios'
-import { JWT_COOKIE } from '../../../constant'
+import { GROUP_PRIVACY, GROUP_TABS, JWT_COOKIE } from '../../../constant'
+import axios from 'axios'
 import Cookies from 'js-cookie'
-import NoData from '../../../ui/no-data'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
-import { useDebouncedCallback } from 'use-debounce'
-import toast, { Toaster } from 'react-hot-toast'
-
-const tabs = [
-  {
-    label: 'Thảo luận',
-  },
-  {
-    label: 'Thành viên',
-  },
-  {
-    label: 'Xét duyệt',
-  },
-]
-
-const PRIVACY = {
-  PUBLIC: 'Công khai',
-  PRIVATE: 'Riêng tư',
-}
 
 function DeleteGroupDialog({
   id,
@@ -93,154 +77,38 @@ function DeleteGroupDialog({
   )
 }
 
-export default function Page({ params }: { params: { id: string } }) {
-  const [activeTab, setActiveTab] = React.useState('Thảo luận')
+export default function GroupLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: { id: string }
+}) {
+  const [activeTab, setActiveTab] = useState('Thảo luận')
 
-  const [group, setGroup] = useState(null)
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [group, setGroup] = useState(null)
   const [openDialogDeleteGroup, setOpenDialogDeleteGroup] = useState(false)
-
-  // Members in groups
-  const [members, setMembers] = useState(null)
-  const [adminMember, setAdminMember] = useState(null)
-
-  // Diccussion
-  const curPostPage = useRef(0)
-  const [postTotalPage, setPostTotalPage] = useState(1)
-  const [posts, setPosts] = useState([])
-  const [postsHasMore, setPostsHasMore] = useState(true)
-
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const paramsRole = new URLSearchParams(searchParams)
-  const [myParams, setMyParams] = useState(`?${paramsRole.toString()}`)
-  const [curPage, setCurPage] = useState(
-    Number(paramsRole.get('page')) + 1 || 1
-  )
-
-  const onDelete = (id) => {
-    axios
-      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then((res) => {
-        toast.success('Xoá thành công')
-      })
-      .catch((e) => {
-        toast.success('Xoá thất bại')
-      })
-  }
-
-  const resetCurPage = () => {
-    paramsRole.delete('page')
-    setCurPage(1)
-  }
 
   function hanldeOpenDeleteGroupDialog() {
     setOpenDialogDeleteGroup((e) => !e)
   }
 
-  const onSearchMember = useDebouncedCallback((keyword) => {
-    if (keyword) {
-      paramsRole.set('role', keyword)
-    } else {
-      paramsRole.delete('role')
-    }
-    resetCurPage()
-    replace(`${pathname}?${paramsRole.toString()}`, { scroll: false })
-    setMyParams(`?${paramsRole.toString()}`)
-  }, 500)
-
-  const onFetchMorePosts = () => {
-    curPostPage.current++
-    if (curPostPage.current >= postTotalPage) {
-      setPostsHasMore(false)
-      return
-    }
-
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${group.id}/posts?page=${curPostPage.current}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { posts: loadedPosts } }) => {
-        setPosts(posts.concat(loadedPosts))
-      })
-      .catch((err) => {
-        console.error(err)
-      })
-  }
-
-  // Members
-
-  // Member requests
-
   useEffect(() => {
-    const detailsPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}`,
-      {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      }
-    )
-    const postsPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    // All member
-    const membersGroup = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members${myParams}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    // Admin member
-    const membersAdminGroup = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members?&role=CREATOR&role=ADMIN`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    Promise.all([detailsPromise, postsPromise, membersGroup, membersAdminGroup])
-      .then(([detailsRes, postsRes, memberRes, adminMemberRes]) => {
-        const { data: groups } = detailsRes
-        const {
-          data: { totalPages, posts },
-        } = postsRes
-        const { data: members } = memberRes
-        const { data: adminMembers } = adminMemberRes
-        if (!totalPages) {
-          setPostsHasMore(false)
-        }
-        setAdminMember(adminMembers.members)
-        setMembers(members.members)
-        setGroup(groups)
-        setPostTotalPage(totalPages)
-        setPosts(posts)
+      })
+      .then(({data}) => {
+        setGroup(data)
         setIsLoading(false)
       })
       .catch((error) => {
-        console.error(error)
         setNoData(true)
       })
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -285,8 +153,8 @@ export default function Page({ params }: { params: { id: string } }) {
                 ) : (
                   <GlobeAmericas className="mr-2" />
                 )}
-                {PRIVACY[group.privacy]} <Dot /> {group.participantCount} thành
-                viên tham gia
+                {GROUP_PRIVACY[group.privacy]} <Dot /> {group.participantCount}{' '}
+                thành viên tham gia
               </p>
             </div>
 
@@ -318,7 +186,7 @@ export default function Page({ params }: { params: { id: string } }) {
                       className:
                         'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
                     }}>
-                    {tabs.map(({ label }) => (
+                    {GROUP_TABS.map(({ label }) => (
                       <Tab
                         key={label}
                         placeholder={undefined}
@@ -379,29 +247,13 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-        <DeleteGroupDialog
+        {/* <DeleteGroupDialog
           id={params.id}
           openDialogDeleteGroup={openDialogDeleteGroup}
           hanldeOpenDeleteGroupDialog={hanldeOpenDeleteGroupDialog}
           onDelete={onDelete}
-        />
-        {activeTab === 'Thảo luận' && (
-          <Discuss
-            group={group}
-            posts={posts}
-            onFetchMore={onFetchMorePosts}
-            hasMore={postsHasMore}
-          />
-        )}
-        {activeTab === 'Thành viên' && (
-          <ListMember
-            adminMembers={adminMember}
-            members={members}
-            onSearchMember={onSearchMember}
-            params={{}}
-          />
-        )}
-        {activeTab === 'Xét duyệt' && <MemberRequest />}
+        /> */}
+        {/* {children} */}
       </div>
     )
 }

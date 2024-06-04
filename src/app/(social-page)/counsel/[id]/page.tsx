@@ -33,7 +33,7 @@ import {
   REACTION_PAGE_SIZE,
   REACTION_TYPE,
 } from '../../../constant'
-import ReactionDialog from '../../../ui/counsel/counsel-react-dialog'
+import ReactionDialog from '../../../ui/common/reaction-dialog'
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
