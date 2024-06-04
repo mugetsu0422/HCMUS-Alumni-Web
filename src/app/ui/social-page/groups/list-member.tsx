@@ -10,75 +10,19 @@ import {
   MenuItem,
 } from '@material-tailwind/react'
 import { Search, Dot, ThreeDots, Pencil, Trash } from 'react-bootstrap-icons'
+import { useForm } from 'react-hook-form'
 
-const admingroups = [
-  {
-    id: '1',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '2',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '3',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-]
-
-const members = [
-  {
-    id: '1',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '2',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '3',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '4',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '5',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '6',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '7',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '8',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '9',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-]
-
-export default function ListMember() {
-  const [listMember, setListMember] = useState([])
+export default function ListMember({
+  members,
+  adminMembers,
+  onSearchMember,
+  params,
+}) {
+  // const { register, reset } = useForm({
+  //   defaultValues: {
+  //     name: params.get('name'),
+  //   },
+  // })
 
   return (
     <div className="mt-8 w-full xl:w-[60%] m-auto">
@@ -101,11 +45,15 @@ export default function ListMember() {
       />
       <div className="flex flex-col gap-4 mt-4">
         <p className="font-bold">Quản trị viên</p>
-        {admingroups.map(({ id, fullName, avararUrl }) => (
-          <div key={id} className="flex gap-2 items-center">
-            <Avatar placeholder={undefined} src={avararUrl} alt="user avatar" />
+        {adminMembers.map(({ user }) => (
+          <div key={user.id} className="flex gap-2 items-center">
+            <Avatar
+              placeholder={undefined}
+              src={user.avatarUrl}
+              alt="user avatar"
+            />
             <div>
-              <p>{fullName}</p>
+              <p>{user.fullName}</p>
               <p className="text-xs p-1 text-[--blue-05] bg-[--blue-03] font-semibold w-fit">
                 Quản trị viên
               </p>
@@ -116,15 +64,15 @@ export default function ListMember() {
 
       <div className="flex flex-col gap-4 mt-4">
         <p className="font-bold">Thành viên trong nhóm</p>
-        {members.map(({ id, fullName, avararUrl }) => (
-          <div key={id} className="flex justify-between">
+        {members.map(({ user }) => (
+          <div key={user.id} className="flex justify-between">
             <div className="flex gap-2 items-center">
               <Avatar
                 placeholder={undefined}
-                src={avararUrl}
+                src={user.avatarUrl}
                 alt="user avatar"
               />
-              <p>{fullName}</p>
+              <p>{user.fullName}</p>
             </div>
 
             <Menu placement="bottom-end">

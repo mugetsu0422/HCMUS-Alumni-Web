@@ -34,6 +34,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
           alt="group avatar"
           placeholder={undefined}
           size="lg"
+          variant="rounded"
         />
         <div className="max-w-[600px] min-w-[350px] w-[80%]">
           <p className="text-[18px] font-[500] text-justify">{group.name}</p>

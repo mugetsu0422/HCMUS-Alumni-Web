@@ -1,7 +1,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import {
   XLg,
   ArrowLeft,
@@ -16,21 +16,29 @@ import toast, { Toaster } from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { TAGS, JWT_COOKIE } from '../../../../../constant'
-import styles from '../../../../../ui/admin/react-tag-autocomplete.module.css'
-import ErrorInput from '../../../../../ui/error-input'
-import { nunito } from '../../../../../ui/fonts'
+import { TAGS, JWT_COOKIE } from '../../../../constant'
+import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
+import ErrorInput from '../../../../ui/error-input'
+import { nunito } from '../../../../ui/fonts'
+import NoData from '../../../../ui/no-data'
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm()
 
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
+  const [noData, setNoData] = useState(false)
+  const [currentImages, setCurrentImages] = useState([])
+  const [votes, setVotes] = useState([])
+  const [groupId, setGroupId] = useState(null)
+  const [addedImageFiles, setAddedImageFiles] = useState([])
+  const [deleteImageIds, setDeleteImageIds] = useState([])
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -47,7 +55,7 @@ export default function Page() {
         return
       }
     }
-    if (previewImages.length + files.length > 5) {
+    if (currentImages.length + previewImages.length + files.length > 5) {
       toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
       return
     }
@@ -55,7 +63,7 @@ export default function Page() {
     if (files.length > 0) {
       const newImages = [...previewImages]
       for (const file of files) {
-        setImageFiles((prev) => prev.concat(file))
+        setAddedImageFiles((prev) => prev.concat(file))
 
         const reader = new FileReader()
         reader.onload = (event) => {
@@ -82,7 +90,7 @@ export default function Page() {
             return
           }
         }
-        if (previewImages.length + files.length > 5) {
+        if (currentImages.length + previewImages.length + files.length > 5) {
           toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
           return
         }
@@ -91,7 +99,7 @@ export default function Page() {
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
 
-          setImageFiles((prev) => prev.concat(file))
+          setAddedImageFiles((prev) => prev.concat(file))
 
           const reader = new FileReader()
           reader.onload = (event) => {
@@ -132,57 +140,102 @@ export default function Page() {
       }),
     }
 
-    const postToast = toast.loading('Đang đăng bài viết...')
+    const imagesForm = new FormData()
+    for (const image of imageFiles) {
+      imagesForm.append('addedImages', image)
+    }
+
+    const postToast = toast.loading('Đang cập nhật bài viết...')
 
     // Upload post without images
+    const updatePromise = axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.id}`,
+      post,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    const updateImages = axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.id}/images`,
+      imagesForm,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    Promise.all([updatePromise, updateImages])
+      .then(() => {
+        toast.success('Cập nhật bài viết thành công', {
+          id: postToast,
+        })
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.error('Có lỗi xảy ra khi cập nhật bài viết', {
+          id: postToast,
+        })
+      })
+  }
+
+  useEffect(() => {
     axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups`, post, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.id}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(({ data: { id } }) => {
-        // Update post if there are images
-        const form = new FormData()
-        for (const image of imageFiles) {
-          form.append('addedImages', image)
-        }
-
-        axios
-          .put(
-            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}/images`,
-            form,
-            {
-              headers: {
-                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-              },
-            }
-          )
-          .then(() => {
-            toast.success('Đăng thành công', {
-              id: postToast,
-            })
+      .then(({ data: { title, content, tags, pictures, votes, groupId } }) => {
+        setValue('title', title)
+        setValue('content', content)
+        setGroupId(groupId)
+        setSelectedTags(
+          tags.map((tag) => {
+            const { id } = tag
+            return TAGS.find(({ value }) => value === id)
           })
-          .catch((err) => {
-            console.error(err)
-            toast.error('Đăng thất bại', {
-              id: postToast,
-            })
-          })
+        )
+        setVotes(votes)
+        setCurrentImages(pictures)
+        setPreviewImages(pictures)
       })
       .catch((err) => {
         console.error(err)
-        toast.error('Đăng thất bại', {
-          id: postToast,
-        })
+        setNoData(true)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (noData) {
+    return <NoData />
   }
 
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
       <div className="w-full flex">
-        <Link href={'/groups/1'}>
+        <Toaster
+          containerStyle={{ zIndex: 99999 }}
+          toastOptions={{
+            success: {
+              style: {
+                background: '#00a700',
+                color: 'white',
+              },
+            },
+            error: {
+              style: {
+                background: '#ea7b7b',
+                color: 'white',
+              },
+            },
+          }}
+        />
+        <Link href={`/groups/${groupId}`}>
           {/*Replace with the exact id */}
           <Button
             placeholder={undefined}
@@ -250,9 +303,9 @@ export default function Page() {
           }}
         />
 
-        <VotingPostForm />
+        <VotingPostForm votes={votes} />
 
-        <AddImaePost
+        <AddImagePost
           onDragOver={onDragOver}
           onDrop={onDrop}
           onClickDropzone={onClickDropzone}
@@ -265,14 +318,14 @@ export default function Page() {
           size="lg"
           type="submit"
           className={`${nunito.className} h-12 w-full text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
-          Đăng
+          Cập nhật
         </Button>
       </form>
     </div>
   )
 }
 
-function AddImaePost({
+function AddImagePost({
   onDragOver,
   onDrop,
   onClickDropzone,
@@ -324,7 +377,7 @@ function AddImaePost({
   )
 }
 
-function VotingPostForm() {
+function VotingPostForm({ votes }) {
   const [title, setTitle] = useState('')
   const [options, setOptions] = useState([''])
   const [posts, setPosts] = useState([])
@@ -355,7 +408,7 @@ function VotingPostForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+    <form onSubmit={handleSubmit} className="w-full rounded-lg">
       <div className="mb-4">
         <div className="flex text-gray-700 text-xl font-bold mb-2 ">
           Tạo bình chọn

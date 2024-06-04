@@ -13,44 +13,6 @@ import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
 import PostListItem from '../../common/post-list-item'
 
-// const group = {
-//   id: '1',
-//   name: 'Sinh viên lớp 20CLC11',
-//   creator: {
-//     id: '1',
-//     name: 'Đặng Nguyễn Duy',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   privacy: 'Nhóm kín',
-//   avatarUrl: '/authentication.png',
-//   coverUrl: '/authentication.png',
-//   website: '',
-//   status: 'Bình thường',
-//   publicAt: '05-04-2023',
-//   numberMember: 500,
-//   isJoined: true,
-//   description:
-//     'Nhóm lớp 20CLC11. Nơi mà sinh viên lớp 20CLC11 chia sẻ kiến thức và sự kiện của nhà trường.',
-
-//   friendsInGroup: [
-//     {
-//       id: '1',
-//       fullName: 'Trương Sammuel',
-//       avatarUrl: '/demo.jpg',
-//     },
-//     {
-//       id: '2',
-//       fullName: 'Đặng Nguyễn Duy',
-//       avatarUrl: '/demo.jpg',
-//     },
-//     {
-//       id: '3',
-//       fullName: 'Huỳnh Cao Nguyên',
-//       avatarUrl: '/demo.jpg',
-//     },
-//   ],
-// }
-
 function CreatePost({ groupId }) {
   return (
     <div className="flex gap-4 items-center">
@@ -107,11 +69,7 @@ export default function Discuss({ group, posts, onFetchMore, hasMore }) {
             </div>
           }>
           {posts.map((post) => (
-            <PostListItem
-              key={post.id}
-              post={post}
-              name={`groups/${group.id}`}
-            />
+            <PostListItem key={post.id} post={post} name={`groups`} />
           ))}
         </InfiniteScroll>
       </div>

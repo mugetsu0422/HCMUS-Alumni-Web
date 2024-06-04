@@ -117,8 +117,8 @@ export default function Page({ params }: { params: { id: string } }) {
     const file = e.target.files[0]
 
     if (!file) {
-      setHof((news) => ({
-        ...news,
+      setHof((hof) => ({
+        ...hof,
         thumbnail: null,
       }))
       return

@@ -454,42 +454,45 @@ export default function PostListItem({
           <List
             placeholder={undefined}
             className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes && post.votes.map(({ name, id: { voteId } }) => (
-              <div
-                key={voteId}
-                className="p-0 mb-2 border-2 rounded-lg relative">
+            {post.votes &&
+              post.votes.map(({ name, id: { voteId } }) => (
                 <div
-                  className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left scale-x-[${
-                    totalVoteCount ? votesCount.get(voteId) / totalVoteCount : 0
-                  }]`}></div>
-                <label
-                  htmlFor={`option-${post.title}-${voteId}`}
-                  className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
-                  <div className="flex w-full gap-2">
-                    <Radio
-                      color="blue"
-                      crossOrigin={undefined}
-                      name={`option-${post.title}`}
-                      id={`option-${post.title}-${voteId}`}
-                      ripple={false}
-                      className="hover:before:opacity-0"
-                      containerProps={{
-                        className: 'p-0',
-                      }}
-                      onClick={() => handleVote(voteId)}
-                      checked={selectedVoteId === voteId}
-                    />
-                    <span className="text-black">{name}</span>
-                  </div>
-                  <span className="text-[var(--blue-02)]">
-                    {totalVoteCount
-                      ? (votesCount.get(voteId) / totalVoteCount) * 100
-                      : votesCount.get(voteId)}
-                    %
-                  </span>
-                </label>
-              </div>
-            ))}
+                  key={voteId}
+                  className="p-0 mb-2 border-2 rounded-lg relative">
+                  <div
+                    className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left scale-x-[${
+                      totalVoteCount
+                        ? votesCount.get(voteId) / totalVoteCount
+                        : 0
+                    }]`}></div>
+                  <label
+                    htmlFor={`option-${post.title}-${voteId}`}
+                    className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
+                    <div className="flex w-full gap-2">
+                      <Radio
+                        color="blue"
+                        crossOrigin={undefined}
+                        name={`option-${post.title}`}
+                        id={`option-${post.title}-${voteId}`}
+                        ripple={false}
+                        className="hover:before:opacity-0"
+                        containerProps={{
+                          className: 'p-0',
+                        }}
+                        onClick={() => handleVote(voteId)}
+                        checked={selectedVoteId === voteId}
+                      />
+                      <span className="text-black">{name}</span>
+                    </div>
+                    <span className="text-[var(--blue-02)]">
+                      {totalVoteCount
+                        ? (votesCount.get(voteId) / totalVoteCount) * 100
+                        : votesCount.get(voteId)}
+                      %
+                    </span>
+                  </label>
+                </div>
+              ))}
           </List>
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (

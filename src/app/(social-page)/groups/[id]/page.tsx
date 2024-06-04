@@ -10,8 +10,18 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
 } from '@material-tailwind/react'
-import { Dot, BoxArrowInRight, Gear, PencilSquare } from 'react-bootstrap-icons'
+import {
+  Dot,
+  BoxArrowInRight,
+  Gear,
+  PencilSquare,
+  Trash,
+} from 'react-bootstrap-icons'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Discuss from '../../../ui/social-page/groups/discuss'
@@ -20,12 +30,13 @@ import { nunito } from '../../../ui/fonts'
 import { GlobeAmericas } from 'react-bootstrap-icons'
 import MemberRequest from '../../../ui/social-page/groups/member-request'
 import Link from 'next/link'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useDebouncedCallback } from 'use-debounce'
 import axios, { AxiosResponse } from 'axios'
 import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
+import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
+import toast, { Toaster } from 'react-hot-toast'
 
 const tabs = [
   {
@@ -44,21 +55,105 @@ const PRIVACY = {
   PRIVATE: 'Riêng tư',
 }
 
+function DeleteGroupDialog({
+  id,
+  openDialogDeleteGroup,
+  hanldeOpenDeleteGroupDialog,
+  onDelete,
+}) {
+  const router = useRouter()
+
+  return (
+    <Dialog
+      placeholder={undefined}
+      size="xs"
+      open={openDialogDeleteGroup}
+      handler={hanldeOpenDeleteGroupDialog}>
+      <DialogHeader placeholder={undefined}>Xóa nhóm</DialogHeader>
+      <DialogBody placeholder={undefined}>Bạn có muốn xóa nhóm ?</DialogBody>
+      <DialogFooter placeholder={undefined}>
+        <Button
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
+          placeholder={undefined}
+          onClick={hanldeOpenDeleteGroupDialog}>
+          <span>Không</span>
+        </Button>
+        <Button
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
+          placeholder={undefined}
+          onClick={() => {
+            onDelete(id)
+            hanldeOpenDeleteGroupDialog()
+            router.push('/groups')
+          }}>
+          <span>Xóa</span>
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  )
+}
+
 export default function Page({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = React.useState('Thảo luận')
 
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
   const [group, setGroup] = useState(null)
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [openDialogDeleteGroup, setOpenDialogDeleteGroup] = useState(false)
+
+  // Members in groups
+  const [members, setMembers] = useState(null)
+  const [adminMember, setAdminMember] = useState(null)
 
   // Diccussion
   const curPostPage = useRef(0)
   const [postTotalPage, setPostTotalPage] = useState(1)
   const [posts, setPosts] = useState([])
   const [postsHasMore, setPostsHasMore] = useState(true)
+
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const searchParams = useSearchParams()
+  const paramsRole = new URLSearchParams(searchParams)
+  const [myParams, setMyParams] = useState(`?${paramsRole.toString()}`)
+  const [curPage, setCurPage] = useState(
+    Number(paramsRole.get('page')) + 1 || 1
+  )
+
+  const onDelete = (id) => {
+    axios
+      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then((res) => {
+        toast.success('Xoá thành công')
+      })
+      .catch((e) => {
+        toast.success('Xoá thất bại')
+      })
+  }
+
+  const resetCurPage = () => {
+    paramsRole.delete('page')
+    setCurPage(1)
+  }
+
+  function hanldeOpenDeleteGroupDialog() {
+    setOpenDialogDeleteGroup((e) => !e)
+  }
+
+  const onSearchMember = useDebouncedCallback((keyword) => {
+    if (keyword) {
+      paramsRole.set('role', keyword)
+    } else {
+      paramsRole.delete('role')
+    }
+    resetCurPage()
+    replace(`${pathname}?${paramsRole.toString()}`, { scroll: false })
+    setMyParams(`?${paramsRole.toString()}`)
+  }, 500)
 
   const onFetchMorePosts = () => {
     curPostPage.current++
@@ -105,15 +200,37 @@ export default function Page({ params }: { params: { id: string } }) {
         },
       }
     )
-    Promise.all([detailsPromise, postsPromise])
-      .then(([detailsRes, postsRes]) => {
+    // All member
+    const membersGroup = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members${myParams}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    // Admin member
+    const membersAdminGroup = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members?&role=CREATOR&role=ADMIN`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([detailsPromise, postsPromise, membersGroup, membersAdminGroup])
+      .then(([detailsRes, postsRes, memberRes, adminMemberRes]) => {
         const { data: groups } = detailsRes
         const {
           data: { totalPages, posts },
         } = postsRes
-        if(!totalPages) {
+        const { data: members } = memberRes
+        const { data: adminMembers } = adminMemberRes
+        if (!totalPages) {
           setPostsHasMore(false)
         }
+        setAdminMember(adminMembers.members)
+        setMembers(members.members)
         setGroup(groups)
         setPostTotalPage(totalPages)
         setPosts(posts)
@@ -134,6 +251,23 @@ export default function Page({ params }: { params: { id: string } }) {
       <div
         className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
         <div className="relative">
+          <Toaster
+            containerStyle={{ zIndex: 99999 }}
+            toastOptions={{
+              success: {
+                style: {
+                  background: '#00a700',
+                  color: 'white',
+                },
+              },
+              error: {
+                style: {
+                  background: '#ea7b7b',
+                  color: 'white',
+                },
+              },
+            }}
+          />
           <img
             src={group.coverUrl}
             alt="group cover"
@@ -201,38 +335,56 @@ export default function Page({ params }: { params: { id: string } }) {
                   </TabsHeader>
                 </Tabs>
               </div>
-              {group.userRole && (
-                <Menu placement="bottom-end">
-                  <MenuHandler>
-                    <Button
-                      placeholder={undefined}
-                      variant="text"
-                      className="py-2 px-4 flex gap-1 items-center text-black">
-                      <Gear className="text-xl" />
-                    </Button>
-                  </MenuHandler>
-                  <MenuList placeholder={undefined}>
-                    <MenuItem
-                      placeholder={undefined}
-                      className="flex items-center gap-1 text-black py-3">
-                      <BoxArrowInRight className="text-lg" />
-                      Rời khỏi nhóm
-                    </MenuItem>
 
-                    <MenuItem placeholder={undefined}>
-                      <Link
-                        href={`/groups/${group.id}/edit-group`}
+              <Menu placement="bottom-end">
+                <MenuHandler>
+                  <Button
+                    placeholder={undefined}
+                    variant="text"
+                    className="py-2 px-4 flex gap-1 items-center text-black">
+                    <Gear className="text-xl" />
+                  </Button>
+                </MenuHandler>
+                <MenuList placeholder={undefined}>
+                  <MenuItem
+                    placeholder={undefined}
+                    className="flex items-center gap-1 text-black py-3">
+                    <BoxArrowInRight className="text-lg" />
+                    Rời khỏi nhóm
+                  </MenuItem>
+
+                  {(group.userRole === 'CREATOR' ||
+                    group.userRole === 'ADMIN') && (
+                    <>
+                      <MenuItem placeholder={undefined}>
+                        <Link
+                          href={`/groups/${group.id}/edit-group`}
+                          className="flex items-center gap-1 text-black py-1">
+                          <PencilSquare className="text-lg" />
+                          Chỉnh sửa thông tin nhóm
+                        </Link>
+                      </MenuItem>
+
+                      <MenuItem
+                        placeholder={undefined}
+                        onClick={hanldeOpenDeleteGroupDialog}
                         className="flex items-center gap-1 text-black py-1">
-                        <PencilSquare className="text-lg" />
-                        Chỉnh sửa thông tin nhóm
-                      </Link>
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              )}
+                        <Trash className="text-lg" />
+                        Xóa nhóm
+                      </MenuItem>
+                    </>
+                  )}
+                </MenuList>
+              </Menu>
             </div>
           </div>
         </div>
+        <DeleteGroupDialog
+          id={params.id}
+          openDialogDeleteGroup={openDialogDeleteGroup}
+          hanldeOpenDeleteGroupDialog={hanldeOpenDeleteGroupDialog}
+          onDelete={onDelete}
+        />
         {activeTab === 'Thảo luận' && (
           <Discuss
             group={group}
@@ -241,7 +393,14 @@ export default function Page({ params }: { params: { id: string } }) {
             hasMore={postsHasMore}
           />
         )}
-        {activeTab === 'Thành viên' && <ListMember />}
+        {activeTab === 'Thành viên' && (
+          <ListMember
+            adminMembers={adminMember}
+            members={members}
+            onSearchMember={onSearchMember}
+            params={{}}
+          />
+        )}
         {activeTab === 'Xét duyệt' && <MemberRequest />}
       </div>
     )

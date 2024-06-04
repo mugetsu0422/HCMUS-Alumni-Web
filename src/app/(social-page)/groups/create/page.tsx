@@ -250,7 +250,10 @@ export default function Page() {
         /> */}
         </div>
 
-        <div className="container flex flex-col items-end relative mx-auto my-2">
+        <div className="container flex flex-col relative mx-auto my-2">
+          <label htmlFor="facultyId" className="text-xl font-bold">
+            Ảnh bìa
+          </label>
           <div
             className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
             onDragOver={onDragOver}
