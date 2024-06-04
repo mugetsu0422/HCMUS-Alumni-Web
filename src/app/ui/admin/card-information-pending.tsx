@@ -44,7 +44,9 @@ export default function CardInformation({ offset, items, setItems }) {
           toast.success(`Đã từ chối ${fullName}`)
         }
       })
-      .catch((e) => {})
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      })
   }
 
   return (

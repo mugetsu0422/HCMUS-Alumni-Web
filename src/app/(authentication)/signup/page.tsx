@@ -133,7 +133,7 @@ function Step1() {
             {...register('confirmPassword', {
               required: 'Vui lòng xác nhận lại mật khẩu',
               validate: (value) =>
-                value === getValues().password || 'Mật khẩu không khớp',
+                value === getValues().password || 'Xác nhận mật khẩu không khớp',
             })}
             crossOrigin={undefined}
           />

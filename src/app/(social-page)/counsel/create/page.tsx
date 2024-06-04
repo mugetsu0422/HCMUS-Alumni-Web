@@ -435,7 +435,7 @@ function VotingPostForm({
         {fields.map((field, index) => {
           return (
             <>
-              <div key={index} className="flex items-center mb-2">
+              <div key={field.id} className="flex items-center mb-2">
                 <Input
                   crossOrigin={undefined}
                   type="text"
