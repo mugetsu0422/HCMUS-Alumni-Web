@@ -16,11 +16,11 @@ import {
   TabsHeader,
   tabs,
 } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { nunito } from '../../../ui/fonts'
 import NoData from '../../../ui/no-data'
-import { useEffect, useState } from 'react'
-import { Toaster } from 'react-hot-toast'
+import { createContext, useContext, useEffect, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -38,6 +38,13 @@ import MemberRequest from '../../../ui/social-page/groups/member-request'
 import { GROUP_PRIVACY, GROUP_TABS, JWT_COOKIE } from '../../../constant'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import Introduce from '../../../ui/social-page/groups/introduce'
+import clsx from 'clsx'
+
+const GroupContext = createContext(null)
+export const useGroupContext = () => {
+  return useContext(GroupContext)
+}
 
 function DeleteGroupDialog({
   id,
@@ -82,9 +89,15 @@ export default function GroupLayout({
   params,
 }: {
   children: React.ReactNode
-  params: { id: string }
+  params: { id: string; group: any }
 }) {
-  const [activeTab, setActiveTab] = useState('Thảo luận')
+  const pathname = usePathname()
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState(() => {
+    const parts = pathname.split('/')
+    if (parts[3] === undefined || parts[3] === 'posts') return ''
+    return parts[3]
+  })
 
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -94,6 +107,24 @@ export default function GroupLayout({
   function hanldeOpenDeleteGroupDialog() {
     setOpenDialogDeleteGroup((e) => !e)
   }
+  const handleClickTab = (url) => {
+    setActiveTab(url)
+    router.push(`/groups/${params.id}/${url}`)
+  }
+  const onDeleteGroup = (id) => {
+    axios
+      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then((res) => {
+        toast.success('Xoá thành công')
+      })
+      .catch((e) => {
+        toast.success('Xoá thất bại')
+      })
+  }
 
   useEffect(() => {
     axios
@@ -102,15 +133,17 @@ export default function GroupLayout({
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(({data}) => {
+      .then(({ data }) => {
         setGroup(data)
         setIsLoading(false)
+        params.group = data
       })
       .catch((error) => {
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  // console.log(activeTab)
 
   if (noData) return <NoData />
 
@@ -178,7 +211,7 @@ export default function GroupLayout({
             <div className="border border-[--delete-filter]"></div>
             <div className="flex justify-between items-center">
               <div>
-                <Tabs value="Thảo luận" className="bg-white z-0">
+                <Tabs value={activeTab || ''} className="bg-white z-0">
                   <TabsHeader
                     placeholder={undefined}
                     className="rounded-none border-b border-blue-gray-50 bg-transparent p-0 z-0"
@@ -186,17 +219,16 @@ export default function GroupLayout({
                       className:
                         'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
                     }}>
-                    {GROUP_TABS.map(({ label }) => (
+                    {GROUP_TABS.map(({ label, url }) => (
                       <Tab
                         key={label}
                         placeholder={undefined}
-                        value={label}
-                        onClick={() => setActiveTab(label)}
-                        className={
-                          activeTab === label
-                            ? 'text-gray-900 text-nowrap w-fit px-6 py-4 text-[--blue-05]'
-                            : 'text-nowrap w-fit px-6 py-4'
-                        }>
+                        value={url}
+                        onClick={() => handleClickTab(url)}
+                        className={clsx({
+                          'text-nowrap w-fit px-6 py-4': true,
+                          'text-[--blue-05]': activeTab === url,
+                        })}>
                         {label}
                       </Tab>
                     ))}
@@ -247,13 +279,13 @@ export default function GroupLayout({
             </div>
           </div>
         </div>
-        {/* <DeleteGroupDialog
+        <DeleteGroupDialog
           id={params.id}
           openDialogDeleteGroup={openDialogDeleteGroup}
           hanldeOpenDeleteGroupDialog={hanldeOpenDeleteGroupDialog}
-          onDelete={onDelete}
-        /> */}
-        {/* {children} */}
+          onDelete={onDeleteGroup}
+        />
+        <GroupContext.Provider value={group}>{children}</GroupContext.Provider>
       </div>
     )
 }

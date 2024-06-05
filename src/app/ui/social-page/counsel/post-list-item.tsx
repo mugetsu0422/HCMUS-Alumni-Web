@@ -449,7 +449,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
           <List
             placeholder={undefined}
             className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes.map(({ name, id: { voteId } }) => (
+            {post.votes && post.votes.map(({ name, id: { voteId } }) => (
               <div
                 key={voteId}
                 className="p-0 mb-2 border-2 rounded-lg relative">

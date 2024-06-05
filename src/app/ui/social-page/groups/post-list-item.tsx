@@ -438,11 +438,11 @@ export default function PostListItem({ post }: { post: PostProps }) {
 
           {/* this is the footer of the body */}
 
-          <List
-            placeholder={undefined}
-            className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes &&
-              post.votes.map(({ name, id: { voteId } }) => (
+          {post.votes && (
+            <List
+              placeholder={undefined}
+              className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+              {post.votes.map(({ name, id: { voteId } }) => (
                 <div
                   key={voteId}
                   className="p-0 mb-2 border-2 rounded-lg relative">
@@ -484,7 +484,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
                   </label>
                 </div>
               ))}
-          </List>
+            </List>
+          )}
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">

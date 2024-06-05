@@ -1,170 +1,60 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
-import {
-  Button,
-  Tabs,
-  TabsHeader,
-  Tab,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Dialog,
-  DialogHeader,
-  DialogBody,
-  DialogFooter,
-} from '@material-tailwind/react'
-import {
-  Dot,
-  BoxArrowInRight,
-  Gear,
-  PencilSquare,
-  Trash,
-} from 'react-bootstrap-icons'
-import { faLock } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Discuss from '../../../ui/social-page/groups/discuss'
-import ListMember from '../../../ui/social-page/groups/list-member'
-import { nunito } from '../../../ui/fonts'
-import { GlobeAmericas } from 'react-bootstrap-icons'
-import MemberRequest from '../../../ui/social-page/groups/member-request'
+
+import { Avatar, Button, Spinner } from '@material-tailwind/react'
+import { group } from 'console'
 import Link from 'next/link'
-import axios, { AxiosResponse } from 'axios'
-import { JWT_COOKIE } from '../../../constant'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { Toaster } from 'react-hot-toast'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import axios from 'axios'
 import Cookies from 'js-cookie'
-import NoData from '../../../ui/no-data'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
-import { useDebouncedCallback } from 'use-debounce'
-import toast, { Toaster } from 'react-hot-toast'
+import { JWT_COOKIE } from '../../../constant'
+import PostListItem from '../../../ui/social-page/groups/post-list-item'
+import Introduce from '../../../ui/social-page/groups/introduce'
+import { usePathname } from 'next/navigation'
+import { useGroupContext } from './layout'
 
-const tabs = [
-  {
-    label: 'Thảo luận',
-  },
-  {
-    label: 'Thành viên',
-  },
-  {
-    label: 'Xét duyệt',
-  },
-]
-
-const PRIVACY = {
-  PUBLIC: 'Công khai',
-  PRIVATE: 'Riêng tư',
-}
-
-function DeleteGroupDialog({
-  id,
-  openDialogDeleteGroup,
-  hanldeOpenDeleteGroupDialog,
-  onDelete,
-}) {
-  const router = useRouter()
-
+function CreatePost({ groupId }) {
   return (
-    <Dialog
-      placeholder={undefined}
-      size="xs"
-      open={openDialogDeleteGroup}
-      handler={hanldeOpenDeleteGroupDialog}>
-      <DialogHeader placeholder={undefined}>Xóa nhóm</DialogHeader>
-      <DialogBody placeholder={undefined}>Bạn có muốn xóa nhóm ?</DialogBody>
-      <DialogFooter placeholder={undefined}>
+    <div className="flex gap-4 items-center">
+      <Avatar
+        src="/authentication.png"
+        alt="user avatar"
+        size="lg"
+        placeholder={undefined}
+      />
+      <Link
+        href={`/groups/${groupId}/posts/create`}
+        className=" w-full bg-blue-gray-50 rounded-full">
         <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
           placeholder={undefined}
-          onClick={hanldeOpenDeleteGroupDialog}>
-          <span>Không</span>
+          size="sm"
+          variant="text"
+          className="p-3 normal-case text-left rounded-full w-full text-md font-normal">
+          Bạn viết gì đi
         </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            onDelete(id)
-            hanldeOpenDeleteGroupDialog()
-            router.push('/groups')
-          }}>
-          <span>Xóa</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
+      </Link>
+    </div>
   )
 }
 
-export default function Page({ params }: { params: { id: string } }) {
-  const [activeTab, setActiveTab] = React.useState('Thảo luận')
-
-  const [group, setGroup] = useState(null)
-  const [noData, setNoData] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [openDialogDeleteGroup, setOpenDialogDeleteGroup] = useState(false)
-
-  // Members in groups
-  const [members, setMembers] = useState(null)
-  const [adminMember, setAdminMember] = useState(null)
-
-  // Diccussion
-  const curPostPage = useRef(0)
+export default function Page({ params }) {
+  const group = useGroupContext()
+  const curPage = useRef(0)
   const [postTotalPage, setPostTotalPage] = useState(1)
   const [posts, setPosts] = useState([])
-  const [postsHasMore, setPostsHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
 
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const paramsRole = new URLSearchParams(searchParams)
-  const [myParams, setMyParams] = useState(`?${paramsRole.toString()}`)
-  const [curPage, setCurPage] = useState(
-    Number(paramsRole.get('page')) + 1 || 1
-  )
-
-  const onDelete = (id) => {
-    axios
-      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then((res) => {
-        toast.success('Xoá thành công')
-      })
-      .catch((e) => {
-        toast.success('Xoá thất bại')
-      })
-  }
-
-  const resetCurPage = () => {
-    paramsRole.delete('page')
-    setCurPage(1)
-  }
-
-  function hanldeOpenDeleteGroupDialog() {
-    setOpenDialogDeleteGroup((e) => !e)
-  }
-
-  const onSearchMember = useDebouncedCallback((keyword) => {
-    if (keyword) {
-      paramsRole.set('role', keyword)
-    } else {
-      paramsRole.delete('role')
-    }
-    resetCurPage()
-    replace(`${pathname}?${paramsRole.toString()}`, { scroll: false })
-    setMyParams(`?${paramsRole.toString()}`)
-  }, 500)
-
-  const onFetchMorePosts = () => {
-    curPostPage.current++
-    if (curPostPage.current >= postTotalPage) {
-      setPostsHasMore(false)
+  const onFetchMore = () => {
+    curPage.current++
+    if (curPage.current >= postTotalPage) {
+      setHasMore(false)
       return
     }
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${group.id}/posts?page=${curPostPage.current}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts?page=${curPage.current}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -179,229 +69,41 @@ export default function Page({ params }: { params: { id: string } }) {
       })
   }
 
-  // Members
-
-  // Member requests
-
   useEffect(() => {
-    const detailsPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}`,
-      {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      }
-    )
-    const postsPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    // All member
-    const membersGroup = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members${myParams}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    // Admin member
-    const membersAdminGroup = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members?&role=CREATOR&role=ADMIN`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    Promise.all([detailsPromise, postsPromise, membersGroup, membersAdminGroup])
-      .then(([detailsRes, postsRes, memberRes, adminMemberRes]) => {
-        const { data: groups } = detailsRes
-        const {
-          data: { totalPages, posts },
-        } = postsRes
-        const { data: members } = memberRes
-        const { data: adminMembers } = adminMemberRes
+      })
+      .then(({ data: { totalPages, posts } }) => {
         if (!totalPages) {
-          setPostsHasMore(false)
+          setHasMore(false)
         }
-        setAdminMember(adminMembers.members)
-        setMembers(members.members)
-        setGroup(groups)
-        setPostTotalPage(totalPages)
         setPosts(posts)
-        setIsLoading(false)
       })
-      .catch((error) => {
-        console.error(error)
-        setNoData(true)
-      })
+      .catch((error) => {})
+  }, [params.id])
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  if (noData) return <NoData />
-
-  if (!isLoading)
-    return (
-      <div
-        className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
-        <div className="relative">
-          <Toaster
-            containerStyle={{ zIndex: 99999 }}
-            toastOptions={{
-              success: {
-                style: {
-                  background: '#00a700',
-                  color: 'white',
-                },
-              },
-              error: {
-                style: {
-                  background: '#ea7b7b',
-                  color: 'white',
-                },
-              },
-            }}
-          />
-          <img
-            src={group.coverUrl}
-            alt="group cover"
-            className="w-full h-60 object-cover object-center"
-          />
-          <div className="flex items-center justify-between mt-4">
-            <div>
-              <p className="flex items-center text-[22px] xl:text-[26px] font-bold ">
-                {group.name}
-              </p>
-
-              <p className="flex items-center">
-                {group.privacy != 'PUBLIC' ? (
-                  <FontAwesomeIcon icon={faLock} className="mr-2" />
-                ) : (
-                  <GlobeAmericas className="mr-2" />
-                )}
-                {PRIVACY[group.privacy]} <Dot /> {group.participantCount} thành
-                viên tham gia
-              </p>
+  return (
+    <div className="mt-8 flex">
+      <div className="w-[70%] mr-4">
+        <CreatePost groupId={params.id} />
+        <InfiniteScroll
+          dataLength={posts.length}
+          next={onFetchMore}
+          hasMore={hasMore}
+          loader={
+            <div className="h-10 flex justify-center ">
+              <Spinner className="h-8 w-8"></Spinner>
             </div>
-
-            {group.userRole ? (
-              <Button
-                placeholder={undefined}
-                className="normal-case px-4 py-2 text-[14px] h-fit bg-[#e4e6eb] text-black ">
-                Đã tham gia
-              </Button>
-            ) : (
-              <Button
-                placeholder={undefined}
-                className="normal-case px-4 py-2 text-[14px] bg-[--blue-04] text-[--blue-05]">
-                Tham gia
-              </Button>
-            )}
-          </div>
-          {/*  */}
-
-          <div className="flex flex-col gap-1 mt-6">
-            <div className="border border-[--delete-filter]"></div>
-            <div className="flex justify-between items-center">
-              <div>
-                <Tabs value="Thảo luận" className="bg-white z-0">
-                  <TabsHeader
-                    placeholder={undefined}
-                    className="rounded-none border-b border-blue-gray-50 bg-transparent p-0 z-0"
-                    indicatorProps={{
-                      className:
-                        'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
-                    }}>
-                    {tabs.map(({ label }) => (
-                      <Tab
-                        key={label}
-                        placeholder={undefined}
-                        value={label}
-                        onClick={() => setActiveTab(label)}
-                        className={
-                          activeTab === label
-                            ? 'text-gray-900 text-nowrap w-fit px-6 py-4 text-[--blue-05]'
-                            : 'text-nowrap w-fit px-6 py-4'
-                        }>
-                        {label}
-                      </Tab>
-                    ))}
-                  </TabsHeader>
-                </Tabs>
-              </div>
-
-              <Menu placement="bottom-end">
-                <MenuHandler>
-                  <Button
-                    placeholder={undefined}
-                    variant="text"
-                    className="py-2 px-4 flex gap-1 items-center text-black">
-                    <Gear className="text-xl" />
-                  </Button>
-                </MenuHandler>
-                <MenuList placeholder={undefined}>
-                  <MenuItem
-                    placeholder={undefined}
-                    className="flex items-center gap-1 text-black py-3">
-                    <BoxArrowInRight className="text-lg" />
-                    Rời khỏi nhóm
-                  </MenuItem>
-
-                  {(group.userRole === 'CREATOR' ||
-                    group.userRole === 'ADMIN') && (
-                    <>
-                      <MenuItem placeholder={undefined}>
-                        <Link
-                          href={`/groups/${group.id}/edit`}
-                          className="flex items-center gap-1 text-black py-1">
-                          <PencilSquare className="text-lg" />
-                          Chỉnh sửa thông tin nhóm
-                        </Link>
-                      </MenuItem>
-
-                      <MenuItem
-                        placeholder={undefined}
-                        onClick={hanldeOpenDeleteGroupDialog}
-                        className="flex items-center gap-1 text-black py-1">
-                        <Trash className="text-lg" />
-                        Xóa nhóm
-                      </MenuItem>
-                    </>
-                  )}
-                </MenuList>
-              </Menu>
-            </div>
-          </div>
-        </div>
-        <DeleteGroupDialog
-          id={params.id}
-          openDialogDeleteGroup={openDialogDeleteGroup}
-          hanldeOpenDeleteGroupDialog={hanldeOpenDeleteGroupDialog}
-          onDelete={onDelete}
-        />
-        {activeTab === 'Thảo luận' && (
-          <Discuss
-            group={group}
-            posts={posts}
-            onFetchMore={onFetchMorePosts}
-            hasMore={postsHasMore}
-          />
-        )}
-        {activeTab === 'Thành viên' && (
-          <ListMember
-            adminMembers={adminMember}
-            members={members}
-            onSearchMember={onSearchMember}
-            params={{}}
-          />
-        )}
-        {activeTab === 'Xét duyệt' && <MemberRequest />}
+          }>
+          {posts.map((post) => (
+            <PostListItem key={post.id} post={post} />
+          ))}
+        </InfiniteScroll>
       </div>
-    )
+      <Introduce privacy={group.privacy} description={group.description} />
+    </div>
+  )
 }

@@ -43,11 +43,14 @@ export const GROUP_PRIVACY = {
 export const GROUP_TABS = [
   {
     label: 'Thảo luận',
+    url: '',
   },
   {
     label: 'Thành viên',
+    url: 'members',
   },
   {
     label: 'Xét duyệt',
+    url: 'member-requests',
   },
 ]
