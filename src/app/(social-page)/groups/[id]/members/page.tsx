@@ -19,7 +19,7 @@ import { useGroupContext } from '../layout'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDebouncedCallback } from 'use-debounce'
 
-export default function Page({ params }) {
+export default function Page({ params }: { params: { id: string } }) {
   const group = useGroupContext()
   const normalMemberCurPage = useRef(0)
   const [normalMemberTotalPages, setNormalMemberTotalPages] = useState(1)
@@ -89,8 +89,6 @@ export default function Page({ params }) {
         console.error(err)
       })
   }
-
-  
 
   // Initial fetch
   useEffect(() => {

@@ -128,7 +128,6 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
       setSelectedVoteId(voteId === selectedVoteId ? null : voteId)
     } catch (error) {
-      console.error(error)
       toast.error(error.response.data.error?.message || 'Lỗi không xác định')
     }
   }
@@ -154,9 +153,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       )
 
       setComments(comments.concat(res.data.comments))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onUploadComment = (
     e: React.FormEvent<HTMLFormElement>,
@@ -183,8 +180,10 @@ export default function PostListItem({ post }: { post: PostProps }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onFetchChildrenComments = async (
@@ -218,8 +217,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
@@ -234,8 +233,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -261,9 +260,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
         }
       )
       setReaction(reaction.concat(res.data.users))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onDeletePost = () => {
     axios
@@ -274,10 +271,10 @@ export default function PostListItem({ post }: { post: PostProps }) {
       })
       .then(() => {
         setIsDeleted(true)
+        toast.success('Xoá bài viết thành công')
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Xóa bài viết thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (
@@ -449,48 +446,49 @@ export default function PostListItem({ post }: { post: PostProps }) {
           <List
             placeholder={undefined}
             className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes && post.votes.map(({ name, id: { voteId } }) => (
-              <div
-                key={voteId}
-                className="p-0 mb-2 border-2 rounded-lg relative">
+            {post.votes &&
+              post.votes.map(({ name, id: { voteId } }) => (
                 <div
-                  style={{
-                    transform: `scaleX(${
-                      totalVoteCount
-                        ? votesCount.get(voteId) / totalVoteCount
-                        : 0
-                    })`,
-                  }}
-                  className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left`}></div>
-                <label
-                  htmlFor={`option-${post.title}-${voteId}`}
-                  className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
-                  <div className="flex w-full gap-2">
-                    <Radio
-                      color="blue"
-                      crossOrigin={undefined}
-                      name={`option-${post.title}`}
-                      id={`option-${post.title}-${voteId}`}
-                      ripple={false}
-                      className="hover:before:opacity-0"
-                      containerProps={{
-                        className: 'p-0',
-                      }}
-                      onClick={() => handleVote(voteId)}
-                      onChange={() => {}}
-                      checked={selectedVoteId === voteId}
-                    />
-                    <span className="text-black">{name}</span>
-                  </div>
-                  <span className="text-[var(--blue-02)]">
-                    {totalVoteCount
-                      ? (votesCount.get(voteId) / totalVoteCount) * 100
-                      : votesCount.get(voteId)}
-                    %
-                  </span>
-                </label>
-              </div>
-            ))}
+                  key={voteId}
+                  className="p-0 mb-2 border-2 rounded-lg relative">
+                  <div
+                    style={{
+                      transform: `scaleX(${
+                        totalVoteCount
+                          ? votesCount.get(voteId) / totalVoteCount
+                          : 0
+                      })`,
+                    }}
+                    className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left`}></div>
+                  <label
+                    htmlFor={`option-${post.title}-${voteId}`}
+                    className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
+                    <div className="flex w-full gap-2">
+                      <Radio
+                        color="blue"
+                        crossOrigin={undefined}
+                        name={`option-${post.title}`}
+                        id={`option-${post.title}-${voteId}`}
+                        ripple={false}
+                        className="hover:before:opacity-0"
+                        containerProps={{
+                          className: 'p-0',
+                        }}
+                        onClick={() => handleVote(voteId)}
+                        onChange={() => {}}
+                        checked={selectedVoteId === voteId}
+                      />
+                      <span className="text-black">{name}</span>
+                    </div>
+                    <span className="text-[var(--blue-02)]">
+                      {totalVoteCount
+                        ? (votesCount.get(voteId) / totalVoteCount) * 100
+                        : votesCount.get(voteId)}
+                      %
+                    </span>
+                  </label>
+                </div>
+              ))}
           </List>
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (

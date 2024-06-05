@@ -15,6 +15,7 @@ import { JWT_COOKIE } from '../../../constant'
 import { useForm } from 'react-hook-form'
 import moment from 'moment'
 import page from './../../../admin/page'
+import { useRouter } from 'next/navigation'
 
 const privacyValue = [
   {
@@ -30,6 +31,7 @@ const privacyValue = [
 ]
 
 export default function Page() {
+  const router = useRouter()
   const [previewImage, setPreviewImage] = useState(null)
   const [imageFile, setImageFile] = useState(null)
   //const [privacy, setPrivacy] = useState('')
@@ -58,10 +60,11 @@ export default function Page() {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(() => {
+      .then(({ data }) => {
         toast.success('Tạo thành công', {
           id: groupToast,
         })
+        router.push(`/groups/${data}`)
       })
       .catch(({ message }) => {
         toast.error(message, {

@@ -120,7 +120,6 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
       setSelectedVoteId(voteId === selectedVoteId ? null : voteId)
     } catch (error) {
-      console.error(error)
       toast.error(error.response.data.error?.message || 'Lỗi không xác định')
     }
   }
@@ -146,9 +145,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       )
 
       setComments(comments.concat(res.data.comments))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onUploadComment = (
     e: React.FormEvent<HTMLFormElement>,
@@ -175,8 +172,10 @@ export default function PostListItem({ post }: { post: PostProps }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onFetchChildrenComments = async (
@@ -210,8 +209,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
@@ -226,8 +225,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -253,23 +252,21 @@ export default function PostListItem({ post }: { post: PostProps }) {
         }
       )
       setReaction(reaction.concat(res.data.users))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onDeletePost = () => {
     axios
-      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}`, {
+      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${post.id}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
       .then(() => {
         setIsDeleted(true)
+        toast.success('Xoá bài viết thành công')
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Xóa bài viết thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (

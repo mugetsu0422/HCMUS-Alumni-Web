@@ -80,6 +80,7 @@ export default function Page({ params }) {
         if (!totalPages) {
           setHasMore(false)
         }
+        setPostTotalPage(totalPages)
         setPosts(posts)
       })
       .catch((error) => {})

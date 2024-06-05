@@ -28,18 +28,14 @@ import {
   Dot,
   Gear,
   BoxArrowInRight,
-  Link,
   PencilSquare,
   Trash,
 } from 'react-bootstrap-icons'
-import Discuss from '../../../ui/social-page/groups/discuss'
-import ListMember from '../../../ui/social-page/groups/list-member'
-import MemberRequest from '../../../ui/social-page/groups/member-request'
 import { GROUP_PRIVACY, GROUP_TABS, JWT_COOKIE } from '../../../constant'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import Introduce from '../../../ui/social-page/groups/introduce'
 import clsx from 'clsx'
+import Link from 'next/link'
 
 const GroupContext = createContext(null)
 export const useGroupContext = () => {
@@ -136,14 +132,12 @@ export default function GroupLayout({
       .then(({ data }) => {
         setGroup(data)
         setIsLoading(false)
-        params.group = data
       })
       .catch((error) => {
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  // console.log(activeTab)
 
   if (noData) return <NoData />
 
@@ -219,19 +213,23 @@ export default function GroupLayout({
                       className:
                         'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
                     }}>
-                    {GROUP_TABS.map(({ label, url }) => (
-                      <Tab
-                        key={label}
-                        placeholder={undefined}
-                        value={url}
-                        onClick={() => handleClickTab(url)}
-                        className={clsx({
-                          'text-nowrap w-fit px-6 py-4': true,
-                          'text-[--blue-05]': activeTab === url,
-                        })}>
-                        {label}
-                      </Tab>
-                    ))}
+                    {GROUP_TABS.map(({ label, url, rolesRequired }) => {
+                      if (rolesRequired.includes(group.userRole))
+                        return (
+                          <Tab
+                            key={label}
+                            placeholder={undefined}
+                            value={url}
+                            onClick={() => handleClickTab(url)}
+                            className={clsx({
+                              'text-nowrap w-fit px-6 py-4': true,
+                              'text-[--blue-05]': activeTab === url,
+                            })}>
+                            {label}
+                          </Tab>
+                        )
+                      else return null
+                    })}
                   </TabsHeader>
                 </Tabs>
               </div>
@@ -246,34 +244,32 @@ export default function GroupLayout({
                   </Button>
                 </MenuHandler>
                 <MenuList placeholder={undefined}>
+                  <Link href={`/groups/${group.id}/edit`}>
+                    <MenuItem
+                      placeholder={undefined}
+                      className="flex items-center gap-1 text-black py-3">
+                      <PencilSquare className="text-lg" />
+                      Chỉnh sửa thông tin nhóm
+                    </MenuItem>
+                  </Link>
+
+                  {(group.userRole === 'CREATOR' ||
+                    group.userRole === 'ADMIN') && (
+                    <MenuItem
+                      placeholder={undefined}
+                      onClick={hanldeOpenDeleteGroupDialog}
+                      className="flex items-center gap-1 text-black py-3">
+                      <Trash className="text-lg" />
+                      Xóa nhóm
+                    </MenuItem>
+                  )}
+
                   <MenuItem
                     placeholder={undefined}
                     className="flex items-center gap-1 text-black py-3">
                     <BoxArrowInRight className="text-lg" />
                     Rời khỏi nhóm
                   </MenuItem>
-
-                  {(group.userRole === 'CREATOR' ||
-                    group.userRole === 'ADMIN') && (
-                    <>
-                      <MenuItem placeholder={undefined}>
-                        <Link
-                          href={`/groups/${group.id}/edit`}
-                          className="flex items-center gap-1 text-black py-1">
-                          <PencilSquare className="text-lg" />
-                          Chỉnh sửa thông tin nhóm
-                        </Link>
-                      </MenuItem>
-
-                      <MenuItem
-                        placeholder={undefined}
-                        onClick={hanldeOpenDeleteGroupDialog}
-                        className="flex items-center gap-1 text-black py-1">
-                        <Trash className="text-lg" />
-                        Xóa nhóm
-                      </MenuItem>
-                    </>
-                  )}
                 </MenuList>
               </Menu>
             </div>
