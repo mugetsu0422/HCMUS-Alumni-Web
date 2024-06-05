@@ -145,7 +145,7 @@ export default function Page() {
             setEvents(events)
           })
       })
-      .catch()
+      .catch((error) => {})
   }, [myParams])
 
   return (

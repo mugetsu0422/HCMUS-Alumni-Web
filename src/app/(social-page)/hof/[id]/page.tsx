@@ -30,7 +30,6 @@ export default function Page({ params }: { params: { id: string } }) {
         setIsLoading(false)
       })
       .catch((error) => {
-        console.error(error)
         setNoData(true)
       })
 

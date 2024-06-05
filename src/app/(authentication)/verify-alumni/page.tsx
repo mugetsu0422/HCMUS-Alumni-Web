@@ -24,7 +24,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import axios from 'axios'
 import Cropper from 'react-easy-crop'
 import Cookies from 'js-cookie'
-import { JWT_COOKIE } from '../../constant'
+import { FACULTIES, JWT_COOKIE } from '../../constant'
 
 const FormContext = createContext(null)
 
@@ -278,6 +278,7 @@ function Step1() {
 }
 
 function Step2() {
+  const router = useRouter()
   const { facultyList, inputs, setInputs, handleBack } = useContext(FormContext)
   const {
     register,
@@ -307,10 +308,10 @@ function Step2() {
       )
       .then((res) => {
         toast.success('Thiết lập thành công')
+        router.push('/home-page')
       })
-      .catch((e) => {
-        console.error(e)
-        toast.error(e.message)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onBack = () => {
@@ -449,17 +450,7 @@ export default function Page() {
   const [inputs, setInputs] = useState({ avatar: null })
   const [currentStep, setCurrentStep] = useState(1)
   const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
-  const [facultyList, setFacultyList] = useState([
-    { id: '1', name: 'Công nghệ Thông tin' },
-    { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
-    { id: '3', name: 'Địa chất' },
-    { id: '4', name: 'Toán – Tin học' },
-    { id: '5', name: 'Điện tử - Viễn thông' },
-    { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
-    { id: '7', name: 'Hóa học' },
-    { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
-    { id: '9', name: 'Môi trường' },
-  ])
+  const [facultyList, setFacultyList] = useState(FACULTIES)
 
   const handleNext = () => {
     setCurrentStep(currentStep + 1)

@@ -120,8 +120,8 @@ export default function EventsListItem({
         toast.success('Xoá thành công')
         setIsDeleted(true)
       })
-      .catch((e) => {
-        toast.success('Xoá thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
 
@@ -144,12 +144,8 @@ export default function EventsListItem({
         }
         setIsHidden(!isHidden)
       })
-      .catch((e) => {
-        if (isHidden) {
-          toast.success('Hiển thị thất bại')
-        } else {
-          toast.success('Ẩn thất bại')
-        }
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
 

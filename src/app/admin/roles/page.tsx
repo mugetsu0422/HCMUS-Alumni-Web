@@ -144,7 +144,7 @@ export default function Page() {
         setTotalPages(totalPages)
         setRoles(roles)
       })
-      .catch()
+      .catch((error) => {})
   }, [myParams])
 
   return (

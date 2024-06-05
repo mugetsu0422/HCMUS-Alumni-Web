@@ -84,8 +84,10 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onShowMoreComments = () => {
@@ -122,8 +124,8 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
@@ -138,8 +140,8 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -165,9 +167,7 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       setReaction(reaction.concat(res.data.users))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onDeletePost = () => {
     axios
@@ -179,9 +179,8 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(() => {
         toast.success('Xóa bài viết thành công')
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Xóa bài viết thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (
@@ -247,7 +246,6 @@ export default function Page({ params }: { params: { id: string } }) {
         setIsLoading(false)
       })
       .catch((error) => {
-        console.error(error)
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -269,7 +267,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data: { comments: fetchedComments } }) => {
         setComments(comments.concat(fetchedComments))
       })
-      .catch()
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 

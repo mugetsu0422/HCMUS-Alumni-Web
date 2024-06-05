@@ -190,7 +190,7 @@ export default function Page() {
         setTotalPages(totalPages)
         setEvents(events)
       })
-      .catch()
+      .catch((error) => {})
   }, [myParams])
 
   return (

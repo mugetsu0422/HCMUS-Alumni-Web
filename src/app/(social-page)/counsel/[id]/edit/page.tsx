@@ -148,7 +148,7 @@ export default function Page({ params }: { params: { id: string } }) {
       imagesForm.append('deletedImageIds', id)
     }
 
-    const postToast = toast.loading('Đang cập nhật bài viết...')
+    const putToast = toast.loading('Đang cập nhật bài viết...')
 
     const updatePromise = axios.put(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${params.id}`,
@@ -172,13 +172,12 @@ export default function Page({ params }: { params: { id: string } }) {
     Promise.all([updatePromise, updateImages])
       .then(() => {
         toast.success('Cập nhật bài viết thành công', {
-          id: postToast,
+          id: putToast,
         })
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Có lỗi xảy ra khi cập nhật bài viết', {
-          id: postToast,
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: putToast,
         })
       })
   }
@@ -201,8 +200,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setVotes(votes)
         setCurrentImages(pictures)
       })
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
         setNoData(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
