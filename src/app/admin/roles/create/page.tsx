@@ -130,9 +130,8 @@ export default function Page() {
           id: postToast,
         })
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Có lỗi xảy ra', {
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
           id: postToast,
         })
       })

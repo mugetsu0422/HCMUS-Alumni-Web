@@ -136,9 +136,8 @@ export default function Page({ params }: { params: { id: string } }) {
           id: putToast,
         })
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Có lỗi xảy ra', {
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
           id: putToast,
         })
       })
@@ -211,7 +210,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
           setValue('name', role.name)
           setValue('description', role.description)
-          setDescriptionCharCount(role.description.length)
+          setDescriptionCharCount(role.description?.length || 0)
           const newMap = new Map(selectedRolePermissionMap)
           newMap.forEach((_, key, map) => map.set(key, false))
           role.permissions.forEach(({ id }) => {

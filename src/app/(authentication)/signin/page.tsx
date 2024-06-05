@@ -278,7 +278,6 @@ export default function Page() {
     axios
       .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
       .then(({ data: { jwt, permissions, forcePasswordChange = null } }) => {
-        console.log(forcePasswordChange)
         if (forcePasswordChange) {
           setEmail(data.email)
           setIsForceChangePassword(true)

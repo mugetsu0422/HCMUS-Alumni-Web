@@ -41,6 +41,7 @@ function CreatePost({ groupId }) {
 export default function Page({ params }) {
   const group = useGroupContext()
   const curPage = useRef(0)
+  const [isLoading, setIsLoading] = useState(true)
   const [postTotalPage, setPostTotalPage] = useState(1)
   const [posts, setPosts] = useState([])
   const [hasMore, setHasMore] = useState(true)
@@ -82,29 +83,31 @@ export default function Page({ params }) {
         }
         setPostTotalPage(totalPages)
         setPosts(posts)
+        setIsLoading(false)
       })
       .catch((error) => {})
   }, [params.id])
 
-  return (
-    <div className="mt-8 flex">
-      <div className="w-[70%] mr-4">
-        <CreatePost groupId={params.id} />
-        <InfiniteScroll
-          dataLength={posts.length}
-          next={onFetchMore}
-          hasMore={hasMore}
-          loader={
-            <div className="h-10 flex justify-center ">
-              <Spinner className="h-8 w-8"></Spinner>
-            </div>
-          }>
-          {posts.map((post) => (
-            <PostListItem key={post.id} post={post} />
-          ))}
-        </InfiniteScroll>
+  if (!isLoading)
+    return (
+      <div className="mt-8 flex">
+        <div className="w-[70%] mr-4">
+          <CreatePost groupId={params.id} />
+          <InfiniteScroll
+            dataLength={posts.length}
+            next={onFetchMore}
+            hasMore={hasMore}
+            loader={
+              <div className="h-10 flex justify-center ">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            }>
+            {posts.map((post) => (
+              <PostListItem key={post.id} post={post} />
+            ))}
+          </InfiniteScroll>
+        </div>
+        <Introduce privacy={group.privacy} description={group.description} />
       </div>
-      <Introduce privacy={group.privacy} description={group.description} />
-    </div>
-  )
+    )
 }

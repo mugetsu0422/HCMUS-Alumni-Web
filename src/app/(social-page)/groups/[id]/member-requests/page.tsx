@@ -62,6 +62,7 @@ const members = [
 export default function Page({ params }: { params: { id: string } }) {
   const group = useGroupContext()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
   const curPage = useRef(0)
   const [totalPages, setTotalPages] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -145,18 +146,20 @@ export default function Page({ params }: { params: { id: string } }) {
         }
         setTotalPages(totalPages)
         setRequests(requests)
+        setIsLoading(false)
       })
       .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
 
-  return (
-    <div className="mt-8 w-full xl:w-[60%] m-auto">
-      <p className="font-bold text-[20px] mb-4 flex items-center">
-        Thành viên cần được xét duyệt
-        {/* <Dot /> 500 */}
-      </p>
-      {/* <Input
+  if (!isLoading)
+    return (
+      <div className="mt-8 w-full xl:w-[60%] m-auto">
+        <p className="font-bold text-[20px] mb-4 flex items-center">
+          Thành viên cần được xét duyệt
+          {/* <Dot /> 500 */}
+        </p>
+        {/* <Input
         size="lg"
         crossOrigin={undefined}
         variant="outlined"
@@ -167,27 +170,27 @@ export default function Page({ params }: { params: { id: string } }) {
         onChange={(e) => onSearchRequests(e.target.value)}
       /> */}
 
-      <div className="flex flex-col gap-4 mt-4">
-        <InfiniteScroll
-          dataLength={requests.length}
-          next={onFetchMore}
-          hasMore={hasMore}
-          loader={
-            <div className="h-10 flex justify-center ">
-              <Spinner className="h-8 w-8"></Spinner>
-            </div>
-          }>
-          {requests.map(({ user }) => (
-            <Request
-              key={user.id}
-              user={user}
-              onChangeRequestStatus={onChangeRequestStatus}
-            />
-          ))}
-        </InfiniteScroll>
+        <div className="flex flex-col gap-4 mt-4">
+          <InfiniteScroll
+            dataLength={requests.length}
+            next={onFetchMore}
+            hasMore={hasMore}
+            loader={
+              <div className="h-10 flex justify-center ">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            }>
+            {requests.map(({ user }) => (
+              <Request
+                key={user.id}
+                user={user}
+                onChangeRequestStatus={onChangeRequestStatus}
+              />
+            ))}
+          </InfiniteScroll>
+        </div>
       </div>
-    </div>
-  )
+    )
 }
 
 function Request({ user, onChangeRequestStatus }) {

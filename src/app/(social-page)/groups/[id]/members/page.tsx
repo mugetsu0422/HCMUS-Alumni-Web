@@ -21,6 +21,7 @@ import { useDebouncedCallback } from 'use-debounce'
 
 export default function Page({ params }: { params: { id: string } }) {
   const group = useGroupContext()
+  const [isLoading, setIsLoading] = useState(true)
   const normalMemberCurPage = useRef(0)
   const [normalMemberTotalPages, setNormalMemberTotalPages] = useState(1)
   const [normalMembers, setNormalMembers] = useState([])
@@ -135,6 +136,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setAdminMembers(creatorMembers.concat(adminMembers))
         setNormalMemberTotalPages(totalPages)
         setNormalMembers(members)
+        setIsLoading(false)
       })
       .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,37 +170,38 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchingParams])
 
-  return (
-    <div className="mt-8 w-full xl:w-[60%] m-auto">
-      <p className="font-bold text-[20px] mb-4 flex items-center">
-        Thành viên <Dot /> {group.participantCount}
-      </p>
-      <Input
-        size="lg"
-        crossOrigin={undefined}
-        variant="outlined"
-        label="Tìm thành viên"
-        type="text"
-        icon={<Search />}
-        onChange={(e) => onSearchMembers(e.target.value)}
-        className="bg-white w-full rounded-full"
-      />
-      {searching ? (
-        <SearchingUI
-          members={searchingMembers}
-          onFetchMore={onFetchMoreSearching}
-          hasMore={searchingMembersHaveMore}
+  if (!isLoading)
+    return (
+      <div className="mt-8 w-full xl:w-[60%] m-auto">
+        <p className="font-bold text-[20px] mb-4 flex items-center">
+          Thành viên <Dot /> {group.participantCount}
+        </p>
+        <Input
+          size="lg"
+          crossOrigin={undefined}
+          variant="outlined"
+          label="Tìm thành viên"
+          type="text"
+          icon={<Search />}
+          onChange={(e) => onSearchMembers(e.target.value)}
+          className="bg-white w-full rounded-full"
         />
-      ) : (
-        <InitialUI
-          adminMembers={adminMembers}
-          normalMembers={normalMembers}
-          onFetchMore={onFetchMore}
-          hasMore={normalMembersHaveMore}
-        />
-      )}
-    </div>
-  )
+        {searching ? (
+          <SearchingUI
+            members={searchingMembers}
+            onFetchMore={onFetchMoreSearching}
+            hasMore={searchingMembersHaveMore}
+          />
+        ) : (
+          <InitialUI
+            adminMembers={adminMembers}
+            normalMembers={normalMembers}
+            onFetchMore={onFetchMore}
+            hasMore={normalMembersHaveMore}
+          />
+        )}
+      </div>
+    )
 }
 
 function Member({ user, role }) {

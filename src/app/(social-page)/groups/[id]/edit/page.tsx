@@ -13,15 +13,18 @@ import { nunito } from '../../../../ui/fonts'
 import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
 import { JWT_COOKIE } from '../../../../constant'
 import { useForm } from 'react-hook-form'
+import NoData from '../../../../ui/no-data'
 
 const privacyValue = [
   {
     id: '1',
     name: 'Công khai',
+    value: 'PUBLIC',
   },
   {
     id: '2',
     name: 'Riêng tư',
+    value: 'PRIVATE',
   },
 ]
 
@@ -126,9 +129,7 @@ export default function Page({ params }: { params: { id: string } }) {
     input.type = 'file'
     input.accept = 'image/png, image/jpeg'
     input.id = 'cover'
-    input.click()
-
-    input.addEventListener('cover', (event) => {
+    input.addEventListener('change', (event) => {
       const target = event.target as HTMLInputElement
       const files = target.files
       if (!files) return // Ensure files is not null
@@ -139,6 +140,7 @@ export default function Page({ params }: { params: { id: string } }) {
       }
 
       const file = files[0]
+      console.log(file)
       if (file.size > 1024 * 1024 * 5) {
         toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
         return
@@ -151,12 +153,17 @@ export default function Page({ params }: { params: { id: string } }) {
       reader.readAsDataURL(file)
       setImageFile(file)
     })
+    input.click()
   }
 
   const removeImage = (event) => {
     event.stopPropagation()
     setPreviewImage(null)
     setImageFile(null)
+  }
+
+  if (noData) {
+    return <NoData />
   }
 
   return (
@@ -214,14 +221,14 @@ export default function Page({ params }: { params: { id: string } }) {
 
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="privacy" className="text-xl font-bold">
-            Riêng tư
+            Quyền riêng tư
           </label>
           <select
             className="h-[50px] hover:cursor-pointer pl-3 w-full text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 p-3 rounded-md border-blue-gray-200 focus:border-gray-900"
             {...register('privacy')}>
-            {privacyValue.map(({ id, name }) => {
+            {privacyValue.map(({ id, name, value }) => {
               return (
-                <option key={id} value={id}>
+                <option key={id} value={value}>
                   {name}
                 </option>
               )

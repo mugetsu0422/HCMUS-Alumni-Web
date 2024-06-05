@@ -11,6 +11,8 @@ import {
   MenuList,
   MenuItem,
   Spinner,
+  List,
+  Radio,
 } from '@material-tailwind/react'
 import {
   TagFill,
@@ -50,7 +52,37 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isReacted, setIsReacted] = useState(null)
   const [reactionCount, setReactionCount] = useState(null)
   const [reaction, setReaction] = useState([])
-  const ref = useRef(null)
+  const [totalVoteCount, setTotalVoteCount] = useState(0)
+  const [votesCount, setVotesCount] = useState(new Map())
+  const [selectedVoteId, setSelectedVoteId] = useState(null)
+
+  const handleVote = async (voteId: number) => {
+    try {
+      if (selectedVoteId === null) {
+        // Post
+        await onVote(voteId)
+        setTotalVoteCount((old) => old + 1)
+        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) + 1))
+        setVotesCount(temp)
+      } else if (selectedVoteId !== voteId) {
+        // Update
+        await onChangeVote(selectedVoteId, voteId)
+        votesCount.set(selectedVoteId, votesCount.get(selectedVoteId) - 1)
+        votesCount.set(voteId, votesCount.get(voteId) + 1)
+        const temp = new Map(votesCount)
+        setVotesCount(temp)
+      } else {
+        // Delete
+        setTotalVoteCount((old) => old - 1)
+        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
+        setVotesCount(temp)
+        await onRemoveVote(selectedVoteId)
+      }
+      setSelectedVoteId(voteId === selectedVoteId ? null : voteId)
+    } catch (error) {
+      toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+    }
+  }
 
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
@@ -218,6 +250,38 @@ export default function Page({ params }: { params: { id: string } }) {
       }
     )
   }
+  const onVote = (voteId: number) => {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${voteId}`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onChangeVote = (oldVoteId: number, newVoteId: number) => {
+    return axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${oldVoteId}`,
+      { updatedVoteId: newVoteId },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onRemoveVote = (voteId: number) => {
+    return axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${voteId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
 
   useEffect(() => {
     const postPromise = axios.get(
@@ -243,6 +307,25 @@ export default function Page({ params }: { params: { id: string } }) {
         setComments(commentRes.data.comments)
         setReactionCount(postRes.data.reactionCount)
         setIsReacted(postRes.data.isReacted)
+
+        setTotalVoteCount(() => {
+          if (!postRes.data.votes) return 0
+          return postRes.data.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
+        })
+        setVotesCount(() => {
+          const map = new Map()
+          if (!postRes.data.votes) return map
+          postRes.data.votes.forEach(({ id: { voteId }, voteCount }) => {
+            map.set(voteId, voteCount)
+          })
+          return map
+        })
+        setSelectedVoteId(() => {
+          if (!postRes.data.votes) return null
+          const vote = postRes.data.votes.find(({ isVoted }) => isVoted)
+          return vote ? vote.id.voteId : null
+        })
+
         setIsLoading(false)
       })
       .catch((error) => {
@@ -370,6 +453,54 @@ export default function Page({ params }: { params: { id: string } }) {
             {post.content}
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
+
+          <List
+            placeholder={undefined}
+            className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+            {post.votes &&
+              post.votes.map(({ name, id: { voteId } }) => (
+                <div
+                  key={voteId}
+                  className="p-0 mb-2 border-2 rounded-lg relative">
+                  <div
+                    style={{
+                      transform: `scaleX(${
+                        totalVoteCount
+                          ? votesCount.get(voteId) / totalVoteCount
+                          : 0
+                      })`,
+                    }}
+                    className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left`}></div>
+                  <label
+                    htmlFor={`option-${post.title}-${voteId}`}
+                    className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
+                    <div className="flex w-full gap-2">
+                      <Radio
+                        color="blue"
+                        crossOrigin={undefined}
+                        name={`option-${post.title}`}
+                        id={`option-${post.title}-${voteId}`}
+                        ripple={false}
+                        className="hover:before:opacity-0"
+                        containerProps={{
+                          className: 'p-0',
+                        }}
+                        onClick={() => handleVote(voteId)}
+                        onChange={() => {}}
+                        checked={selectedVoteId === voteId}
+                      />
+                      <span className="text-black">{name}</span>
+                    </div>
+                    <span className="text-[var(--blue-02)]">
+                      {totalVoteCount
+                        ? (votesCount.get(voteId) / totalVoteCount) * 100
+                        : votesCount.get(voteId)}
+                      %
+                    </span>
+                  </label>
+                </div>
+              ))}
+          </List>
 
           {/* this is the comment */}
 

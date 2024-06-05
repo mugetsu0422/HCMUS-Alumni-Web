@@ -156,7 +156,9 @@ export default function CreatePostDialog() {
 
   const onSubmit = (data) => {
     const post = {
-      ...data,
+      title: data.title,
+      content: data.content,
+      votes: !openAddingPoll ? [] : data.votes,
       tags: selectedTags.map((tag) => {
         return { id: tag.value }
       }),
@@ -172,6 +174,12 @@ export default function CreatePostDialog() {
         },
       })
       .then(({ data: { id } }) => {
+        if (imageFiles.length === 0) {
+          toast.success('Đăng thành công', {
+            id: postToast,
+          })
+        }
+
         // Update post if there are images
         const form = new FormData()
         for (const image of imageFiles) {
