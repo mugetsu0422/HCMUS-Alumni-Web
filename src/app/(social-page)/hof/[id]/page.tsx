@@ -44,26 +44,7 @@ export default function Page({ params }: { params: { id: string } }) {
     return (
       <>
         <div className="flex flex-col justify-center items-center m-auto mb-10 max-w-[1000px] w-[80%] gap-6">
-          <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
-            <div className="w-full flex justify-between items-center">
-              <div className="flex items-center gap-x-2 text-[--secondary] font-medium text-lg">
-                <ClockFill className="text-[--blue-01]" />
-                Lần cuối cập nhật:{' '}
-                {moment(hof.updateAt).local().format('DD/MM/YYYY')}
-              </div>
-
-              <div className="font-medium text-lg flex items-center gap-x-1 text-[--secondary]">
-                <ClockFill className="text-[--blue-01]" />
-                {moment(hof.publsihedAt).format('DD/MM/YYYY')}
-
-                <span className="flex ml-2 items-center gap-x-2">
-                  <EyeFill className="text-[--blue-01]" />
-                  {hof.views} -
-                </span>
-
-                <div className="text-black">{hof.creator.fullName}</div>
-              </div>
-            </div>
+          <div className={`mt-10 flex flex-col gap-y-6 mx-0 md:mx-auto w-full`}>
             <div className="w-full flex justify-center">
               <img
                 src={hof.thumbnail}
@@ -71,6 +52,19 @@ export default function Page({ params }: { params: { id: string } }) {
                 className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
               />
             </div>
+
+            <div className="w-full flex justify-center items-center">
+              <div className="font-medium text-lg flex items-center gap-x-1 text-[--secondary] italic">
+                <ClockFill className="text-[--blue-01] " />
+                {moment(hof.publsihedAt).format('DD/MM/YYYY')}
+
+                <span className="flex ml-2 items-center gap-x-2 italic">
+                  <EyeFill className="text-[--blue-01]" />
+                  {hof.views}
+                </span>
+              </div>
+            </div>
+
             <div className="flex gap-2 flex-col w-4/5 m-auto">
               <p
                 className={`${nunito.className} 2xl:text-[28px] sm:text-lg lg:text-2xl font-bold text-center`}>

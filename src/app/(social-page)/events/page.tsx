@@ -197,12 +197,14 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <Pagination
-        totalPages={totalPages}
-        curPage={curPage}
-        onNextPage={onNextPage}
-        onPrevPage={onPrevPage}
-      />
+      {curPage > 1 && (
+        <Pagination
+          totalPages={totalPages}
+          curPage={curPage}
+          onNextPage={onNextPage}
+          onPrevPage={onPrevPage}
+        />
+      )}
     </>
   )
 }

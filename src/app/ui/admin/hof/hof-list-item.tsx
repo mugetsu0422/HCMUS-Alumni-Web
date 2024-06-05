@@ -183,7 +183,7 @@ export default function HofListItem({ hof }) {
         {hof.position}
       </p>
       <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
-        {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
+        {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm')}
       </p>
       <p className="text-lg w-[8rem] text-center text-black font-[600] flex items-center justify-center">
         {hof.faculty?.name}
