@@ -279,14 +279,14 @@ export default function Page() {
             <HofListItem key={hof.id} hof={hof} />
           ))}
         </div>
-        {curPage > 1 && (
-          <Pagination
-            totalPages={totalPages}
-            curPage={curPage}
-            onNextPage={onNextPage}
-            onPrevPage={onPrevPage}
-          />
-        )}
+        {totalPages > 1 && (
+        <Pagination
+          totalPages={totalPages}
+          curPage={curPage}
+          onNextPage={onNextPage}
+          onPrevPage={onPrevPage}
+        />
+      )}
       </div>
     </>
   )

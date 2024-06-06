@@ -152,7 +152,7 @@ export default function EventsListItem({
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1650px] m-auto items-center justify-between h-fit flex pl-4 py-2 last:rounded-b-lg`}>
+      className={`${nunito.className} border border-t-0 gap-2 border-[#CDCDCD] w-[1650px] m-auto items-center justify-between h-fit flex pl-4 py-2 last:rounded-b-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -174,7 +174,7 @@ export default function EventsListItem({
         <img
           src={thumbnail}
           alt="news image"
-          className="h-full w-full object-cover object-center rounded-lg  p-1 border-solid border border-black"
+          className="h-full w-full object-cover object-center rounded-lg  p-1 border-solid border border-[#CDCDCD]"
         />
       </div>
       <p className="h-20 px-2 w-[350px] py-2 font-[600] text-black align-middle flex items-center">

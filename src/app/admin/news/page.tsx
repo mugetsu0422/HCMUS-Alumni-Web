@@ -244,7 +244,7 @@ export default function Page() {
           )}
         </div>
       </div>
-      {curPage > 1 && (
+      {totalPages > 1 && (
         <Pagination
           totalPages={totalPages}
           curPage={curPage}

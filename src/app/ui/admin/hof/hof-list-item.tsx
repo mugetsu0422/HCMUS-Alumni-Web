@@ -150,7 +150,7 @@ export default function HofListItem({ hof }) {
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 g border-[--secondary] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
+      className={`${nunito.className} border border-t-0 g border-[#CDCDCD] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
       <Toaster
         containerStyle={{ zIndex: 99999 }}
         toastOptions={{
@@ -172,7 +172,7 @@ export default function HofListItem({ hof }) {
         <img
           src={hof.thumbnail}
           alt="hall of fame image"
-          className="h-full w-full object-cover object-center p-1 border-solid border border-black"
+          className="h-full w-full object-cover object-center p-1 border-solid border border-[#CDCDCD]"
         />
       </div>
 
