@@ -11,54 +11,6 @@ import { useDebouncedCallback } from 'use-debounce'
 import toast from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-const members = [
-  {
-    id: '1',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '2',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '3',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '4',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '5',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '6',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '7',
-    fullName: 'Trương Sammuel',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '8',
-    fullName: 'Đặng Nguyễn Duy',
-    avararUrl: '/demo.jpg',
-  },
-  {
-    id: '9',
-    fullName: 'Huỳnh Cao Nguyên',
-    avararUrl: '/demo.jpg',
-  },
-]
-
 export default function Page({ params }: { params: { id: string } }) {
   const group = useGroupContext()
   const router = useRouter()
@@ -176,7 +128,7 @@ export default function Page({ params }: { params: { id: string } }) {
             next={onFetchMore}
             hasMore={hasMore}
             loader={
-              <div className="h-10 flex justify-center ">
+              <div className="h-10 flex justify-center">
                 <Spinner className="h-8 w-8"></Spinner>
               </div>
             }>

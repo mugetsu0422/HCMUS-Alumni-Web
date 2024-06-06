@@ -224,7 +224,7 @@ export default function Page() {
             }}
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             {...register('description', {
-              required: 'Vui lòng nhập tiêu đề',
+              required: 'Vui lòng nhập mô tả',
             })}
           />
           <ErrorInput
@@ -235,7 +235,7 @@ export default function Page() {
 
         <div className="flex flex-col gap-2">
           <label htmlFor="facultyId" className="text-xl font-bold">
-            Hashtag
+            Thẻ
           </label>
           <Input
             size="lg"

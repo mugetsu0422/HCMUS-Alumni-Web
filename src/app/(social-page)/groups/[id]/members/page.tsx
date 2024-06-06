@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import {
   Input,
   Avatar,
@@ -18,6 +18,10 @@ import Cookies from 'js-cookie'
 import { useGroupContext } from '../layout'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDebouncedCallback } from 'use-debounce'
+import toast from 'react-hot-toast'
+
+const curUserId = Cookies.get('userId')
+const MembersContext = createContext(null)
 
 export default function Page({ params }: { params: { id: string } }) {
   const group = useGroupContext()
@@ -88,6 +92,42 @@ export default function Page({ params }: { params: { id: string } }) {
       })
       .catch((err) => {
         console.error(err)
+      })
+  }
+
+  const onUpdateMemberRole = (userId: string, role: 'ADMIN' | 'MEMBER') => {
+    axios
+      .put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members/${userId}`,
+        { role: role },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Cập nhật vai trò thành công')
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+      })
+  }
+  const onRemoveMember = (userId: string) => {
+    axios
+      .delete(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/members/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Xóa thành viên thành công')
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error?.message || 'Lỗi không xác định')
       })
   }
 
@@ -172,39 +212,103 @@ export default function Page({ params }: { params: { id: string } }) {
 
   if (!isLoading)
     return (
-      <div className="mt-8 w-full xl:w-[60%] m-auto">
-        <p className="font-bold text-[20px] mb-4 flex items-center">
-          Thành viên <Dot /> {group.participantCount}
-        </p>
-        <Input
-          size="lg"
-          crossOrigin={undefined}
-          variant="outlined"
-          label="Tìm thành viên"
-          type="text"
-          icon={<Search />}
-          onChange={(e) => onSearchMembers(e.target.value)}
-          className="bg-white w-full rounded-full"
-        />
-        {searching ? (
-          <SearchingUI
-            members={searchingMembers}
-            onFetchMore={onFetchMoreSearching}
-            hasMore={searchingMembersHaveMore}
+      <MembersContext.Provider value={{ onUpdateMemberRole, onRemoveMember }}>
+        <div className="mt-8 w-full xl:w-[60%] m-auto">
+          <p className="font-bold text-[20px] mb-4 flex items-center">
+            Thành viên <Dot /> {group.participantCount}
+          </p>
+          <Input
+            size="lg"
+            crossOrigin={undefined}
+            variant="outlined"
+            label="Tìm thành viên"
+            type="text"
+            icon={<Search />}
+            onChange={(e) => onSearchMembers(e.target.value)}
+            className="bg-white w-full rounded-full"
           />
-        ) : (
-          <InitialUI
-            adminMembers={adminMembers}
-            normalMembers={normalMembers}
-            onFetchMore={onFetchMore}
-            hasMore={normalMembersHaveMore}
-          />
-        )}
-      </div>
+          {searching ? (
+            <SearchingUI
+              currentUserRole={group.userRole}
+              members={searchingMembers}
+              onFetchMore={onFetchMoreSearching}
+              hasMore={searchingMembersHaveMore}
+            />
+          ) : (
+            <InitialUI
+              currentUserRole={group.userRole}
+              adminMembers={adminMembers}
+              normalMembers={normalMembers}
+              onFetchMore={onFetchMore}
+              hasMore={normalMembersHaveMore}
+            />
+          )}
+        </div>
+      </MembersContext.Provider>
     )
 }
 
-function Member({ user, role }) {
+function ManageMemberMenuList({
+  role,
+  onClickUpdateRole,
+  onClickRemoveMember,
+}) {
+  if (role === 'CREATOR') return null
+  return (
+    <>
+      <Menu placement="bottom-end">
+        <MenuHandler>
+          <Button
+            placeholder={undefined}
+            variant="text"
+            className="rounded-full h-fit p-2">
+            <ThreeDots className="text-lg text-black" />
+          </Button>
+        </MenuHandler>
+        <MenuList placeholder={undefined}>
+          <MenuItem
+            onClick={onClickUpdateRole}
+            placeholder={undefined}
+            className={`text-black text-base flex items-center gap-2`}>
+            <Pencil />
+            <p>
+              {role === 'MEMBER'
+                ? 'Đặt làm quản trị viên'
+                : role === 'ADMIN'
+                  ? 'Gỡ vai trò quản trị viên'
+                  : null}
+            </p>
+          </MenuItem>
+          <MenuItem
+            onClick={onClickRemoveMember}
+            placeholder={undefined}
+            className={`text-black text-base flex items-center gap-2`}>
+            <Trash />
+            <p>Xóa thành viên</p>
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </>
+  )
+}
+
+function Member({ currentUserRole, user, role }) {
+  const { onUpdateMemberRole, onRemoveMember } = useContext(MembersContext)
+  const [isDeleted, setIsDeleted] = useState(false)
+
+  const onClickUpdateRole = () => {
+    if (role === 'MEMBER') {
+      onUpdateMemberRole(user.id, 'ADMIN')
+    } else if (role === 'ADMIN') {
+      onUpdateMemberRole(user.id, 'MEMBER')
+    }
+  }
+  const onClickRemoveMember = () => {
+    onRemoveMember(user.id)
+    setIsDeleted(true)
+  }
+
+  if (isDeleted) return null
   return (
     <>
       <div key={user.id} className="flex justify-between mb-2">
@@ -224,44 +328,37 @@ function Member({ user, role }) {
           </div>
         </div>
 
-        <Menu placement="bottom-end">
-          <MenuHandler>
-            <Button
-              placeholder={undefined}
-              variant="text"
-              className="rounded-full h-fit p-2">
-              <ThreeDots className="text-lg text-black" />
-            </Button>
-          </MenuHandler>
-          <MenuList placeholder={undefined}>
-            <MenuItem
-              //onClick={() => setOpenEditComment((e) => !e)}
-              placeholder={undefined}
-              className={`text-black text-base flex items-center gap-2`}>
-              <Pencil />
-              <p>Chỉnh sửa quyền</p>
-            </MenuItem>
-            <MenuItem
-              //onClick={onDeletePost}
-              placeholder={undefined}
-              className={`text-black text-base flex items-center gap-2`}>
-              <Trash />
-              <p>Xóa thành viên</p>
-            </MenuItem>
-          </MenuList>
-        </Menu>
+        {(currentUserRole === 'CREATOR' || currentUserRole === 'ADMIN') &&
+          user.id !== curUserId && (
+            <ManageMemberMenuList
+              role={role}
+              onClickUpdateRole={onClickUpdateRole}
+              onClickRemoveMember={onClickRemoveMember}
+            />
+          )}
       </div>
     </>
   )
 }
 
-function InitialUI({ adminMembers, normalMembers, onFetchMore, hasMore }) {
+function InitialUI({
+  currentUserRole,
+  adminMembers,
+  normalMembers,
+  onFetchMore,
+  hasMore,
+}) {
   return (
     <>
       <div className="flex flex-col gap-4 mt-4">
         <p className="font-bold">Quản trị viên</p>
         {adminMembers.map(({ user, role }) => (
-          <Member key={user.id} user={user} role={role} />
+          <Member
+            key={user.id}
+            currentUserRole={currentUserRole}
+            user={user}
+            role={role}
+          />
         ))}
       </div>
       <div className="flex flex-col gap-4 mt-4">
@@ -276,7 +373,12 @@ function InitialUI({ adminMembers, normalMembers, onFetchMore, hasMore }) {
             </div>
           }>
           {normalMembers.map(({ user, role }) => (
-            <Member key={user.id} user={user} role={role} />
+            <Member
+              key={user.id}
+              currentUserRole={currentUserRole}
+              user={user}
+              role={role}
+            />
           ))}
         </InfiniteScroll>
       </div>
@@ -284,7 +386,7 @@ function InitialUI({ adminMembers, normalMembers, onFetchMore, hasMore }) {
   )
 }
 
-function SearchingUI({ members, onFetchMore, hasMore }) {
+function SearchingUI({ currentUserRole, members, onFetchMore, hasMore }) {
   return (
     <>
       <div className="flex flex-col gap-4 mt-4">
@@ -299,7 +401,12 @@ function SearchingUI({ members, onFetchMore, hasMore }) {
             </div>
           }>
           {members.map(({ user, role }) => (
-            <Member key={user.id} user={user} role={role} />
+            <Member
+              key={user.id}
+              currentUserRole={currentUserRole}
+              user={user}
+              role={role}
+            />
           ))}
         </InfiniteScroll>
       </div>

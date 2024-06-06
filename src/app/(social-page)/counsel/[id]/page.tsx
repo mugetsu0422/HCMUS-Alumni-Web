@@ -40,8 +40,12 @@ import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import toast, { Toaster } from 'react-hot-toast'
+import DeletePostDialog from '../../../ui/social-page/counsel/delete-post-dialog'
+import clsx from 'clsx'
+import { useRouter } from 'next/navigation'
 
 export default function Page({ params }: { params: { id: string } }) {
+  const router = useRouter()
   const [post, setPost] = useState(null)
   const [noData, setNoData] = useState(false)
   const [comments, setComments] = useState([])
@@ -55,6 +59,11 @@ export default function Page({ params }: { params: { id: string } }) {
   const [totalVoteCount, setTotalVoteCount] = useState(0)
   const [votesCount, setVotesCount] = useState(new Map())
   const [selectedVoteId, setSelectedVoteId] = useState(null)
+  const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
+
+  const handleOpenDeletePostDialog = () => {
+    setOpenDeletePostDialog((e) => !e)
+  }
 
   const handleVote = async (voteId: number) => {
     try {
@@ -83,7 +92,6 @@ export default function Page({ params }: { params: { id: string } }) {
       toast.error(error.response.data.error?.message || 'Lỗi không xác định')
     }
   }
-
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
   }
@@ -210,6 +218,7 @@ export default function Page({ params }: { params: { id: string } }) {
       })
       .then(() => {
         toast.success('Xóa bài viết thành công')
+        router.push('/counsel')
       })
       .catch((error) => {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
@@ -406,22 +415,34 @@ export default function Page({ params }: { params: { id: string } }) {
                 <ThreeDots className="text-xl text-black" />
               </Button>
             </MenuHandler>
-            <MenuList placeholder={undefined}>
+            <MenuList
+              placeholder={undefined}
+              className={`${nunito.className} max-w-[250px]`}>
               {post.permissions.edit && (
-                <Link href={`/counsel/${post.id}/edit`}>
-                  <MenuItem
-                    placeholder={undefined}
-                    className={`${nunito.className} text-black text-base flex items-center gap-2`}>
-                    <Pencil />
-                    <p>Chỉnh sửa bài viết</p>
-                  </MenuItem>
-                </Link>
+                <MenuItem
+                  disabled={post.votes.length ? true : false}
+                  placeholder={undefined}
+                  className={'text-black text-base'}>
+                  <Link
+                    href={`/counsel/${post.id}/edit`}
+                    className="flex items-center gap-2">
+                    <div>
+                      <Pencil />
+                    </div>
+                    <div>
+                      <p>Chỉnh sửa bài viết</p>
+                      <p className="text-sm text-wrap">
+                        Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                      </p>
+                    </div>
+                  </Link>
+                </MenuItem>
               )}
               {post.permissions.delete && (
                 <MenuItem
-                  onClick={onDeletePost}
+                  onClick={handleOpenDeletePostDialog}
                   placeholder={undefined}
-                  className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+                  className={`text-black text-base flex items-center gap-2`}>
                   <Trash />
                   <p>Xóa bài viết</p>
                 </MenuItem>
@@ -617,6 +638,12 @@ export default function Page({ params }: { params: { id: string } }) {
             )}
           </div>
         </div>
+        <DeletePostDialog
+          postId={post.id}
+          openDeletePostDialog={openDeletePostDialog}
+          handleOpenDeletePostDialog={handleOpenDeletePostDialog}
+          onDelete={onDeletePost}
+        />
       </div>
     )
 }

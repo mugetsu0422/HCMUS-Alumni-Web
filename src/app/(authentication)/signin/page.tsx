@@ -282,8 +282,9 @@ export default function Page() {
           setEmail(data.email)
           setIsForceChangePassword(true)
         } else {
-          const decoded: { roles?: string[] } = jwtDecode(jwt)
+          const decoded: { sub: string } = jwtDecode(jwt)
 
+          Cookies.set('userId', decoded.sub, { expires: 3 })
           Cookies.set('jwt', jwt, { expires: 3 })
           Cookies.set('permissions', permissions, { expires: 3 })
           router.push('/home-page')
@@ -314,8 +315,9 @@ export default function Page() {
           pass: data.newPassword,
         }
       )
-      const decoded: { roles?: string[] } = jwtDecode(jwt)
+      const decoded: { sub: string } = jwtDecode(jwt)
 
+      Cookies.set('userId', decoded.sub, { expires: 3 })
       Cookies.set('jwt', jwt, { expires: 3 })
       Cookies.set('permissions', permissions, { expires: 3 })
       router.push('/home-page')

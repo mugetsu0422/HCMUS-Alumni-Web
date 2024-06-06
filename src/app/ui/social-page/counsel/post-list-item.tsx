@@ -1,13 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, {
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-  useLayoutEffect,
-} from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
@@ -17,8 +11,6 @@ import {
   MenuList,
   MenuItem,
   List,
-  ListItem,
-  ListItemPrefix,
 } from '@material-tailwind/react'
 import {
   TagFill,
@@ -48,6 +40,8 @@ import CommentsDialog from '../../counsel/counsel-comments-dialog'
 import ImageGird from '../../counsel/image-grid'
 import { nunito } from '../../fonts'
 import ReactionDialog from '../../common/reaction-dialog'
+import clsx from 'clsx'
+import DeletePostDialog from './delete-post-dialog'
 
 interface PostProps {
   id: string
@@ -104,6 +98,11 @@ export default function PostListItem({ post }: { post: PostProps }) {
     return vote ? vote.id.voteId : null
   })
 
+  const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
+
+  const handleOpenDeletePostDialog = () => {
+    setOpenDeletePostDialog((e) => !e)
+  }
   const handleVote = async (voteId: number) => {
     try {
       if (selectedVoteId === null) {
@@ -379,23 +378,37 @@ export default function PostListItem({ post }: { post: PostProps }) {
                 <ThreeDots className="text-xl text-black" />
               </Button>
             </MenuHandler>
-            <MenuList placeholder={undefined}>
+            <MenuList
+              placeholder={undefined}
+              className={`${nunito.className} max-w-[250px]`}>
               {post.permissions.edit && (
-                <Link href={`/counsel/${post.id}/edit`}>
-                  <MenuItem
-                    placeholder={undefined}
-                    className={`${nunito.className} text-black text-base flex items-center gap-2`}>
-                    <Pencil />
-                    <p>Chỉnh sửa bài viết</p>
-                  </MenuItem>
-                </Link>
+                <MenuItem
+                  disabled={post.votes.length ? true : false}
+                  placeholder={undefined}
+                  className={'text-black text-base'}>
+                  <Link
+                    href={`/counsel/${post.id}/edit`}
+                    className="flex items-center gap-2">
+                    <div>
+                      <Pencil />
+                    </div>
+                    <div>
+                      <p>Chỉnh sửa bài viết</p>
+                      <p className="text-sm text-wrap">
+                        Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                      </p>
+                    </div>
+                  </Link>
+                </MenuItem>
               )}
               {post.permissions.delete && (
                 <MenuItem
-                  onClick={onDeletePost}
+                  onClick={handleOpenDeletePostDialog}
                   placeholder={undefined}
-                  className={`${nunito.className} text-black text-base flex items-center gap-2`}>
-                  <Trash />
+                  className={`text-black text-base flex items-center gap-2`}>
+                  <div>
+                    <Trash />
+                  </div>
                   <p>Xóa bài viết</p>
                 </MenuItem>
               )}
@@ -443,11 +456,11 @@ export default function PostListItem({ post }: { post: PostProps }) {
 
           {/* this is the footer of the body */}
 
-          <List
-            placeholder={undefined}
-            className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes &&
-              post.votes.map(({ name, id: { voteId } }) => (
+          {post.votes.length !== 0 && (
+            <List
+              placeholder={undefined}
+              className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+              {post.votes.map(({ name, id: { voteId } }) => (
                 <div
                   key={voteId}
                   className="p-0 mb-2 border-2 rounded-lg relative">
@@ -489,7 +502,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
                   </label>
                 </div>
               ))}
-          </List>
+            </List>
+          )}
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">
@@ -590,6 +604,13 @@ export default function PostListItem({ post }: { post: PostProps }) {
             onFetchComments={onFetchComments}
           />
         </div>
+
+        <DeletePostDialog
+          postId={post.id}
+          openDeletePostDialog={openDeletePostDialog}
+          handleOpenDeletePostDialog={handleOpenDeletePostDialog}
+          onDelete={onDeletePost}
+        />
       </div>
     )
   )

@@ -136,7 +136,7 @@ export default function Page() {
             <Button
               placeholder={undefined}
               size="md"
-              className="text-white bg-[--blue-05] px-4 normal-case flex items-center justify-center gap-2">
+              className="text-white bg-[--blue-05] px-4 normal-case text-sm flex items-center justify-center gap-2">
               <Plus className="text-xl font-semibold" />
               Tạo nhóm mới
             </Button>

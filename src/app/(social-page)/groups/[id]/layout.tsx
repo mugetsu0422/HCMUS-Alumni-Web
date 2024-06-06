@@ -42,44 +42,6 @@ export const useGroupContext = () => {
   return useContext(GroupContext)
 }
 
-function DeleteGroupDialog({
-  id,
-  openDialogDeleteGroup,
-  hanldeOpenDeleteGroupDialog,
-  onDelete,
-}) {
-  const router = useRouter()
-
-  return (
-    <Dialog
-      placeholder={undefined}
-      size="xs"
-      open={openDialogDeleteGroup}
-      handler={hanldeOpenDeleteGroupDialog}>
-      <DialogHeader placeholder={undefined}>Xóa nhóm</DialogHeader>
-      <DialogBody placeholder={undefined}>Bạn có muốn xóa nhóm ?</DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={hanldeOpenDeleteGroupDialog}>
-          <span>Không</span>
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            onDelete(id)
-            hanldeOpenDeleteGroupDialog()
-            router.push('/groups')
-          }}>
-          <span>Xóa</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
-
 export default function GroupLayout({
   children,
   params,
@@ -99,9 +61,13 @@ export default function GroupLayout({
   const [isLoading, setIsLoading] = useState(true)
   const [group, setGroup] = useState(null)
   const [openDialogDeleteGroup, setOpenDialogDeleteGroup] = useState(false)
+  const [openDialogLeaveGroup, setOpenDialogLeaveGroup] = useState(false)
 
   function hanldeOpenDeleteGroupDialog() {
     setOpenDialogDeleteGroup((e) => !e)
+  }
+  function handleOpenLeaveGroupDialog() {
+    setOpenDialogLeaveGroup((e) => !e)
   }
   const handleClickTab = (url) => {
     setActiveTab(url)
@@ -121,6 +87,22 @@ export default function GroupLayout({
         toast.success('Xoá thất bại')
       })
   }
+  const onLeaveGroup = (id) => {
+    const userId = Cookies.get('userId')
+    axios
+      .delete(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}/members/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {})
+      .catch((error) => {
+        toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+      })
+  }
 
   useEffect(() => {
     axios
@@ -130,6 +112,10 @@ export default function GroupLayout({
         },
       })
       .then(({ data }) => {
+        if (!data.userRole && data.privacy === 'PRIVATE') {
+          router.push('/groups')
+          return
+        }
         setGroup(data)
         setIsLoading(false)
       })
@@ -244,17 +230,19 @@ export default function GroupLayout({
                   </Button>
                 </MenuHandler>
                 <MenuList placeholder={undefined}>
-                  <Link href={`/groups/${group.id}/edit`}>
-                    <MenuItem
-                      placeholder={undefined}
-                      className="flex items-center gap-1 text-black py-3">
-                      <PencilSquare className="text-lg" />
-                      Chỉnh sửa thông tin nhóm
-                    </MenuItem>
-                  </Link>
-
                   {(group.userRole === 'CREATOR' ||
                     group.userRole === 'ADMIN') && (
+                    <Link href={`/groups/${group.id}/edit`}>
+                      <MenuItem
+                        placeholder={undefined}
+                        className="flex items-center gap-1 text-black py-3">
+                        <PencilSquare className="text-lg" />
+                        Chỉnh sửa thông tin nhóm
+                      </MenuItem>
+                    </Link>
+                  )}
+
+                  {group.userRole === 'CREATOR' && (
                     <MenuItem
                       placeholder={undefined}
                       onClick={hanldeOpenDeleteGroupDialog}
@@ -266,6 +254,7 @@ export default function GroupLayout({
 
                   <MenuItem
                     placeholder={undefined}
+                    onClick={handleOpenLeaveGroupDialog}
                     className="flex items-center gap-1 text-black py-3">
                     <BoxArrowInRight className="text-lg" />
                     Rời khỏi nhóm
@@ -281,7 +270,89 @@ export default function GroupLayout({
           hanldeOpenDeleteGroupDialog={hanldeOpenDeleteGroupDialog}
           onDelete={onDeleteGroup}
         />
+        <LeaveGroupDialog
+          id={params.id}
+          openDialogLeaveGroup={openDialogLeaveGroup}
+          hanldeOpenLeaveGroupDialog={handleOpenLeaveGroupDialog}
+          onLeave={onLeaveGroup}
+        />
         <GroupContext.Provider value={group}>{children}</GroupContext.Provider>
       </div>
     )
+}
+
+function DeleteGroupDialog({
+  id,
+  openDialogDeleteGroup,
+  hanldeOpenDeleteGroupDialog,
+  onDelete,
+}) {
+  const router = useRouter()
+
+  return (
+    <Dialog
+      placeholder={undefined}
+      size="xs"
+      open={openDialogDeleteGroup}
+      handler={hanldeOpenDeleteGroupDialog}>
+      <DialogHeader placeholder={undefined}>Xóa nhóm</DialogHeader>
+      <DialogBody placeholder={undefined}>Bạn có muốn xóa nhóm?</DialogBody>
+      <DialogFooter placeholder={undefined}>
+        <Button
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
+          placeholder={undefined}
+          onClick={hanldeOpenDeleteGroupDialog}>
+          <span>Không</span>
+        </Button>
+        <Button
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
+          placeholder={undefined}
+          onClick={() => {
+            onDelete(id)
+            hanldeOpenDeleteGroupDialog()
+            router.push('/groups')
+          }}>
+          <span>Xóa</span>
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  )
+}
+
+function LeaveGroupDialog({
+  id,
+  openDialogLeaveGroup,
+  hanldeOpenLeaveGroupDialog,
+  onLeave,
+}) {
+  const router = useRouter()
+
+  return (
+    <Dialog
+      placeholder={undefined}
+      size="xs"
+      open={openDialogLeaveGroup}
+      handler={hanldeOpenLeaveGroupDialog}>
+      <DialogHeader placeholder={undefined}>Rời nhóm</DialogHeader>
+      <DialogBody placeholder={undefined}>Bạn có muốn rời nhóm?</DialogBody>
+      <DialogFooter placeholder={undefined}>
+        <Button
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
+          placeholder={undefined}
+          onClick={hanldeOpenLeaveGroupDialog}>
+          <span>Không</span>
+        </Button>
+        <Button
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
+          placeholder={undefined}
+          onClick={() => {
+            onLeave(id)
+            hanldeOpenLeaveGroupDialog()
+            router.push('/groups')
+          }}>
+          <span>Rời nhóm</span>
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  )
 }
