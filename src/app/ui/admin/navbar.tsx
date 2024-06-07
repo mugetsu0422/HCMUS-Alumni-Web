@@ -7,12 +7,10 @@ import {
   Badge,
   Avatar,
   Button,
-  Card,
   Menu,
   MenuHandler,
   MenuItem,
   MenuList,
-  Typography,
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -22,11 +20,11 @@ import {
   faBell,
   faEnvelope,
   faNewspaper,
-  faUserPlus,
   faCalendarDays,
   faCertificate,
   faComments,
   faUserPen,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons'
 import { inter } from '../fonts'
 
@@ -35,7 +33,8 @@ const navListItems = [
   {
     label: 'Tài khoản',
     subMenu: [
-      { title: 'Cấp tài khoản', link: '/admin/users/create' },
+      { title: 'Quản lý vai trò', link: '/admin/roles' },
+      { title: 'Quản lý tài khoản', link: '/admin/users/create' },
       {
         title: 'Xét duyệt cựu sinh viên',
         link: '/admin/alumni-verification/pending',
@@ -51,7 +50,7 @@ const navListItems = [
         ],
       },
     ],
-    icon: faUserPlus,
+    icon: faUser,
   },
   {
     label: 'Tin tức',
@@ -71,18 +70,12 @@ const navListItems = [
     icon: faCertificate,
     link: '/admin/hof',
   },
-  {
-    label: 'Tư vấn',
-    subMenu: null,
-    icon: faComments,
-    link: '#',
-  },
-  {
-    label: 'Vai trò',
-    link: '/admin/roles',
-    subMenu: null,
-    icon: faUserPen,
-  },
+  // {
+  //   label: 'Tư vấn',
+  //   subMenu: null,
+  //   icon: faComments,
+  //   link: '#',
+  // },
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {

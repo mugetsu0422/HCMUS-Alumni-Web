@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form'
 import moment from 'moment'
 import page from './../../../admin/page'
 import { useRouter } from 'next/navigation'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const privacyValue = [
   {
@@ -142,23 +143,7 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[800px] w-[80%] m-auto`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <div className="w-full flex">
         <Link href={'/groups'}>
           {/*Replace with the exact id */}

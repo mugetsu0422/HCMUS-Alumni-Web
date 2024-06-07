@@ -368,7 +368,7 @@ function InitialUI({
           next={onFetchMore}
           hasMore={hasMore}
           loader={
-            <div className="h-10 flex justify-center ">
+            <div className="h-10 my-5 flex justify-center">
               <Spinner className="h-8 w-8"></Spinner>
             </div>
           }>
@@ -396,7 +396,7 @@ function SearchingUI({ currentUserRole, members, onFetchMore, hasMore }) {
           next={onFetchMore}
           hasMore={hasMore}
           loader={
-            <div className="h-10 flex justify-center ">
+            <div className="h-10 my-5 flex justify-center">
               <Spinner className="h-8 w-8"></Spinner>
             </div>
           }>

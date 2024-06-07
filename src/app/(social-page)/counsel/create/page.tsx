@@ -22,6 +22,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function CreatePostDialog() {
   const {
@@ -33,7 +34,7 @@ export default function CreatePostDialog() {
     defaultValues: {
       title: '',
       content: '',
-      votes: Array(3).fill({ name: '' }),
+      votes: null,
     },
   })
   const voteFieldArray = useFieldArray({
@@ -47,9 +48,13 @@ export default function CreatePostDialog() {
   const [openAddingPoll, setOpenAddingPoll] = useState(false)
   const [openAddingImage, setOpenAddingImage] = useState(false)
 
-  const handleOpenAdingPost = () => {
+  const handleOpenAddingPost = () => {
     if (openAddingPoll) {
       voteFieldArray.remove()
+    } else {
+      for (let i = 0; i < 3; i++) {
+        voteFieldArray.append({ name: '' })
+      }
     }
     setOpenAddingPoll((e) => !e)
   }
@@ -220,23 +225,7 @@ export default function CreatePostDialog() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <div className="w-full flex">
         <Link href={'/counsel'}>
           <Button
@@ -306,7 +295,7 @@ export default function CreatePostDialog() {
 
         {openAddingPoll && (
           <VotingPostForm
-            handleOpenAdingPost={handleOpenAdingPost}
+            handleOpenAddingPost={handleOpenAddingPost}
             register={register}
             voteFieldArray={voteFieldArray}
             errors={errors}
@@ -326,7 +315,7 @@ export default function CreatePostDialog() {
 
         {!openAddingPoll && (
           <Button
-            onClick={handleOpenAdingPost}
+            onClick={handleOpenAddingPost}
             placeholder={undefined}
             className="bg-[--blue-02] w-96 m-auto normal-case flex gap-2 items-center justify-center">
             <BarChartLine className="text-xl" />
@@ -371,7 +360,7 @@ function AddImagePost({
         <Button
           variant="text"
           placeholder={undefined}
-          className="z-10 mr-1 p-2 cursor-pointer"
+          className="mr-1 p-2 cursor-pointer"
           onClick={handleOpenAdingImage} // Pass event object
         >
           <XLg className="text-lg" />
@@ -399,7 +388,7 @@ function AddImagePost({
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
-                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                     onClick={(event) => removeImage(index, event)} // Pass event object
                   >
                     <XLg />
@@ -420,7 +409,7 @@ function AddImagePost({
 }
 
 function VotingPostForm({
-  handleOpenAdingPost,
+  handleOpenAddingPost,
   register,
   voteFieldArray,
   errors,
@@ -435,16 +424,16 @@ function VotingPostForm({
           <Button
             variant="text"
             placeholder={undefined}
-            className="z-10 mr-1 p-2 cursor-pointer"
-            onClick={handleOpenAdingPost} // Pass event object
+            className="mr-1 p-2 cursor-pointer"
+            onClick={handleOpenAddingPost} // Pass event object
           >
             <XLg className="text-lg" />
           </Button>
         </div>
         {fields.map((field, index) => {
           return (
-            <>
-              <div key={field.id} className="flex items-center mb-2">
+            <div key={field.id}>
+              <div className="flex items-center mb-2">
                 <Input
                   crossOrigin={undefined}
                   type="text"
@@ -455,17 +444,19 @@ function VotingPostForm({
                   })}
                 />
                 <Button
+                  variant="text"
                   placeholder={undefined}
-                  onClick={() => remove(index)}
-                  className="ml-2 bg-red-500 rounded text-nowrap normal-case text-[13px]">
-                  <p className="text-black"> Xóa lựa chọn </p>
+                  className="mr-1 p-2 cursor-pointer"
+                  onClick={() => remove(index)} // Pass event object
+                >
+                  <XLg className="text-lg" />
                 </Button>
               </div>
               <ErrorInput
                 // This is the error message
                 errors={errors?.votes?.[index]?.name?.message}
               />
-            </>
+            </div>
           )
         })}
         <Button

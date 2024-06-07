@@ -21,6 +21,7 @@ import { TAGS, JWT_COOKIE } from '../../../../../constant'
 import styles from '../../../../../ui/admin/react-tag-autocomplete.module.css'
 import ErrorInput from '../../../../../ui/error-input'
 import { nunito } from '../../../../../ui/fonts'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
@@ -196,22 +197,7 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[600px] w-[80%] m-auto`}>
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <div className="w-full flex">
         <Link href={`/groups/${params.id}`}>
           <Button

@@ -17,6 +17,7 @@ import {
 import Countdown from 'react-countdown'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const FormContext = createContext(null)
 
@@ -133,7 +134,8 @@ function Step1() {
             {...register('confirmPassword', {
               required: 'Vui lòng xác nhận lại mật khẩu',
               validate: (value) =>
-                value === getValues().password || 'Xác nhận mật khẩu không khớp',
+                value === getValues().password ||
+                'Xác nhận mật khẩu không khớp',
             })}
             crossOrigin={undefined}
           />
@@ -338,23 +340,7 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <Typography
         variant="h2"
         color="blue-gray"

@@ -17,8 +17,6 @@ import {
   tabs,
 } from '@material-tailwind/react'
 import { usePathname, useRouter } from 'next/navigation'
-import { nunito } from '../../../ui/fonts'
-import NoData from '../../../ui/no-data'
 import { createContext, useContext, useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
@@ -31,11 +29,14 @@ import {
   PencilSquare,
   Trash,
 } from 'react-bootstrap-icons'
-import { GROUP_PRIVACY, GROUP_TABS, JWT_COOKIE } from '../../../constant'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import clsx from 'clsx'
 import Link from 'next/link'
+import CustomToaster from '@/app/ui/common/custom-toaster'
+import { JWT_COOKIE, GROUP_PRIVACY, GROUP_TABS } from '@/app/constant'
+import { nunito } from '@/app/ui/fonts'
+import NoData from '@/app/ui/no-data'
 
 const GroupContext = createContext(null)
 export const useGroupContext = () => {
@@ -132,23 +133,7 @@ export default function GroupLayout({
       <div
         className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
         <div className="relative">
-          <Toaster
-            containerStyle={{ zIndex: 99999 }}
-            toastOptions={{
-              success: {
-                style: {
-                  background: '#00a700',
-                  color: 'white',
-                },
-              },
-              error: {
-                style: {
-                  background: '#ea7b7b',
-                  color: 'white',
-                },
-              },
-            }}
-          />
+          <CustomToaster />
           <img
             src={group.coverUrl}
             alt="group cover"

@@ -5,6 +5,7 @@ import { Button, Avatar, Spinner } from '@material-tailwind/react'
 import { Dot } from 'react-bootstrap-icons'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 export default function GroupsListItem({ group, onJoinGroup }) {
   const router = useRouter()
@@ -73,13 +74,14 @@ export default function GroupsListItem({ group, onJoinGroup }) {
           Đang chờ duyệt
         </Button>
       ) : isJoined ? (
-        <Button
-          onClick={() => router.push(`/groups/${group.id}`)}
-          size="sm"
-          placeholder={undefined}
-          className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-36 flex justify-center items-center gap-2">
-          Xem nhóm
-        </Button>
+        <Link href={`/groups/${group.id}`}>
+          <Button
+            size="sm"
+            placeholder={undefined}
+            className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+            Xem nhóm
+          </Button>
+        </Link>
       ) : (
         <Button
           disabled={isJoining}

@@ -170,7 +170,7 @@ function Request({ user, onChangeRequestStatus }) {
             }}
             placeholder={undefined}
             size="md"
-            className=" bg-[--delete-filter] text-black normal-case">
+            className="bg-[--delete-filter] text-black normal-case">
             Từ chối
           </Button>
           <Button

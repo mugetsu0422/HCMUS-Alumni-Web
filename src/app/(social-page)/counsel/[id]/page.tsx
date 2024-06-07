@@ -43,6 +43,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import DeletePostDialog from '../../../ui/social-page/counsel/delete-post-dialog'
 import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -371,23 +372,7 @@ export default function Page({ params }: { params: { id: string } }) {
     return (
       <div
         className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto`}>
-        <Toaster
-          containerStyle={{ zIndex: 99999 }}
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
+        <CustomToaster />
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <Link href="#">

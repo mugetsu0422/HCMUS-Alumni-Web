@@ -17,6 +17,7 @@ import Cookies from 'js-cookie'
 import { Button, Input } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const PAGE_SIZE = 9
 
@@ -243,22 +244,7 @@ export default function Page() {
       <Thumbnail />
 
       <div className="flex flex-col w-[80%] gap-6 max-w-[80rem] m-auto mt-10">
-        <Toaster
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
+        <CustomToaster />
         <p
           className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
           GƯƠNG THÀNH CÔNG

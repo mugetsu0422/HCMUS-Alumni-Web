@@ -16,6 +16,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 function ForceChangePasswordForm({
   forceChangePasswordForm,
@@ -329,22 +330,7 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       {isForceChangePassword ? (
         <ForceChangePasswordForm
           forceChangePasswordForm={forceChangePasswordForm}
