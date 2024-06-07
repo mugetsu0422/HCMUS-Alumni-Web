@@ -134,7 +134,7 @@ function HofListItem({ hof }) {
       <p className="w-full text-center text-xl text-black font-bold">
         {hof.title}
       </p>
-      <p className="font-semibold text-center">
+      <p className="font-semibold text-center text-[14px]">
         {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
         {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
       </p>
@@ -265,12 +265,14 @@ export default function Page() {
             <HofListItem key={hof.id} hof={hof} />
           ))}
         </div>
+        {totalPages > 1 && (
         <Pagination
           totalPages={totalPages}
           curPage={curPage}
           onNextPage={onNextPage}
           onPrevPage={onPrevPage}
         />
+      )}
       </div>
     </>
   )

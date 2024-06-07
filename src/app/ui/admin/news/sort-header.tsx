@@ -21,7 +21,7 @@ interface HeaderProps {
 
 export default function SortHeader({ onOrder }: HeaderProps) {
   return (
-    <div className="w-[1220px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 rounded-t-lg">
+    <div className="w-[1220px] h-fit bg-[#f6f9ff] border border-[#CDCDCD] m-auto py-1 rounded-t-lg">
       <div className="flex w-fit justify-evenly items-center">
         <Menu>
           <MenuHandler>

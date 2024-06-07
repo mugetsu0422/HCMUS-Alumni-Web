@@ -151,13 +151,13 @@ export default function HofListItem({ hof }) {
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border-2 border-t-0 g border-[--secondary] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
+      className={`${nunito.className} border border-t-0 g border-[#CDCDCD] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
       <CustomToaster />
       <div className="h-[120px] w-[180px]">
         <img
           src={hof.thumbnail}
           alt="hall of fame image"
-          className="h-full w-full object-cover object-center p-1 border-solid border border-black"
+          className="h-full w-full object-cover object-center p-1 border-solid border border-[#CDCDCD]"
         />
       </div>
 
@@ -168,7 +168,7 @@ export default function HofListItem({ hof }) {
         {hof.position}
       </p>
       <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
-        {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
+        {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm')}
       </p>
       <p className="text-lg w-[8rem] text-center text-black font-[600] flex items-center justify-center">
         {hof.faculty?.name}

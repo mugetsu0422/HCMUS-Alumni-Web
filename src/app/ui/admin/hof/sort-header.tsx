@@ -16,7 +16,7 @@ import {
 } from '@material-tailwind/react'
 export default function SortHeader({ onOrder }) {
   return (
-    <div className="w-[1400px] h-fit bg-[#f6f9ff] border-2 border-[--secondary] m-auto py-1 rounded-t-lg">
+    <div className="w-[1400px] h-fit bg-[#f6f9ff] border border-[#CDCDCD] m-auto py-1 rounded-t-lg">
       <div className="flex w-fit justify-evenly items-center ">
         <Menu>
           <MenuHandler>
