@@ -27,6 +27,7 @@ import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Comments from '../../../ui/common/comments'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const PARTICIPANT_FETCH_LIMIT = 50
 
@@ -78,7 +79,7 @@ function ParticipantsDialog({
           next={onFetchMore}
           hasMore={hasMore}
           loader={
-            <div className="h-10 flex justify-center ">
+            <div className="h-10 my-5 flex justify-center">
               <Spinner className="h-8 w-8"></Spinner>
             </div>
           }
@@ -344,22 +345,7 @@ export default function Page({ params }: { params: { id: string } }) {
       <>
         <div
           className={`${nunito.className} flex flex-col gap-6 w-[75%] max-w-[1366px] bg-[--blue-04] rounded-lg m-auto lg:px-10 lg:py-10 mt-16 mb-16`}>
-          <Toaster
-            toastOptions={{
-              success: {
-                style: {
-                  background: '#00a700',
-                  color: 'white',
-                },
-              },
-              error: {
-                style: {
-                  background: '#ea7b7b',
-                  color: 'white',
-                },
-              },
-            }}
-          />
+          <CustomToaster />
           <div className="flex flex-col xl:flex-row items-center justify-center m-auto gap-x-10">
             <img
               src={event?.thumbnail}

@@ -17,6 +17,7 @@ import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
+import CustomToaster from '../../common/custom-toaster'
 
 type Role = {
   id: number
@@ -71,8 +72,8 @@ export default function RolesListItem({ role }: { role: Role }) {
         toast.success('Xoá thành công')
         setIsDeleted(true)
       })
-      .catch((e) => {
-        toast.success('Xoá thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
 
@@ -80,23 +81,7 @@ export default function RolesListItem({ role }: { role: Role }) {
   return (
     <div
       className={`${nunito.className} border-2 border-t-0 gap-2 border-[--secondary] w-[1220px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <div className="flex">
         <p className="h-full w-[250px] p-2 font-[600] text-black align-middle flex items-center justify-center">
           {role.name}

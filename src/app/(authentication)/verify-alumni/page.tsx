@@ -25,6 +25,7 @@ import axios from 'axios'
 import Cropper from 'react-easy-crop'
 import Cookies from 'js-cookie'
 import { FACULTIES, JWT_COOKIE } from '../../constant'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const FormContext = createContext(null)
 
@@ -462,23 +463,7 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-[20rem] m-auto sm:pt-[10rem] 2xl:pt-0 flex flex-col items-center sm:items-start`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <p className="text-3xl text-[var(--blue-01)] font-bold">BẮT ĐẦU</p>
       <p className="mt-2 text-[var(--text)] font-medium">
         Hãy thiết lập hồ sơ của bạn. Những thông tin này sẽ giúp chúng tôi xét
