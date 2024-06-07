@@ -1,71 +1,108 @@
-'use client'
 /* eslint-disable @next/next/no-img-element */
+'use client'
 
-import React, { useEffect, useState, useLayoutEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
-  Textarea,
+  Radio,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
-  Spinner,
   List,
-  Radio,
 } from '@material-tailwind/react'
 import {
   TagFill,
-  SendFill,
-  HandThumbsUpFill,
+  Chat,
   HandThumbsUp,
+  HandThumbsUpFill,
   ThreeDots,
-  Trash,
   Pencil,
+  Trash,
 } from 'react-bootstrap-icons'
 import Link from 'next/link'
-import Comments from '../../../ui/common/comments'
-import { nunito } from '../../../ui/fonts'
-import ImageGird from '../../../ui/counsel/image-grid'
 import moment from 'moment'
 import 'moment/locale/vi'
-import {
-  COMMENT_PAGE_SIZE,
-  JWT_COOKIE,
-  REACTION_PAGE_SIZE,
-  REACTION_TYPE,
-} from '../../../constant'
-import ReactionDialog from '../../../ui/common/reaction-dialog'
 import axios, { AxiosResponse } from 'axios'
-import Cookies from 'js-cookie'
-import NoData from '../../../ui/no-data'
-import toast, { Toaster } from 'react-hot-toast'
-import DeletePostDialog from '../../../ui/social-page/counsel/delete-post-dialog'
-import clsx from 'clsx'
-import { useRouter } from 'next/navigation'
-import CustomToaster from '@/app/ui/common/custom-toaster'
 
-export default function Page({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const [post, setPost] = useState(null)
-  const [noData, setNoData] = useState(false)
-  const [comments, setComments] = useState([])
-  const [commentPage, setCommentPage] = useState(0)
-  const [uploadComment, setUploadComment] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
+import Cookies from 'js-cookie'
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
+import { useTruncatedElement } from '../../../../hooks/use-truncated-element'
+import {
+  JWT_COOKIE,
+  REACTION_TYPE,
+  REACTION_PAGE_SIZE,
+  COMMENT_PAGE_SIZE,
+} from '../../../constant'
+import CommentsDialog from '../../counsel/counsel-comments-dialog'
+import ImageGird from '../../counsel/image-grid'
+import { nunito } from '../../fonts'
+import ReactionDialog from '../../common/reaction-dialog'
+import clsx from 'clsx'
+import DeletePostDialog from './delete-post-dialog'
+
+interface PostProps {
+  id: string
+  title: string
+  content: string
+  childrenCommentNumber: number
+  updateAt: string
+  publishedAt: string
+  tags: { id: string; name: string }[]
+  status: { name: string }
+  creator: { id: string; fullName: string; avatarUrl: string }
+  pictures: { id: string; pictureUrl: string }[]
+  votes: {
+    id: { voteId: number }
+    name: string
+    voteCount: number
+    isVoted: boolean
+  }[]
+  isReacted: boolean
+  reactionCount: number
+  permissions: {
+    edit: boolean
+    delete: boolean
+  }
+}
+
+export default function PostListItem({ post }: { post: PostProps }) {
+  const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [openReactDialog, setOpenReactDialog] = useState(false)
-  const [isReacted, setIsReacted] = useState(null)
-  const [reactionCount, setReactionCount] = useState(null)
+  const [isReacted, setIsReacted] = useState(post.isReacted)
+  const [comments, setComments] = useState([])
+  const [reactionCount, setReactionCount] = useState(post.reactionCount)
   const [reaction, setReaction] = useState([])
-  const [totalVoteCount, setTotalVoteCount] = useState(0)
-  const [votesCount, setVotesCount] = useState(new Map())
-  const [selectedVoteId, setSelectedVoteId] = useState(null)
+  const [isDeleted, setIsDeleted] = useState(false)
+  const ref = React.useRef(null)
+  const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
+    ref,
+  })
+  const [totalVoteCount, setTotalVoteCount] = useState(() => {
+    if (!post.votes) return 0
+    return post.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
+  })
+  const [votesCount, setVotesCount] = useState(() => {
+    const map = new Map()
+    if (!post.votes) return map
+    post.votes.forEach(({ id: { voteId }, voteCount }) => {
+      map.set(voteId, voteCount)
+    })
+    return map
+  })
+  const [selectedVoteId, setSelectedVoteId] = useState(() => {
+    if (!post.votes) return null
+    const vote = post.votes.find(({ isVoted }) => isVoted)
+    return vote ? vote.id.voteId : null
+  })
+
   const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
 
   const handleOpenDeletePostDialog = () => {
     setOpenDeletePostDialog((e) => !e)
   }
-
   const handleVote = async (voteId: number) => {
     try {
       if (selectedVoteId === null) {
@@ -93,12 +130,29 @@ export default function Page({ params }: { params: { id: string } }) {
       toast.error(error.response.data.error?.message || 'Lỗi không xác định')
     }
   }
+
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
   }
-  // Function to handle changes in the textarea
-  const handleUploadCommentChange = (event) => {
-    setUploadComment(event.target.value)
+  function handleOpenCommentDialog() {
+    setOpenCommentsDialog((e) => !e)
+  }
+  const toggleExpand = () => {
+    setIsReadingMore((e) => !e)
+  }
+  const onFetchComments = async (page: number, pageSize: number) => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/comments?page=${page}&pageSize=${pageSize}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+
+      setComments(comments.concat(res.data.comments))
+    } catch (error) {}
   }
   const onUploadComment = (
     e: React.FormEvent<HTMLFormElement>,
@@ -130,9 +184,6 @@ export default function Page({ params }: { params: { id: string } }) {
           id: postCommentToast,
         })
       })
-  }
-  const onShowMoreComments = () => {
-    setCommentPage((commentPage) => commentPage + 1)
   }
   const onFetchChildrenComments = async (
     parentId: string,
@@ -200,7 +251,7 @@ export default function Page({ params }: { params: { id: string } }) {
   ) => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${params.id}/react?reactId=${reactId}&page=${page}&pageSize=${pageSize}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/react?reactId=${reactId}&page=${page}&pageSize=${pageSize}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -218,8 +269,8 @@ export default function Page({ params }: { params: { id: string } }) {
         },
       })
       .then(() => {
-        toast.success('Xóa bài viết thành công')
-        router.push('/counsel')
+        setIsDeleted(true)
+        toast.success('Xoá bài viết thành công')
       })
       .catch((error) => {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
@@ -293,86 +344,11 @@ export default function Page({ params }: { params: { id: string } }) {
     )
   }
 
-  useEffect(() => {
-    const postPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${params.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    const commentPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${params.id}/comments?page=0&pageSize=${COMMENT_PAGE_SIZE}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-
-    Promise.all([postPromise, commentPromise])
-      .then(([postRes, commentRes]) => {
-        setPost(postRes.data)
-        setComments(commentRes.data.comments)
-        setReactionCount(postRes.data.reactionCount)
-        setIsReacted(postRes.data.isReacted)
-
-        setTotalVoteCount(() => {
-          if (!postRes.data.votes) return 0
-          return postRes.data.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
-        })
-        setVotesCount(() => {
-          const map = new Map()
-          if (!postRes.data.votes) return map
-          postRes.data.votes.forEach(({ id: { voteId }, voteCount }) => {
-            map.set(voteId, voteCount)
-          })
-          return map
-        })
-        setSelectedVoteId(() => {
-          if (!postRes.data.votes) return null
-          const vote = postRes.data.votes.find(({ isVoted }) => isVoted)
-          return vote ? vote.id.voteId : null
-        })
-
-        setIsLoading(false)
-      })
-      .catch((error) => {
-        setNoData(true)
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Fetch more comments
-  useEffect(() => {
-    if (!commentPage) return
-
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${params.id}/comments?page=${commentPage}&pageSize=${COMMENT_PAGE_SIZE}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { comments: fetchedComments } }) => {
-        setComments(comments.concat(fetchedComments))
-      })
-      .catch((error) => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentPage])
-
-  if (noData) {
-    return <NoData />
-  }
-
-  if (!isLoading)
-    return (
+  return (
+    !isDeleted && (
       <div
-        className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto`}>
-        <CustomToaster />
+        className={`${nunito.className} flex flex-col w-full h-fit mt-4 mb-20`}>
+        {/* this is the header of a post */}
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <Link href="#">
@@ -385,9 +361,11 @@ export default function Page({ params }: { params: { id: string } }) {
 
             <div className="flex flex-col gap-1">
               <p className="font-bold text-lg">{post.creator.fullName}</p>
-              <p className="text-sm text-[--secondary]">
+              <Link
+                href={`/counsel/${post.id}`}
+                className="text-sm text-[--secondary] hover:underline">
                 {moment(post.publishedAt).locale('vi').local().fromNow()}
-              </p>
+              </Link>
             </div>
           </div>
 
@@ -428,7 +406,9 @@ export default function Page({ params }: { params: { id: string } }) {
                   onClick={handleOpenDeletePostDialog}
                   placeholder={undefined}
                   className={`text-black text-base flex items-center gap-2`}>
-                  <Trash />
+                  <div>
+                    <Trash />
+                  </div>
                   <p>Xóa bài viết</p>
                 </MenuItem>
               )}
@@ -436,12 +416,11 @@ export default function Page({ params }: { params: { id: string } }) {
           </Menu>
         </div>
 
+        {/* this is the body of a post */}
         <div>
           {/* this is the header of the body */}
           <div className="mt-3">
-            <p className="text-xl uppercase font-bold text-black">
-              {post.title}
-            </p>
+            <p className="text-xl uppercase font-bold">{post.title}</p>
             <div className="flex items-center gap-2 text-[--secondary]">
               {post.tags.length != 0 && (
                 <>
@@ -456,15 +435,32 @@ export default function Page({ params }: { params: { id: string } }) {
 
           {/* this is the content of the body */}
           <div className="flex flex-col gap-2 ">
-            {post.content}
+            <div className="overflow-hidden">
+              <div
+                ref={ref}
+                className={`${
+                  isReadingMore ? 'block' : 'line-clamp-3'
+                } whitespace-pre-line`}>
+                {post.content}
+              </div>
+              {isTruncated && !isReadingMore && (
+                <span
+                  className="text-black font-semibold hover:underline hover:cursor-pointer rounded text-nowrap inline-flex"
+                  onClick={toggleExpand}>
+                  Xem thêm
+                </span>
+              )}
+            </div>
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
 
-          <List
-            placeholder={undefined}
-            className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes &&
-              post.votes.map(({ name, id: { voteId } }) => (
+          {/* this is the footer of the body */}
+
+          {post.votes.length !== 0 && (
+            <List
+              placeholder={undefined}
+              className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+              {post.votes.map(({ name, id: { voteId } }) => (
                 <div
                   key={voteId}
                   className="p-0 mb-2 border-2 rounded-lg relative">
@@ -506,9 +502,8 @@ export default function Page({ params }: { params: { id: string } }) {
                   </label>
                 </div>
               ))}
-          </List>
-
-          {/* this is the comment */}
+            </List>
+          )}
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">
@@ -532,13 +527,28 @@ export default function Page({ params }: { params: { id: string } }) {
                 )}
 
                 {post.childrenCommentNumber > 0 && (
-                  <div>{post.childrenCommentNumber} Bình luận</div>
+                  <div
+                    onClick={() => {
+                      if (
+                        comments.length === 0 &&
+                        post.childrenCommentNumber != 0
+                      ) {
+                        onFetchComments(0, COMMENT_PAGE_SIZE)
+                      }
+
+                      handleOpenCommentDialog()
+                    }}
+                    className="hover:underline hover:cursor-pointer">
+                    {post.childrenCommentNumber} Bình luận
+                  </div>
                 )}
               </div>
+              <span className="border-t-[1px] border-[--secondary]"></span>
             </div>
           ) : (
             ''
           )}
+
           <ReactionDialog
             users={reaction}
             reactionCount={reactionCount}
@@ -546,8 +556,8 @@ export default function Page({ params }: { params: { id: string } }) {
             openReactDialog={openReactDialog}
             hanldeOpenReactDialog={hanldeOpenReactDialog}
           />
-          <div className="flex flex-col gap-1">
-            <span className="border-t-[1px] border-[--secondary]"></span>
+
+          <div className="flex gap-2">
             <Button
               onClick={handleReactionClick}
               placeholder={undefined}
@@ -565,64 +575,36 @@ export default function Page({ params }: { params: { id: string } }) {
                 Thích
               </span>
             </Button>
-            <span className="border-t-[1px] border-[--secondary]"> </span>
+
+            <Button
+              onClick={() => {
+                if (comments.length === 0 && post.childrenCommentNumber != 0) {
+                  onFetchComments(0, COMMENT_PAGE_SIZE)
+                }
+
+                handleOpenCommentDialog()
+              }}
+              placeholder={undefined}
+              variant="text"
+              className="flex gap-1 py-2 px-4 normal-case w-fit">
+              <Chat className="text-[16px]" />
+              <span className="text-[14px]">Bình luận</span>
+            </Button>
           </div>
 
-          <div className="h-fit py-3 bg-white">
-            <form
-              className="flex flex-start items-start w-full gap-2"
-              onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
-              <Avatar
-                placeholder={undefined}
-                src={'/demo.jpg'}
-                alt="avatar user"
-              />
-              <Textarea
-                rows={1}
-                resize={true}
-                placeholder="Bình luận của bạn"
-                className="min-h-full !border-0 focus:border-transparent w-full !bg-[var(--comment-input)]"
-                containerProps={{
-                  className: 'grid h-full',
-                }}
-                labelProps={{
-                  className: 'before:content-none after:content-none',
-                }}
-                onChange={handleUploadCommentChange}
-              />
-              <Button
-                type="submit"
-                placeholder={undefined}
-                variant="text"
-                className="p-2">
-                <SendFill className="text-xl" />
-              </Button>
-            </form>
-          </div>
-          <div className={`${nunito.className} mt-2`}>
-            <p className="text-black font-bold text-lg">Bình luận</p>
-            <Comments
-              comments={comments}
-              onUploadComment={onUploadComment}
-              onEditComment={onEditComment}
-              onDeleteComment={onDeleteComment}
-              onFetchChildrenComments={onFetchChildrenComments}
-            />
-            {comments.length < post.childrenCommentNumber && (
-              <div
-                onClick={onShowMoreComments}
-                className="group w-full flex gap-2 text-[--secondary] justify-between">
-                <span className="group-hover:underline group-hover:cursor-pointer flex gap-3">
-                  Xem thêm bình luận
-                  {isLoading && <Spinner className="w-4" />}
-                </span>
-                <span>
-                  {comments.length}/{post.childrenCommentNumber}
-                </span>
-              </div>
-            )}
-          </div>
+          <CommentsDialog
+            post={post}
+            comments={comments}
+            openCommentsDialog={openCommentsDialog}
+            handleOpenCommentDialog={handleOpenCommentDialog}
+            onUploadComment={onUploadComment}
+            onEditComment={onEditComment}
+            onDeleteComment={onDeleteComment}
+            onFetchChildrenComments={onFetchChildrenComments}
+            onFetchComments={onFetchComments}
+          />
         </div>
+
         <DeletePostDialog
           postId={post.id}
           openDeletePostDialog={openDeletePostDialog}
@@ -631,4 +613,5 @@ export default function Page({ params }: { params: { id: string } }) {
         />
       </div>
     )
+  )
 }

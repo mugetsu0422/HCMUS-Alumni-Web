@@ -16,6 +16,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 function ForceChangePasswordForm({
   forceChangePasswordForm,
@@ -278,13 +279,13 @@ export default function Page() {
     axios
       .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
       .then(({ data: { jwt, permissions, forcePasswordChange = null } }) => {
-        console.log(forcePasswordChange)
         if (forcePasswordChange) {
           setEmail(data.email)
           setIsForceChangePassword(true)
         } else {
-          const decoded: { roles?: string[] } = jwtDecode(jwt)
+          const decoded: { sub: string } = jwtDecode(jwt)
 
+          Cookies.set('userId', decoded.sub, { expires: 3 })
           Cookies.set('jwt', jwt, { expires: 3 })
           Cookies.set('permissions', permissions, { expires: 3 })
           router.push('/home-page')
@@ -315,8 +316,9 @@ export default function Page() {
           pass: data.newPassword,
         }
       )
-      const decoded: { roles?: string[] } = jwtDecode(jwt)
+      const decoded: { sub: string } = jwtDecode(jwt)
 
+      Cookies.set('userId', decoded.sub, { expires: 3 })
       Cookies.set('jwt', jwt, { expires: 3 })
       Cookies.set('permissions', permissions, { expires: 3 })
       router.push('/home-page')
@@ -328,22 +330,7 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       {isForceChangePassword ? (
         <ForceChangePasswordForm
           forceChangePasswordForm={forceChangePasswordForm}

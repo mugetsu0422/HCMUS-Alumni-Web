@@ -1,13 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, {
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-  useLayoutEffect,
-} from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
@@ -17,10 +11,7 @@ import {
   MenuList,
   MenuItem,
   List,
-  ListItem,
-  ListItemPrefix,
 } from '@material-tailwind/react'
-import { nunito } from '../fonts'
 import {
   TagFill,
   Chat,
@@ -31,25 +22,27 @@ import {
   Trash,
 } from 'react-bootstrap-icons'
 import Link from 'next/link'
-import CommentsDialog from '../counsel/counsel-comments-dialog'
-import ImageGird from '../counsel/image-grid'
 import moment from 'moment'
 import 'moment/locale/vi'
 import axios, { AxiosResponse } from 'axios'
-import {
-  COMMENT_PAGE_SIZE,
-  JWT_COOKIE,
-  REACTION_PAGE_SIZE,
-  REACTION_TYPE,
-} from '../../constant'
+
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
-import ReactionDialog from '../counsel/counsel-react-dialog'
-import { useRouter } from 'next/navigation'
-import { useTruncatedElement } from '../../../hooks/use-truncated-element'
+import { useTruncatedElement } from '../../../../hooks/use-truncated-element'
+import {
+  JWT_COOKIE,
+  REACTION_TYPE,
+  REACTION_PAGE_SIZE,
+  COMMENT_PAGE_SIZE,
+} from '../../../constant'
+import CommentsDialog from '../../counsel/counsel-comments-dialog'
+import ImageGird from '../../counsel/image-grid'
+import { nunito } from '../../fonts'
+import ReactionDialog from '../../common/reaction-dialog'
 
 interface PostProps {
   id: string
+  groupId: string
   title: string
   content: string
   childrenCommentNumber: number
@@ -73,13 +66,7 @@ interface PostProps {
   }
 }
 
-export default function PostListItem({
-  post,
-  name,
-}: {
-  post: PostProps
-  name: string
-}) {
+export default function PostListItem({ post }: { post: PostProps }) {
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [openReactDialog, setOpenReactDialog] = useState(false)
   const [isReacted, setIsReacted] = useState(post.isReacted)
@@ -133,7 +120,6 @@ export default function PostListItem({
       }
       setSelectedVoteId(voteId === selectedVoteId ? null : voteId)
     } catch (error) {
-      console.error(error)
       toast.error(error.response.data.error?.message || 'Lỗi không xác định')
     }
   }
@@ -150,7 +136,7 @@ export default function PostListItem({
   const onFetchComments = async (page: number, pageSize: number) => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/comments?page=${page}&pageSize=${pageSize}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/comments?page=${page}&pageSize=${pageSize}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -159,9 +145,7 @@ export default function PostListItem({
       )
 
       setComments(comments.concat(res.data.comments))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onUploadComment = (
     e: React.FormEvent<HTMLFormElement>,
@@ -177,7 +161,7 @@ export default function PostListItem({
     const postCommentToast = toast.loading('Đang đăng')
     axios
       .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/comments`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/comments`,
         comment,
         {
           headers: {
@@ -188,8 +172,10 @@ export default function PostListItem({
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
-      .catch(() => {
-        toast.error('Đăng thất bại', { id: postCommentToast })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+          id: postCommentToast,
+        })
       })
   }
   const onFetchChildrenComments = async (
@@ -198,7 +184,7 @@ export default function PostListItem({
     pageSize: number
   ) => {
     const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/comments/${parentId}/children?page=${page}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/comments/${parentId}/children?page=${page}&pageSize=${pageSize}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -214,7 +200,7 @@ export default function PostListItem({
     setReactionCount((old) => old + 1)
     axios
       .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/react`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/react`,
         { reactId: REACTION_TYPE['Like'] },
         {
           headers: {
@@ -223,15 +209,15 @@ export default function PostListItem({
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
     setReactionCount((old) => old - 1)
     axios
       .delete(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/react`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/react`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -239,8 +225,8 @@ export default function PostListItem({
         }
       )
       .then()
-      .catch((err) => {
-        console.error(err)
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -258,7 +244,7 @@ export default function PostListItem({
   ) => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/react?reactId=${reactId}&page=${page}&pageSize=${pageSize}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/react?reactId=${reactId}&page=${page}&pageSize=${pageSize}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -266,23 +252,21 @@ export default function PostListItem({
         }
       )
       setReaction(reaction.concat(res.data.users))
-    } catch (error) {
-      console.error(error)
-    }
+    } catch (error) {}
   }
   const onDeletePost = () => {
     axios
-      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}`, {
+      .delete(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${post.id}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
       .then(() => {
         setIsDeleted(true)
+        toast.success('Xoá bài viết thành công')
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Xóa bài viết thất bại')
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (
@@ -296,7 +280,7 @@ export default function PostListItem({
     }
 
     return axios.put(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/comments/${commentId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/comments/${commentId}`,
       comment,
       {
         headers: {
@@ -312,7 +296,7 @@ export default function PostListItem({
     e.preventDefault()
 
     return axios.delete(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/comments/${commentId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/comments/${commentId}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -322,7 +306,7 @@ export default function PostListItem({
   }
   const onVote = (voteId: number) => {
     return axios.post(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/votes/${voteId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/votes/${voteId}`,
       null,
       {
         headers: {
@@ -333,7 +317,7 @@ export default function PostListItem({
   }
   const onChangeVote = (oldVoteId: number, newVoteId: number) => {
     return axios.put(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/votes/${oldVoteId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/votes/${oldVoteId}`,
       { updatedVoteId: newVoteId },
       {
         headers: {
@@ -344,7 +328,7 @@ export default function PostListItem({
   }
   const onRemoveVote = (voteId: number) => {
     return axios.delete(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/${name}/${post.id}/votes/${voteId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/votes/${voteId}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -371,7 +355,7 @@ export default function PostListItem({
             <div className="flex flex-col gap-1">
               <p className="font-bold text-lg">{post.creator.fullName}</p>
               <Link
-                href={`/${name}/${post.id}`}
+                href={`/groups/${post.id}/posts/${post.groupId}`}
                 className="text-sm text-[--secondary] hover:underline">
                 {moment(post.publishedAt).locale('vi').local().fromNow()}
               </Link>
@@ -389,7 +373,7 @@ export default function PostListItem({
             </MenuHandler>
             <MenuList placeholder={undefined}>
               {post.permissions.edit && (
-                <Link href={`/${name}/${post.id}/edit`}>
+                <Link href={`/groups/${post.groupId}/posts/${post.id}/edit`}>
                   <MenuItem
                     placeholder={undefined}
                     className={`${nunito.className} text-black text-base flex items-center gap-2`}>
@@ -451,46 +435,54 @@ export default function PostListItem({
 
           {/* this is the footer of the body */}
 
-          <List
-            placeholder={undefined}
-            className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-            {post.votes && post.votes.map(({ name, id: { voteId } }) => (
-              <div
-                key={voteId}
-                className="p-0 mb-2 border-2 rounded-lg relative">
+          {post.votes && (
+            <List
+              placeholder={undefined}
+              className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
+              {post.votes.map(({ name, id: { voteId } }) => (
                 <div
-                  className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left scale-x-[${
-                    totalVoteCount ? votesCount.get(voteId) / totalVoteCount : 0
-                  }]`}></div>
-                <label
-                  htmlFor={`option-${post.title}-${voteId}`}
-                  className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
-                  <div className="flex w-full gap-2">
-                    <Radio
-                      color="blue"
-                      crossOrigin={undefined}
-                      name={`option-${post.title}`}
-                      id={`option-${post.title}-${voteId}`}
-                      ripple={false}
-                      className="hover:before:opacity-0"
-                      containerProps={{
-                        className: 'p-0',
-                      }}
-                      onClick={() => handleVote(voteId)}
-                      checked={selectedVoteId === voteId}
-                    />
-                    <span className="text-black">{name}</span>
-                  </div>
-                  <span className="text-[var(--blue-02)]">
-                    {totalVoteCount
-                      ? (votesCount.get(voteId) / totalVoteCount) * 100
-                      : votesCount.get(voteId)}
-                    %
-                  </span>
-                </label>
-              </div>
-            ))}
-          </List>
+                  key={voteId}
+                  className="p-0 mb-2 border-2 rounded-lg relative">
+                  <div
+                    style={{
+                      transform: `scaleX(${
+                        totalVoteCount
+                          ? votesCount.get(voteId) / totalVoteCount
+                          : 0
+                      })`,
+                    }}
+                    className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left`}></div>
+                  <label
+                    htmlFor={`option-${post.title}-${voteId}`}
+                    className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
+                    <div className="flex w-full gap-2">
+                      <Radio
+                        color="blue"
+                        crossOrigin={undefined}
+                        name={`option-${post.title}`}
+                        id={`option-${post.title}-${voteId}`}
+                        ripple={false}
+                        className="hover:before:opacity-0"
+                        containerProps={{
+                          className: 'p-0',
+                        }}
+                        onClick={() => handleVote(voteId)}
+                        onChange={() => {}}
+                        checked={selectedVoteId === voteId}
+                      />
+                      <span className="text-black">{name}</span>
+                    </div>
+                    <span className="text-[var(--blue-02)]">
+                      {totalVoteCount
+                        ? (votesCount.get(voteId) / totalVoteCount) * 100
+                        : votesCount.get(voteId)}
+                      %
+                    </span>
+                  </label>
+                </div>
+              ))}
+            </List>
+          )}
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">

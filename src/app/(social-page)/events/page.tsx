@@ -12,6 +12,7 @@ import { roboto } from '../../ui/fonts'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import toast, { Toaster } from 'react-hot-toast'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page() {
   const pathname = usePathname()
@@ -152,22 +153,7 @@ export default function Page() {
     <>
       <Thumbnail />
       <div className="xl:w-[1264px] flex flex-col xl:flex-row justify-between gap-x-8 m-auto">
-        <Toaster
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
+        <CustomToaster />
         <div className="flex flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>

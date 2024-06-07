@@ -10,6 +10,7 @@ import Cookies from 'js-cookie'
 import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'
 import { useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page() {
   const status = 'pending'
@@ -76,22 +77,7 @@ export default function Page() {
 
   return (
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 py-4 px-10">
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <p
         className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
         Yêu cầu xét duyệt cựu sinh viên - #{totalCount}

@@ -24,6 +24,8 @@
     --layer: #183b5642; /* Màu nền của chữ sau bản tin */
     --comment-input: #f0f2f5;
     --highlight-bg: #e7f3ff;
+    --toast-success: #003f88;
+    --toast-error: #ea7b7b;
 }
 
 @media (prefers-color-scheme: dark) {

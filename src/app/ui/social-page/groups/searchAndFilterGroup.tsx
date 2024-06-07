@@ -7,14 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 
 const filterPrivacy = [
-  { id: '0', name: 'Tất cả', value: '' },
+  { id: '0', name: 'Tất cả', value: '0' },
   { id: '1', name: 'Công khai', value: 'PUBLIC' },
   { id: '2', name: 'Riêng tư', value: 'PRIVATE' },
 ]
 const filterIsJoined = [
-  { id: '0', name: 'Tất cả', value: '' },
+  { id: '0', name: 'Tất cả', value: '0' },
   { id: '1', name: 'Đã tham gia', value: 'true' },
-  { id: '2', name: 'Khám phá', value: 'false' },
+  { id: '2', name: 'Chưa tham gia', value: 'false' },
 ]
 
 interface SearchAndFilterGroupProps {
@@ -39,45 +39,36 @@ export default function SearchAndFilterGroups({
   const { register, reset } = useForm({
     defaultValues: {
       name: params.name,
-      privacy: params.privacy,
-      isJoined: params.isJoined,
     },
   })
-
-  const [valueIsJoined, setValueIsJoined] = React.useState('')
+  const [privacy, setPrivacy] = useState(params.privacy || '0')
+  const [isJoined, setIsJoined] = useState(params.isJoined || '0')
 
   return (
     <div className="flex items-end gap-4 w-full flex-wrap xl:flex-nowrap">
       <div className="flex flex-col gap-2 lg:basis-1/2">
-        <p className="font-semibold text-md">Tìm kiếm nhóm</p>
         <Input
           crossOrigin={undefined}
           placeholder={undefined}
           //containerProps={{ className: 'max-w-[80%]' }}
+          label="Tìm kiếm nhóm"
           {...register('name', {
             onChange: (e) => onSearch(e.target.value),
           })}
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 "
         />
       </div>
 
       <div className="flex flex-col gap-2 w-[130px] xl:w-[150px]">
-        <p className="font-semibold text-md">Quyền riêng tư</p>
         <Select
           placeholder={undefined}
-          style={{
-            position: 'relative',
-          }}
-          className="bg-white !border-blue-gray-200 focus:!border-gray-900 hover:cursor-pointer pl-3 text-black w-[130px] xl:w-[150px]"
+          label="Quyền riêng tư"
+          className="text-black w-[130px] xl:w-[150px] relative"
           labelProps={{
-            className: 'before:content-none after:content-none',
+            className: 'w-[130px] xl:w-[150px]',
           }}
+          value={privacy}
           onChange={(value) => {
-            const event = { target: { value } }
-            register('privacy').onChange(event)
+            setPrivacy(value)
             onFilterPrivacy(value)
           }}>
           {filterPrivacy.map(({ id, name, value }) => (
@@ -89,22 +80,17 @@ export default function SearchAndFilterGroups({
       </div>
 
       <div className="flex flex-col gap-2 w-[130px] xl:w-[150px]">
-        <p className="font-semibold text-md">Nhóm của tôi</p>
         <Select
           placeholder={undefined}
-          style={{
-            position: 'relative',
-          }}
-          className="bg-white !border-blue-gray-200 focus:!border-gray-900 hover:cursor-pointer text-black w-[130px] xl:w-[150px]"
+          label="Trạng thái"
+          className="text-black w-[130px] xl:w-[150px] relative"
           labelProps={{
-            className: 'before:content-none after:content-none',
+            className: 'w-[130px] xl:w-[150px]',
           }}
-          value={valueIsJoined}
+          value={isJoined}
           onChange={(value) => {
-            const event = { target: { value } }
-            register('isJoined').onChange(event)
+            setIsJoined(value)
             onFilterMyGroup(value)
-            setValueIsJoined(value)
           }}>
           {filterIsJoined.map(({ id, name, value }) => {
             return (
@@ -119,7 +105,8 @@ export default function SearchAndFilterGroups({
       <Button
         onClick={() => {
           onResetFilter()
-          setValueIsJoined('')
+          setPrivacy('0')
+          setIsJoined('0')
         }}
         placeholder={undefined}
         className="bg-[--blue-02] w-fit text-nowrap normal-case text-sm flex items-center gap-1">
