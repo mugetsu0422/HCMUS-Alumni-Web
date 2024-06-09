@@ -18,7 +18,7 @@ import {
 } from '@material-tailwind/react'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { ReactTags } from 'react-tag-autocomplete'
-import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import NoData from '../../../ui/no-data'
 import axios from 'axios'
 import Cookies from 'js-cookie'

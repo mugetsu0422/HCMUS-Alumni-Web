@@ -25,6 +25,7 @@ import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
 import CustomToaster from '../../common/custom-toaster'
+import Tag from '../../common/tag'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -172,7 +173,7 @@ export default function NewsListItem({
       <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black p-2 font-[600] flex flex-col gap-1">
         {tags &&
           tags.map((tag) => {
-            return <span key={tag.name}>{tag.name}</span>
+            return <Tag key={tag.id} name={tag.name} />
           })}
       </p>
 
