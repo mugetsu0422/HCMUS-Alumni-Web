@@ -24,7 +24,6 @@ interface FunctionSectionProps {
   selectedTags: TagSelected[]
   onAddTags: (tag: Tag) => void
   onDeleteTags: (index: number) => void
-  onClearAllTags: () => void
   onResetAll: () => void
 }
 
@@ -203,11 +202,7 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedTags]
   )
-
-  const onClearAllTags = () => {
-    setSelectedTags([])
-  }
-
+  
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
@@ -236,7 +231,6 @@ export default function Page() {
         selectedTags={selectedTags}
         onAddTags={onAddTags}
         onDeleteTags={onDeleteTags}
-        onClearAllTags={onClearAllTags}
       />
 
       <div className="overflow-x-auto">

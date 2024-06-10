@@ -52,7 +52,7 @@ export default function SearchAndFilter({
         <div className="flex flex-col gap-2">
           <p className="font-semibold text-md">Thẻ</p>
           <select
-            className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+            className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
             {...register('tagsId', {
               onChange: (e) => onFilterTag(e.target.value),
             })}>

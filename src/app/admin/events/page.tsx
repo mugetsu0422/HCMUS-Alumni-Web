@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Input, Button } from '@material-tailwind/react'
 import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { roboto } from '../../ui/fonts'
@@ -14,22 +14,27 @@ import { JWT_COOKIE, FACULTIES, TAGS } from '../../constant'
 import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
+import { TagSelected, Tag } from 'react-tag-autocomplete'
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
-  onFilterTag: (keyword: string) => void
   onFilterFaculties: (keyword: string) => void
+  selectedTags: TagSelected[]
+  onAddTags: (tag: Tag) => void
+  onDeleteTags: (index: number) => void
   onResetAll: () => void
 }
 
 function FuntionSection({
   onSearch,
   onResetAll,
-  onFilterTag,
   onFilterFaculties,
+  selectedTags,
+  onAddTags,
+  onDeleteTags,
 }: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -62,10 +67,11 @@ function FuntionSection({
         </div>
 
         <FilterAdmin
-          onFilterTag={onFilterTag}
           onFilterFaculties={onFilterFaculties}
+          selectedTags={selectedTags}
+          onAddTags={onAddTags}
+          onDeleteTags={onDeleteTags}
           params={{
-            tagsId: params.get('tagsId'),
             facultyId: params.get('facultyId'),
           }}
         />
@@ -106,6 +112,11 @@ export default function Page() {
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [events, setEvents] = useState([])
+  const [selectedTags, setSelectedTags] = useState(() => {
+    const tagNames = params.get('tagNames')
+    if (!tagNames) return []
+    return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
+  })
 
   const resetCurPage = () => {
     params.delete('page')
@@ -127,6 +138,7 @@ export default function Page() {
   const onResetAll = () => {
     resetCurPage()
     replace(pathname)
+    setSelectedTags([])
     setMyParams(`?mode=${FETCH_MODE}`)
   }
   const onNextPage = () => {
@@ -168,16 +180,34 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     onChangeMyParams()
   }
-  const onFilterTag = (tag: string) => {
-    if (tag != '0') {
-      params.set('tagsId', tag)
-    } else {
-      params.delete('tagsId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
-    onChangeMyParams()
-  }
+  const onAddTags = useCallback(
+    (newTag) => {
+      const newTags = [...selectedTags, newTag]
+      setSelectedTags(newTags)
+      params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
+      setSelectedTags(newTags)
+      if (newTags.length == 0) {
+        params.delete('tagNames')
+      } else {
+        params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      }
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
 
   useEffect(() => {
     axios
@@ -200,10 +230,12 @@ export default function Page() {
         Quản lý sự kiện
       </p>
       <FuntionSection
-        onFilterFaculties={onFilterFaculties}
-        onFilterTag={onFilterTag}
         onSearch={onSearch}
         onResetAll={onResetAll}
+        onFilterFaculties={onFilterFaculties}
+        selectedTags={selectedTags}
+        onAddTags={onAddTags}
+        onDeleteTags={onDeleteTags}
       />
 
       <div className="overflow-x-auto">

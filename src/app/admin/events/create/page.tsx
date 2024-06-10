@@ -3,9 +3,9 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { nunito } from '../../../ui/fonts'
 import toast, { Toaster } from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import { JWT_COOKIE, FACULTIES, TAGS } from '../../../constant'
+import { JWT_COOKIE, FACULTIES, TAGS, TAGS_LIMIT } from '../../../constant'
 import { useRouter } from 'next/navigation'
 import {
   Input,
@@ -73,15 +73,16 @@ function CancelDialog({ open, handleOpen }) {
 
 export default function Page() {
   const {
+    control,
     register,
     handleSubmit,
-    trigger,
     watch,
     formState: { errors },
   } = useForm()
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
   const [selectedTags, setSelectedTags] = useState([])
+  const tagsInputRef = useRef(null)
 
   const onSubmit = async (data) => {
     const event = {
@@ -90,9 +91,9 @@ export default function Page() {
       organizationTime: moment(data.organizationTime).format(
         'YYYY-MM-DD HH:mm:ss'
       ),
-      tagsId: selectedTags.map((tag) => {
+      tagNames: selectedTags.map((tag) => {
         return tag.value
-      }),
+      }).join(','),
     }
 
     const postToast = toast.loading('Đang đăng')
@@ -195,7 +196,6 @@ export default function Page() {
                 variant="outlined"
                 min={today}
                 type="datetime-local"
-                step={900} // Set step to 900 seconds (15 minutes)
                 {...register('organizationTime', {
                   required: 'Vui lòng nhập thời gian diễn ra',
                 })}
@@ -313,13 +313,20 @@ export default function Page() {
           <div className="flex flex-col gap-2">
             <label className="text-xl font-bold">Thẻ</label>
             <ReactTags
-              activateFirstOption={true}
-              placeholderText="Thêm thẻ"
+              ref={tagsInputRef}
+              id="tags-input-validity-description"
+              suggestions={[]}
               selected={selectedTags}
-              suggestions={TAGS}
               onAdd={onAddTags}
               onDelete={onDeleteTags}
-              noOptionsText="No matching countries"
+              isInvalid={selectedTags.length > TAGS_LIMIT}
+              ariaErrorMessage="tags-input-error"
+              ariaDescribedBy="tags-input-validity-description"
+              allowNew={true}
+              activateFirstOption={true}
+              placeholderText="Nhập thẻ"
+              newOptionText="Thêm thẻ %value%"
+              noOptionsText="Không tim thấy the %value%"
               classNames={{
                 root: `${styles['react-tags']}`,
                 rootIsActive: `${styles['is-active']}`,
@@ -338,6 +345,25 @@ export default function Page() {
                 highlight: `${styles['react-tags__listbox-option-highlight']}`,
               }}
             />
+            <Controller
+              name="tagsDummy"
+              control={control}
+              render={() => <input type="text" className="hidden" />}
+              rules={{
+                validate: {
+                  validateTagsInput: () => {
+                    if (selectedTags.length > 5) {
+                      tagsInputRef.current.input.focus()
+                      return false
+                    }
+                    return true
+                  },
+                },
+              }}
+            />
+            {selectedTags.length > TAGS_LIMIT && (
+              <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+            )}
           </div>
 
           <div className="flex flex-col gap-2">

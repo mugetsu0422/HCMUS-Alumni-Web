@@ -1,7 +1,6 @@
 'use client'
 
 import React, {
-  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -21,8 +20,7 @@ import {
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import { FACULTIES, JWT_COOKIE, TAGS, TAGS_LIMIT } from '../../../constant'
-import toast, { Toaster } from 'react-hot-toast'
-import Image from 'next/image'
+import toast from 'react-hot-toast'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
 import NoData from '../../../ui/no-data'
