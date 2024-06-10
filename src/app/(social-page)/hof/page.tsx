@@ -55,7 +55,7 @@ function SearchAndFilter({
         crossOrigin={undefined}
         label="Tìm kiếm ..."
         placeholder={undefined}
-        containerProps={{ className: 'w-full sm:!w-[500px]' }}
+        containerProps={{ className: 'h-[50px] w-full sm:!w-[500px]' }}
         {...register('title', {
           onChange: (e) => onSearch(e.target.value),
         })}
@@ -98,7 +98,7 @@ function SearchAndFilter({
               className: 'before:content-none after:content-none',
             }}
             containerProps={{
-              className: '!min-w-[100px] !w-[100px]',
+              className: 'h-[50px] !min-w-[100px] !w-[100px]',
             }}
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
           />

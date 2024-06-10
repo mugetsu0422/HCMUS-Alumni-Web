@@ -62,7 +62,7 @@ export default function FilterAdmin({
             className: 'before:content-none after:content-none',
           }}
           containerProps={{
-            className: '!min-w-[100px] !w-[100px]',
+            className: 'h-[50px] !min-w-[100px] !w-[100px]',
           }}
           className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
         />

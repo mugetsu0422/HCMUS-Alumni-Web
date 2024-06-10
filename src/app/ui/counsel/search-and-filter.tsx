@@ -37,7 +37,7 @@ export default function SearchAndFilter({
           size="lg"
           crossOrigin={undefined}
           placeholder={undefined}
-          containerProps={{ className: '!w-[500px]' }}
+          containerProps={{ className: 'h-[50px] !w-[500px]' }}
           {...register('title', {
             onChange: (e) => onSearch(e.target.value),
           })}
@@ -45,6 +45,7 @@ export default function SearchAndFilter({
           labelProps={{
             className: 'before:content-none after:content-none',
           }}
+          
         />
       </div>
 

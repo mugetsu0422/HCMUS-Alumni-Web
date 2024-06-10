@@ -139,10 +139,10 @@ export default function Page() {
   return (
     <>
       <Thumbnail />
-      <div className="flex flex-row justify-center gap-x-8 m-auto mb-8">
+      <div className="flex flex-row justify-center gap-x-8 m-auto mb-8 px-10">
         <div className="flex flex-col gap-y-6 mt-10">
           <p
-            className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+            className={`${roboto.className} ml-8 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
             TIN TỨC
           </p>
 

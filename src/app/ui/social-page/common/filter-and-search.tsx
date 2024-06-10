@@ -40,7 +40,7 @@ export default function SearchAndFilterFaculty({
   })
 
   return (
-    <div className="w-full flex flex-wrap px-8 md:px-0 items-end gap-4">
+    <div className="w-full flex flex-wrap items-end gap-4">
       <div className="w-full sm:w-[500px] xl:w-[800px] flex gap-5 justify-start flex-wrap">
         <div className="h-full w-full mr-auto flex flex-col gap-2">
           <p className="font-semibold text-md">Tìm kiếm {name}</p>
@@ -53,6 +53,9 @@ export default function SearchAndFilterFaculty({
             })}
             labelProps={{
               className: 'before:content-none after:content-none',
+            }}
+            containerProps={{
+              className: 'h-[50px]',
             }}
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
           />

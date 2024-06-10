@@ -62,6 +62,9 @@ function FuntionSection({
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
+            containerProps={{
+              className: 'h-[50px]',
+            }}
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
           />
         </div>
@@ -202,7 +205,7 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedTags]
   )
-  
+
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
