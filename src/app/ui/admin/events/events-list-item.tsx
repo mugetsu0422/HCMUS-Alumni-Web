@@ -166,12 +166,12 @@ export default function EventsListItem({
       <p className="h-20 px-2 w-[350px] py-2 font-[600] text-black align-middle flex items-center">
         {title}
       </p>
-      <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black py-2 font-[600] flex flex-col gap-1 items-center">
+      <div className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black py-2 font-[600] flex flex-col gap-2 items-center">
         {tags &&
           tags.map((tag) => {
             return <Tag key={tag.id} name={tag.name} />
           })}
-      </p>
+      </div>
       <p className="w-[12rem] h-20 text-center text-black py-2 font-[600] flex justify-center items-center">
         {faculty ? faculty.name : 'Tất cả'}
       </p>

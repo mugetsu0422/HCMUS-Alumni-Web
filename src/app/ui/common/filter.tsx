@@ -1,31 +1,33 @@
 'use client'
 import React from 'react'
-import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
-import { Button } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
-import { FACULTIES, TAGS } from '../../constant'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FACULTIES } from '../../constant'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
+import { ReactTags, Tag, TagSelected } from 'react-tag-autocomplete'
 
 interface SearchAndFilterFacultyProps {
-  onFilterTag: (tagsId: string) => void
   onFilterFaculties: (facultyId: string) => void
-  params: { tagsId: string | null; facultyId: string | null }
+  selectedTags: TagSelected[]
+  onAddTags: (tag: Tag) => void
+  onDeleteTags: (index: number) => void
+  params: { facultyId: string | null }
 }
 
 export default function Filter({
   onFilterFaculties,
-  onFilterTag,
+  selectedTags,
+  onAddTags,
+  onDeleteTags,
   params,
 }: SearchAndFilterFacultyProps) {
   const { register, reset } = useForm({
     values: {
-      tagsId: params.tagsId || 0,
       facultyId: params.facultyId || 0,
     },
   })
 
   return (
-    <div className={`w-fit flex items-end gap-5 flex-wrap`}>
+    <div className={`w-full flex items-end gap-5 flex-wrap`}>
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Khoa</p>
         <select
@@ -44,22 +46,36 @@ export default function Filter({
         </select>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="w-full md:w-[500px] flex flex-col gap-2 flex-shrink">
         <p className="font-semibold text-md">Thẻ</p>
-        <select
-          className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-          {...register('tagsId', {
-            onChange: (e) => onFilterTag(e.target.value),
-          })}>
-          <option value={0}>Tất cả</option>
-          {TAGS.map(({ value, label }) => {
-            return (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            )
-          })}
-        </select>
+        <ReactTags
+          suggestions={[]}
+          selected={selectedTags}
+          onAdd={onAddTags}
+          onDelete={onDeleteTags}
+          allowNew={true}
+          activateFirstOption={true}
+          placeholderText="Nhập thẻ"
+          newOptionText="Thêm thẻ %value%"
+          noOptionsText="Không tim thấy the %value%"
+          classNames={{
+            root: `${styles['react-tags']}`,
+            rootIsActive: `${styles['is-active']}`,
+            rootIsDisabled: `${styles['is-disabled']}`,
+            rootIsInvalid: `${styles['is-invalid']}`,
+            label: `${styles['react-tags__label']}`,
+            tagList: `${styles['react-tags__list']}`,
+            tagListItem: `${styles['react-tags__list-item']}`,
+            tag: `${styles['react-tags__tag']}`,
+            tagName: `${styles['react-tags__tag-name']}`,
+            comboBox: `${styles['react-tags__combobox']}`,
+            input: `${styles['react-tags__combobox-input']}`,
+            listBox: `${styles['react-tags__listbox']}`,
+            option: `${styles['react-tags__listbox-option']}`,
+            optionIsActive: `${styles['is-active']}`,
+            highlight: `${styles['react-tags__listbox-option-highlight']}`,
+          }}
+        />
       </div>
     </div>
   )

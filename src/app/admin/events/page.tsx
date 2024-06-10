@@ -42,8 +42,8 @@ function FuntionSection({
 
   return (
     <div className="my-5 w-full max-w-[1650px] m-auto flex flex-wrap items-end justify-between gap-5">
-      <div className="flex gap-5 flex-wrap">
-        <div className="h-full w-[500px] mr-auto flex flex-col gap-2">
+      <div className="w-[800px] flex gap-5 justify-start flex-wrap">
+        <div className="h-full w-full mr-auto flex flex-col gap-2">
           <p className="font-semibold text-md">Tìm kiếm sự kiện </p>
           <Input
             size="lg"

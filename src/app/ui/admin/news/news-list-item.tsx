@@ -170,12 +170,12 @@ export default function NewsListItem({
         {name}
       </p>
 
-      <p className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black p-2 font-[600] flex flex-col gap-1">
+      <div className="w-[8rem] max-h-20 scrollbar-webkit-main overflow-y-auto text-left text-black p-2 font-[600] flex flex-col gap-2">
         {tags &&
           tags.map((tag) => {
             return <Tag key={tag.id} name={tag.name} />
           })}
-      </p>
+      </div>
 
       <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
         {faculty ? faculty.name : 'Tất cả'}

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import NewsListItem from '../../ui/admin/news/news-list-item'
 import SortHeader from '../../ui/admin/news/sort-header'
 import { Input, Button } from '@material-tailwind/react'
@@ -16,19 +16,25 @@ import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import { TagSelected, Tag } from 'react-tag-autocomplete'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
-  onFilterTag: (keyword: string) => void
   onFilterFaculties: (keyword: string) => void
+  selectedTags: TagSelected[]
+  onAddTags: (tag: Tag) => void
+  onDeleteTags: (index: number) => void
+  onClearAllTags: () => void
   onResetAll: () => void
 }
 
 function FuntionSection({
   onSearch,
   onResetAll,
-  onFilterTag,
   onFilterFaculties,
+  selectedTags,
+  onAddTags,
+  onDeleteTags,
 }: FunctionSectionProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -41,9 +47,9 @@ function FuntionSection({
 
   return (
     <div className="my-5 w-full max-w-[1220px] justify-between flex flex-wrap items-end gap-5 m-auto">
-      <div className="w-[500px] flex gap-5 justify-start flex-wrap">
+      <div className="w-[800px] flex gap-5 justify-start flex-wrap">
         <div className="h-full w-full mr-auto flex flex-col gap-2">
-          <p className="font-semibold text-md">Tìm kiếm vai trò</p>
+          <p className="font-semibold text-md">Tìm kiếm tin tức</p>
 
           <Input
             size="lg"
@@ -62,10 +68,11 @@ function FuntionSection({
         </div>
 
         <FilterAdmin
-          onFilterTag={onFilterTag}
           onFilterFaculties={onFilterFaculties}
+          selectedTags={selectedTags}
+          onAddTags={onAddTags}
+          onDeleteTags={onDeleteTags}
           params={{
-            tagsId: params.get('tagsId'),
             facultyId: params.get('facultyId'),
           }}
         />
@@ -103,6 +110,11 @@ export default function Page() {
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [news, setNews] = useState([])
+  const [selectedTags, setSelectedTags] = useState(() => {
+    const tagNames = params.get('tagNames')
+    if (!tagNames) return []
+    return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
+  })
 
   const resetCurPage = () => {
     params.delete('page')
@@ -122,6 +134,7 @@ export default function Page() {
   const onResetAll = () => {
     resetCurPage()
     replace(pathname)
+    setSelectedTags([])
     setMyParams(``)
   }
 
@@ -162,15 +175,37 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }
-  const onFilterTag = (tag: string) => {
-    if (tag != '0') {
-      params.set('tagsId', tag)
-    } else {
-      params.delete('tagsId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?${params.toString()}`)
+  const onAddTags = useCallback(
+    (newTag) => {
+      const newTags = [...selectedTags, newTag]
+      setSelectedTags(newTags)
+      params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
+      setSelectedTags(newTags)
+      if (newTags.length == 0) {
+        params.delete('tagNames')
+      } else {
+        params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      }
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+
+  const onClearAllTags = () => {
+    setSelectedTags([])
   }
 
   useEffect(() => {
@@ -197,8 +232,11 @@ export default function Page() {
       <FuntionSection
         onSearch={onSearch}
         onResetAll={onResetAll}
-        onFilterTag={onFilterTag}
         onFilterFaculties={onFilterFaculties}
+        selectedTags={selectedTags}
+        onAddTags={onAddTags}
+        onDeleteTags={onDeleteTags}
+        onClearAllTags={onClearAllTags}
       />
 
       <div className="overflow-x-auto">
