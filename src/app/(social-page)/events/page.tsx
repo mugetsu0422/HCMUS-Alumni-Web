@@ -176,7 +176,7 @@ export default function Page() {
     <>
       <CustomToaster />
       <Thumbnail />
-      <div className="max-w-[1264px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+      <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
         <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>

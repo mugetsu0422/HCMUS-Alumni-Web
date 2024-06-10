@@ -2,7 +2,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useState } from 'react'
+import React, { Fragment, useCallback, useRef, useState } from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import {
   XLg,
@@ -13,10 +13,10 @@ import {
 } from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
 import ErrorInput from '../../../ui/error-input'
-import { set, useFieldArray, useForm } from 'react-hook-form'
+import { Controller, set, useFieldArray, useForm } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import { TAGS, JWT_COOKIE } from '../../../constant'
+import { TAGS, JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
@@ -34,12 +34,16 @@ export default function CreatePostDialog() {
     defaultValues: {
       title: '',
       content: '',
+      tagsDummy: '',
       votes: null,
     },
   })
   const voteFieldArray = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormProvider)
     name: 'votes', // unique name for your Field Array
+    rules: {
+      maxLength: 10,
+    },
   })
 
   const [previewImages, setPreviewImages] = useState([])
@@ -47,6 +51,7 @@ export default function CreatePostDialog() {
   const [selectedTags, setSelectedTags] = useState([])
   const [openAddingPoll, setOpenAddingPoll] = useState(false)
   const [openAddingImage, setOpenAddingImage] = useState(false)
+  const tagsInputRef = useRef(null)
 
   const handleOpenAddingPost = () => {
     if (openAddingPoll) {
@@ -58,7 +63,6 @@ export default function CreatePostDialog() {
     }
     setOpenAddingPoll((e) => !e)
   }
-
   const handleOpenAdingImage = () => {
     if (openAddingImage) {
       setPreviewImages([])
@@ -165,7 +169,7 @@ export default function CreatePostDialog() {
       content: data.content,
       votes: !openAddingPoll ? [] : data.votes,
       tags: selectedTags.map((tag) => {
-        return { id: tag.value }
+        return { name: tag.value }
       }),
     }
 
@@ -183,6 +187,7 @@ export default function CreatePostDialog() {
           toast.success('Đăng thành công', {
             id: postToast,
           })
+          return
         }
 
         // Update post if there are images
@@ -267,13 +272,20 @@ export default function CreatePostDialog() {
         />
 
         <ReactTags
-          activateFirstOption={true}
-          placeholderText="Thêm thẻ"
+          ref={tagsInputRef}
+          id="tags-input-validity-description"
+          suggestions={[]}
           selected={selectedTags}
-          suggestions={TAGS}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
-          noOptionsText="No matching countries"
+          isInvalid={selectedTags.length > TAGS_LIMIT}
+          ariaErrorMessage="tags-input-error"
+          ariaDescribedBy="tags-input-validity-description"
+          allowNew={true}
+          activateFirstOption={true}
+          placeholderText="Nhập thẻ"
+          newOptionText="Thêm thẻ %value%"
+          noOptionsText="Không tim thấy the %value%"
           classNames={{
             root: `${styles['react-tags']}`,
             rootIsActive: `${styles['is-active']}`,
@@ -292,6 +304,25 @@ export default function CreatePostDialog() {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
+        <Controller
+          name="tagsDummy"
+          control={control}
+          render={() => <input type="text" className="hidden" />}
+          rules={{
+            validate: {
+              validateTagsInput: () => {
+                if (selectedTags.length > 5) {
+                  tagsInputRef.current.input.focus()
+                  return false
+                }
+                return true
+              },
+            },
+          }}
+        />
+        {selectedTags.length > TAGS_LIMIT && (
+          <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+        )}
 
         {openAddingPoll && (
           <VotingPostForm
@@ -430,36 +461,39 @@ function VotingPostForm({
             <XLg className="text-lg" />
           </Button>
         </div>
-        {fields.map((field, index) => {
-          return (
-            <div key={field.id}>
-              <div className="flex items-center mb-2">
-                <Input
-                  crossOrigin={undefined}
-                  type="text"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  label={`Lựa chọn ${index + 1}`}
-                  {...register(`votes.${index}.name`, {
-                    required: 'Vui lòng nhập tên lựa chọn',
-                  })}
+        <div className="flex flex-col gap-4">
+          {fields.map((field, index) => {
+            return (
+              <Fragment key={field.id}>
+                <div className="flex items-center">
+                  <Input
+                    crossOrigin={undefined}
+                    type="text"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    label={`Lựa chọn ${index + 1}`}
+                    {...register(`votes.${index}.name`, {
+                      required: 'Vui lòng nhập tên lựa chọn',
+                    })}
+                  />
+                  <Button
+                    variant="text"
+                    placeholder={undefined}
+                    className="mr-1 p-2 cursor-pointer"
+                    onClick={() => remove(index)} // Pass event object
+                  >
+                    <XLg className="text-lg" />
+                  </Button>
+                </div>
+                <ErrorInput
+                  // This is the error message
+                  errors={errors?.votes?.[index]?.name?.message}
                 />
-                <Button
-                  variant="text"
-                  placeholder={undefined}
-                  className="mr-1 p-2 cursor-pointer"
-                  onClick={() => remove(index)} // Pass event object
-                >
-                  <XLg className="text-lg" />
-                </Button>
-              </div>
-              <ErrorInput
-                // This is the error message
-                errors={errors?.votes?.[index]?.name?.message}
-              />
-            </div>
-          )
-        })}
+              </Fragment>
+            )
+          })}
+        </div>
         <Button
+          disabled={fields.length >= TAGS_LIMIT}
           placeholder={undefined}
           onClick={() => append({ name: '' })}
           className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">

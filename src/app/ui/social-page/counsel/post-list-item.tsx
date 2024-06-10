@@ -394,9 +394,14 @@ export default function PostListItem({ post }: { post: PostProps }) {
                     </div>
                     <div>
                       <p>Chỉnh sửa bài viết</p>
-                      <p className="text-sm text-wrap">
-                        Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
-                      </p>
+                      {post.votes.length
+                        ? true
+                        : false && (
+                            <p className="text-sm text-wrap">
+                              Không thể chỉnh sửa bài viết có cuộc thăm dò ý
+                              kiến
+                            </p>
+                          )}
                     </div>
                   </Link>
                 </MenuItem>

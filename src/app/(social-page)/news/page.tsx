@@ -2,18 +2,13 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Input } from '@material-tailwind/react'
-import { Calendar, TagFill } from 'react-bootstrap-icons'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import Link from 'next/link'
-import moment from 'moment'
 import Pagination from '../../ui/common/pagination'
 import { roboto } from '../../ui/fonts'
-import { useForm } from 'react-hook-form'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import NewsListItem from '../../ui/social-page/news/news-litst-item'
@@ -139,8 +134,8 @@ export default function Page() {
   return (
     <>
       <Thumbnail />
-      <div className="flex flex-row justify-center gap-x-8 m-auto mb-8 px-10">
-        <div className="flex flex-col gap-y-6 mt-10">
+      <div className="max-w-[1200px] flex flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+        <div className="w-full flex flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} ml-8 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
             TIN TỨC

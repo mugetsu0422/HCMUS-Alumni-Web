@@ -10,7 +10,6 @@ import { FACULTIES, TAGS } from '../../constant'
 import Pagination from '../../ui/common/pagination'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
@@ -49,68 +48,74 @@ function SearchAndFilter({
   })
 
   return (
-    <div className="flex items-end gap-2 w-fit ml-5 lg:ml-0">
-      <Input
-        size="lg"
-        crossOrigin={undefined}
-        label="Tìm kiếm ..."
-        placeholder={undefined}
-        containerProps={{ className: 'h-[50px] w-full sm:!w-[500px]' }}
-        {...register('title', {
-          onChange: (e) => onSearch(e.target.value),
-        })}
-      />
+    <div className="flex gap-4 w-fit flex-wrap">
+      <div className="h-full w-full sm:!w-[500px] flex flex-col gap-2">
+        <p className="font-semibold text-md">Tìm kiếm gương thành công</p>
+        <Input
+          size="lg"
+          crossOrigin={undefined}
+          placeholder={undefined}
+          containerProps={{ className: 'h-[50px] w-full' }}
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
+          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+          {...register('title', {
+            onChange: (e) => onSearch(e.target.value),
+          })}
+        />
+      </div>
 
-      <div className="flex items-end gap-4 flex-wrap">
-        <div className="flex flex-col gap-2">
-          <p className="font-semibold text-md">Khoa</p>
-          <select
-            className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-            {...register('facultyId', {
-              onChange: (e) => onFilter(e.target.value),
-            })}>
-            <option value={0}>Tất cả</option>
-            {FACULTIES.map(({ id, name }) => {
-              return (
-                <option key={id} value={id}>
-                  {name}
-                </option>
-              )
-            })}
-          </select>
-        </div>
+      <div className="flex flex-col gap-2">
+        <p className="font-semibold text-md">Khoa</p>
+        <select
+          className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+          {...register('facultyId', {
+            onChange: (e) => onFilter(e.target.value),
+          })}>
+          <option value={0}>Tất cả</option>
+          {FACULTIES.map(({ id, name }) => {
+            return (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            )
+          })}
+        </select>
+      </div>
 
-        <div className="flex flex-col gap-2">
-          <p className="font-semibold text-md">Khóa</p>
-          <Input
-            size="lg"
-            crossOrigin={undefined}
-            variant="outlined"
-            type="text"
-            maxLength={4}
-            {...register('beginningYear', {
-              onChange: (e) => {
-                const newVal = e.target.value.replace(/[^0-9]/g, '')
-                onFilterBeginningYear(newVal)
-              },
-            })}
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            containerProps={{
-              className: 'h-[50px] !min-w-[100px] !w-[100px]',
-            }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-          />
-        </div>
+      <div className="flex flex-col gap-2">
+        <p className="font-semibold text-md">Khóa</p>
+        <Input
+          size="lg"
+          crossOrigin={undefined}
+          variant="outlined"
+          type="text"
+          maxLength={4}
+          {...register('beginningYear', {
+            onChange: (e) => {
+              const newVal = e.target.value.replace(/[^0-9]/g, '')
+              onFilterBeginningYear(newVal)
+            },
+          })}
+          labelProps={{
+            className: 'before:content-none after:content-none',
+          }}
+          containerProps={{
+            className: 'h-[50px] !min-w-[100px] !w-[100px]',
+          }}
+          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+        />
+      </div>
 
+      <div className="flex items-end">
         <Button
           onClick={() => {
             onResetFilter()
             reset({ facultyId: 0, beginningYear: null })
           }}
           placeholder={undefined}
-          className="bg-[--blue-02] w-fit normal-case text-sm flex items-center gap-1">
+          className="bg-[--blue-02] w-fit h-[50px] normal-case text-sm flex items-center gap-1">
           Xóa bộ lọc
           <FontAwesomeIcon icon={faFilterCircleXmark} className="text-lg" />
         </Button>
@@ -241,38 +246,40 @@ export default function Page() {
 
   return (
     <>
-      <Thumbnail />
+      <CustomToaster />
 
-      <div className="flex flex-col w-[80%] gap-6 max-w-[80rem] m-auto mt-10">
-        <CustomToaster />
-        <p
-          className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
-          GƯƠNG THÀNH CÔNG
-        </p>
-        <SearchAndFilter
-          onSearch={onSearch}
-          onFilter={onFilter}
-          onFilterBeginningYear={onFilterBeginningYear}
-          onResetFilter={onResetFilter}
-          params={{
-            title: params.get('title'),
-            facultyId: params.get('facultyId'),
-            beginningYear: params.get('beginningYear'),
-          }}
-        />
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-10 gap-y-6">
-          {hof.map((hof) => (
-            <HofListItem key={hof.id} hof={hof} />
-          ))}
+      <Thumbnail />
+      <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+        <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
+          <p
+            className={`${roboto.className} text-3xl font-bold text-[var(--blue-02)]`}>
+            GƯƠNG THÀNH CÔNG
+          </p>
+          <SearchAndFilter
+            onSearch={onSearch}
+            onFilter={onFilter}
+            onFilterBeginningYear={onFilterBeginningYear}
+            onResetFilter={onResetFilter}
+            params={{
+              title: params.get('title'),
+              facultyId: params.get('facultyId'),
+              beginningYear: params.get('beginningYear'),
+            }}
+          />
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-10 gap-y-6">
+            {hof.map((hof) => (
+              <HofListItem key={hof.id} hof={hof} />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <Pagination
+              totalPages={totalPages}
+              curPage={curPage}
+              onNextPage={onNextPage}
+              onPrevPage={onPrevPage}
+            />
+          )}
         </div>
-        {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          curPage={curPage}
-          onNextPage={onNextPage}
-          onPrevPage={onPrevPage}
-        />
-      )}
       </div>
     </>
   )

@@ -17,11 +17,11 @@ import toast, { Toaster } from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { TAGS, JWT_COOKIE } from '../../../../../constant'
-import styles from '../../../../../ui/admin/react-tag-autocomplete.module.css'
-import ErrorInput from '../../../../../ui/error-input'
-import { nunito } from '../../../../../ui/fonts'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import { JWT_COOKIE, TAGS } from '@/app/constant'
+import ErrorInput from '@/app/ui/error-input'
+import { nunito } from '@/app/ui/fonts'
 
 export default function Page({ params }: { params: { id: string } }) {
   const {

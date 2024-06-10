@@ -41,7 +41,7 @@ export default function SearchAndFilterFaculty({
 
   return (
     <div className="w-full flex flex-wrap items-end gap-4">
-      <div className="w-full sm:w-[500px] xl:w-[800px] flex gap-5 justify-start flex-wrap">
+      <div className="w-full flex gap-5 justify-start flex-wrap">
         <div className="h-full w-full mr-auto flex flex-col gap-2">
           <p className="font-semibold text-md">Tìm kiếm {name}</p>
           <Input
@@ -61,7 +61,7 @@ export default function SearchAndFilterFaculty({
           />
         </div>
 
-        <div className="flex items-end gap-4 flex-wrap">
+        <div className="w-full flex items-end gap-4 flex-wrap">
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-md">Khoa</p>
             <select
@@ -80,7 +80,7 @@ export default function SearchAndFilterFaculty({
             </select>
           </div>
 
-          <div className="w-full sm:w-[500px] flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-2 md:flex-1">
             <p className="font-semibold text-md">Thẻ</p>
             <ReactTags
               suggestions={[]}
@@ -111,18 +111,18 @@ export default function SearchAndFilterFaculty({
               }}
             />
           </div>
+          <Button
+            onClick={() => {
+              onResetFilter()
+              reset({ facultyId: 0 })
+            }}
+            placeholder={undefined}
+            className="bg-[--blue-02] w-fit h-[50px] normal-case text-sm flex items-center gap-1">
+            Xóa bộ lọc
+            <FontAwesomeIcon icon={faFilterCircleXmark} className="text-lg" />
+          </Button>
         </div>
       </div>
-      <Button
-        onClick={() => {
-          onResetFilter()
-          reset({ facultyId: 0 })
-        }}
-        placeholder={undefined}
-        className="bg-[--blue-02] w-fit normal-case text-sm flex items-center gap-1">
-        Xóa bộ lọc
-        <FontAwesomeIcon icon={faFilterCircleXmark} className="text-lg" />
-      </Button>
     </div>
   )
 }

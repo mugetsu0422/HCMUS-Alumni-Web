@@ -15,7 +15,7 @@ export default function NewsListItem({
   thumbnail,
 }) {
   return (
-    <div className="flex lg:flex-row flex-col justify-center items-center gap-6">
+    <div className="flex lg:flex-row flex-col items-center gap-6">
       <Link href={`/news/${id}`} className="w-[20rem] xl:w-[20rem] h-52 ">
         <img
           src={thumbnail}
