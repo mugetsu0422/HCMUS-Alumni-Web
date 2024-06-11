@@ -1,4 +1,5 @@
 export const SALT = 15
+import Introduce from './ui/social-page/groups/introduce'
 export const EMAIL_ACTIVATION_CODE_TIMER = 59000 // 59s
 export const JWT_COOKIE = 'jwt'
 export const JWT_EXPIRED_TIME = 3 // 3 days
@@ -36,3 +37,40 @@ export const POST_STATUS = {
 export const REACTION_TYPE = {
   Like: 1,
 }
+
+export const PROFILE_TABS = [
+  {
+    label: 'Giới thiệu',
+    url: 'about',
+  },
+  {
+    label: 'Hoạt động',
+    url: 'joined-events',
+  },
+]
+
+export const PROFILE_ABOUT_TABS = [
+  {
+    label: 'Thông tin cơ bản và liên hệ',
+    url: '',
+  },
+  {
+    label: 'Công việc và học vấn',
+    url: 'work-and-education',
+  },
+  {
+    label: 'Thành tựu nổi bật',
+    url: 'achievements',
+  },
+]
+
+export const PROFILE_JOINED_EVENTS_TABS = [
+  {
+    label: 'Hoạt động đã tham gia',
+    url: '',
+  },
+  {
+    label: 'Tư vấn & cố vấn',
+    url: 'counsel-posts',
+  },
+]
