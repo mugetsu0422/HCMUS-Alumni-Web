@@ -2,10 +2,10 @@
 
 import React, { useState, useRef, useCallback } from 'react'
 import { nunito } from '../../../ui/fonts'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import { JWT_COOKIE, FACULTIES, TAGS, TAGS_LIMIT } from '../../../constant'
+import { JWT_COOKIE, FACULTIES, TAGS_LIMIT } from '../../../constant'
 import { useRouter } from 'next/navigation'
 import {
   Input,

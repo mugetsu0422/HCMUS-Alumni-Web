@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { FACULTIES, TAGS } from '../../../constant'
+import { FACULTIES } from '../../../constant'
 import { Button, Input } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

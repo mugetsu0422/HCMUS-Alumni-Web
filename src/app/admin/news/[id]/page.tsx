@@ -19,7 +19,7 @@ import {
 } from '@material-tailwind/react'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import { FACULTIES, JWT_COOKIE, TAGS, TAGS_LIMIT } from '../../../constant'
+import { FACULTIES, JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
 import toast from 'react-hot-toast'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'

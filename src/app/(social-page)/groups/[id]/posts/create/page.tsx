@@ -19,7 +19,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import CustomToaster from '@/app/ui/common/custom-toaster'
-import { JWT_COOKIE, TAGS } from '@/app/constant'
+import { JWT_COOKIE } from '@/app/constant'
 import ErrorInput from '@/app/ui/error-input'
 import { nunito } from '@/app/ui/fonts'
 
@@ -241,7 +241,7 @@ export default function Page({ params }: { params: { id: string } }) {
           activateFirstOption={true}
           placeholderText="Thêm thẻ"
           selected={selectedTags}
-          suggestions={TAGS}
+          suggestions={[]}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
           noOptionsText="No matching countries"
