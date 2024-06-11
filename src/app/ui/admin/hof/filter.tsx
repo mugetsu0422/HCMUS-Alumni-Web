@@ -29,7 +29,7 @@ export default function FilterAdmin({
       <div className="flex flex-col gap-2">
         <p className="font-semibold text-md">Khoa</p>
         <select
-          className="h-[2.8rem] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+          className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
           {...register('facultyId', {
             onChange: (e) => onFilterFaculties(e.target.value),
           })}>
@@ -62,7 +62,7 @@ export default function FilterAdmin({
             className: 'before:content-none after:content-none',
           }}
           containerProps={{
-            className: '!min-w-[100px] !w-[100px]',
+            className: 'h-[50px] !min-w-[100px] !w-[100px]',
           }}
           className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
         />

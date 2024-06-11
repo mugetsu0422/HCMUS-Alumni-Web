@@ -6,12 +6,12 @@ import { Button, Input, Textarea } from '@material-tailwind/react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { nunito } from '../../../../ui/fonts'
 import ErrorInput from '../../../../ui/error-input'
-import { set, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
-import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import { TAGS, JWT_COOKIE } from '../../../../constant'
 import axios from 'axios'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import NoData from '../../../../ui/no-data'
@@ -193,10 +193,10 @@ export default function Page({ params }: { params: { id: string } }) {
         setValue('title', title)
         setValue('content', content)
         setSelectedTags(
-          tags.map((tag) => {
-            const { id } = tag
-            return TAGS.find(({ value }) => value === id)
-          })
+          tags.map((tag) => ({
+            value: tag.name,
+            label: tag.name,
+          }))
         )
         setVotes(votes)
         setCurrentImages(pictures)

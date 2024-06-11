@@ -5,12 +5,10 @@ import React, { useState } from 'react'
 import {
   Avatar,
   Button,
-  Radio,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
-  List,
 } from '@material-tailwind/react'
 import {
   TagFill,
@@ -28,7 +26,6 @@ import axios, { AxiosResponse } from 'axios'
 
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
-import { useRouter } from 'next/navigation'
 import { useTruncatedElement } from '../../../../hooks/use-truncated-element'
 import {
   JWT_COOKIE,
@@ -42,6 +39,7 @@ import { nunito } from '../../fonts'
 import ReactionDialog from '../../common/reaction-dialog'
 import clsx from 'clsx'
 import DeletePostDialog from './delete-post-dialog'
+import Poll from '../../common/poll'
 
 interface PostProps {
   id: string
@@ -60,6 +58,8 @@ interface PostProps {
     voteCount: number
     isVoted: boolean
   }[]
+  allowMultipleVotes: boolean
+  allowAddOptions: boolean
   isReacted: boolean
   reactionCount: number
   permissions: {
@@ -92,40 +92,69 @@ export default function PostListItem({ post }: { post: PostProps }) {
     })
     return map
   })
-  const [selectedVoteId, setSelectedVoteId] = useState(() => {
-    if (!post.votes) return null
-    const vote = post.votes.find(({ isVoted }) => isVoted)
-    return vote ? vote.id.voteId : null
+  const [selectedVoteIds, setSelectedVoteIds] = useState<Set<number>>(() => {
+    const set = new Set<number>()
+    post.votes.forEach(({ isVoted, id: { voteId } }) => {
+      if (isVoted) set.add(voteId)
+    })
+    return set
   })
+  const [votes, setVotes] = useState(post.votes)
 
   const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
 
   const handleOpenDeletePostDialog = () => {
     setOpenDeletePostDialog((e) => !e)
   }
-  const handleVote = async (voteId: number) => {
+  const handleVote = async (allowMultipleVotes: boolean, voteId: number) => {
     try {
-      if (selectedVoteId === null) {
-        // Post
-        await onVote(voteId)
-        setTotalVoteCount((old) => old + 1)
-        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) + 1))
-        setVotesCount(temp)
-      } else if (selectedVoteId !== voteId) {
-        // Update
-        await onChangeVote(selectedVoteId, voteId)
-        votesCount.set(selectedVoteId, votesCount.get(selectedVoteId) - 1)
-        votesCount.set(voteId, votesCount.get(voteId) + 1)
-        const temp = new Map(votesCount)
-        setVotesCount(temp)
-      } else {
+      if (selectedVoteIds.has(voteId)) {
         // Delete
         setTotalVoteCount((old) => old - 1)
         const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
         setVotesCount(temp)
-        await onRemoveVote(selectedVoteId)
+        await onRemoveVote(voteId)
+
+        selectedVoteIds.delete(voteId)
+      } else {
+        if (allowMultipleVotes) {
+          // Add vote
+          await onVote(voteId)
+          setTotalVoteCount((old) => old + 1)
+          const temp = new Map(
+            votesCount.set(voteId, votesCount.get(voteId) + 1)
+          )
+          setVotesCount(temp)
+
+          selectedVoteIds.add(voteId)
+        } else {
+          if (selectedVoteIds.size) {
+            // Update vote
+            const oldVoteId = Array.from(selectedVoteIds)[0]
+
+            await onChangeVote(oldVoteId, voteId)
+            votesCount.set(oldVoteId, votesCount.get(oldVoteId) - 1)
+            votesCount.set(voteId, votesCount.get(voteId) + 1)
+            const temp = new Map(votesCount)
+            setVotesCount(temp)
+
+            selectedVoteIds.clear()
+            selectedVoteIds.add(voteId)
+            setSelectedVoteIds(new Set(selectedVoteIds))
+          } else {
+            // Add vote
+            await onVote(voteId)
+            setTotalVoteCount((old) => old + 1)
+            const temp = new Map(
+              votesCount.set(voteId, votesCount.get(voteId) + 1)
+            )
+            setVotesCount(temp)
+
+            selectedVoteIds.add(voteId)
+          }
+        }
       }
-      setSelectedVoteId(voteId === selectedVoteId ? null : voteId)
+      setSelectedVoteIds(new Set(selectedVoteIds))
     } catch (error) {
       toast.error(error.response.data.error?.message || 'Lỗi không xác định')
     }
@@ -343,6 +372,27 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
     )
   }
+  const onAddVoteOption = (vote: string) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes`,
+        vote,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { vote } }) => {
+        setVotes((old) => [...old, vote])
+
+        votesCount.set(vote.id.voteId, 0)
+        setVotesCount(new Map(votesCount))
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      })
+  }
 
   return (
     !isDeleted && (
@@ -394,9 +444,11 @@ export default function PostListItem({ post }: { post: PostProps }) {
                     </div>
                     <div>
                       <p>Chỉnh sửa bài viết</p>
-                      <p className="text-sm text-wrap">
-                        Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
-                      </p>
+                      {post.votes.length ? (
+                        <p className="text-sm text-wrap">
+                          Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                        </p>
+                      ) : null}
                     </div>
                   </Link>
                 </MenuItem>
@@ -454,55 +506,18 @@ export default function PostListItem({ post }: { post: PostProps }) {
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
 
-          {/* this is the footer of the body */}
-
-          {post.votes.length !== 0 && (
-            <List
-              placeholder={undefined}
-              className="w-full flex flex-col bg-[#f8fafc] p-4 my-2 rounded-lg">
-              {post.votes.map(({ name, id: { voteId } }) => (
-                <div
-                  key={voteId}
-                  className="p-0 mb-2 border-2 rounded-lg relative">
-                  <div
-                    style={{
-                      transform: `scaleX(${
-                        totalVoteCount
-                          ? votesCount.get(voteId) / totalVoteCount
-                          : 0
-                      })`,
-                    }}
-                    className={`bg-[var(--highlight-bg)] w-full h-full absolute top-0 bottom-0 left-0 transition-transform duration-300 origin-left`}></div>
-                  <label
-                    htmlFor={`option-${post.title}-${voteId}`}
-                    className="flex justify-between w-full cursor-pointer px-6 py-4 gap-2 rounded-lg shadow relative">
-                    <div className="flex w-full gap-2">
-                      <Radio
-                        color="blue"
-                        crossOrigin={undefined}
-                        name={`option-${post.title}`}
-                        id={`option-${post.title}-${voteId}`}
-                        ripple={false}
-                        className="hover:before:opacity-0"
-                        containerProps={{
-                          className: 'p-0',
-                        }}
-                        onClick={() => handleVote(voteId)}
-                        onChange={() => {}}
-                        checked={selectedVoteId === voteId}
-                      />
-                      <span className="text-black">{name}</span>
-                    </div>
-                    <span className="text-[var(--blue-02)]">
-                      {totalVoteCount
-                        ? (votesCount.get(voteId) / totalVoteCount) * 100
-                        : votesCount.get(voteId)}
-                      %
-                    </span>
-                  </label>
-                </div>
-              ))}
-            </List>
+          {votes.length !== 0 && (
+            <Poll
+              allowMultipleVotes={post.allowMultipleVotes}
+              allowAddOptions={post.allowAddOptions}
+              votes={votes}
+              totalVoteCount={totalVoteCount}
+              selectedVoteIds={selectedVoteIds}
+              votesCount={votesCount}
+              handleVote={handleVote}
+              onAddVoteOption={onAddVoteOption}
+              postId={post.id}
+            />
           )}
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (

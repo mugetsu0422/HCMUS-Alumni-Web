@@ -27,7 +27,7 @@ export default function CreatePost() {
           placeholder={undefined}
           size="sm"
           variant="text"
-          className="p-3 normal-case text-left rounded-full w-full text-md font-normal">
+          className="p-3 px-5 normal-case text-left rounded-full w-full text-md font-normal">
           Bạn đang cần tư vấn?
         </Button>
       </Link>
