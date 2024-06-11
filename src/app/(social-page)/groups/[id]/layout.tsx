@@ -181,8 +181,7 @@ export default function GroupLayout({
                     placeholder={undefined}
                     className="rounded-none border-b border-blue-gray-50 bg-transparent p-0 z-0"
                     indicatorProps={{
-                      className:
-                        'bg-transparent border-b-2 border-[--blue-05] shadow-none rounded-none z-0',
+                      className: 'bg-[#e6f0fb] shadow-none rounded-none z-0',
                     }}>
                     {GROUP_TABS.map(({ label, url, rolesRequired }) => {
                       if (rolesRequired.includes(group.userRole))
@@ -193,9 +192,12 @@ export default function GroupLayout({
                             value={url}
                             onClick={() => handleClickTab(url)}
                             className={clsx({
-                              'text-nowrap w-fit px-6 py-4': true,
-                              'text-[--blue-05]': activeTab === url,
-                            })}>
+                              'sm:text-wrap xl:text-nowrap sm:w-[190px] lg:w-fit font-bold px-4 py-2 xl:px-6 xl:py-4 flex justify-start text-[14px] lg:text-base':
+                                true,
+                              'sm:text-wrap xl:text-nowrap text-[--blue-05] sm:w-[190px] lg:w-full  border-b-2 border-[--blue-05] flex justify-start bg-[#e6f0fb] text-[14px] lg:text-base':
+                                activeTab === url,
+                            })}
+                            activeClassName="text-[--blue-05] bg-[#e6f0fb]">
                             {label}
                           </Tab>
                         )

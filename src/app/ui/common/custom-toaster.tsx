@@ -8,8 +8,12 @@ export default function CustomToaster() {
       toastOptions={{
         success: {
           style: {
-            background: 'var(--toast-success)',
-            color: 'white',
+            background: 'var(--blue-03)',
+            color: 'black',
+          },
+          iconTheme: {
+            primary: 'var(--toast-success)',
+            secondary: '#FFFAEE',
           },
         },
         error: {
