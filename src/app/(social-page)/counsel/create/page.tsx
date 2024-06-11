@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { Fragment, useCallback, useRef, useState } from 'react'
-import { Button, Input, Textarea } from '@material-tailwind/react'
+import { Button, Checkbox, Input, Textarea } from '@material-tailwind/react'
 import {
   XLg,
   ArrowLeft,
@@ -29,6 +29,7 @@ export default function CreatePostDialog() {
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -36,6 +37,8 @@ export default function CreatePostDialog() {
       content: '',
       tagsDummy: '',
       votes: null,
+      allowAddOptions: false,
+      allowMultipleVotes: false,
     },
   })
   const voteFieldArray = useFieldArray({
@@ -56,6 +59,8 @@ export default function CreatePostDialog() {
   const handleOpenAddingPost = () => {
     if (openAddingPoll) {
       voteFieldArray.remove()
+      setValue('allowAddOptions', false)
+      setValue('allowMultipleVotes', false)
     } else {
       for (let i = 0; i < 3; i++) {
         voteFieldArray.append({ name: '' })
@@ -164,10 +169,9 @@ export default function CreatePostDialog() {
   )
 
   const onSubmit = (data) => {
+    const { tagsDummy, ...rest } = data
     const post = {
-      title: data.title,
-      content: data.content,
-      votes: !openAddingPoll ? [] : data.votes,
+      ...rest,
       tags: selectedTags.map((tag) => {
         return { name: tag.value }
       }),
@@ -491,7 +495,28 @@ function VotingPostForm({
               </Fragment>
             )
           })}
+          <div className="flex flex-col">
+            <Checkbox
+              crossOrigin={undefined}
+              type="checkbox"
+              label="Cho phép mọi người thêm lựa chọn"
+              className="h-6 w-6"
+              color="blue"
+              labelProps={{ className: 'text-black font-medium' }}
+              {...register('allowAddOptions')}
+            />
+            <Checkbox
+              crossOrigin={undefined}
+              type="checkbox"
+              label="Cho phép mọi người chọn nhiều lựa chọn"
+              className="h-6 w-6"
+              color="blue"
+              labelProps={{ className: 'text-black font-medium' }}
+              {...register('allowMultipleVotes')}
+            />
+          </div>
         </div>
+
         <Button
           disabled={fields.length >= TAGS_LIMIT}
           placeholder={undefined}
