@@ -13,18 +13,19 @@ import {
 } from 'react-bootstrap-icons'
 import { nunito } from '../../../ui/fonts'
 import ErrorInput from '../../../ui/error-input'
-import { Controller, set, useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import { TAGS, JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
+import { JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
 import axios from 'axios'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 
-export default function CreatePostDialog() {
+export default function Page() {
+  const router = useRouter()
   const {
     control,
     register,
@@ -191,6 +192,7 @@ export default function CreatePostDialog() {
           toast.success('Đăng thành công', {
             id: postToast,
           })
+          router.push(`/counsel/${id}`)
           return
         }
 
@@ -214,6 +216,7 @@ export default function CreatePostDialog() {
             toast.success('Đăng thành công', {
               id: postToast,
             })
+            router.push(`/counsel/${id}`)
           })
           .catch((error) => {
             toast.error(

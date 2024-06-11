@@ -1,16 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Avatar,
   Button,
-  Radio,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
-  List,
 } from '@material-tailwind/react'
 import {
   TagFill,
@@ -28,7 +26,6 @@ import axios, { AxiosResponse } from 'axios'
 
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
-import { useRouter } from 'next/navigation'
 import { useTruncatedElement } from '../../../../hooks/use-truncated-element'
 import {
   JWT_COOKIE,
@@ -391,8 +388,6 @@ export default function PostListItem({ post }: { post: PostProps }) {
 
         votesCount.set(vote.id.voteId, 0)
         setVotesCount(new Map(votesCount))
-
-        
       })
       .catch((error) => {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
