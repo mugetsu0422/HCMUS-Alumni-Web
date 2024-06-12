@@ -8,6 +8,8 @@ export const ADMIN_NEWS_PAGE_LIMIT = 10
 export const COMMENT_PAGE_SIZE = 50
 export const CHILDREN_COMMENTS_PAGE_SIZE = 50
 export const REACTION_PAGE_SIZE = 50
+export const TAGS_LIMIT = 5
+export const VOTE_OPTIONS_LIMIT = 10
 export const FACULTIES = [
   { id: '1', name: 'Công nghệ Thông tin' },
   { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
@@ -19,14 +21,9 @@ export const FACULTIES = [
   { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
   { id: '9', name: 'Môi trường' },
 ]
-export const TAGS = [
-  { value: 1, label: 'Cựu sinh viên' },
-  { value: 2, label: 'Trường học' },
-  { value: 3, label: 'Cộng đồng' },
-  { value: 4, label: 'Khởi nghiệp' },
-  { value: 5, label: 'Nghề nghiệp' },
-  { value: 6, label: 'Học tập' },
-  { value: 7, label: 'Việc làm' },
+export const GENDER = [
+  { id: '1', name: 'Nam' },
+  { id: '2', name: 'Nữ' },
 ]
 export const POST_STATUS = {
   Chờ: 1,

@@ -16,6 +16,14 @@ const nextConfig = {
     ],
     minimumCacheTTL: 30,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/groups/:id/posts',
+        destination: '/groups/:id',
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

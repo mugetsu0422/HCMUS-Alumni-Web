@@ -1,7 +1,6 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
-import PostListItem from '../../ui/common/post-list-item'
 
 import CreatePost from '../../ui/counsel/create-post'
 import axios from 'axios'
@@ -13,6 +12,8 @@ import SearchAndFilter from '../../ui/counsel/search-and-filter'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
+import PostListItem from '../../ui/social-page/counsel/post-list-item'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page() {
   const pathname = usePathname()
@@ -26,6 +27,11 @@ export default function Page() {
   const [posts, setPosts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [hasMore, setHasMore] = useState(true)
+  const [selectedTags, setSelectedTags] = useState(() => {
+    const tagNames = params.get('tagNames')
+    if (!tagNames) return []
+    return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
+  })
 
   const resetCurPage = () => {
     params.delete('page')
@@ -42,22 +48,39 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }, 500)
-  const onFilterTag = (tag: string) => {
-    if (tag != '0') {
-      params.set('tagsId', tag)
-    } else {
-      params.delete('tagsId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
-  }
+  const onAddTags = useCallback(
+    (newTag) => {
+      const newTags = [...selectedTags, newTag]
+      setSelectedTags(newTags)
+      params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
+      setSelectedTags(newTags)
+      if (newTags.length == 0) {
+        params.delete('tagNames')
+      } else {
+        params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      }
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
   const onResetFilter = () => {
-    params.delete('facultyId')
-    params.delete('tagsId')
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
+    replace(pathname)
+    setSelectedTags([])
+    setMyParams(``)
   }
   const onFetchMore = () => {
     curPage.current++
@@ -90,6 +113,7 @@ export default function Page() {
         },
       })
       .then(({ data: { totalPages, posts } }) => {
+        if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setPosts(posts)
 
@@ -100,32 +124,17 @@ export default function Page() {
 
   return (
     <>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <Thumbnail />
-      <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6">
+      <div className="mt-4 max-w-[850px] w-[80%] m-auto flex flex-col gap-6">
         <SearchAndFilter
+          selectedTags={selectedTags}
+          onAddTags={onAddTags}
+          onDeleteTags={onDeleteTags}
           onSearch={onSearch}
-          onFilterTag={onFilterTag}
           onResetFilter={onResetFilter}
           params={{
             title: params.get('title'),
-            tagsId: params.get('tagsId'),
           }}
         />
         <CreatePost />
@@ -140,7 +149,7 @@ export default function Page() {
               </div>
             }>
             {posts.map((post) => (
-              <PostListItem key={post.id} post={post} name="counsel" />
+              <PostListItem key={post.id} post={post} />
             ))}
           </InfiniteScroll>
         )}

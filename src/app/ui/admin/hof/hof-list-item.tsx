@@ -23,6 +23,7 @@ import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
+import CustomToaster from '../../common/custom-toaster'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -151,23 +152,7 @@ export default function HofListItem({ hof }) {
   return (
     <div
       className={`${nunito.className} border border-t-0 g border-[#CDCDCD] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <div className="h-[120px] w-[180px]">
         <img
           src={hof.thumbnail}

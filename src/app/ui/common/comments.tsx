@@ -309,6 +309,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                             try {
                               await onDeleteComment(e, comment.id)
                               setIsDeleted(true)
+                              toast.success('Xoá bình luận thành công')
                             } catch (error) {
                               toast.error(
                                 error.response.data.error.message ||

@@ -1,7 +1,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useEffect, useState, useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Avatar,
   Button,
@@ -11,6 +11,8 @@ import {
   MenuList,
   MenuItem,
   Spinner,
+  List,
+  Radio,
 } from '@material-tailwind/react'
 import {
   TagFill,
@@ -33,13 +35,18 @@ import {
   REACTION_PAGE_SIZE,
   REACTION_TYPE,
 } from '../../../constant'
-import ReactionDialog from '../../../ui/counsel/counsel-react-dialog'
+import ReactionDialog from '../../../ui/common/reaction-dialog'
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
+import DeletePostDialog from '../../../ui/social-page/counsel/delete-post-dialog'
+import { useRouter } from 'next/navigation'
+import CustomToaster from '@/app/ui/common/custom-toaster'
+import Poll from '@/app/ui/common/poll'
 
 export default function Page({ params }: { params: { id: string } }) {
+  const router = useRouter()
   const [post, setPost] = useState(null)
   const [noData, setNoData] = useState(false)
   const [comments, setComments] = useState([])
@@ -50,8 +57,69 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isReacted, setIsReacted] = useState(null)
   const [reactionCount, setReactionCount] = useState(null)
   const [reaction, setReaction] = useState([])
-  const ref = useRef(null)
+  const [totalVoteCount, setTotalVoteCount] = useState(0)
+  const [votesCount, setVotesCount] = useState(new Map())
+  const [selectedVoteIds, setSelectedVoteIds] = useState<Set<number>>(null)
+  const [votes, setVotes] = useState([])
+  const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
 
+  const handleOpenDeletePostDialog = () => {
+    setOpenDeletePostDialog((e) => !e)
+  }
+
+  const handleVote = async (allowMultipleVotes: boolean, voteId: number) => {
+    try {
+      if (selectedVoteIds.has(voteId)) {
+        // Delete
+        setTotalVoteCount((old) => old - 1)
+        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
+        setVotesCount(temp)
+        await onRemoveVote(voteId)
+
+        selectedVoteIds.delete(voteId)
+      } else {
+        if (allowMultipleVotes) {
+          // Add vote
+          await onVote(voteId)
+          setTotalVoteCount((old) => old + 1)
+          const temp = new Map(
+            votesCount.set(voteId, votesCount.get(voteId) + 1)
+          )
+          setVotesCount(temp)
+
+          selectedVoteIds.add(voteId)
+        } else {
+          if (selectedVoteIds.size) {
+            // Update vote
+            const oldVoteId = Array.from(selectedVoteIds)[0]
+
+            await onChangeVote(oldVoteId, voteId)
+            votesCount.set(oldVoteId, votesCount.get(oldVoteId) - 1)
+            votesCount.set(voteId, votesCount.get(voteId) + 1)
+            const temp = new Map(votesCount)
+            setVotesCount(temp)
+
+            selectedVoteIds.clear()
+            selectedVoteIds.add(voteId)
+            setSelectedVoteIds(new Set(selectedVoteIds))
+          } else {
+            // Add vote
+            await onVote(voteId)
+            setTotalVoteCount((old) => old + 1)
+            const temp = new Map(
+              votesCount.set(voteId, votesCount.get(voteId) + 1)
+            )
+            setVotesCount(temp)
+
+            selectedVoteIds.add(voteId)
+          }
+        }
+      }
+      setSelectedVoteIds(new Set(selectedVoteIds))
+    } catch (error) {
+      toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+    }
+  }
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
   }
@@ -178,6 +246,7 @@ export default function Page({ params }: { params: { id: string } }) {
       })
       .then(() => {
         toast.success('Xóa bài viết thành công')
+        router.push('/counsel')
       })
       .catch((error) => {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
@@ -218,6 +287,59 @@ export default function Page({ params }: { params: { id: string } }) {
       }
     )
   }
+  const onVote = (voteId: number) => {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${voteId}`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onChangeVote = (oldVoteId: number, newVoteId: number) => {
+    return axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${oldVoteId}`,
+      { updatedVoteId: newVoteId },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onRemoveVote = (voteId: number) => {
+    return axios.delete(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${voteId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onAddVoteOption = (vote: string) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes`,
+        vote,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { vote } }) => {
+        setVotes((old) => [...old, vote])
+
+        votesCount.set(vote.id.voteId, 0)
+        setVotesCount(new Map(votesCount))
+      })
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      })
+  }
 
   useEffect(() => {
     const postPromise = axios.get(
@@ -240,9 +362,31 @@ export default function Page({ params }: { params: { id: string } }) {
     Promise.all([postPromise, commentPromise])
       .then(([postRes, commentRes]) => {
         setPost(postRes.data)
+        setVotes(postRes.data.votes)
         setComments(commentRes.data.comments)
         setReactionCount(postRes.data.reactionCount)
         setIsReacted(postRes.data.isReacted)
+
+        setTotalVoteCount(() => {
+          if (!postRes.data.votes) return 0
+          return postRes.data.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
+        })
+        setVotesCount(() => {
+          const map = new Map()
+          if (!postRes.data.votes) return map
+          postRes.data.votes.forEach(({ id: { voteId }, voteCount }) => {
+            map.set(voteId, voteCount)
+          })
+          return map
+        })
+        setSelectedVoteIds(() => {
+          const set = new Set<number>()
+          postRes.data.votes.forEach(({ isVoted, id: { voteId } }) => {
+            if (isVoted) set.add(voteId)
+          })
+          return set
+        })
+
         setIsLoading(false)
       })
       .catch((error) => {
@@ -279,23 +423,7 @@ export default function Page({ params }: { params: { id: string } }) {
     return (
       <div
         className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto`}>
-        <Toaster
-          containerStyle={{ zIndex: 99999 }}
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
+        <CustomToaster />
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <Link href="#">
@@ -323,22 +451,36 @@ export default function Page({ params }: { params: { id: string } }) {
                 <ThreeDots className="text-xl text-black" />
               </Button>
             </MenuHandler>
-            <MenuList placeholder={undefined}>
+            <MenuList
+              placeholder={undefined}
+              className={`${nunito.className} max-w-[250px]`}>
               {post.permissions.edit && (
-                <Link href={`/counsel/${post.id}/edit`}>
-                  <MenuItem
-                    placeholder={undefined}
-                    className={`${nunito.className} text-black text-base flex items-center gap-2`}>
-                    <Pencil />
-                    <p>Chỉnh sửa bài viết</p>
-                  </MenuItem>
-                </Link>
+                <MenuItem
+                  disabled={post.votes.length ? true : false}
+                  placeholder={undefined}
+                  className={'text-black text-base'}>
+                  <Link
+                    href={`/counsel/${post.id}/edit`}
+                    className="flex items-center gap-2">
+                    <div>
+                      <Pencil />
+                    </div>
+                    <div>
+                      <p>Chỉnh sửa bài viết</p>
+                      {post.votes.length ? (
+                        <p className="text-sm text-wrap">
+                          Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                        </p>
+                      ) : null}
+                    </div>
+                  </Link>
+                </MenuItem>
               )}
               {post.permissions.delete && (
                 <MenuItem
-                  onClick={onDeletePost}
+                  onClick={handleOpenDeletePostDialog}
                   placeholder={undefined}
-                  className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+                  className={`text-black text-base flex items-center gap-2`}>
                   <Trash />
                   <p>Xóa bài viết</p>
                 </MenuItem>
@@ -371,7 +513,19 @@ export default function Page({ params }: { params: { id: string } }) {
             {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
           </div>
 
-          {/* this is the comment */}
+          {votes.length !== 0 && (
+            <Poll
+              allowMultipleVotes={post.allowMultipleVotes}
+              allowAddOptions={post.allowAddOptions}
+              votes={votes}
+              totalVoteCount={totalVoteCount}
+              selectedVoteIds={selectedVoteIds}
+              votesCount={votesCount}
+              handleVote={handleVote}
+              onAddVoteOption={onAddVoteOption}
+              postId={post.id}
+            />
+          )}
 
           {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
             <div className="flex flex-col">
@@ -486,6 +640,12 @@ export default function Page({ params }: { params: { id: string } }) {
             )}
           </div>
         </div>
+        <DeletePostDialog
+          postId={post.id}
+          openDeletePostDialog={openDeletePostDialog}
+          handleOpenDeletePostDialog={handleOpenDeletePostDialog}
+          onDelete={onDeletePost}
+        />
       </div>
     )
 }

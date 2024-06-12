@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
 import { useRouter } from 'next/navigation'
 import NoData from '../../../ui/no-data'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const roleNameToCategoryName = (roleName) => {
   switch (roleName) {
@@ -136,9 +137,8 @@ export default function Page({ params }: { params: { id: string } }) {
           id: putToast,
         })
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Có lỗi xảy ra', {
+      .catch((error) => {
+        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
           id: putToast,
         })
       })
@@ -211,7 +211,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
           setValue('name', role.name)
           setValue('description', role.description)
-          setDescriptionCharCount(role.description.length)
+          setDescriptionCharCount(role.description?.length || 0)
           const newMap = new Map(selectedRolePermissionMap)
           newMap.forEach((_, key, map) => map.set(key, false))
           role.permissions.forEach(({ id }) => {
@@ -233,23 +233,7 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>

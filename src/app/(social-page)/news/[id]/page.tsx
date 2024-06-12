@@ -6,12 +6,13 @@ import { Textarea, Button } from '@material-tailwind/react'
 import Comments from '../../../ui/common/comments'
 import { nunito } from '../../../ui/fonts'
 import axios, { AxiosResponse } from 'axios'
-import { JWT_COOKIE, TAGS } from '../../../constant'
+import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import NoData from '../../../ui/no-data'
 import moment from 'moment'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import RelatedNews from '../../../ui/social-page/news/related-news'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
@@ -191,22 +192,7 @@ export default function Page({ params }: { params: { id: string } }) {
   if (!isLoading)
     return (
       <div className="flex flex-col xl:flex-row m-auto max-w-[1000px] w-[80%]">
-        <Toaster
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
+        <CustomToaster />
         <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
           <div className="flex justify-between items-start">
             {news?.faculty ? (

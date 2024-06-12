@@ -1,19 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { Button, Input } from '@material-tailwind/react'
-import { Calendar, TagFill } from 'react-bootstrap-icons'
+import React, { useCallback, useEffect, useState } from 'react'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import Link from 'next/link'
-import moment from 'moment'
 import Pagination from '../../ui/common/pagination'
 import { roboto } from '../../ui/fonts'
-import { useForm } from 'react-hook-form'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import NewsListItem from '../../ui/social-page/news/news-litst-item'
@@ -28,6 +23,11 @@ export default function Page() {
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [news, setNews] = useState([])
+  const [selectedTags, setSelectedTags] = useState(() => {
+    const tagNames = params.get('tagNames')
+    if (!tagNames) return []
+    return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
+  })
 
   const resetCurPage = () => {
     params.delete('page')
@@ -45,16 +45,34 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }, 500)
 
-  const onFilter = (facultyId: string) => {
-    if (facultyId != '0') {
-      params.set('facultyId', facultyId)
-    } else {
-      params.delete('facultyId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
-  }
+  const onAddTags = useCallback(
+    (newTag) => {
+      const newTags = [...selectedTags, newTag]
+      setSelectedTags(newTags)
+      params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
+      setSelectedTags(newTags)
+      if (newTags.length == 0) {
+        params.delete('tagNames')
+      } else {
+        params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      }
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
 
   const onFilterFaculties = (facultyId: string) => {
     if (facultyId != '0') {
@@ -67,20 +85,10 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }
 
-  const onFilterTag = (tag: string) => {
-    if (tag != '0') {
-      params.set('tagsId', tag)
-    } else {
-      params.delete('tagsId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
-  }
-
   const onResetFilter = () => {
     params.delete('facultyId')
-    params.delete('tagsId')
+    params.delete('tagNames')
+    setSelectedTags([])
     resetCurPage()
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
@@ -126,23 +134,24 @@ export default function Page() {
   return (
     <>
       <Thumbnail />
-      <div className="xl:w-[1264px] flex flex-col xl:flex-row justify-between gap-x-8 m-auto">
-        <div className="flex flex-col gap-y-6 mt-10">
+      <div className="max-w-[1200px] flex flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+        <div className="w-full flex flex-col gap-y-6 mt-10">
           <p
-            className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+            className={`${roboto.className} ml-8 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
             TIN TỨC
           </p>
 
           <SearchAndFilterFaculty
             name="tin tức"
             onSearch={onSearch}
-            onFilter={onFilter}
+            onFilter={onFilterFaculties}
             onResetFilter={onResetFilter}
-            onFilterTag={onFilterTag}
+            selectedTags={selectedTags}
+            onAddTags={onAddTags}
+            onDeleteTags={onDeleteTags}
             params={{
               title: params.get('title'),
               facultyId: params.get('facultyId'),
-              tagsId: params.get('tagsID'),
             }}
           />
 

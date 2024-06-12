@@ -13,6 +13,8 @@ import {
   PencilFill,
 } from 'react-bootstrap-icons'
 import { Button, Input } from '@material-tailwind/react'
+import { useForm } from 'react-hook-form'
+import { FACULTIES, GENDER } from '@/app/constant'
 
 const user = {
   fullName: 'Trương Samuel',
@@ -27,6 +29,17 @@ const user = {
 
 export default function Page() {
   const [onpenEdit, setOpenEdit] = useState(false)
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const tomorrowString = tomorrow.toISOString().split('T')[0]
+
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    formState: { errors },
+  } = useForm()
 
   function handleOpenEdit() {
     setOpenEdit((e) => !e)
@@ -113,29 +126,35 @@ export default function Page() {
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-lg font-bold text-black">Khóa</label>
-                <Input
-                  crossOrigin={undefined}
-                  variant="outlined"
-                  type="text"
-                  // {...register('name', {
-                  //   required: 'Vui lòng nhập thành tựu',
-                  // })}
-                  labelProps={{
-                    className: 'before:content-none after:content-none ',
-                  }}
-                  className="!border-t-blue-gray-200 focus:!border-t-gray-900 "
-                />
-                {/* <ErrorInput errors={errors?.title?.message} /> */}
+                <select
+                  className="h-10 text-[14px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+                  {...register('facultyId')}>
+                  <option value={0}>Không</option>
+                  {FACULTIES.map(({ id, name }) => {
+                    return (
+                      <option key={id} value={id}>
+                        {name}
+                      </option>
+                    )
+                  })}
+                </select>
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-lg font-bold text-black">Khoa</label>
                 <Input
                   crossOrigin={undefined}
                   variant="outlined"
-                  type="text"
-                  // {...register('name', {
-                  //   required: 'Vui lòng nhập thành tựu',
-                  // })}
+                  type="number"
+                  {...register('beginningYear', {
+                    pattern: {
+                      value: /^\d{4}$/,
+                      message: 'Vui lòng nhập đúng 4 chữ số',
+                    },
+                  })}
+                  onInput={(e) => {
+                    const input = e.target as HTMLInputElement
+                    input.value = input.value.trim().slice(0, 4)
+                  }} //
                   labelProps={{
                     className: 'before:content-none after:content-none',
                   }}
@@ -168,10 +187,17 @@ export default function Page() {
               <Input
                 crossOrigin={undefined}
                 variant="outlined"
-                type="text"
-                // {...register('name', {
-                //   required: 'Vui lòng nhập thành tựu',
-                // })}
+                type="number"
+                {...register('MSSV', {
+                  pattern: {
+                    value: /^\d{4}$/,
+                    message: 'Vui lòng nhập đúng 4 chữ số',
+                  },
+                })}
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement
+                  input.value = input.value.trim().slice(0, 4)
+                }} //
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
@@ -198,17 +224,14 @@ export default function Page() {
           ) : (
             <div className="flex flex-col gap-2">
               <label className="text-lg font-bold text-black">Ngày sinh</label>
-              <Input
-                crossOrigin={undefined}
-                variant="outlined"
-                type="text"
-                // {...register('name', {
-                //   required: 'Vui lòng nhập thành tựu',
-                // })}
-                labelProps={{
-                  className: 'before:content-none after:content-none',
-                }}
-                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              <input
+                className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+                id="date"
+                type="date"
+                defaultValue={tomorrowString}
+                onFocus={(e) => e.target.showPicker()}
+                //onChange={(e) => onChange({ date: e.target.value })}
+                // {...register('date', {})}
               />
               {/* <ErrorInput errors={errors?.name?.message} /> */}
             </div>
@@ -236,19 +259,18 @@ export default function Page() {
           ) : (
             <div className="flex flex-col gap-2">
               <label className="text-lg font-bold text-black">Giới tính</label>
-              <Input
-                crossOrigin={undefined}
-                variant="outlined"
-                type="text"
-                // {...register('name', {
-                //   required: 'Vui lòng nhập thành tựu',
-                // })}
-                labelProps={{
-                  className: 'before:content-none after:content-none',
-                }}
-                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-              />
-              {/* <ErrorInput errors={errors?.name?.message} /> */}
+              <select
+                className="h-10 text-[14px] hover:cursor-pointer pl-3 pr-2 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+                {...register('gender')}>
+                <option value={0}>Không</option>
+                {GENDER.map(({ id, name }) => {
+                  return (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  )
+                })}
+              </select>
             </div>
           )}
         </div>
@@ -279,7 +301,7 @@ export default function Page() {
               <Input
                 crossOrigin={undefined}
                 variant="outlined"
-                type="text"
+                type="number"
                 // {...register('name', {
                 //   required: 'Vui lòng nhập thành tựu',
                 // })}

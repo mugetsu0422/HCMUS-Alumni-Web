@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { roboto } from '../../ui/fonts'
-import { Button } from '@material-tailwind/react'
+import { Button, Spinner } from '@material-tailwind/react'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
@@ -15,6 +15,8 @@ import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGr
 import { Plus } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import { Toaster } from 'react-hot-toast'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page() {
   const pathname = usePathname()
@@ -22,16 +24,11 @@ export default function Page() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
-  const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
+  const curPage = useRef(0)
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [totalPages, setTotalPages] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const [groups, setGroups] = useState([])
-
-  const { register, reset } = useForm({
-    defaultValues: {
-      name: params.get('name'),
-    },
-  })
 
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
@@ -39,14 +36,12 @@ export default function Page() {
     } else {
       params.delete('name')
     }
-    resetCurPage()
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }, 500)
   const onResetFilter = () => {
     params.delete('privacy')
     params.delete('isJoined')
-    resetCurPage()
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
@@ -56,7 +51,6 @@ export default function Page() {
     } else {
       params.delete('privacy')
     }
-    resetCurPage()
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
@@ -66,15 +60,33 @@ export default function Page() {
     } else {
       params.delete('isJoined')
     }
-    resetCurPage()
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
-  const resetCurPage = () => {
-    params.delete('page')
-    setCurPage(1)
-  }
 
+  const onFetchMore = () => {
+    curPage.current++
+    if (curPage.current >= totalPages) {
+      setHasMore(false)
+      return
+    }
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups${myParams}&page=${curPage.current}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { totalPages, groups: addedGroups } }) => {
+        setGroups(groups.concat(addedGroups))
+      })
+      .catch((error) => {
+        console.log(error.response.data.error.message || 'Lỗi không xác định')
+      })
+  }
   const onJoinGroup = (groupId: string): Promise<AxiosResponse<any, any>> => {
     return axios.post(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${groupId}/requests`,
@@ -88,17 +100,17 @@ export default function Page() {
   }
 
   useEffect(() => {
-    // News groups
+    curPage.current = 0
+    setHasMore(true)
+    // Fetch groups
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups${myParams}&statusId=${POST_STATUS['Bình thường']}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups${myParams}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
       .then(({ data: { totalPages, groups } }) => {
+        if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setGroups(groups)
       })
@@ -109,22 +121,7 @@ export default function Page() {
 
   return (
     <>
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <Thumbnail />
       <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
         <div className="flex justify-between">
@@ -136,7 +133,7 @@ export default function Page() {
             <Button
               placeholder={undefined}
               size="md"
-              className="text-white bg-[--blue-05] px-4 normal-case flex items-center justify-center gap-2">
+              className="text-white bg-[--blue-05] px-4 normal-case text-sm flex items-center justify-center gap-2">
               <Plus className="text-xl font-semibold" />
               Tạo nhóm mới
             </Button>
@@ -153,14 +150,24 @@ export default function Page() {
             isJoined: params.get('isJoined'),
           }}
         />
-
-        {groups.map((group) => (
-          <GroupsListItem
-            key={group.id}
-            group={group}
-            onJoinGroup={onJoinGroup}
-          />
-        ))}
+        <InfiniteScroll
+          className="flex flex-col gap-6"
+          dataLength={groups.length}
+          next={onFetchMore}
+          hasMore={hasMore}
+          loader={
+            <div className="h-10 my-5 flex justify-center">
+              <Spinner className="h-8 w-8"></Spinner>
+            </div>
+          }>
+          {groups.map((group) => (
+            <GroupsListItem
+              key={group.id}
+              group={group}
+              onJoinGroup={onJoinGroup}
+            />
+          ))}
+        </InfiniteScroll>
       </div>
     </>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import EventsListItem from '../../ui/social-page/events/events-list-item'
 import Pagination from '../../ui/common/pagination'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
@@ -12,6 +12,7 @@ import { roboto } from '../../ui/fonts'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import toast, { Toaster } from 'react-hot-toast'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page() {
   const pathname = usePathname()
@@ -23,6 +24,11 @@ export default function Page() {
   const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
   const [totalPages, setTotalPages] = useState(1)
   const [events, setEvents] = useState([])
+  const [selectedTags, setSelectedTags] = useState(() => {
+    const tagNames = params.get('tagNames')
+    if (!tagNames) return []
+    return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
+  })
 
   const resetCurPage = () => {
     params.delete('page')
@@ -39,7 +45,36 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }, 500)
 
-  const onFilter = (facultyId: string) => {
+  const onAddTags = useCallback(
+    (newTag) => {
+      const newTags = [...selectedTags, newTag]
+      setSelectedTags(newTags)
+      params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
+      setSelectedTags(newTags)
+      if (newTags.length == 0) {
+        params.delete('tagNames')
+      } else {
+        params.set('tagNames', newTags.map(({ value }) => value).join(','))
+      }
+      resetCurPage()
+      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      setMyParams(`?${params.toString()}`)
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedTags]
+  )
+
+  const onFilterFaculties = (facultyId: string) => {
     if (facultyId != '0') {
       params.set('facultyId', facultyId)
     } else {
@@ -50,21 +85,10 @@ export default function Page() {
     setMyParams(`?${params.toString()}`)
   }
 
-  const onFilterTag = (tag: string) => {
-    if (tag != '0') {
-      params.set('tagsId', tag)
-    } else {
-      params.delete('tagsId')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
-  }
-
   const onResetFilter = () => {
     params.delete('facultyId')
-    params.delete('tagsId')
-    resetCurPage()
+    params.delete('tagNames')
+    setSelectedTags([])
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }
@@ -150,25 +174,10 @@ export default function Page() {
 
   return (
     <>
+      <CustomToaster />
       <Thumbnail />
-      <div className="xl:w-[1264px] flex flex-col xl:flex-row justify-between gap-x-8 m-auto">
-        <Toaster
-          toastOptions={{
-            success: {
-              style: {
-                background: '#00a700',
-                color: 'white',
-              },
-            },
-            error: {
-              style: {
-                background: '#ea7b7b',
-                color: 'white',
-              },
-            },
-          }}
-        />
-        <div className="flex flex-col gap-y-6 mt-10">
+      <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+        <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
             SỰ KIỆN
@@ -176,16 +185,17 @@ export default function Page() {
           <SearchAndFilterFaculty
             name="sự kiện"
             onSearch={onSearch}
-            onFilter={onFilter}
+            onFilter={onFilterFaculties}
             onResetFilter={onResetFilter}
-            onFilterTag={onFilterTag}
+            selectedTags={selectedTags}
+            onAddTags={onAddTags}
+            onDeleteTags={onDeleteTags}
             params={{
               title: params.get('title'),
               facultyId: params.get('facultyId'),
-              tagsId: params.get('tagsId'),
             }}
           />
-          <div className="flex xl:w-[1264px] flex-col gap-6 justify-center mt-4">
+          <div className="flex flex-col gap-6 justify-center mt-4">
             {events.map((event) => (
               <EventsListItem
                 key={event.id}

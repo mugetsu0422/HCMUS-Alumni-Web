@@ -1,47 +1,43 @@
-/* eslint-disable jsx-a11y/alt-text */
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useState } from 'react'
-import {
-  XLg,
-  ArrowLeft,
-  FileEarmarkImage,
-  Image,
-  BarChartLine,
-} from 'react-bootstrap-icons'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
+import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { useForm } from 'react-hook-form'
-import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import axios from 'axios'
+import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
-import { TAGS, JWT_COOKIE } from '../../../../constant'
-import styles from '../../../../ui/admin/react-tag-autocomplete.module.css'
-import ErrorInput from '../../../../ui/error-input'
-import { nunito } from '../../../../ui/fonts'
+import { useRouter } from 'next/navigation'
+import { JWT_COOKIE } from '../../../../../../constant'
+import ErrorInput from '../../../../../../ui/error-input'
+import { nunito } from '../../../../../../ui/fonts'
+import NoData from '../../../../../../ui/no-data'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function Page({
+  params,
+}: {
+  params: { id: string; postId: string }
+}) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm()
 
+  const [noData, setNoData] = useState(false)
+  const [currentImages, setCurrentImages] = useState([])
   const [previewImages, setPreviewImages] = useState([])
-  const [imageFiles, setImageFiles] = useState([])
+  const [addedImageFiles, setAddedImageFiles] = useState([])
+  const [deleteImageIds, setDeleteImageIds] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
-  const [openAddingPost, setOpenAddingPost] = useState(false)
-  const [openAddinImage, setOpenAddinImage] = useState(false)
-
-  const handleOpenAdingPost = () => {
-    setOpenAddingPost((e) => !e)
-  }
-
-  const handleOpenAdingImage = () => {
-    setOpenAddinImage((e) => !e)
-  }
+  const router = useRouter()
+  const [options, setOptions] = useState([''])
+  const [votes, setVotes] = useState([])
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -58,7 +54,7 @@ export default function Page({ params }: { params: { id: string } }) {
         return
       }
     }
-    if (previewImages.length + files.length > 5) {
+    if (currentImages.length + previewImages.length + files.length > 5) {
       toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
       return
     }
@@ -66,7 +62,7 @@ export default function Page({ params }: { params: { id: string } }) {
     if (files.length > 0) {
       const newImages = [...previewImages]
       for (const file of files) {
-        setImageFiles((prev) => prev.concat(file))
+        setAddedImageFiles((prev) => prev.concat(file))
 
         const reader = new FileReader()
         reader.onload = (event) => {
@@ -93,7 +89,7 @@ export default function Page({ params }: { params: { id: string } }) {
             return
           }
         }
-        if (previewImages.length + files.length > 5) {
+        if (currentImages.length + previewImages.length + files.length > 5) {
           toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
           return
         }
@@ -102,7 +98,7 @@ export default function Page({ params }: { params: { id: string } }) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
 
-          setImageFiles((prev) => prev.concat(file))
+          setAddedImageFiles((prev) => prev.concat(file))
 
           const reader = new FileReader()
           reader.onload = (event) => {
@@ -120,7 +116,7 @@ export default function Page({ params }: { params: { id: string } }) {
       (image, imageIndex) => imageIndex !== index
     )
     setPreviewImages(newImages)
-    setImageFiles((prev) => prev.filter((_, i) => i !== index))
+    setAddedImageFiles((prev) => prev.filter((_, i) => i !== index))
   }
   const onAddTags = useCallback(
     (newTag) => {
@@ -142,88 +138,98 @@ export default function Page({ params }: { params: { id: string } }) {
         return { id: tag.value }
       }),
     }
+    const imagesForm = new FormData()
+    for (const image of addedImageFiles) {
+      imagesForm.append('addedImages', image)
+    }
+    for (const id of deleteImageIds) {
+      imagesForm.append('deletedImageIds', id)
+    }
 
-    const postToast = toast.loading('Đang đăng bài viết...')
+    const postToast = toast.loading('Đang cập nhật bài viết...')
 
-    // Upload post without images
+    const updatePromise = axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}`,
+      post,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    const updateImages = axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}/images`,
+      imagesForm,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    Promise.all([updatePromise, updateImages])
+      .then(() => {
+        toast.success('Cập nhật bài viết thành công', {
+          id: postToast,
+        })
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.error('Có lỗi xảy ra khi cập nhật bài viết', {
+          id: postToast,
+        })
+      })
+  }
+  useEffect(() => {
     axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`,
-        post,
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
           },
         }
       )
-      .then(({ data: postData }) => {
-        // Update post if there are images
-        const form = new FormData()
-        for (const image of imageFiles) {
-          form.append('addedImages', image)
-        }
-
-        axios
-          .put(
-            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${postData}/images`,
-            form,
-            {
-              headers: {
-                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-              },
-            }
-          )
-          .then(() => {
-            toast.success('Đăng thành công', {
-              id: postToast,
-            })
-          })
-          .catch((err) => {
-            console.error(err)
-            toast.error(err.response?.data?.error?.message, {
-              id: postToast,
-            })
-          })
+      .then(({ data: { title, content, tags, pictures, votes } }) => {
+        setValue('title', title)
+        setValue('content', content)
+        // setSelectedTags(
+        //   tags.map((tag) => {
+        //     const { id } = tag
+        //     return TAGS.find(({ value }) => value === id)
+        //   })
+        // )
+        setVotes(votes)
+        setCurrentImages(pictures)
       })
       .catch((err) => {
         console.error(err)
-        toast.error(err.response?.data?.error?.message, {
-          id: postToast,
-        })
+        setNoData(true)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (noData) {
+    return <NoData />
   }
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[600px] w-[80%] m-auto`}>
-      <Toaster
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
+      <CustomToaster />
       <div className="w-full flex">
-        <Link href={`/groups/${params.id}`}>
-          <Button
-            placeholder={undefined}
-            variant="text"
-            className="p-2 rounded-full">
-            <ArrowLeft className="text-xl" />
-          </Button>
-        </Link>
-
-        <p className="m-auto text-2xl text-black font-bold">Tạo bài viết mới</p>
+        <Button
+          onClick={() => router.push(`/groups/${params.id}`)}
+          placeholder={undefined}
+          variant="text"
+          className="p-2 rounded-full">
+          <ArrowLeft className="text-xl" />
+        </Button>
+        <p className="m-auto text-2xl text-black font-bold">
+          Chỉnh sửa bài viết
+        </p>
       </div>
+      {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <Input
@@ -255,7 +261,7 @@ export default function Page({ params }: { params: { id: string } }) {
           activateFirstOption={true}
           placeholderText="Thêm thẻ"
           selected={selectedTags}
-          suggestions={TAGS}
+          suggestions={[]}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
           noOptionsText="No matching countries"
@@ -277,48 +283,22 @@ export default function Page({ params }: { params: { id: string } }) {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
+        <VotingPostForm votes={votes} />
 
-        {openAddingPost && (
-          <VotingPostForm handleOpenAdingPost={handleOpenAdingPost} />
-        )}
-
-        {openAddinImage && (
-          <AddImagePost
-            handleOpenAdingImage={handleOpenAdingImage}
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-            onClickDropzone={onClickDropzone}
-            removeImage={removeImage}
-            previewImages={previewImages}
-          />
-        )}
-
-        {!openAddingPost && (
-          <Button
-            onClick={handleOpenAdingPost}
-            placeholder={undefined}
-            className="bg-[--blue-02] w-full m-auto normal-case flex gap-2 items-center justify-center">
-            <BarChartLine className="text-xl" />
-            Tạo bình chọn
-          </Button>
-        )}
-
-        {!openAddinImage && (
-          <Button
-            onClick={handleOpenAdingImage}
-            placeholder={undefined}
-            className="bg-[--blue-02] w-full m-auto normal-case flex gap-2 items-center justify-center">
-            <Image className="text-xl" />
-            Chọn ảnh
-          </Button>
-        )}
+        <AddImagePost
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          onClickDropzone={onClickDropzone}
+          removeImage={removeImage}
+          previewImages={previewImages}
+        />
 
         <Button
           placeholder={undefined}
           size="lg"
           type="submit"
-          className={`${nunito.className} h-12 w-full m-auto text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
-          Đăng
+          className={`${nunito.className} h-12 w-full text-center mb-5 py-2 px-4 bg-[var(--blue-05)] normal-case text-base`}>
+          Cập nhật
         </Button>
       </form>
     </div>
@@ -331,21 +311,10 @@ function AddImagePost({
   onClickDropzone,
   removeImage,
   previewImages,
-  handleOpenAdingImage,
 }) {
   return (
     <div>
-      <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
-        Thêm ảnh
-        <Button
-          variant="text"
-          placeholder={undefined}
-          className="z-10 mr-1 p-2 cursor-pointer"
-          onClick={handleOpenAdingImage} // Pass event object
-        >
-          <XLg className="text-lg" />
-        </Button>
-      </div>
+      <div className="flex text-gray-700 text-xl font-bold mb-2 ">Thêm ảnh</div>
       <div className="container flex flex-col items-end relative mx-auto my-2">
         <div
           className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
@@ -388,76 +357,39 @@ function AddImagePost({
   )
 }
 
-function VotingPostForm({ handleOpenAdingPost }) {
-  const [title, setTitle] = useState('')
-  const [options, setOptions] = useState([''])
-  const [posts, setPosts] = useState([])
-
-  const addPost = (post) => {
-    setPosts([...posts, post])
-  }
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options]
-    newOptions[index] = value
-    setOptions(newOptions)
-  }
-
-  const handleAddOption = () => {
-    setOptions([...options, ''])
-  }
-
-  const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index)
-    setOptions(newOptions)
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    addPost({ options })
-    setOptions([''])
-  }
-
+function VotingPostForm({ votes }) {
   return (
-    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+    <div className="w-full   rounded-lg ">
       <div className="mb-4">
-        <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
+        <div className="flex text-gray-700 text-xl font-bold mb-2 ">
           Tạo bình chọn
-          <Button
-            variant="text"
-            placeholder={undefined}
-            className="z-10 mr-1 p-2 cursor-pointer"
-            onClick={handleOpenAdingPost} // Pass event object
-          >
-            <XLg className="text-lg" />
-          </Button>
         </div>
-        {options.map((option, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <Input
-              size="lg"
-              crossOrigin={undefined}
-              type="text"
-              value={option}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              label={`Lựa chọn ${index + 1}`}
-            />
-            <Button
-              placeholder={undefined}
-              onClick={() => handleRemoveOption(index)}
-              className="ml-2 px-3 py-2 bg-red-400 rounded text-nowrap normal-case ">
-              <p className="text-black"> Xóa lựa chọn </p>
-            </Button>
-          </div>
-        ))}
+        {votes &&
+          votes.map(({ name }, index) => (
+            <div key={index} className="flex items-center mb-2">
+              <Input
+                crossOrigin={undefined}
+                disabled={true}
+                type="text"
+                value={name}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                label={`Lựa chọn ${index + 1}`}
+              />
+              <Button
+                placeholder={undefined}
+                disabled={true}
+                className="ml-2 bg-red-500 text-white rounded text-nowrap normal-case text-[13px]">
+                Xóa lựa chọn
+              </Button>
+            </div>
+          ))}
         <Button
           placeholder={undefined}
-          onClick={handleAddOption}
-          className="mt-2 bg-blue-500 text-white px-3 py-2 rounded normal-case">
+          disabled={true}
+          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
           Thêm lựa chọn
         </Button>
       </div>
-    </form>
+    </div>
   )
 }

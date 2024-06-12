@@ -2,10 +2,10 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { nunito } from '../../../ui/fonts'
-import toast, { Toaster } from 'react-hot-toast'
-import { set, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import { JWT_COOKIE, FACULTIES, TAGS } from '../../../constant'
+import { JWT_COOKIE, FACULTIES, TAGS_LIMIT } from '../../../constant'
 import { useRouter } from 'next/navigation'
 import {
   Input,
@@ -18,11 +18,12 @@ import {
 } from '@material-tailwind/react'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { ReactTags } from 'react-tag-autocomplete'
-import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import NoData from '../../../ui/no-data'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import moment from 'moment'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const getTodayDate = () => {
   //*Get current date
@@ -75,10 +76,13 @@ export default function Page({ params }: { params: { id: string } }) {
   const [noData, setNoData] = useState(false)
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
+  const tagsInputRef = useRef(null)
   const [selectedTags, setSelectedTags] = useState([])
+
   const today = getTodayDate()
 
   const {
+    control,
     register,
     handleSubmit,
     setValue,
@@ -128,9 +132,9 @@ export default function Page({ params }: { params: { id: string } }) {
       organizationTime: moment(data.organizationTime).format(
         'YYYY-MM-DD HH:mm:ss'
       ),
-      tagsId: selectedTags.map((tag) => {
+      tagNames: selectedTags.map((tag) => {
         return tag.value
-      }),
+      }).join(','),
     }
 
     const putToast = toast.loading('Đang cập nhật')
@@ -176,10 +180,10 @@ export default function Page({ params }: { params: { id: string } }) {
         setValue('minimumParticipants', data.minimumParticipants)
         setValue('maximumParticipants', data.maximumParticipants)
         setSelectedTags(
-          data.tags.map((tag) => {
-            const { id } = tag
-            return TAGS.find(({ value }) => value === id)
-          })
+          data.tags.map((tag) => ({
+            value: tag.name,
+            label: tag.name,
+          }))
         )
       })
       .catch((e) => {
@@ -195,23 +199,7 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>
@@ -363,13 +351,20 @@ export default function Page({ params }: { params: { id: string } }) {
           <div className="flex flex-col gap-2">
             <label className="text-xl font-bold">Thẻ</label>
             <ReactTags
-              activateFirstOption={true}
-              placeholderText="Thêm thẻ"
+              ref={tagsInputRef}
+              id="tags-input-validity-description"
+              suggestions={[]}
               selected={selectedTags}
-              suggestions={TAGS}
               onAdd={onAddTags}
               onDelete={onDeleteTags}
-              noOptionsText="No matching countries"
+              isInvalid={selectedTags.length > TAGS_LIMIT}
+              ariaErrorMessage="tags-input-error"
+              ariaDescribedBy="tags-input-validity-description"
+              allowNew={true}
+              activateFirstOption={true}
+              placeholderText="Nhập thẻ"
+              newOptionText="Thêm thẻ %value%"
+              noOptionsText="Không tim thấy the %value%"
               classNames={{
                 root: `${styles['react-tags']}`,
                 rootIsActive: `${styles['is-active']}`,
@@ -388,6 +383,25 @@ export default function Page({ params }: { params: { id: string } }) {
                 highlight: `${styles['react-tags__listbox-option-highlight']}`,
               }}
             />
+            <Controller
+              name="tagsDummy"
+              control={control}
+              render={() => <input type="text" className="hidden" />}
+              rules={{
+                validate: {
+                  validateTagsInput: () => {
+                    if (selectedTags.length > 5) {
+                      tagsInputRef.current.input.focus()
+                      return false
+                    }
+                    return true
+                  },
+                },
+              }}
+            />
+            {selectedTags.length > TAGS_LIMIT && (
+              <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+            )}
           </div>
 
           <div className="flex flex-col gap-2">

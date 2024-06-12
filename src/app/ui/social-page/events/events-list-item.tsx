@@ -39,11 +39,9 @@ export default function EventsListItem({
   }
 
   return (
-    <div className="flex flex-col xl:flex-row justify-between h-fit gap-6 min-w-[25rem] w-[80%]">
-      <Link
-        href={`/events/${event.id}`}
-        className="lg:w-[30rem] w-full h-64 lg:h-72">
-        <figure className="relative h-72 lg:w-[30rem]">
+    <div className="flex flex-col lg:flex-row justify-center gap-6">
+      <Link href={`/events/${event.id}`} className="">
+        <figure className="relative w-full h-64 lg:w-[30rem] lg:h-72">
           <img
             src={event.thumbnail}
             alt="thumbnail"
@@ -57,7 +55,7 @@ export default function EventsListItem({
         </figure>
       </Link>
 
-      <div className="flex flex-col min-w-[25rem] w-full items-left justify-between">
+      <div className="flex flex-col gap-2 w-full items-left justify-between">
         <Link
           href={`/events/${event.id}`}
           className="text-[24px] font-semibold w-full line-clamp-2 text-ellipsis overflow-hidden">
@@ -65,26 +63,37 @@ export default function EventsListItem({
         </Link>
         <div className="flex flex-col gap-1">
           <p className="flex items-start gap-1 text-md w-full">
-            <GeoAltFill className="text-[--blue-02]" />
-            <span className="">Địa điểm:</span>
-            <span className="w-[70%] whitespace-nowrap text-ellipsis overflow-hidden text-wrap">
+            <div className="">
+              <GeoAltFill className="text-[--blue-02]" />
+            </div>
+            <span className="w-fit">Địa điểm:</span>
+            <span className="whitespace-nowrap text-ellipsis overflow-hidden text-wrap">
               {event.organizationLocation}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
-            <Clock className="text-[--blue-02]" /> Thời gian:{' '}
+            <div>
+              <Clock className="text-[--blue-02]" />
+            </div>
+            <span>Thời gian:</span>
             <span>
               {moment(event.organizationTime).format('DD-MM-YYYY HH:mm:ss')}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
-            <BarChartFill className="text-[--blue-02]" /> Số người tham gia:{' '}
+            <div>
+              <BarChartFill className="text-[--blue-02]" />
+            </div>
+            <span>Số người tham gia:</span>
             <span>
               {event.participants} / {event.maximumParticipants}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
-            <BarChartFill className="text-[--blue-02]" /> Số người tối thiểu:{' '}
+            <div>
+              <BarChartFill className="text-[--blue-02]" />
+            </div>
+            <span>Số người tối thiểu: </span>
             <span>{event.minimumParticipants}</span>
           </p>
         </div>
@@ -94,7 +103,7 @@ export default function EventsListItem({
             disabled={isDisabled}
             placeholder={undefined}
             size="md"
-            className="bg-[--blue-02] font-medium w-full text-[16px]">
+            className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
             Tham gia
           </Button>
         ) : (
@@ -103,7 +112,7 @@ export default function EventsListItem({
             disabled={isDisabled}
             placeholder={undefined}
             size="md"
-            className="bg-[--blue-02] font-medium w-full text-[16px]">
+            className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
             Huỷ tham gia
           </Button>
         )}

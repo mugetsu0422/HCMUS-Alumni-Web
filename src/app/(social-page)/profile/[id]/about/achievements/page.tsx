@@ -24,7 +24,13 @@ const user = {
   email: 'tsamuel20@clc.fitus.edu.vn',
 }
 
-const works = []
+const works = [
+  {
+    id: '1',
+    name: 'Tốt nghiệp trường đại học Khoa Học Tự Nhiên',
+    tag: 'Học vấn',
+  },
+]
 
 function DialogAddAchievements({ openDialogAdd, handleOpenDialogAdd }) {
   return (
@@ -175,6 +181,7 @@ function AchievementListItem({ id, name, tag }) {
       </div>
       <Button
         placeholder={undefined}
+        onClick={handleOpenDialogEdit}
         className="p-2 rounded-full bg-[#E4E4E7]"
         variant="text">
         <PencilFill className="text-[14px] lg:text-lg" />

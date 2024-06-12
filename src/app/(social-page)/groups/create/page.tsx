@@ -10,11 +10,13 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import ErrorInput from '../../../ui/error-input'
 import { nunito } from '../../../ui/fonts'
-import styles from '../../../ui/admin/react-tag-autocomplete.module.css'
+import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import { JWT_COOKIE } from '../../../constant'
 import { useForm } from 'react-hook-form'
 import moment from 'moment'
 import page from './../../../admin/page'
+import { useRouter } from 'next/navigation'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const privacyValue = [
   {
@@ -30,6 +32,7 @@ const privacyValue = [
 ]
 
 export default function Page() {
+  const router = useRouter()
   const [previewImage, setPreviewImage] = useState(null)
   const [imageFile, setImageFile] = useState(null)
   //const [privacy, setPrivacy] = useState('')
@@ -58,10 +61,11 @@ export default function Page() {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(() => {
+      .then(({ data }) => {
         toast.success('Tạo thành công', {
           id: groupToast,
         })
+        router.push(`/groups/${data}`)
       })
       .catch(({ message }) => {
         toast.error(message, {
@@ -139,23 +143,7 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[800px] w-[80%] m-auto`}>
-      <Toaster
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          success: {
-            style: {
-              background: '#00a700',
-              color: 'white',
-            },
-          },
-          error: {
-            style: {
-              background: '#ea7b7b',
-              color: 'white',
-            },
-          },
-        }}
-      />
+      <CustomToaster />
       <div className="w-full flex">
         <Link href={'/groups'}>
           {/*Replace with the exact id */}
@@ -221,7 +209,7 @@ export default function Page() {
             }}
             className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
             {...register('description', {
-              required: 'Vui lòng nhập tiêu đề',
+              required: 'Vui lòng nhập mô tả',
             })}
           />
           <ErrorInput
@@ -232,7 +220,7 @@ export default function Page() {
 
         <div className="flex flex-col gap-2">
           <label htmlFor="facultyId" className="text-xl font-bold">
-            Hashtag
+            Thẻ
           </label>
           <Input
             size="lg"
@@ -250,7 +238,10 @@ export default function Page() {
         /> */}
         </div>
 
-        <div className="container flex flex-col items-end relative mx-auto my-2">
+        <div className="container flex flex-col relative mx-auto my-2">
+          <label htmlFor="facultyId" className="text-xl font-bold">
+            Ảnh bìa
+          </label>
           <div
             className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
             onDragOver={onDragOver}
