@@ -11,7 +11,7 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
-import { JWT_COOKIE, TAGS } from '../../../../../../constant'
+import { JWT_COOKIE } from '../../../../../../constant'
 import ErrorInput from '../../../../../../ui/error-input'
 import { nunito } from '../../../../../../ui/fonts'
 import NoData from '../../../../../../ui/no-data'
@@ -110,13 +110,6 @@ export default function Page({
       }
     })
   }
-  const removeCurrentImage = (index, id, event) => {
-    event.stopPropagation()
-    setCurrentImages((prev) =>
-      prev.filter((image, imageIndex) => imageIndex !== index)
-    )
-    setDeleteImageIds((prev) => prev.concat(id))
-  }
   const removeImage = (index, event) => {
     event.stopPropagation()
     const newImages = previewImages.filter(
@@ -200,12 +193,12 @@ export default function Page({
       .then(({ data: { title, content, tags, pictures, votes } }) => {
         setValue('title', title)
         setValue('content', content)
-        setSelectedTags(
-          tags.map((tag) => {
-            const { id } = tag
-            return TAGS.find(({ value }) => value === id)
-          })
-        )
+        // setSelectedTags(
+        //   tags.map((tag) => {
+        //     const { id } = tag
+        //     return TAGS.find(({ value }) => value === id)
+        //   })
+        // )
         setVotes(votes)
         setCurrentImages(pictures)
       })
@@ -268,7 +261,7 @@ export default function Page({
           activateFirstOption={true}
           placeholderText="Thêm thẻ"
           selected={selectedTags}
-          suggestions={TAGS}
+          suggestions={[]}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
           noOptionsText="No matching countries"

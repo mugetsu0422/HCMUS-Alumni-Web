@@ -1,15 +1,15 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { nunito } from '../../../../ui/fonts'
 import ErrorInput from '../../../../ui/error-input'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import { TAGS, JWT_COOKIE } from '../../../../constant'
+import { JWT_COOKIE, TAGS_LIMIT } from '@/app/constant'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
@@ -19,6 +19,7 @@ import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
+    control,
     register,
     handleSubmit,
     setValue,
@@ -32,8 +33,8 @@ export default function Page({ params }: { params: { id: string } }) {
   const [deleteImageIds, setDeleteImageIds] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const router = useRouter()
-  const [options, setOptions] = useState([''])
   const [votes, setVotes] = useState([])
+  const tagsInputRef = useRef(null)
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -106,13 +107,6 @@ export default function Page({ params }: { params: { id: string } }) {
       }
     })
   }
-  const removeCurrentImage = (index, id, event) => {
-    event.stopPropagation()
-    setCurrentImages((prev) =>
-      prev.filter((image, imageIndex) => imageIndex !== index)
-    )
-    setDeleteImageIds((prev) => prev.concat(id))
-  }
   const removeImage = (index, event) => {
     event.stopPropagation()
     const newImages = previewImages.filter(
@@ -135,12 +129,14 @@ export default function Page({ params }: { params: { id: string } }) {
   )
 
   const onSubmit = (data) => {
+    const { tagsDummy, ...rest } = data
     const post = {
-      ...data,
+      ...rest,
       tags: selectedTags.map((tag) => {
-        return { id: tag.value }
+        return { name: tag.value }
       }),
     }
+
     const imagesForm = new FormData()
     for (const image of addedImageFiles) {
       imagesForm.append('addedImages', image)
@@ -256,13 +252,20 @@ export default function Page({ params }: { params: { id: string } }) {
         />
 
         <ReactTags
-          activateFirstOption={true}
-          placeholderText="Thêm thẻ"
+          ref={tagsInputRef}
+          id="tags-input-validity-description"
+          suggestions={[]}
           selected={selectedTags}
-          suggestions={TAGS}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
-          noOptionsText="No matching countries"
+          isInvalid={selectedTags.length > TAGS_LIMIT}
+          ariaErrorMessage="tags-input-error"
+          ariaDescribedBy="tags-input-validity-description"
+          allowNew={true}
+          activateFirstOption={true}
+          placeholderText="Nhập thẻ"
+          newOptionText="Thêm thẻ %value%"
+          noOptionsText="Không tim thấy the %value%"
           classNames={{
             root: `${styles['react-tags']}`,
             rootIsActive: `${styles['is-active']}`,
@@ -281,6 +284,26 @@ export default function Page({ params }: { params: { id: string } }) {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
+        <Controller
+          name="tagsDummy"
+          control={control}
+          render={() => <input type="text" className="hidden" />}
+          rules={{
+            validate: {
+              validateTagsInput: () => {
+                if (selectedTags.length > 5) {
+                  tagsInputRef.current.input.focus()
+                  return false
+                }
+                return true
+              },
+            },
+          }}
+        />
+        {selectedTags.length > TAGS_LIMIT && (
+          <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+        )}
+
         <VotingPostForm votes={votes} />
 
         <AddImagePost

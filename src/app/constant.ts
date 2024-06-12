@@ -20,15 +20,6 @@ export const FACULTIES = [
   { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
   { id: '9', name: 'Môi trường' },
 ]
-export const TAGS = [
-  { value: 1, label: 'Cựu sinh viên' },
-  { value: 2, label: 'Trường học' },
-  { value: 3, label: 'Cộng đồng' },
-  { value: 4, label: 'Khởi nghiệp' },
-  { value: 5, label: 'Nghề nghiệp' },
-  { value: 6, label: 'Học tập' },
-  { value: 7, label: 'Việc làm' },
-]
 export const POST_STATUS = {
   Chờ: 1,
   'Bình thường': 2,

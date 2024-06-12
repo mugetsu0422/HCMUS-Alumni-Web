@@ -1,10 +1,8 @@
 'use client'
 import React from 'react'
-import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
-import { Button, Input } from '@material-tailwind/react'
+import { Input } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
-import { FACULTIES, TAGS } from '../../../constant'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FACULTIES } from '../../../constant'
 
 interface SearchAndFilterFacultyProps {
   onFilterFaculties: (facultyId: string) => void
