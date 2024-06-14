@@ -35,6 +35,11 @@ export const REACTION_TYPE = {
   Like: 1,
 }
 
+export const GROUP_PRIVACY = {
+  PUBLIC: 'Công khai',
+  PRIVATE: 'Riêng tư',
+}
+
 export const PROFILE_TABS = [
   {
     label: 'Giới thiệu',
@@ -58,6 +63,24 @@ export const PROFILE_ABOUT_TABS = [
   {
     label: 'Thành tựu nổi bật',
     url: 'achievements',
+  },
+]
+
+export const GROUP_TABS = [
+  {
+    label: 'Thảo luận',
+    url: '',
+    rolesRequired: ['CREATOR', 'ADMIN', 'MEMBER'],
+  },
+  {
+    label: 'Thành viên',
+    url: 'members',
+    rolesRequired: ['CREATOR', 'ADMIN', 'MEMBER'],
+  },
+  {
+    label: 'Xét duyệt',
+    url: 'member-requests',
+    rolesRequired: ['CREATOR', 'ADMIN'],
   },
 ]
 

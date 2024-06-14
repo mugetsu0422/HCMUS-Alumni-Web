@@ -44,7 +44,7 @@ import {
 } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
-import ReactionDialog from '../../counsel/counsel-react-dialog'
+import ReactionDialog from '../../common/reaction-dialog'
 import { useRouter } from 'next/navigation'
 import { useTruncatedElement } from '../../../../hooks/use-truncated-element'
 
