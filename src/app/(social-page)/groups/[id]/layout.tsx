@@ -157,13 +157,13 @@ export default function GroupLayout({
               </p>
 
               {group.tags.length > 0 && (
-            <div className="flex items-center gap-1 text-[#65676b]">
-              <TagsFill className="text-[--blue-05] mr-2" />
-              {group.tags.map(({ id, name }) => (
-                <span key={id}>{name}</span>
-              ))}
-            </div>
-          )}
+                <div className="flex items-center gap-1 text-[#65676b]">
+                  <TagsFill className="text-[--blue-05] mr-2" />
+                  {group.tags.map(({ id, name }) => (
+                    <span key={id}>{name}</span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {group.userRole ? (

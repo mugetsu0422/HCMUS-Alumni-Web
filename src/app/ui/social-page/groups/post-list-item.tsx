@@ -5,12 +5,10 @@ import React, { useState } from 'react'
 import {
   Avatar,
   Button,
-  Radio,
   Menu,
   MenuHandler,
   MenuList,
   MenuItem,
-  List,
 } from '@material-tailwind/react'
 import {
   TagFill,
@@ -417,7 +415,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
             <div className="flex flex-col gap-1">
               <p className="font-bold text-lg">{post.creator.fullName}</p>
               <Link
-                href={`/groups/${post.id}/posts/${post.groupId}`}
+                href={`/groups/${post.groupId}/posts/${post.id}`}
                 className="text-sm text-[--secondary] hover:underline">
                 {moment(post.publishedAt).locale('vi').local().fromNow()}
               </Link>
@@ -435,14 +433,28 @@ export default function PostListItem({ post }: { post: PostProps }) {
             </MenuHandler>
             <MenuList placeholder={undefined}>
               {post.permissions.edit && (
-                <Link href={`/groups/${post.groupId}/posts/${post.id}/edit`}>
+               
                   <MenuItem
+                    disabled={post.votes.length ? true : false}
                     placeholder={undefined}
-                    className={`${nunito.className} text-black text-base flex items-center gap-2`}>
-                    <Pencil />
-                    <p>Chỉnh sửa bài viết</p>
+                    className={'text-black text-base'}>
+                       <Link href={`/groups/${post.groupId}/posts/${post.id}/edit`}
+                        className=" flex items-center gap-2"
+                       >
+                    <div>
+                      <Pencil />
+                    </div>
+                    <div>
+                      <p>Chỉnh sửa bài viết</p>
+                      {post.votes.length ? (
+                        <p className="text-sm text-wrap">
+                          Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                        </p>
+                      ) : null}
+                    </div>
+                    </Link>
+
                   </MenuItem>
-                </Link>
               )}
               {post.permissions.delete && (
                 <MenuItem

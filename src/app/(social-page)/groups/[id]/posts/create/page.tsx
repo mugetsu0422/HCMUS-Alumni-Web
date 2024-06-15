@@ -206,7 +206,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
         axios
           .put(
-            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${id}/posts/images`,
+            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${id}/images`,
             form,
             {
               headers: {
