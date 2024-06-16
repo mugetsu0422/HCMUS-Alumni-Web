@@ -34,7 +34,7 @@ const navListItems = [
     label: 'Tài khoản',
     subMenu: [
       { title: 'Quản lý vai trò', link: '/admin/roles' },
-      { title: 'Quản lý tài khoản', link: '/admin/users/create' },
+      { title: 'Quản lý tài khoản', link: '/admin/users' },
       {
         title: 'Xét duyệt cựu sinh viên',
         link: '/admin/alumni-verification/pending',
