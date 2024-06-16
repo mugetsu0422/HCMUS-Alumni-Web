@@ -393,6 +393,21 @@ export default function PostListItem({ post }: { post: PostProps }) {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
+  const onFetchUserVotes = (
+    postId: string,
+    voteId: number,
+    page: number = 0,
+    pageSize: number = 50
+  ) => {
+    return axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${postId}/votes/${voteId}?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
 
   return (
     !isDeleted && (
@@ -517,6 +532,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
               handleVote={handleVote}
               onAddVoteOption={onAddVoteOption}
               postId={post.id}
+              onFetchUserVotes={onFetchUserVotes}
             />
           )}
 

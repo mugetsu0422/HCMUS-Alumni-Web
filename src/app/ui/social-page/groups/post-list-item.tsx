@@ -374,7 +374,6 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
     )
   }
-
   const onAddVoteOption = (vote: string) => {
     axios
       .post(
@@ -395,6 +394,21 @@ export default function PostListItem({ post }: { post: PostProps }) {
       .catch((error) => {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
+  }
+  const onFetchUserVotes = (
+    postId: string,
+    voteId: number,
+    page: number = 0,
+    pageSize: number = 50
+  ) => {
+    return axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${postId}/votes/${voteId}?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
 
   return (
@@ -433,14 +447,13 @@ export default function PostListItem({ post }: { post: PostProps }) {
             </MenuHandler>
             <MenuList placeholder={undefined}>
               {post.permissions.edit && (
-               
-                  <MenuItem
-                    disabled={post.votes.length ? true : false}
-                    placeholder={undefined}
-                    className={'text-black text-base'}>
-                       <Link href={`/groups/${post.groupId}/posts/${post.id}/edit`}
-                        className=" flex items-center gap-2"
-                       >
+                <MenuItem
+                  disabled={post.votes.length ? true : false}
+                  placeholder={undefined}
+                  className={'text-black text-base'}>
+                  <Link
+                    href={`/groups/${post.groupId}/posts/${post.id}/edit`}
+                    className=" flex items-center gap-2">
                     <div>
                       <Pencil />
                     </div>
@@ -452,9 +465,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
                         </p>
                       ) : null}
                     </div>
-                    </Link>
-
-                  </MenuItem>
+                  </Link>
+                </MenuItem>
               )}
               {post.permissions.delete && (
                 <MenuItem
@@ -520,6 +532,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
               handleVote={handleVote}
               onAddVoteOption={onAddVoteOption}
               postId={post.id}
+              onFetchUserVotes={onFetchUserVotes}
             />
           )}
 

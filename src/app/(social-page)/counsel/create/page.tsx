@@ -98,14 +98,12 @@ export default function Page() {
     }
 
     if (files.length > 0) {
-      const newImages = [...previewImages]
       for (const file of files) {
         setImageFiles((prev) => prev.concat(file))
 
         const reader = new FileReader()
         reader.onload = (event) => {
-          newImages.push({ src: event.target.result })
-          setPreviewImages(newImages)
+          setPreviewImages((old) => [...old, { src: event.target.result }])
         }
         reader.readAsDataURL(file)
       }
@@ -132,7 +130,6 @@ export default function Page() {
           return
         }
 
-        const newImages = [...previewImages]
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
 
@@ -140,8 +137,7 @@ export default function Page() {
 
           const reader = new FileReader()
           reader.onload = (event) => {
-            newImages.push({ src: event.target.result })
-            setPreviewImages(newImages)
+            setPreviewImages((old) => [...old, { src: event.target.result }])
           }
           reader.readAsDataURL(file)
         }

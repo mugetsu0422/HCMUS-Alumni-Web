@@ -230,7 +230,7 @@ export default function Page({
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
       <CustomToaster />
       <div className="w-full flex">
         <Button
@@ -377,7 +377,7 @@ function AddImagePost({
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
-                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                     onClick={(event) =>
                       removeCurrentImage(index, image.id, event)
                     } // Pass event object

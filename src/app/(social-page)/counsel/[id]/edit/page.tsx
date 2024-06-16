@@ -361,7 +361,7 @@ function AddImagePost({
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
-                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                     onClick={(event) => removeImage(index, image.id, event)} // Pass event object
                   >
                     <XLg />

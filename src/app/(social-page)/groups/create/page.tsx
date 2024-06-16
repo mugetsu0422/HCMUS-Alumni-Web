@@ -309,7 +309,7 @@ export default function Page() {
               <div className="mt-4 flex flex-col items-end w-full">
                 <Button
                   placeholder={undefined}
-                  className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                  className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                   onClick={removeImage}>
                   <XLg />
                 </Button>
