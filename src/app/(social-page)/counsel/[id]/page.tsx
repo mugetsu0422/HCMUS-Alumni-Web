@@ -340,6 +340,21 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.error(error.response.data.error.message || 'Lỗi không xác định')
       })
   }
+  const onFetchUserVotes = (
+    postId: string,
+    voteId: number,
+    page: number = 0,
+    pageSize: number = 50
+  ) => {
+    return axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${postId}/votes/${voteId}?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
 
   useEffect(() => {
     const postPromise = axios.get(
@@ -524,6 +539,7 @@ export default function Page({ params }: { params: { id: string } }) {
               handleVote={handleVote}
               onAddVoteOption={onAddVoteOption}
               postId={post.id}
+              onFetchUserVotes={onFetchUserVotes}
             />
           )}
 

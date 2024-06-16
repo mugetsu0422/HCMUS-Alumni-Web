@@ -1,7 +1,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useRef } from 'react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import Link from 'next/link'
@@ -11,12 +11,12 @@ import Cookies from 'js-cookie'
 import ErrorInput from '../../../ui/error-input'
 import { nunito } from '../../../ui/fonts'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import { JWT_COOKIE } from '../../../constant'
-import { useForm } from 'react-hook-form'
+import { JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
+import { useForm, Controller } from 'react-hook-form'
 import moment from 'moment'
-import page from './../../../admin/page'
 import { useRouter } from 'next/navigation'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import { ReactTags } from 'react-tag-autocomplete'
 
 const privacyValue = [
   {
@@ -36,8 +36,11 @@ export default function Page() {
   const [previewImage, setPreviewImage] = useState(null)
   const [imageFile, setImageFile] = useState(null)
   //const [privacy, setPrivacy] = useState('')
+  const tagsInputRef = useRef(null)
+  const [selectedTags, setSelectedTags] = useState([])
 
   const {
+    control,
     register,
     handleSubmit,
     trigger,
@@ -51,6 +54,9 @@ export default function Page() {
       description: data.description,
       privacy: data.privacy,
       cover: imageFile,
+      tagNames: selectedTags.map((tag) => {
+        return tag.value
+      }).join(','),
     }
 
     const groupToast = toast.loading('Đang tạo')
@@ -140,6 +146,19 @@ export default function Page() {
     setImageFile(null)
   }
 
+  const onAddTags = useCallback(
+    (newTag) => {
+      setSelectedTags([...selectedTags, newTag])
+    },
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
+    },
+    [selectedTags]
+  )
+
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[800px] w-[80%] m-auto`}>
@@ -175,10 +194,7 @@ export default function Page() {
               required: 'Vui lòng nhập tiêu đề',
             })}
           />
-          <ErrorInput
-            // This is the error message
-            errors={errors?.name?.message}
-          />
+          <ErrorInput errors={errors?.name?.message} />
         </div>
 
         <div className="flex flex-col gap-2 w-full">
@@ -212,30 +228,65 @@ export default function Page() {
               required: 'Vui lòng nhập mô tả',
             })}
           />
-          <ErrorInput
-            // This is the error message
-            errors={errors?.description?.message}
-          />
+          <ErrorInput errors={errors?.description?.message} />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="facultyId" className="text-xl font-bold">
+          <label htmlFor="tagNames" className="text-xl font-bold">
             Thẻ
           </label>
-          <Input
-            size="lg"
-            crossOrigin={undefined}
-            type="text"
-            labelProps={{
-              className: 'before:content-none after:content-none',
+          <ReactTags
+            ref={tagsInputRef}
+            id="tags-input-validity-description"
+            suggestions={[]}
+            selected={selectedTags}
+            onAdd={onAddTags}
+            onDelete={onDeleteTags}
+            isInvalid={selectedTags.length > TAGS_LIMIT}
+            ariaErrorMessage="tags-input-error"
+            ariaDescribedBy="tags-input-validity-description"
+            allowNew={true}
+            activateFirstOption={true}
+            placeholderText="Nhập thẻ"
+            newOptionText="Thêm thẻ %value%"
+            noOptionsText="Không tim thấy the %value%"
+            classNames={{
+              root: `${styles['react-tags']}`,
+              rootIsActive: `${styles['is-active']}`,
+              rootIsDisabled: `${styles['is-disabled']}`,
+              rootIsInvalid: `${styles['is-invalid']}`,
+              label: `${styles['react-tags__label']}`,
+              tagList: `${styles['react-tags__list']}`,
+              tagListItem: `${styles['react-tags__list-item']}`,
+              tag: `${styles['react-tags__tag']}`,
+              tagName: `${styles['react-tags__tag-name']}`,
+              comboBox: `${styles['react-tags__combobox']}`,
+              input: `${styles['react-tags__combobox-input']}`,
+              listBox: `${styles['react-tags__listbox']}`,
+              option: `${styles['react-tags__listbox-option']}`,
+              optionIsActive: `${styles['is-active']}`,
+              highlight: `${styles['react-tags__listbox-option-highlight']}`,
             }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-            //   {...register('hashtag')}
           />
-          {/* <ErrorInput
-          // This is the error message
-          errors={errors?.hashtag?.message}
-        /> */}
+          <Controller
+            name="tagNames"
+            control={control}
+            render={() => <input type="text" className="hidden" />}
+            rules={{
+              validate: {
+                validateTagsInput: () => {
+                  if (selectedTags.length > 5) {
+                    tagsInputRef.current.input.focus()
+                    return false
+                  }
+                  return true
+                },
+              },
+            }}
+          />
+          {selectedTags.length > TAGS_LIMIT && (
+            <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+          )}
         </div>
 
         <div className="container flex flex-col relative mx-auto my-2">
@@ -258,7 +309,7 @@ export default function Page() {
               <div className="mt-4 flex flex-col items-end w-full">
                 <Button
                   placeholder={undefined}
-                  className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                  className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                   onClick={removeImage}>
                   <XLg />
                 </Button>
