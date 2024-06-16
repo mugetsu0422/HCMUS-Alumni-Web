@@ -2,15 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Cookies from 'js-cookie'
-import {
-  Dialog,
-  DialogHeader,
-  DialogBody,
-  DialogFooter,
-  Button,
-  Input,
-  Checkbox,
-} from '@material-tailwind/react'
+import { Button, Input, Checkbox } from '@material-tailwind/react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import toast, { Toaster } from 'react-hot-toast'
 import ErrorInput from '../../ui/error-input'

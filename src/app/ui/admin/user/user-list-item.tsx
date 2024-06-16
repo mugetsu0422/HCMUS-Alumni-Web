@@ -2,7 +2,13 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React from 'react'
-import { Button } from '@material-tailwind/react'
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from '@material-tailwind/react'
 import { nunito } from '../../fonts'
 import { Eye, PencilSquare } from 'react-bootstrap-icons'
 import Image from 'next/image'
@@ -15,6 +21,38 @@ import CustomToaster from '../../common/custom-toaster'
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+function LockAccountDialog({ openLockAccount, handleOpenLockAccount, isLock }) {
+  return (
+    <Dialog
+      placeholder={undefined}
+      size="xs"
+      open={openLockAccount}
+      handler={handleOpenLockAccount}>
+      <DialogHeader placeholder={undefined}>
+        {isLock ? 'Mở' : 'Khóa'} tài khoản
+      </DialogHeader>
+      <DialogBody placeholder={undefined}>
+        Bạn có muốn {isLock ? 'Mở' : 'Khóa'} tài khoản này
+      </DialogBody>
+      <DialogFooter placeholder={undefined}>
+        <Button
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
+          placeholder={undefined}
+          onClick={handleOpenLockAccount}>
+          <span>Không</span>
+        </Button>
+        <Button
+          className={`${nunito.className}  ${
+            isLock ? 'bg-[--blue-05]' : 'bg-[--delete]'
+          }  text-white normal-case text-md`}
+          placeholder={undefined}>
+          <span> {isLock ? 'Mở' : 'Khóa'}</span>
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  )
+}
+
 export default function UserListItem({
   id,
   fullName,
@@ -23,11 +61,11 @@ export default function UserListItem({
   isLock,
 }) {
   const [openDelete, setOpenDelete] = React.useState(false)
-  const [openShow, setOpenShow] = React.useState(false)
   const [isDeleted, setIsDeleted] = React.useState(false)
+  const [openLockAccount, setOpenLockAccount] = React.useState(false)
 
+  const handleOpenLockAccount = () => setOpenLockAccount((e) => !e)
   const handleOpenDetele = () => setOpenDelete((e) => !e)
-  const handleOpenShow = () => setOpenShow((e) => !e)
 
   if (isDeleted) return null
   return (
@@ -57,7 +95,8 @@ export default function UserListItem({
         <Button
           variant="text"
           placeholder={undefined}
-          className="px-4 w-12 flex justify-center">
+          className="px-4 w-12 flex justify-center"
+          onClick={handleOpenLockAccount}>
           {isLock ? (
             <FontAwesomeIcon
               icon={faLock}
@@ -70,12 +109,14 @@ export default function UserListItem({
             />
           )}
         </Button>
+
+        <LockAccountDialog
+          handleOpenLockAccount={handleOpenLockAccount}
+          openLockAccount={openLockAccount}
+          isLock={isLock}
+        />
         <Link href={`/profile/${id}/about`}>
-          <Button
-            variant="text"
-            onClick={handleOpenShow}
-            className="px-4"
-            placeholder={undefined}>
+          <Button variant="text" className="px-4" placeholder={undefined}>
             <Eye className="text-2xl  text-black" />
           </Button>
         </Link>
