@@ -48,7 +48,6 @@ export default function Page({
   const [comments, setComments] = useState([])
   const [reactionCount, setReactionCount] = useState(0)
   const [reaction, setReaction] = useState([])
-  const [isDeleted, setIsDeleted] = useState(false)
   const ref = React.useRef(null)
   const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
     ref,
@@ -262,7 +261,6 @@ export default function Page({
         }
       )
       .then(() => {
-        setIsDeleted(true)
         toast.success('Xoá bài viết thành công')
       })
       .catch((error) => {
@@ -449,14 +447,13 @@ export default function Page({
             </MenuHandler>
             <MenuList placeholder={undefined}>
               {post.permissions.edit && (
-                  <MenuItem
-                    disabled={post.votes.length ? true : false}
-                    placeholder={undefined}
-                    className={'text-black text-base'}>
-                                      <Link href={`/groups/${post.groupId}/posts/${post.id}/edit`}
-                                       className="flex items-center gap-2"
-                                      >
-
+                <MenuItem
+                  disabled={post.votes.length ? true : false}
+                  placeholder={undefined}
+                  className={'text-black text-base'}>
+                  <Link
+                    href={`/groups/${post.groupId}/posts/${post.id}/edit`}
+                    className="flex items-center gap-2">
                     <div className="">
                       <Pencil />
                     </div>
@@ -468,9 +465,8 @@ export default function Page({
                         </p>
                       ) : null}
                     </div>
-                    </Link>
-
-                  </MenuItem>
+                  </Link>
+                </MenuItem>
               )}
               {post.permissions.delete && (
                 <MenuItem
