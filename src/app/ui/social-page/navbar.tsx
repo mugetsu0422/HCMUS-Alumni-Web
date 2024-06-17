@@ -20,9 +20,9 @@ import {
   faCalendarDays,
   faCertificate,
   faBell,
-  faMagnifyingGlass,
   faEnvelope,
   faUsers,
+  faUserGroup,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
@@ -52,6 +52,11 @@ const navListItems = [
     icon: faUsers,
     link: '/groups',
   },
+  {
+    label: 'Bạn bè',
+    icon: faUserGroup,
+    link: '/friends',
+  },
 ]
 
 function NavList() {
@@ -59,16 +64,16 @@ function NavList() {
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
       {navListItems.map(({ label, icon, link }) => (
         <li className="group cursor-pointer lg:py-3" key={label}>
-            <Link
-              href={link}
-              className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
-              <MenuItem
-                placeholder={undefined}
-                className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
-                <FontAwesomeIcon icon={icon} className="text-2xl" />
-                {label}
-              </MenuItem>
-            </Link>
+          <Link
+            href={link}
+            className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
+            <MenuItem
+              placeholder={undefined}
+              className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
+              <FontAwesomeIcon icon={icon} className="text-2xl" />
+              {label}
+            </MenuItem>
+          </Link>
         </li>
       ))}
     </ul>

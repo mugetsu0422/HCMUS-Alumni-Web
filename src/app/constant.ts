@@ -50,3 +50,18 @@ export const GROUP_TABS = [
     rolesRequired: ['CREATOR', 'ADMIN'],
   },
 ]
+
+export const FRIEND_TABS = [
+  {
+    label: 'Bạn bè',
+    url: '',
+  },
+  {
+    label: 'Khám phá',
+    url: 'explore',
+  },
+  {
+    label: 'Lời mời kết bạn',
+    url: 'friend-requests',
+  },
+]
