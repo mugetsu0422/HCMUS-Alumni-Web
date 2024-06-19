@@ -62,6 +62,6 @@ export const FRIEND_TABS = [
   },
   {
     label: 'Lời mời kết bạn',
-    url: 'friend-requests',
+    url: 'requests',
   },
 ]

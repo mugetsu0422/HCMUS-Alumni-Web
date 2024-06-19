@@ -12,7 +12,7 @@ import {
 import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import SearchAndFilterFriends from './../../../ui/social-page/friends/SearchAndFilterFriend'
+import SearchAndFilterFriends from '../../../ui/social-page/friends/SearchAndFilterFriend'
 
 const PAGE_SIZE = 9
 
