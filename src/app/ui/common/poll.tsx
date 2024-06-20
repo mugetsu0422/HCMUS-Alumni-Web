@@ -57,7 +57,7 @@ function UserVotesDialog({
         placeholder={undefined}
         className={`${nunito.className} flex flex-col gap-4 h-[50dvh] overflow-y-auto scrollbar-webkit-main`}>
         <div className="text-black font-medium text-xl">
-          {Math.trunc((voteCount / totalVoteCount) * 100)}% · {voteCount} lượt
+          {totalVoteCount ? Math.trunc((voteCount / totalVoteCount) * 100) : 0}% · {voteCount} lượt
           bình chọn
         </div>
         <InfiniteScroll
