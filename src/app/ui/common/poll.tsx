@@ -165,7 +165,7 @@ function AddNewVoteOptionInput() {
         containerProps={{ className: 'h-[56px]' }}
         labelProps={{
           className:
-            'top-0 before:mt-[0px] after:mt-[0px] focus-after:top-0 peer-focus:leading-[0px]',
+            'top-0 focus-after:top-0 before:!mt-[0px] after:!mt-[0px] peer-focus:!leading-[0px]',
         }}
         {...register('name')}
       />
