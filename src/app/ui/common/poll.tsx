@@ -57,7 +57,7 @@ function UserVotesDialog({
         placeholder={undefined}
         className={`${nunito.className} flex flex-col gap-4 h-[50dvh] overflow-y-auto scrollbar-webkit-main`}>
         <div className="text-black font-medium text-xl">
-          {Math.trunc((voteCount / totalVoteCount) * 100)}% · {voteCount} lượt
+          {totalVoteCount ? Math.trunc((voteCount / totalVoteCount) * 100) : 0}% · {voteCount} lượt
           bình chọn
         </div>
         <InfiniteScroll
@@ -165,7 +165,7 @@ function AddNewVoteOptionInput() {
         containerProps={{ className: 'h-[56px]' }}
         labelProps={{
           className:
-            'top-0 before:mt-[0px] after:mt-[0px] focus-after:top-0 peer-focus:leading-[0px]',
+            'top-0 focus-after:top-0 before:!mt-[0px] after:!mt-[0px] peer-focus:!leading-[0px]',
         }}
         {...register('name')}
       />
