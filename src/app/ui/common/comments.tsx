@@ -236,7 +236,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                             await onEditComment(e, comment.id, editComment)
                           } catch (error) {
                             toast.error(
-                              error.response.data.error.message ||
+                              error.response?.data?.error?.message ||
                                 'Lỗi không xác định'
                             )
                           } finally {
@@ -312,7 +312,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                               toast.success('Xoá bình luận thành công')
                             } catch (error) {
                               toast.error(
-                                error.response.data.error.message ||
+                                error.response?.data?.error?.message ||
                                   'Lỗi không xác định'
                               )
                             }
