@@ -115,7 +115,7 @@ export default function Page({
       }
       setSelectedVoteIds(new Set(selectedVoteIds))
     } catch (error) {
-      toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+      toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
     }
   }
 
@@ -169,7 +169,7 @@ export default function Page({
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: postCommentToast,
         })
       })
@@ -206,7 +206,7 @@ export default function Page({
       )
       .then()
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
@@ -222,7 +222,7 @@ export default function Page({
       )
       .then()
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -264,7 +264,7 @@ export default function Page({
         toast.success('Xoá bài viết thành công')
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (
@@ -352,7 +352,7 @@ export default function Page({
         setVotesCount(new Map(votesCount))
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onFetchUserVotes = (

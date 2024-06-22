@@ -73,7 +73,7 @@ export default function RolesListItem({ role }: { role: Role }) {
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

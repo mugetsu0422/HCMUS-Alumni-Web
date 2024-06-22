@@ -132,7 +132,7 @@ export default function Page() {
         })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: postToast,
         })
       })
@@ -189,7 +189,7 @@ export default function Page() {
       })
       .catch((error) => {
         console.error(error)
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }, [])
 

@@ -248,7 +248,7 @@ export default function Page() {
         toast.success('Cấp tài khoản thành công')
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

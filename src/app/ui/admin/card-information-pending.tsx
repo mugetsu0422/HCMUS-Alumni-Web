@@ -45,7 +45,7 @@ export default function CardInformation({ offset, items, setItems }) {
         }
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

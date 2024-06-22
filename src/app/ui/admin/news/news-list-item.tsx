@@ -126,7 +126,7 @@ export default function NewsListItem({
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 
@@ -150,7 +150,7 @@ export default function NewsListItem({
         setIsHidden(!isHidden)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 
