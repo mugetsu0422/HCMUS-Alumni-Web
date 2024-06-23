@@ -9,6 +9,9 @@ import {
   Button,
   Input,
   MenuItem,
+  Menu,
+  MenuHandler,
+  MenuList,
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -20,9 +23,10 @@ import {
   faCalendarDays,
   faCertificate,
   faBell,
-  faMagnifyingGlass,
   faEnvelope,
   faUsers,
+  faRightFromBracket,
+  faCircleUser,
 } from '@fortawesome/free-solid-svg-icons'
 
 // nav list component
@@ -92,7 +96,7 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className="sticky top-0 z-10 px-3 lg:pl-10 py-4 lg:py-0 border-b-2 border-slate-700 "
+      className="sticky top-0 z-10 px-3 lg:pl-10 py-4 lg:py-0 border-b-2 border-slate-700"
       shadow={false}>
       <div className="mx-auto flex items-center justify-between text-blue-gray-900">
         <Link href="/home-page">
@@ -112,24 +116,6 @@ export default function MyNavbar() {
           className="ml-5 mr-auto lg:hidden text-[--text-navbar] text-2xl"
           icon={faBars}
         />
-        {/* <div className=" w-[40vw] m-auto ">
-          <Input
-            label="Tìm kiếm"
-            crossOrigin={undefined}
-            size="lg"
-            className="pl-2 !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 max-w-sm"
-            labelProps={{
-              className: 'pl-2 before:content-none after:content-none',
-            }}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                alert(message)
-              }
-            }}
-            type="text"
-          />
-        </div> */}
 
         <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
           <Badge content={2} color="blue">
@@ -149,9 +135,37 @@ export default function MyNavbar() {
             </Button>
           </Badge>
 
-          <Link href={`/profile/id/about`}>
-            <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />{' '}
-          </Link>
+          <Menu>
+            <MenuHandler>
+              <Button
+                placeholder={undefined}
+                variant="text"
+                size="sm"
+                className="p-0 rounded-full">
+                <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+              </Button>
+            </MenuHandler>
+            <MenuList placeholder={undefined}>
+              <MenuItem placeholder={undefined}>
+                <Link
+                  href={`/profile/id/about`}
+                  className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
+                  Trang cá nhân
+                </Link>
+              </MenuItem>
+
+              <MenuItem placeholder={undefined}>
+                <Link href={`/signin`} className="flex items-center gap-2">
+                  <FontAwesomeIcon
+                    icon={faRightFromBracket}
+                    className="text-xl"
+                  />
+                  Đăng xuất
+                </Link>
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </div>
       </div>
       <Collapse open={isNavOpen} className="overflow-scroll flex text-left">

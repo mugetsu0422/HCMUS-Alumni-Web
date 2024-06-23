@@ -106,7 +106,7 @@ function DialogEditAchievements({ openEditDialog, handleOpenDialogEdit }) {
       open={openEditDialog}
       handler={handleOpenDialogEdit}>
       <DialogHeader placeholder={undefined}>
-        Thêm thành tựu nổi bật
+        Chỉnh sửa thành tựu nổi bật
       </DialogHeader>
       <DialogBody placeholder={undefined}>
         <div className="flex flex-col gap-2">
@@ -157,7 +157,7 @@ function DialogEditAchievements({ openEditDialog, handleOpenDialogEdit }) {
         <Button
           className={`${nunito.className} bg-[--blue-05] text-white normal-case text-md`}
           placeholder={undefined}>
-          Thêm
+          Cập nhật
         </Button>
       </DialogFooter>
     </Dialog>

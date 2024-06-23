@@ -11,6 +11,7 @@ import {
   TelephoneFill,
   Envelope,
   PencilFill,
+  PersonCheckFill,
 } from 'react-bootstrap-icons'
 import { Button, Input } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
@@ -53,13 +54,23 @@ export default function Page() {
           <p className="text-[18px] lg:text-[22px] font-bold">
             Thông tin cơ bản
           </p>
+
           {!onpenEdit ? (
-            <Button
-              className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
-              placeholder={undefined}
-              onClick={handleOpenEdit}>
-              <PencilFill /> Chỉnh sửa thông tin
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
+                placeholder={undefined}
+                onClick={handleOpenEdit}>
+                <PencilFill /> Chỉnh sửa thông tin
+              </Button>
+
+              <Button
+                placeholder={undefined}
+                className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
+                <PersonCheckFill className="text-base" />
+                Yêu cầu xét duyệt
+              </Button>
+            </div>
           ) : (
             <div className="flex gap-3">
               <Button
@@ -125,7 +136,7 @@ export default function Page() {
           ) : (
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-lg font-bold text-black">Khóa</label>
+                <label className="text-lg font-bold text-black">Khoa</label>
                 <select
                   className="h-10 text-[14px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
                   {...register('facultyId')}>
@@ -140,7 +151,7 @@ export default function Page() {
                 </select>
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg font-bold text-black">Khoa</label>
+                <label className="text-lg font-bold text-black">Khóa</label>
                 <Input
                   crossOrigin={undefined}
                   variant="outlined"
@@ -196,7 +207,7 @@ export default function Page() {
                 })}
                 onInput={(e) => {
                   const input = e.target as HTMLInputElement
-                  input.value = input.value.trim().slice(0, 4)
+                  input.value = input.value.trim().slice(0, 8)
                 }} //
                 labelProps={{
                   className: 'before:content-none after:content-none',

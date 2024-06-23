@@ -250,7 +250,7 @@ function DialogEditWorks({ openDialogEdit, handleOpenDialogEdit }) {
         <Button
           className={`${nunito.className} bg-[--blue-05] text-white normal-case text-md`}
           placeholder={undefined}>
-          Thêm
+          Cập nhật
         </Button>
       </DialogFooter>
     </Dialog>
@@ -418,7 +418,7 @@ function DialogEditEducation({ openDialogEdit, handleOpenDialogEdit }) {
         <Button
           className={`${nunito.className} bg-[--blue-05] text-white normal-case text-md`}
           placeholder={undefined}>
-          Thêm
+          Cập nhật
         </Button>
       </DialogFooter>
     </Dialog>

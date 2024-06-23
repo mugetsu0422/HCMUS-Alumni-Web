@@ -2,7 +2,7 @@
 'use client'
 
 import '../../../globals.css'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext, createContext } from 'react'
 import { nunito } from '../../../ui/fonts'
 import {
   Button,
@@ -17,11 +17,14 @@ import { useForm } from 'react-hook-form'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import axios, { AxiosResponse } from 'axios'
-import { CheckCircleFill, XCircleFill } from 'react-bootstrap-icons'
+import { CheckCircleFill, XCircleFill, Camera } from 'react-bootstrap-icons'
 import Link from 'next/link'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { PROFILE_TABS } from '../../../constant'
 import clsx from 'clsx'
+import Image from 'next/image'
+import ChangeAvatarUser from '@/app/ui/social-page/profile/ChangeAvatarUser'
+import ChangeCoverUser from '@/app/ui/social-page/profile/ChangeCoverUser'
 
 const user = {
   fullName: 'Trương Samuel',
@@ -36,20 +39,66 @@ const user = {
   verify: true,
 }
 
-function AvatarUser() {
+const FormContext = createContext(null)
+
+function AvatarAndCoverUser({ register, getValues }) {
+  const {
+    setInputs,
+    croppedAvatar,
+    setCroppedAvatar,
+    coverImage,
+    setCoverImage,
+  } = useContext(FormContext)
+
+  const [openChangeCover, setOpenChangeCover] = useState(false)
+  const handleOpenChangeCover = () => {
+    setOpenChangeCover((e) => !e)
+  }
+
   return (
     <div className="relative">
-      <img
-        src="/thumbnail-social-pages.jpg"
-        alt="user cover"
-        className="w-full h-40 xl:h-60 object-cover object-center"
+      <figure className="relative h-40 xl:h-60 w-full">
+        <img
+          src={coverImage}
+          alt="user cover"
+          className="w-full h-40 xl:h-60 object-cover object-center"
+        />
+        <figcaption className="absolute bottom-0 left-2/4 flex justify-end w-full -translate-x-2/4 py-2 px-4">
+          <Button
+            placeholder={undefined}
+            onClick={handleOpenChangeCover}
+            className="text-[14px] text-black flex w-fit justify-end items-center gap-2 rounded-lg bg-[white] py-2 px-4 z-10">
+            <Camera className="text-lg" />
+            Chỉnh sửa ảnh bìa
+          </Button>
+        </figcaption>
+      </figure>
+
+      <ChangeCoverUser
+        register={register}
+        getValues={getValues}
+        setInputs={setInputs}
+        setCoverImage={setCoverImage}
+        handleOpenChangeCover={handleOpenChangeCover}
+        openChangeCover={openChangeCover}
       />
-      <Avatar
-        placeholder={undefined}
-        src="/demo.jpg"
-        alt="user avatar"
-        className="w-24 h-24 lg:w-32 lg:h-32 2xl:w-40 2xl:h-40 border-4 border-white border-radius object-cover absolute top-[68%] ml-[2vw] 2xl:ml-[1.5vw] lg:top-[50%] xl:top-[60%]"
-      />
+
+      <div className="absolute top-[68%] ml-[2vw] 2xl:ml-[1.5vw] lg:top-[50%] xl:top-[60%] flex flex-col items-end">
+        <Avatar
+          placeholder={undefined}
+          src={croppedAvatar}
+          alt="user avatar"
+          className="w-24 h-24 lg:w-32 lg:h-32 2xl:w-40 2xl:h-40 border-4 border-white border-radius object-cover "
+        />
+
+        <ChangeAvatarUser
+          register={register}
+          getValues={getValues}
+          setInputs={setInputs}
+          setCroppedAvatar={setCroppedAvatar}
+        />
+      </div>
+
       <div className="mt-6 flex justify-between items-center ml-[24vw] md:ml-[16vw] xl:ml-[17vw] 2xl:ml-[17%]">
         <div className="flex flex-col">
           <p className="text-[28px] font-bold flex items-center gap-2">
@@ -96,6 +145,20 @@ export default function GroupLayout({
   children: React.ReactNode
   params: { id: string }
 }) {
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      avatar: null,
+      cover: null,
+    },
+  })
+  const [inputs, setInputs] = useState({ avatar: null, cover: null })
+
   const pathname = usePathname()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState(() => {
@@ -103,6 +166,8 @@ export default function GroupLayout({
     if (parts[3] === undefined) return ''
     return parts[3]
   })
+  const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
+  const [coverImage, setCoverImage] = useState('/thumbnail-social-pages.jpg')
 
   const handleClickTab = (url) => {
     setActiveTab(url)
@@ -112,7 +177,17 @@ export default function GroupLayout({
   return (
     <div
       className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto overflow-x-hidden mb-10`}>
-      <AvatarUser />
+      <FormContext.Provider
+        value={{
+          inputs: inputs,
+          setInputs: setInputs,
+          croppedAvatar: croppedAvatar,
+          setCroppedAvatar: setCroppedAvatar,
+          coverImage: coverImage,
+          setCoverImage: setCoverImage,
+        }}>
+        <AvatarAndCoverUser register={register} getValues={getValues} />
+      </FormContext.Provider>
 
       <main className="mt-10">
         <Tabs value={activeTab || ''} className="flex w-[90%] m-auto">
