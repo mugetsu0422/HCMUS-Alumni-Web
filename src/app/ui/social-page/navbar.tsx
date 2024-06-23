@@ -7,7 +7,6 @@ import {
   Badge,
   Avatar,
   Button,
-  Input,
   Popover,
   PopoverHandler,
   PopoverContent,
@@ -24,10 +23,10 @@ import {
   faCalendarDays,
   faCertificate,
   faBell,
-  faEnvelope,
   faUsers,
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons'
+import { ChatDotsFill } from 'react-bootstrap-icons'
 
 // nav list component
 const navListItems = [
@@ -223,12 +222,11 @@ export default function MyNavbar() {
           </Popover>
 
           <Badge content={2} color="blue">
-            <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon
-                icon={faEnvelope}
-                className="text-2xl text-[--text-navbar]"
-              />
-            </Button>
+            <Link href="/messenger">
+              <Button placeholder={undefined} variant="text" size="sm">
+                <ChatDotsFill className="text-2xl text-[--text-navbar]" />
+              </Button>
+            </Link>
           </Badge>
 
           <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
