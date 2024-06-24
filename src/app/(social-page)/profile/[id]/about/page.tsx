@@ -91,7 +91,7 @@ export default function Page() {
 
         {/* Tên */}
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <PersonFill className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
@@ -122,7 +122,7 @@ export default function Page() {
 
         {/* Khóa - Khoa */}
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <Mortarboard className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
@@ -179,7 +179,7 @@ export default function Page() {
 
         {/* Mã số sinh viên */}
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <PersonVcard className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
@@ -221,7 +221,7 @@ export default function Page() {
 
         {/* Ngày sinh */}
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <Calendar className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
@@ -251,7 +251,7 @@ export default function Page() {
 
         {/* Giới tính */}
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           {user.gender == 'Nam' ? (
             <GenderMale className="text-[20px] lg:text-[24px]" />
           ) : (
@@ -293,7 +293,7 @@ export default function Page() {
           Thông tin liên hệ
         </p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <TelephoneFill className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
@@ -326,7 +326,7 @@ export default function Page() {
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <Envelope className="text-[20px] lg:text-[24px]" />
           <div>
             <p className="text-base lg:text-[20px] font-semibold">

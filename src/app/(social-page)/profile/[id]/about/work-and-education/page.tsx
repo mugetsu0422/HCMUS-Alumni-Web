@@ -266,7 +266,7 @@ function WorksListItem({ id, name, position, startTime, endTime }) {
 
   return (
     <div key={id} className="flex justify-between items-center">
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-4">
         <Briefcase className="text-[20px] lg:text-[24px]" />
         <div>
           <p className="text-base lg:text-[20px] font-semibold">{name}</p>
@@ -434,7 +434,7 @@ function EducationListItem({ id, name, skill }) {
 
   return (
     <div key={id} className="flex justify-between items-center">
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-4">
         <Award className="text-[20px] lg:text-[24px]" />
         <div>
           <p className="text-base lg:text-[20px] font-semibold">{name}</p>

@@ -31,8 +31,8 @@ const works = [
 
 function AchievementListItem({ id, name, tags }) {
   return (
-    <div key={id} className="flex justify-between items-center">
-      <div className="flex items-center gap-4">
+    <div key={id} className="flex justify-between items-center w-full">
+      <div className="flex items-center gap-4 w-full">
         <PostListItem />
       </div>
     </div>

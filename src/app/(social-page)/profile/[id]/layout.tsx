@@ -25,6 +25,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import ChangeAvatarUser from '@/app/ui/social-page/profile/ChangeAvatarUser'
 import ChangeCoverUser from '@/app/ui/social-page/profile/ChangeCoverUser'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const user = {
   fullName: 'Trương Samuel',
@@ -57,11 +58,12 @@ function AvatarAndCoverUser({ register, getValues }) {
 
   return (
     <div className="relative">
-      <figure className="relative h-40 xl:h-60 w-full">
+      <CustomToaster />
+      <figure className="relative h-40 xl:h-96 w-full">
         <img
           src={coverImage}
           alt="user cover"
-          className="w-full h-40 xl:h-60 object-cover object-center"
+          className="w-full h-40 xl:h-96 object-cover object-center"
         />
         <figcaption className="absolute bottom-0 left-2/4 flex justify-end w-full -translate-x-2/4 py-2 px-4">
           <Button
@@ -83,7 +85,7 @@ function AvatarAndCoverUser({ register, getValues }) {
         openChangeCover={openChangeCover}
       />
 
-      <div className="absolute top-[68%] ml-[2vw] 2xl:ml-[1.5vw] lg:top-[50%] xl:top-[60%] flex flex-col items-end">
+      <div className="absolute top-[70%] ml-[2vw] 2xl:ml-[1.5vw] lg:top-[50%] xl:top-[70%] flex flex-col items-end">
         <Avatar
           placeholder={undefined}
           src={croppedAvatar}
@@ -204,9 +206,9 @@ export default function GroupLayout({
                 value={label}
                 onClick={() => handleClickTab(url)}
                 className={clsx({
-                  'text-nowrap w-fit font-bold px-4 py-2 xl:px-6 xl:py-4 flex justify-start text-sm lg:text-base':
+                  'text-nowrap w-fit font-bold px-4 py-2 xl:px-6 xl:py-4 flex justify-start text-sm lg:text-base z-0':
                     true,
-                  'text-nowrap border-b-2 px-4 py-2 border-[--blue-05]  bg-[#e6f0fb] w-fit text-[--blue-05] flex justify-start text-sm lg:text-base':
+                  'text-nowrap border-b-2 px-4 py-2 border-[--blue-05]  bg-[#e6f0fb] w-fit text-[--blue-05] flex justify-start text-sm lg:text-base z-0':
                     activeTab === url,
                 })}
                 activeClassName="text-[--blue-05] bg-[#e6f0fb]">

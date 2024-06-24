@@ -37,7 +37,7 @@ export default function ChangeCoverUser({
     setCroppedAreaPixels(croppedAreaPixels)
   }
 
-  const handleAvatarSelected = (e) => {
+  const handleCoverSelected = (e) => {
     const file = e.target.files[0]
 
     if (!file) {
@@ -101,23 +101,6 @@ export default function ChangeCoverUser({
     handleOpenChangeCover()
   }
 
-  const ImageWidth = ({ src }) => {
-    useEffect(() => {
-      const img = new Image()
-      img.src = src
-
-      img.onload = () => {
-        setWidth(img.width)
-      }
-
-      img.onerror = (error) => {
-        console.error('Failed to load the image', error)
-      }
-    }, [src])
-
-    return null
-  }
-
   return (
     <>
       <Dialog
@@ -129,7 +112,7 @@ export default function ChangeCoverUser({
         <DialogHeader
           placeholder={undefined}
           className="border-b-2 border-gray-300 justify-center">
-          Chọn ảnh đại diện
+          Chọn ảnh bìa
         </DialogHeader>
         <DialogBody placeholder={undefined} className="h-[30vw] flex flex-col">
           {!coverForCropping && (
@@ -145,25 +128,23 @@ export default function ChangeCoverUser({
                 type="file"
                 accept="image/png, image/jpeg"
                 {...register('cover', {
-                  onChange: handleAvatarSelected,
+                  onChange: handleCoverSelected,
                 })}
               />
             </>
           )}
           {coverForCropping && (
             <>
-              <ImageWidth src={coverForCropping.src} />
               <Cropper
                 image={coverForCropping.src}
                 crop={crop}
                 zoom={zoom}
-                aspect={1}
+                aspect={1350 / 384}
                 onCropChange={setCrop}
                 onCropComplete={onCropComplete}
                 onZoomChange={setZoom}
                 zoomWithScroll={false}
                 showGrid={false}
-                cropSize={{ height: 240, width: Number(width) }}
               />
             </>
           )}

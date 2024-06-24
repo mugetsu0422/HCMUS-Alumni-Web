@@ -40,9 +40,9 @@ function ProfileAboutTags({ params }) {
               value={label}
               onClick={() => handleClickTab(url)}
               className={clsx({
-                'sm:text-wrap xl:text-nowrap sm:w-[190px] lg:w-fit font-bold px-4 py-2 xl:px-6 xl:py-4 flex justify-start text-[14px] lg:text-base':
+                'sm:text-wrap xl:text-nowrap sm:w-[190px] lg:w-fit font-bold px-4 py-2 xl:px-6 xl:py-4 flex justify-start text-[14px] lg:text-base z-0':
                   true,
-                'sm:text-wrap xl:text-nowrap text-[--blue-05] sm:w-[190px] lg:w-full border-b-2 border-[--blue-05] flex justify-start bg-[#e6f0fb] text-[14px] lg:text-base':
+                'sm:text-wrap xl:text-nowrap text-[--blue-05] sm:w-[190px] lg:w-full border-b-2 border-[--blue-05] flex justify-start bg-[#e6f0fb] text-[14px] lg:text-base z-0':
                   activeTab === url,
               })}
               activeClassName="text-[--blue-05] bg-[#e6f0fb]">

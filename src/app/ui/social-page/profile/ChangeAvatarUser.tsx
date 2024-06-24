@@ -107,7 +107,7 @@ export default function ChangeAvatarUser({
       <Button
         placeholder={undefined}
         onClick={handleOpen}
-        className="h-fit w-fit p-2 bg-[#e4e6eb] -mt-6 2xl:-mt-8 rounded-full z-10 relative right-2">
+        className="h-fit w-fit p-2 bg-[#e4e6eb] -mt-6 2xl:-mt-8 rounded-full z-0 relative right-2">
         <Camera className="text-base xl:text-xl text-black" />
       </Button>
 
