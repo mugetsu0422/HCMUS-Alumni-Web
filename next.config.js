@@ -22,6 +22,14 @@ const nextConfig = {
         source: '/groups/:id/posts',
         destination: '/groups/:id',
       },
+      {
+        source: '/profile/:id/activities/joined-events',
+        destination: '/profile/:id/activities',
+      },
+      {
+        source: '/profile/:id',
+        destination: '/profile/:id/about',
+      },
     ]
   },
 }

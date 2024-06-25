@@ -160,6 +160,7 @@ export default function GroupLayout({
     },
   })
   const [inputs, setInputs] = useState({ avatar: null, cover: null })
+  const userId = Cookies.get('userId')
 
   const pathname = usePathname()
   const router = useRouter()

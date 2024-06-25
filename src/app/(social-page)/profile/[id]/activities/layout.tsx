@@ -17,7 +17,7 @@ function ProfileAboutTags({ params }) {
 
   const handleClickTab = (url) => {
     setActiveTab(url)
-    router.push(`/profile/${params.id}/joined-events/${url}`)
+    router.push(`/profile/${params.id}/activities/${url}`)
   }
   return (
     <div className="w-fit h-fit">

@@ -28,6 +28,7 @@ import {
   faRightFromBracket,
   faCircleUser,
 } from '@fortawesome/free-solid-svg-icons'
+import Cookies from 'js-cookie'
 
 // nav list component
 const navListItems = [
@@ -148,7 +149,7 @@ export default function MyNavbar() {
             <MenuList placeholder={undefined}>
               <MenuItem placeholder={undefined}>
                 <Link
-                  href={`/profile/id/about`}
+                  href={`/profile/${Cookies.get('userId')}/about`}
                   className="flex items-center gap-2">
                   <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
                   Trang cá nhân

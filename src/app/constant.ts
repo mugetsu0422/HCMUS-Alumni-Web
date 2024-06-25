@@ -47,7 +47,7 @@ export const PROFILE_TABS = [
   },
   {
     label: 'Hoạt động',
-    url: 'joined-events',
+    url: 'activities ',
   },
 ]
 
