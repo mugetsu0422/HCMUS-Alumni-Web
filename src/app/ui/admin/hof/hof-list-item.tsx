@@ -36,12 +36,12 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           onClick={() => {
             onDelete(id)
             handleOpen()
@@ -75,13 +75,15 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
           color="red"
-          className="mr-1 bg-[--delete] "
+          className={`${nunito.className}  ${
+            isHidden ? 'bg-[--blue-05]' : 'bg-[--delete]'
+          }  text-white normal-case text-md`}
           onClick={() => {
             onHideOrShow(id, statusId)
             handleOpen()
@@ -120,7 +122,9 @@ export default function HofListItem({ hof }) {
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -144,15 +148,16 @@ export default function HofListItem({ hof }) {
         setIsHidden(!isHidden)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
   if (isDeleted) return null
   return (
     <div
-      className={`${nunito.className} border border-t-0 g border-[#CDCDCD] w-[1400px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      <CustomToaster />
+      className={`${nunito.className} border border-t-0 g border-[#CDCDCD] w-[1450px] gap-2 m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
       <div className="h-[120px] w-[180px]">
         <img
           src={hof.thumbnail}
@@ -181,7 +186,7 @@ export default function HofListItem({ hof }) {
       </p>
       <div className="flex justify-end px-2">
         <Link href={`/admin/hof/${hof.id}`}>
-          <Button variant="text" placeholder={undefined} className="px-2 py-2">
+          <Button variant="text" placeholder={undefined} className="px-4">
             <PencilSquare className="text-2xl text-[--blue-05]" />
           </Button>
         </Link>
@@ -189,7 +194,7 @@ export default function HofListItem({ hof }) {
           variant="text"
           onClick={handleOpenDetele}
           placeholder={undefined}
-          className="px-2 py-2">
+          className="px-4">
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
         <DeleteDialog
@@ -200,14 +205,14 @@ export default function HofListItem({ hof }) {
         />
 
         {hof.status.name === 'Chờ' ? (
-          <div className="flex justify-center items-center px-2 py-2">
+          <div className="flex justify-center items-center px-4">
             <CalendarCheck className="text-2xl text-green-800" />
           </div>
         ) : (
           <Button
             variant="text"
             onClick={handleOpenShow}
-            className="px-2 py-2"
+            className="px-4"
             placeholder={undefined}>
             {!isHidden ? (
               <Eye className="text-2xl  text-black" />
