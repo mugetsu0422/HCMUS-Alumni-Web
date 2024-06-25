@@ -25,35 +25,7 @@ import { useRouter } from 'next/navigation'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ tạo bài viết?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          Không
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/news')
-          }}>
-          Hủy
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page() {
   const [content, setContent] = useState(null)
@@ -345,9 +317,10 @@ export default function Page() {
               className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog
+            <CancelChangesDialog
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
+              backUrl={'/admin/news'}
             />
             <Button
               onClick={async () => {
