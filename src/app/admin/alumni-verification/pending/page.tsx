@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import Filter from '../../../ui/admin/filter'
-import CardInformation from '../../../ui/admin/card-information-pending'
+import Filter from '../../../ui/admin/verify-alumni/filter'
+import CardInformation from '../../../ui/admin/verify-alumni/card-information-pending'
 import { nunito } from '../../../ui/fonts'
 import { Button } from '@material-tailwind/react'
 import axios from 'axios'

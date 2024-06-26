@@ -7,7 +7,7 @@ import {
   DialogBody,
   DialogFooter,
 } from '@material-tailwind/react'
-import { nunito } from '../fonts'
+import { nunito } from '../../fonts'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 

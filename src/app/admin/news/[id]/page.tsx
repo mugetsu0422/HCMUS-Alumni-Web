@@ -1,11 +1,6 @@
 'use client'
 
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
 import {
@@ -29,35 +24,7 @@ import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { useRouter } from 'next/navigation'
 import CustomToaster from '@/app/ui/common/custom-toaster'
-
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ các thay đổi?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          <span>Không</span>
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/news')
-          }}>
-          <span>Hủy</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
@@ -123,9 +90,11 @@ export default function Page({ params }: { params: { id: string } }) {
     const news = {
       title: data.title,
       thumbnail: data.thumbnail[0] || null,
-      tagNames: selectedTags.map((tag) => {
-        return tag.value
-      }).join(','),
+      tagNames: selectedTags
+        .map((tag) => {
+          return tag.value
+        })
+        .join(','),
       facultyId: data.facultyId,
     }
 
@@ -157,9 +126,12 @@ export default function Page({ params }: { params: { id: string } }) {
         id: putToast,
       })
     } catch (error) {
-      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-        id: putToast,
-      })
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
+        {
+          id: putToast,
+        }
+      )
     }
   }
 
@@ -364,9 +336,10 @@ export default function Page({ params }: { params: { id: string } }) {
               className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog
+            <CancelChangesDialog
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
+              backUrl={'/admin/news'}
             />
             <Button
               placeholder={undefined}
