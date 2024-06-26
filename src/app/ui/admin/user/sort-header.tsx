@@ -31,14 +31,14 @@ export default function SortHeader({ onOrder }) {
           <MenuList placeholder={undefined}>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('title', 'asc')}
+              onClick={() => onOrder('fullName', 'asc')}
               className="text-center font-bold flex justify-center ">
               A tới Z
               <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('title', 'desc')}
+              onClick={() => onOrder('fullName', 'desc')}
               className="text-center font-bold flex justify-center">
               Z tới A
               <SortAlphaUp />
@@ -57,19 +57,19 @@ export default function SortHeader({ onOrder }) {
             </Button>
           </MenuHandler>
           <MenuList placeholder={undefined}>
-            <MenuItem
+          <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('publishedAt', 'desc')}
-              className="text-center font-bold flex justify-center">
-              Mới nhất
-              <ArrowDown />
+              onClick={() => onOrder('email', 'asc')}
+              className="text-center font-bold flex justify-center ">
+              A tới Z
+              <SortAlphaDown />
             </MenuItem>
             <MenuItem
               placeholder={undefined}
-              onClick={() => onOrder('publishedAt', 'asc')}
+              onClick={() => onOrder('email', 'desc')}
               className="text-center font-bold flex justify-center">
-              Cũ nhất
-              <ArrowUp />
+              Z tới A
+              <SortAlphaUp />
             </MenuItem>
           </MenuList>
         </Menu>
