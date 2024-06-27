@@ -1,11 +1,13 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { nunito, plusJakartaSans } from '@/app/ui/fonts'
-import { Avatar, Button } from '@material-tailwind/react'
+import { Avatar, Button, Input } from '@material-tailwind/react'
 import Link from 'next/link'
-import { XLg, PlusCircle } from 'react-bootstrap-icons'
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { XLg, PlusCircle, Search, PencilSquare } from 'react-bootstrap-icons'
+import CustomToaster from '@/app/ui/common/custom-toaster'
+import { useForm } from 'react-hook-form'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useDebouncedCallback } from 'use-debounce'
 
 const dataTemp = [
   { name: 'Trần Phúc', time: '11:00', latestMes: 'Xin chào bạn', isRead: true },
@@ -67,10 +69,23 @@ export default function GroupLayout({
 }: {
   children: React.ReactNode
 }) {
+  const { register, reset } = useForm({
+    defaultValues: {
+      title: '',
+    },
+  })
   const [isSmallerThanLg, setIsSmallerThanLg] = useState(true)
-
   const [isSideBarOpen, setIsSideBarOpen] = React.useState(true)
   const [isSmallerThan2XL, setIsSmallerThan2XL] = React.useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const curPage = useRef(0)
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const searchParams = useSearchParams()
+  const params = new URLSearchParams(searchParams)
+  const [myParams, setMyParams] = useState(`?${params.toString()}`)
+  const router = useRouter()
+
   const closeSideBar = () => setIsSideBarOpen((e) => !e)
   const toggleIsSideBar = () => setIsSideBarOpen((cur) => !cur)
 
@@ -83,6 +98,23 @@ export default function GroupLayout({
     setIsSmallerThan2XL(false)
     setIsSideBarOpen(true)
   }
+
+  const resetCurPage = () => {
+    params.delete('page')
+    curPage.current = 0
+    setHasMore(true)
+  }
+
+  const onSearch = useDebouncedCallback((keyword) => {
+    if (keyword) {
+      params.set('title', keyword)
+    } else {
+      params.delete('title')
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    setMyParams(`?${params.toString()}`)
+  }, 500)
 
   useEffect(() => {
     const handleResize = () => {
@@ -107,6 +139,7 @@ export default function GroupLayout({
 
   return (
     <>
+      <CustomToaster />
       {isSideBarOpen ? (
         ''
       ) : (
@@ -135,11 +168,33 @@ export default function GroupLayout({
             )}
             <div className="flex flex-col p-4 gap-y-6 w-full">
               {isSmallerThanLg && (
-                <div className="flex justify-between">
-                  <p
-                    className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2`}>
-                    Nhắn tin
-                  </p>
+                <div className="flex flex-col gap-2 justify-between">
+                  <div
+                    className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2 flex justify-between items-center`}>
+                    <p>Nhắn tin</p>
+                    <Button
+                      onClick={() => router.push('/messages/inbox/new')}
+                      placeholder={undefined}
+                      className="p-2"
+                      variant="text">
+                      <PencilSquare className="text-xl xl:text-2xl" />
+                    </Button>
+                  </div>
+
+                  <Input
+                    size="lg"
+                    crossOrigin={undefined}
+                    placeholder="Tìm kiếm bạn bè"
+                    containerProps={{ className: 'w-full' }}
+                    {...register('title', {
+                      onChange: (e) => onSearch(e.target.value),
+                    })}
+                    icon={<Search />}
+                    className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                    labelProps={{
+                      className: 'before:content-none after:content-none',
+                    }}
+                  />
                 </div>
               )}
               {/* #f7fafd */}
@@ -147,7 +202,7 @@ export default function GroupLayout({
                 {dataTemp.map(
                   ({ name, time, latestMes, isRead, isOline }, idx) => (
                     <Link
-                      href={`/messages/id`}
+                      href={`/messages/inbox/id`}
                       key={idx}
                       className={`${plusJakartaSans.className} flex justify-around rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer pt-2 pb-2 pl-2 pr-4 w-full`}>
                       <Avatar

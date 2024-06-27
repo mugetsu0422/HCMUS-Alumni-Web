@@ -222,7 +222,7 @@ export default function MyNavbar() {
           </Popover>
 
           <Badge content={2} color="blue">
-            <Link href="/messages">
+            <Link href="/messages/inbox">
               <Button placeholder={undefined} variant="text" size="sm">
                 <ChatDotsFill className="text-2xl text-[--text-navbar]" />
               </Button>
