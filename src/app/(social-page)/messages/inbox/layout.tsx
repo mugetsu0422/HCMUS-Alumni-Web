@@ -57,7 +57,7 @@ const dataTemp = [
     isRead: true,
   },
   {
-    name: 'QQQQQ',
+    name: 'End mes',
     time: '11:00',
     latestMes: '111111111111121555555555555555555555555555111111',
     isRead: true,
@@ -75,7 +75,6 @@ export default function GroupLayout({
     },
   })
   const [isSmallerThanLg, setIsSmallerThanLg] = useState(true)
-  const [isSideBarOpen, setIsSideBarOpen] = React.useState(true)
   const [isSmallerThan2XL, setIsSmallerThan2XL] = React.useState(false)
   const [hasMore, setHasMore] = useState(true)
   const curPage = useRef(0)
@@ -85,19 +84,6 @@ export default function GroupLayout({
   const params = new URLSearchParams(searchParams)
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const router = useRouter()
-
-  const closeSideBar = () => setIsSideBarOpen((e) => !e)
-  const toggleIsSideBar = () => setIsSideBarOpen((cur) => !cur)
-
-  const handleChangeSmallScreen = () => {
-    setIsSmallerThan2XL(true)
-    setIsSideBarOpen(false)
-  }
-
-  const handleChangeBigScreen = () => {
-    setIsSmallerThan2XL(false)
-    setIsSideBarOpen(true)
-  }
 
   const resetCurPage = () => {
     params.delete('page')
@@ -118,19 +104,19 @@ export default function GroupLayout({
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth <= 1024) {
-        if (window.innerWidth <= 570) {
-          handleChangeSmallScreen()
+      if (window.innerWidth <= 900) {
+        if (window.innerWidth <= 690) {
+          setIsSmallerThan2XL(true)
           setIsSmallerThanLg(false)
         } else {
-          handleChangeBigScreen()
+          setIsSmallerThan2XL(false)
           setIsSmallerThanLg(false)
         }
       } else {
         setIsSmallerThanLg(true)
       }
     }
-
+    //handleResize()
     window.addEventListener('resize', handleResize)
     return () => {
       window.removeEventListener('resize', handleResize)
@@ -138,116 +124,93 @@ export default function GroupLayout({
   }, [])
 
   return (
-    <>
+    <div className="sticky top-0 flex flex-1 overflow-hidden">
       <CustomToaster />
-      {isSideBarOpen ? (
-        ''
-      ) : (
-        <Button
-          onClick={toggleIsSideBar}
-          variant="text"
-          placeholder={undefined}
-          className="fixed p-0 mt-1 z-10">
-          <PlusCircle className="text-2xl" />
-        </Button>
-      )}
-      <div className="flex flex-1 h-full overflow-x-auto">
-        {isSideBarOpen && (
+      <div className="relative flex flex-1 h-full overflow-x-auto">
+        {
           <div
-            className={`fixed left-0 w-1/5 min-w-[120px] max-h-[90vh] overflow-auto scrollbar-webkit border-[#eeeeee] border-r-2 z-20`}>
-            {isSmallerThan2XL && isSideBarOpen && (
-              <div className="pt-4 pr-4 flex justify-end">
-                <Button
-                  onClick={closeSideBar}
-                  placeholder={undefined}
-                  className="p-2"
-                  variant="text">
-                  <XLg className="text-[22px]" />
-                </Button>
-              </div>
-            )}
-            <div className="flex flex-col p-4 gap-y-6 w-full">
-              {isSmallerThanLg && (
-                <div className="flex flex-col gap-2 justify-between">
-                  <div
-                    className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2 flex justify-between items-center`}>
-                    <p>Nhắn tin</p>
-                    <Button
-                      onClick={() => router.push('/messages/inbox/new')}
-                      placeholder={undefined}
-                      className="p-2"
-                      variant="text">
-                      <PencilSquare className="text-xl xl:text-2xl" />
-                    </Button>
-                  </div>
-
-                  <Input
-                    size="lg"
-                    crossOrigin={undefined}
-                    placeholder="Tìm kiếm bạn bè"
-                    containerProps={{ className: 'w-full' }}
-                    {...register('title', {
-                      onChange: (e) => onSearch(e.target.value),
-                    })}
-                    icon={<Search />}
-                    className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-                    labelProps={{
-                      className: 'before:content-none after:content-none',
-                    }}
-                  />
+            className={`relative left-0 shrink h-full overflow-hidden border-[#eeeeee] border-r-2 z-20`}>
+            <div className="flex flex-1 flex-col p-4 gap-y-6 w-full">
+              <div className="flex flex-1 flex-col gap-2 justify-between">
+                <div
+                  className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2 flex justify-between items-center`}>
+                  {isSmallerThanLg && <p>Nhắn tin</p>}
+                  <Button
+                    onClick={() => router.push('/messages/inbox/new')}
+                    placeholder={undefined}
+                    className={`p-2 ${!isSmallerThanLg && 'm-auto'} `}
+                    variant="text">
+                    <PencilSquare className="text-xl xl:text-2xl" />
+                  </Button>
                 </div>
-              )}
-              {/* #f7fafd */}
-              <div className="flex flex-col gap-3 h-[91vh] w-fit max-w-[18rem] pr-2">
-                {dataTemp.map(
-                  ({ name, time, latestMes, isRead, isOline }, idx) => (
-                    <Link
-                      href={`/messages/inbox/id`}
-                      key={idx}
-                      className={`${plusJakartaSans.className} flex justify-around rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer pt-2 pb-2 pl-2 pr-4 w-full`}>
-                      <Avatar
-                        placeholder={undefined}
-                        src="/demo.jpg"
-                        size="md"
-                        alt="user avatar"
-                      />
-                      {isSmallerThanLg && (
-                        <div className="ml-2 w-[100%] flex justify-around">
-                          <div className="w-[90vw] max-w-[170px]">
-                            <p className="font-bold text-black text-base">
-                              {name}
-                            </p>
-                            <p
-                              className={`truncate max-w-[80%] ${
-                                !isRead && 'font-semibold text-[--secondary]'
-                              } text-[14px]`}>
-                              {latestMes}
-                            </p>
-                          </div>
 
-                          <div>
-                            <p>{time}</p>
-                            {!isRead && (
-                              <span className="mx-auto mt-1 block h-2 w-2 rounded-full bg-[var(--warning)] content-['']" />
-                            )}
+                <Input
+                  size="lg"
+                  crossOrigin={undefined}
+                  placeholder="Tìm kiếm bạn bè"
+                  containerProps={{ className: 'w-full shrink' }}
+                  {...register('title', {
+                    onChange: (e) => onSearch(e.target.value),
+                  })}
+                  icon={<Search />}
+                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full shrink"
+                  labelProps={{
+                    className: 'before:content-none after:content-none',
+                  }}
+                />
+              </div>
+
+              <div
+                className={`relative shrink h-full max-h-[65vh] overflow-y-auto overflow-x-hidden scrollbar-webkit`}>
+                <div className="relative flex flex-col mx-auto flex-1 lg:flex-0 h-full gap-3 w-fit max-w-[18rem] pr-2">
+                  {dataTemp.map(
+                    ({ name, time, latestMes, isRead, isOline }, idx) => (
+                      <Link
+                        href={`/messages/inbox/id`}
+                        key={idx}
+                        className={`${plusJakartaSans.className}relative flex flex-1 justify-around rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer pt-2 pb-2 pl-2 pr-4 w-full`}>
+                        <Avatar
+                          placeholder={undefined}
+                          src="/demo.jpg"
+                          size="md"
+                          alt="user avatar"
+                        />
+                        {isSmallerThanLg && (
+                          <div className="flex-1 flex ml-2 shrink w-fit max-w-[100vw] justify-around">
+                            <div className="flex-1 flex flex-col w-[90vw] max-w-[200px]">
+                              <p className="font-bold text-black text-base">
+                                {name}
+                              </p>
+                              <p
+                                className={`truncate shrink w-full max-w-[90px] 2xl:max-w-[150px] ${
+                                  !isRead && 'font-semibold text-[--secondary]'
+                                } text-[14px]`}>
+                                {latestMes}
+                              </p>
+                            </div>
+
+                            <div className="absolute right-4">
+                              <p>{time}</p>
+                              {!isRead && (
+                                <span className="mx-auto mt-1 block h-2 w-2 rounded-full bg-[var(--warning)] content-['']" />
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </Link>
-                  )
-                )}
+                        )}
+                      </Link>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        )}
+        }
 
         <main
-          className={`fixed right-0 flex-1 ${
-            !isSideBarOpen ? 'w-[92%]' : 'w-4/5'
-          } min-w-[250px] h-[91vh] flex flex-col items-between overflow-hidden`}>
+          className={`relative flex-1 w-[92%] min-w-[250px] h-full flex flex-col overflow-hidden`}>
           {children}
         </main>
       </div>
-    </>
+    </div>
   )
 }

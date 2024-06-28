@@ -86,9 +86,6 @@ export default function Page() {
         <div className="mx-auto flex flex-col items-center gap-1">
           <Avatar placeholder={undefined} src="/demo.jpg" size="xl" />
           <p className="font-semibold text-base">Trương Samuel</p>
-          <p className="text-[14px] text-[--secondary]">
-            Người dùng trên Alumni
-          </p>
         </div>
       </div>
 
