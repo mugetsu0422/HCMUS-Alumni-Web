@@ -26,6 +26,11 @@ export const POST_STATUS = {
   Ẩn: 3,
   Xoá: 4,
 }
+export const USER_GROUP_STATUS = {
+  Khóa: 1,
+  'Bình thường': 2,
+  Xóa: 3,
+}
 export const REACTION_TYPE = {
   Like: 1,
 }

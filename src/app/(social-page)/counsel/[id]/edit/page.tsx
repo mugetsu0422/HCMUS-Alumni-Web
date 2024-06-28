@@ -63,7 +63,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
         const reader = new FileReader()
         reader.onload = (event) => {
-          newImages.push({ src: event.target.result })
+          newImages.push({ pictureUrl: event.target.result })
           setPreviewImages(newImages)
         }
         reader.readAsDataURL(file)
@@ -99,7 +99,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
           const reader = new FileReader()
           reader.onload = (event) => {
-            newImages.push({ src: event.target.result })
+            newImages.push({ pictureUrl: event.target.result })
             setPreviewImages(newImages)
           }
           reader.readAsDataURL(file)
@@ -107,13 +107,16 @@ export default function Page({ params }: { params: { id: string } }) {
       }
     })
   }
-  const removeImage = (index, event) => {
+  const removeImage = (index, id, event) => {
     event.stopPropagation()
     const newImages = previewImages.filter(
       (image, imageIndex) => imageIndex !== index
     )
+    setCurrentImages(newImages)
     setPreviewImages(newImages)
     setAddedImageFiles((prev) => prev.filter((_, i) => i !== index))
+
+    setDeleteImageIds((prev) => prev.concat(id))
   }
   const onAddTags = useCallback(
     (newTag) => {
@@ -173,7 +176,7 @@ export default function Page({ params }: { params: { id: string } }) {
         })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: putToast,
         })
       })
@@ -354,17 +357,17 @@ function AddImagePost({
             <div className="mt-4 flex flex-wrap gap-3 justify-center">
               {previewImages.map((image, index) => (
                 <div
-                  key={image.src}
+                  key={image.pictureUrl}
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
-                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                    onClick={(event) => removeImage(index, event)} // Pass event object
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    onClick={(event) => removeImage(index, image.id, event)} // Pass event object
                   >
                     <XLg />
                   </Button>
                   <img
-                    src={image.src}
+                    src={image.pictureUrl}
                     alt="Ảnh được kéo thả"
                     className="w-48 h-48 object-cover rounded-md"
                   />
@@ -383,7 +386,7 @@ function VotingPostForm({ votes }) {
     <div className="w-full   rounded-lg ">
       <div className="mb-4">
         <div className="flex text-gray-700 text-xl font-bold mb-2 ">
-          Tạo bình chọn
+          Bình chọn
         </div>
         {votes.map(({ name }, index) => (
           <div key={index} className="flex items-center mb-2">
@@ -396,19 +399,14 @@ function VotingPostForm({ votes }) {
               label={`Lựa chọn ${index + 1}`}
             />
             <Button
+              variant="text"
               placeholder={undefined}
-              disabled={true}
-              className="ml-2 bg-red-500 text-white rounded text-nowrap normal-case text-[13px]">
-              Xóa lựa chọn
+              className="mr-1 p-2 cursor-pointer"
+              disabled={true}>
+              <XLg className="text-lg" />
             </Button>
           </div>
         ))}
-        <Button
-          placeholder={undefined}
-          disabled={true}
-          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
-          Thêm lựa chọn
-        </Button>
       </div>
     </div>
   )

@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
 import { useRouter } from 'next/navigation'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 const roleNameToCategoryName = (roleName) => {
   switch (roleName) {
@@ -46,35 +47,6 @@ const roleNameToCategoryName = (roleName) => {
     default:
       return null
   }
-}
-
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ các thay đổi?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          <span>Không</span>
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/roles')
-          }}>
-          <span>Hủy</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
 }
 
 export default function Page() {
@@ -132,9 +104,12 @@ export default function Page() {
         })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
-          id: postToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: postToast,
+          }
+        )
       })
   }
 
@@ -189,7 +164,9 @@ export default function Page() {
       })
       .catch((error) => {
         console.error(error)
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }, [])
 
@@ -318,9 +295,10 @@ export default function Page() {
                   className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
                   Hủy
                 </Button>
-                <CancelDialog
+                <CancelChangesDialog
                   open={openCancelDialog}
                   handleOpen={handleOpenCancelDialog}
+                  backUrl={'/admin/roles'}
                 />
                 <Button
                   placeholder={undefined}

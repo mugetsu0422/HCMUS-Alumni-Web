@@ -156,7 +156,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
       setSelectedVoteIds(new Set(selectedVoteIds))
     } catch (error) {
-      toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+      toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
     }
   }
 
@@ -209,7 +209,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: postCommentToast,
         })
       })
@@ -246,7 +246,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       )
       .then()
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onCancelReactPost = () => {
@@ -262,7 +262,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       )
       .then()
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   function handleReactionClick() {
@@ -302,7 +302,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
         toast.success('Xoá bài viết thành công')
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onEditComment = (
@@ -390,8 +390,23 @@ export default function PostListItem({ post }: { post: PostProps }) {
         setVotesCount(new Map(votesCount))
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
+  }
+  const onFetchUserVotes = (
+    postId: string,
+    voteId: number,
+    page: number = 0,
+    pageSize: number = 50
+  ) => {
+    return axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${postId}/votes/${voteId}?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
 
   return (
@@ -517,6 +532,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
               handleVote={handleVote}
               onAddVoteOption={onAddVoteOption}
               postId={post.id}
+              onFetchUserVotes={onFetchUserVotes}
             />
           )}
 

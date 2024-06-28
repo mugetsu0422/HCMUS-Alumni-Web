@@ -24,6 +24,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import moment from 'moment'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 const getTodayDate = () => {
   //*Get current date
@@ -41,35 +42,6 @@ const getTodayDate = () => {
   let year = newDate.getFullYear().toString()
 
   return `${year}-${month}-${date}T00:00`.toString()
-}
-
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ tạo bài viết?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          <span>Không</span>
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/events')
-          }}>
-          <span>Hủy</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
 }
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -154,7 +126,7 @@ export default function Page({ params }: { params: { id: string } }) {
         })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: putToast,
         })
       })
@@ -458,9 +430,10 @@ export default function Page({ params }: { params: { id: string } }) {
               className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog
+            <CancelChangesDialog
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
+              backUrl={'/admin/events'}
             />
             <Button
               placeholder={undefined}

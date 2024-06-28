@@ -50,7 +50,7 @@ function Step1() {
         handleNext()
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
         return
       })
   }
@@ -204,7 +204,7 @@ function Step2() {
       })
       .catch((error) => {
         // failed
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const countdownRenderer = ({ seconds }) => {
@@ -224,7 +224,7 @@ function Step2() {
       )
       .then((res) => {})
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
     setIsCodeExpired(false)
     timer.current = Date.now()

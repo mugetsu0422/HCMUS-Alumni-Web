@@ -144,7 +144,7 @@ export default function Page({ params }: { params: { id: string } }) {
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
-      toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
   // Fetch event participants
@@ -208,7 +208,7 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: postCommentToast,
         })
       })

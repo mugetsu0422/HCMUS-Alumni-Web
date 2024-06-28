@@ -27,6 +27,7 @@ import {
   BoxArrowInRight,
   PencilSquare,
   Trash,
+  TagsFill,
 } from 'react-bootstrap-icons'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -100,7 +101,7 @@ export default function GroupLayout({
       )
       .then(() => {})
       .catch((error) => {
-        toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
       })
   }
 
@@ -153,6 +154,15 @@ export default function GroupLayout({
                 {GROUP_PRIVACY[group.privacy]} <Dot /> {group.participantCount}{' '}
                 thành viên tham gia
               </p>
+
+              {group.tags.length > 0 && (
+                <div className="flex items-center gap-1 text-[#65676b]">
+                  <TagsFill className="text-[--blue-05] mr-2" />
+                  {group.tags.map(({ id, name }) => (
+                    <span key={id}>{name}</span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {group.userRole ? (
