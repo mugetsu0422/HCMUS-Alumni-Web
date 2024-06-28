@@ -1,5 +1,6 @@
 // 'use client'
 import './globals.css'
+import FirebaseForeground from './ui/common/firebase-foreground'
 import { inter } from './ui/fonts'
 
 export const metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         className={`${inter.className} overflow-x-auto scrollbar-webkit-main`}>
+        <FirebaseForeground />
         {children}
       </body>
     </html>
