@@ -38,12 +38,12 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           onClick={() => {
             onDelete(id)
             handleOpen()
@@ -73,7 +73,7 @@ export default function RolesListItem({ role }: { role: Role }) {
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

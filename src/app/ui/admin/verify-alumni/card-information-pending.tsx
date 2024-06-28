@@ -1,13 +1,12 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { inter, nunito } from '../fonts'
+import { inter, nunito } from '../../fonts'
 import { Input, Button } from '@material-tailwind/react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { JWT_COOKIE } from '../../constant'
+import { JWT_COOKIE } from '../../../constant'
 import { FieldValues, useForm } from 'react-hook-form'
-import { Facebook, Linkedin } from 'react-bootstrap-icons'
 import LinkIcon from './link-icon'
 import toast from 'react-hot-toast'
 
@@ -45,7 +44,7 @@ export default function CardInformation({ offset, items, setItems }) {
         }
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

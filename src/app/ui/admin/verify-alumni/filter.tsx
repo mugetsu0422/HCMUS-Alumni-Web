@@ -7,7 +7,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { classNames } from 'react-easy-crop/helpers'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
-import { FACULTIES } from '../../constant'
+import { FACULTIES } from '../../../constant'
 import { SortAlphaUp, SortAlphaDown } from 'react-bootstrap-icons'
 const filerBtn = [
   {

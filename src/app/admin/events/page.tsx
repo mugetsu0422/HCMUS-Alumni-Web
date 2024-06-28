@@ -15,6 +15,7 @@ import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3
@@ -228,6 +229,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] ">
+      <CustomToaster />
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1650px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý sự kiện

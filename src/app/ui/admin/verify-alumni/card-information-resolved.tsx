@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { inter, nunito } from '../fonts'
+import { inter, nunito } from '../../fonts'
 import { Input, Button } from '@material-tailwind/react'
 import LinkIcon from './link-icon'
 import { CheckCircleFill, XCircleFill } from 'react-bootstrap-icons'

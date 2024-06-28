@@ -84,7 +84,7 @@ export default function Page() {
         setGroups(groups.concat(addedGroups))
       })
       .catch((error) => {
-        console.log(error.response.data.error.message || 'Lỗi không xác định')
+        console.log(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onJoinGroup = (groupId: string): Promise<AxiosResponse<any, any>> => {
@@ -110,12 +110,12 @@ export default function Page() {
         },
       })
       .then(({ data: { totalPages, groups } }) => {
-        if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setGroups(groups)
+        setHasMore(totalPages > 1)
       })
       .catch((error) => {
-        console.log(error.response.data.error.message || 'Lỗi không xác định')
+        console.log(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }, [myParams])
 

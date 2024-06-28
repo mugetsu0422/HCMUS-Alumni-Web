@@ -31,12 +31,12 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           onClick={() => {
             onDelete(id)
             handleOpen()
@@ -48,20 +48,18 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
   )
 }
 
-function HideOrShowDialog({ id, open, handleOpen, status, onHideOrShow }) {
+function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
   let header = ''
   let body = ''
   let statusId = null
-  if (status === 'Bình thường') {
-    header = 'Ẩn'
-    body = 'Bạn có muốn ẩn sự kiện này'
-    statusId = POST_STATUS['Ẩn']
-  } else if (status === 'Ẩn') {
-    header = 'Hiện thị'
+  if (isHidden) {
+    header = 'Hiển thị'
     body = 'Bạn có muốn hiển thị sự kiện này?'
     statusId = POST_STATUS['Bình thường']
   } else {
-    return null
+    header = 'Ẩn'
+    body = 'Bạn có muốn ẩn sự kiện này'
+    statusId = POST_STATUS['Ẩn']
   }
 
   return (
@@ -72,12 +70,14 @@ function HideOrShowDialog({ id, open, handleOpen, status, onHideOrShow }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className}  ${
+            isHidden ? 'bg-[--blue-05]' : 'bg-[--delete]'
+          }  text-white normal-case text-md`}
           onClick={() => {
             onHideOrShow(id, statusId)
             handleOpen()
@@ -123,7 +123,9 @@ export default function EventsListItem({
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -147,7 +149,9 @@ export default function EventsListItem({
         setIsHidden(!isHidden)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -155,7 +159,6 @@ export default function EventsListItem({
   return (
     <div
       className={`${nunito.className} border border-t-0 gap-2 border-[#CDCDCD] w-[1650px] m-auto items-center justify-between h-fit flex pl-4 py-2 last:rounded-b-lg`}>
-      <CustomToaster />
       <div className="h-[120px] w-[180px]">
         <img
           src={thumbnail}
@@ -223,7 +226,7 @@ export default function EventsListItem({
           id={id}
           open={openShow}
           handleOpen={handleOpenShow}
-          status={status.name}
+          isHidden={isHidden}
           onHideOrShow={onHideOrShow}
         />
       </div>
