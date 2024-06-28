@@ -163,7 +163,7 @@ export default function Page() {
               size="lg"
               crossOrigin={undefined}
               variant="outlined"
-              type="text"
+              type="number"
               {...register('beginningYear', {
                 pattern: {
                   value: /^\d{4}$/,

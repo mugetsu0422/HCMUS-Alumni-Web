@@ -3,9 +3,11 @@ import Navbar from '../ui/social-page/navbar'
 
 export default function RootLayout({ children }) {
   return (
-    <>
-      <Navbar />
-      <main>{children}</main>
-    </>
+    <div className="flex flex-col">
+      <div className="relative">
+        <Navbar />
+      </div>
+      <main className="relative ">{children}</main>
+    </div>
   )
 }

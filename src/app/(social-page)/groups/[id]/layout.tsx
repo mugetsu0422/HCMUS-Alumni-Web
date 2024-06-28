@@ -14,7 +14,6 @@ import {
   Tab,
   Tabs,
   TabsHeader,
-  tabs,
 } from '@material-tailwind/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createContext, useContext, useEffect, useState } from 'react'
