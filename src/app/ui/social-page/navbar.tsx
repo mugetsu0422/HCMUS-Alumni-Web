@@ -168,7 +168,7 @@ export default function MyNavbar() {
           <Popover placement="bottom-end">
             <PopoverHandler>
               <Button placeholder={undefined} variant="text" size="sm">
-                <Badge content={2} color="blue">
+                <Badge content={2} color="blue" className="">
                   <FontAwesomeIcon
                     icon={faBell}
                     className="text-2xl text-[--text-navbar]"
@@ -221,13 +221,13 @@ export default function MyNavbar() {
             </PopoverContent>
           </Popover>
 
-          <Badge content={2} color="blue">
-            <Link href="/messages/inbox">
-              <Button placeholder={undefined} variant="text" size="sm">
+          <Button placeholder={undefined} variant="text" size="sm">
+            <Link href={`messages/inbox`}>
+              <Badge content={2} color="blue">
                 <ChatDotsFill className="text-2xl text-[--text-navbar]" />
-              </Button>
+              </Badge>
             </Link>
-          </Badge>
+          </Button>
 
           <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
         </div>
