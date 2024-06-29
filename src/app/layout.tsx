@@ -1,6 +1,6 @@
 // 'use client'
 import './globals.css'
-import FirebaseForeground from './ui/common/firebase-foreground'
+import FirebaseForeground from '@/config/firebase-foreground'
 import { inter } from './ui/fonts'
 
 export const metadata = {

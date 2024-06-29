@@ -1,5 +1,5 @@
 'use client'
-import firebaseApp from '@/firebase'
+import firebaseApp from '@/config/firebase'
 import useFcmToken from '@/hooks/use-fcm-token'
 import { getMessaging, onMessage } from 'firebase/messaging'
 import { useEffect } from 'react'

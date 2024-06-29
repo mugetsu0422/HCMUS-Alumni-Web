@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { getMessaging, getToken } from 'firebase/messaging'
-import firebaseApp from '@/firebase'
+import firebaseApp from '@/config/firebase'
 import axios from 'axios'
 import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'

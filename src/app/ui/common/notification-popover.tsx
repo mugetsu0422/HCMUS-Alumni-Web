@@ -1,13 +1,21 @@
-'use client'
-
-import React, { useEffect, useRef, useState } from 'react'
-import { List, Spinner } from '@material-tailwind/react'
-import { roboto } from '@/app/ui/fonts'
 import { JWT_COOKIE } from '@/app/constant'
+import { faBell } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  Badge,
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverHandler,
+  Spinner,
+  Typography,
+} from '@material-tailwind/react'
 import axios from 'axios'
+import Link from 'next/link'
+import React, { useRef, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import Cookies from 'js-cookie'
 import NotificationItem from '@/app/ui/common/notification-item'
-import InfiniteScroll from 'react-infinite-scroll-component'
 
 const data = [
   {
@@ -92,11 +100,39 @@ const data = [
   },
 ]
 
-export default function Page() {
+export default function NotificationPopover() {
+  const [openNotification, setOpenNotification] = useState(false)
   const [notifications, setNotifications] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [totalPages, setTotalPages] = useState(0)
   const page = useRef(0)
+
+  const popoverHandler = () => {
+    if (!openNotification && !notifications.length && hasMore) {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/notification`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        })
+        .then(
+          ({
+            data: { totalUnreadNotification, totalPages, notifications },
+          }) => {
+            setNotifications(data)
+
+            if (!totalPages) {
+              setHasMore(false)
+              return
+            }
+            setTotalPages(totalPages)
+            setNotifications(notifications)
+          }
+        )
+        .catch((error) => {})
+    }
+    setOpenNotification((prev) => !prev)
+  }
 
   const onFetchMore = () => {
     page.current++
@@ -119,35 +155,44 @@ export default function Page() {
       .catch((error) => {})
   }
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/notification`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(
-        ({ data: { totalUnreadNotification, totalPages, notifications } }) => {
-          setNotifications(data)
-
-          if (!totalPages) {
-            setHasMore(false)
-            return
-          }
-          setTotalPages(totalPages)
-          setNotifications(notifications)
-        }
-      )
-      .catch((error) => {})
-  }, [])
-
   return (
-    <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
-      <p
-        className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
-        THÔNG BÁO
-      </p>
-      <List placeholder={undefined}>
+    <Popover
+      placement="bottom-end"
+      open={openNotification}
+      handler={popoverHandler}>
+      <PopoverHandler>
+        <Button placeholder={undefined} variant="text" size="sm">
+          <Badge content={2} color="blue" className="">
+            <FontAwesomeIcon
+              icon={faBell}
+              className="text-2xl text-[--text-navbar]"
+            />
+          </Badge>
+        </Button>
+      </PopoverHandler>
+      <PopoverContent
+        id="notification-popover"
+        placeholder={undefined}
+        className="max-h-[calc(100vh-var(--navbar-height)-15px)] w-[360px] max-w-[calc(100vw-24px)] overflow-y-auto scrollbar-webkit-main">
+        <div className="flex items-center justify-between">
+          <Typography
+            placeholder={undefined}
+            variant="h4"
+            color="blue-gray"
+            className="my-5">
+            Thông báo
+          </Typography>
+
+          <Link href="/notifications">
+            <Button
+              placeholder={undefined}
+              variant="text"
+              className="normal-case text-[14px] py-2 px-4">
+              Xem tất cả
+            </Button>
+          </Link>
+        </div>
+
         <InfiniteScroll
           className="flex flex-col"
           dataLength={notifications.length}
@@ -157,7 +202,8 @@ export default function Page() {
             <div className="h-10 my-5 flex justify-center">
               <Spinner className="h-8 w-8"></Spinner>
             </div>
-          }>
+          }
+          scrollableTarget="notification-popover">
           {notifications.map((notification) => (
             <NotificationItem
               notification={notification}
@@ -165,7 +211,7 @@ export default function Page() {
             />
           ))}
         </InfiniteScroll>
-      </List>
-    </div>
+      </PopoverContent>
+    </Popover>
   )
 }

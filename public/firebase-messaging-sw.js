@@ -9,7 +9,7 @@ const firebaseConfig = {
     storageBucket: "alumverse-23173.appspot.com",
     messagingSenderId: "436562093949",
     appId: "1:436562093949:web:f0e6eba6d4b3d2f50a4e14"
-  };
+};
 
 firebase.initializeApp(firebaseConfig);
 

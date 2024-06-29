@@ -27,6 +27,7 @@ import {
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons'
 import { ChatDotsFill } from 'react-bootstrap-icons'
+import NotificationPopover from '../common/notification-popover'
 
 // nav list component
 const navListItems = [
@@ -59,49 +60,6 @@ const navListItems = [
     label: 'Bạn bè',
     icon: faUserGroup,
     link: '/friends',
-  },
-]
-
-const notifications = [
-  {
-    id: '1',
-    imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: false,
-  },
-  {
-    id: '2',
-    imageUrl: '/demo.jpg',
-    notification: 'Trần Phúc đã bình luận bài viết của bạn của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '3',
-    imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '4',
-    imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '5',
-    imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
   },
 ]
 
@@ -165,61 +123,7 @@ export default function MyNavbar() {
         />
 
         <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
-          <Popover placement="bottom-end">
-            <PopoverHandler>
-              <Button placeholder={undefined} variant="text" size="sm">
-                <Badge content={2} color="blue" className="">
-                  <FontAwesomeIcon
-                    icon={faBell}
-                    className="text-2xl text-[--text-navbar]"
-                  />
-                </Badge>
-              </Button>
-            </PopoverHandler>
-            <PopoverContent
-              placeholder={undefined}
-              className="h-[370px] overflow-y-auto scrollbar-webkit-main">
-              <div className="flex items-center justify-between">
-                <Typography
-                  placeholder={undefined}
-                  variant="h4"
-                  color="blue-gray"
-                  className="my-5">
-                  Thông báo
-                </Typography>
-
-                <Link href="/notifications">
-                  <Button
-                    placeholder={undefined}
-                    variant="text"
-                    className="normal-case text-[14px] py-2 px-4">
-                    Xem tất cả
-                  </Button>
-                </Link>
-              </div>
-
-              {notifications.map(
-                ({ id, imageUrl, notification, time, link, isRead }) => (
-                  <Link href={link} key={id}>
-                    <MenuItem
-                      placeholder={undefined}
-                      className="flex gap-2 items-center justify-between">
-                      <Avatar placeholder={undefined} src={imageUrl} />
-                      <div className="w-48">
-                        <p className="text-black ">{notification}</p>
-                        <p>{time}</p>
-                      </div>
-                      <span
-                        className={`mx-auto block h-[10px] w-[10px] rounded-full ${
-                          !isRead ? 'bg-[--blue-05]' : ''
-                        } `}
-                      />
-                    </MenuItem>
-                  </Link>
-                )
-              )}
-            </PopoverContent>
-          </Popover>
+          <NotificationPopover />
 
           <Button placeholder={undefined} variant="text" size="sm">
             <Link href={`messages/inbox`}>
