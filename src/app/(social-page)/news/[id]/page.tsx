@@ -53,9 +53,12 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-          id: postCommentToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: postCommentToast,
+          }
+        )
       })
   }
   const onEditComment = (
@@ -117,51 +120,49 @@ export default function Page({ params }: { params: { id: string } }) {
 
   // Initial fetch
   useEffect(() => {
-    try {
-      const news = axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      const comments = axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      const relatedNews = axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
+    const news = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    const comments = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    const relatedNews = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
 
-      Promise.all([news, comments, relatedNews]).then(
-        ([newsRes, commentRes, relatedNewsRes]) => {
-          const { data: news } = newsRes
-          const {
-            data: { comments },
-          } = commentRes
-          const {
-            data: { news: relatedNews },
-          } = relatedNewsRes
+    Promise.all([news, comments, relatedNews])
+      .then(([newsRes, commentRes, relatedNewsRes]) => {
+        const { data: news } = newsRes
+        const {
+          data: { comments },
+        } = commentRes
+        const {
+          data: { news: relatedNews },
+        } = relatedNewsRes
 
-          setNews(news)
-          setComments(comments)
-          setRelatedNews(relatedNews)
-          setIsLoading(false)
-        }
-      )
-    } catch (error) {
-      setNoData(true)
-    }
+        setNews(news)
+        setComments(comments)
+        setRelatedNews(relatedNews)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        setNoData(true)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

@@ -128,7 +128,7 @@ export default function Page() {
       })
       .then(
         ({ data: { totalUnreadNotification, totalPages, notifications } }) => {
-          setNotifications(data)
+          // setNotifications(data)
 
           if (!totalPages) {
             setHasMore(false)

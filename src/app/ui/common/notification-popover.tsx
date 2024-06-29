@@ -119,7 +119,7 @@ export default function NotificationPopover() {
           ({
             data: { totalUnreadNotification, totalPages, notifications },
           }) => {
-            setNotifications(data)
+            // setNotifications(data)
 
             if (!totalPages) {
               setHasMore(false)

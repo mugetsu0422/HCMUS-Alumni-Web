@@ -332,7 +332,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data: { comments: fetchedComments } }) => {
         setComments(comments.concat(fetchedComments))
       })
-      .catch((errror) => {})
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
