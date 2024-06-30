@@ -120,7 +120,6 @@ export default function NotificationPopover() {
             data: { totalUnreadNotification, totalPages, notifications },
           }) => {
             // setNotifications(data)
-
             if (!totalPages) {
               setHasMore(false)
               return
@@ -155,6 +154,8 @@ export default function NotificationPopover() {
       .catch((error) => {})
   }
 
+
+
   return (
     <Popover
       placement="bottom-end"
@@ -185,6 +186,7 @@ export default function NotificationPopover() {
 
           <Link href="/notifications">
             <Button
+              onClick={() => setOpenNotification(false)}
               placeholder={undefined}
               variant="text"
               className="normal-case text-[14px] py-2 px-4">
@@ -207,6 +209,7 @@ export default function NotificationPopover() {
           {notifications.map((notification) => (
             <NotificationItem
               notification={notification}
+              lineClamp={3}
               key={notification.id}
             />
           ))}

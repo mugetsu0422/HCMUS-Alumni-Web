@@ -31,6 +31,23 @@ export const USER_GROUP_STATUS = {
   'Bình thường': 2,
   Xóa: 3,
 }
+export const NOTIFICATION_STATUS = {
+  'Chưa xem': 1,
+  'Đã xem': 2,
+  Xóa: 3,
+}
+export const NOTIFICATION_ENTITY_TABLE = [
+  'request_friend',
+  'comment_news',
+  'comment_event',
+  'interact_post_advise',
+  'comment_post_advise',
+  'group',
+  'request_join_group',
+  'interact_post_group',
+  'comment_post_group',
+] as const
+export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
   Like: 1,
 }
