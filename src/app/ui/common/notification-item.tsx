@@ -2,13 +2,15 @@ import { Avatar } from '@material-tailwind/react'
 import Link from 'next/link'
 import 'moment/locale/vi'
 import clsx from 'clsx'
-import { NOTIFICATION_STATUS } from '@/app/constant'
+import { JWT_COOKIE, NOTIFICATION_STATUS } from '@/app/constant'
 import moment from 'moment'
 import { useState } from 'react'
 import {
   NotificationProps,
   NotificationUrlBuilder,
 } from '@/helper/notification-url-builder'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 
 export default function NotificationItem({
   notification,
@@ -17,6 +19,10 @@ export default function NotificationItem({
   notification: NotificationProps
   lineClamp?: number
 }) {
+  const [isRead, setIsRead] = useState(
+    NOTIFICATION_STATUS[notification.status.name] ==
+      NOTIFICATION_STATUS['Đã xem']
+  )
   const [url, setUrl] = useState(() => {
     const builder = new NotificationUrlBuilder(notification)
     return builder.constructUrl(
@@ -25,8 +31,23 @@ export default function NotificationItem({
     )
   })
 
+  const onReadNotification = () => {
+    setIsRead(true)
+    axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/notification/${notification.id}`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+
   return (
     <Link
+      onAuxClick={() => onReadNotification()}
+      onClick={() => onReadNotification()}
       href={url}
       className={`flex gap-2 px-2 py-3 hover:rounded-lg hover:bg-[var(--highlight-bg)]`}>
       <div>
@@ -43,7 +64,8 @@ export default function NotificationItem({
         <p
           className={clsx({
             'text-sm': true,
-            'text-[--blue-05]': NOTIFICATION_STATUS[notification.status.name],
+            'text-[--blue-05]': !isRead,
+            'text-gray-600': isRead,
           })}>
           {moment(notification.createAt).locale('vi').local().fromNow()}
         </p>
@@ -52,7 +74,7 @@ export default function NotificationItem({
         <span
           className={clsx({
             'mx-auto block h-[12px] w-[12px] rounded-full': true,
-            'bg-[--blue-05]': NOTIFICATION_STATUS[notification.status.name],
+            'bg-[--blue-05]': !isRead,
           })}
         />
       </div>
