@@ -1,13 +1,15 @@
 import '../globals.css'
 import Navbar from '../ui/social-page/navbar'
+import { AuthProvider } from '@/hooks/use-auth-context'
+import { Provider } from 'react-redux'
 
 export default function RootLayout({ children }) {
   return (
-    <div className="flex flex-col">
-      <div className="relative">
-        <Navbar />
-      </div>
-      <main className="relative ">{children}</main>
-    </div>
+    <AuthProvider>
+      <Navbar />
+      <main className="relative top-[--navbar-height] min-h-[--min-height-view]">
+        {children}
+      </main>
+    </AuthProvider>
   )
 }

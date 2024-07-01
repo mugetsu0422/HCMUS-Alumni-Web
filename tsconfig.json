@@ -26,7 +26,8 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "build/types/**/*.ts"
+    "build/types/**/*.ts",
+    "src/lib/store.js"
   ],
   "exclude": ["node_modules"]
 }

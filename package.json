@@ -28,6 +28,7 @@
     "quill-image-compress": "^1.2.32",
     "quill-image-resize-module-react": "^3.0.0",
     "react": "^18",
+    "react-autosuggest": "^10.1.0",
     "react-bootstrap-icons": "^1.11.3",
     "react-countdown": "^2.3.5",
     "react-dom": "^18",
@@ -37,7 +38,9 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-quill": "^2.0.0",
     "react-redux": "^9.1.0",
+    "react-stomp": "^5.1.0",
     "react-tag-autocomplete": "^7.2.0",
+    "sockjs-client": "^1.6.1",
     "use-debounce": "^10.0.0"
   },
   "devDependencies": {

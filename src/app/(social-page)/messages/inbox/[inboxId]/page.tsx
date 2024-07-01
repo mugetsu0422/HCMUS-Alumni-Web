@@ -1,122 +1,51 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Button, Avatar, Badge, Textarea } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faImage } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { XLg, PencilFill } from 'react-bootstrap-icons'
 import toast from 'react-hot-toast'
-import DisplayChat from '@/app/ui/social-page/messages/DisplayChat'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { JWT_COOKIE } from '@/app/constant'
+import DisplayMessage from '@/app/ui/social-page/messages/DisplayMessage'
 
-const chatDataTemp = [
-  {
-    id: 1,
-    sender: {
-      id: 1,
-      fullName: 'A',
-      avatarUrl: '/demo.jpg',
-    },
-    content: 'Hi Phúc',
-    messageType: 'TEXT',
-    parentMessage: '',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-  {
-    id: 2,
-    sender: {
-      id: 1,
-      fullName: 'A',
-      avatarUrl: '/demo.jpg',
-    },
-    content: 'Look at my new picture',
-    messageType: 'TEXT',
-    parentMessage: '',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-  {
-    id: 3,
-    sender: {
-      id: 1,
-      fullName: 'A',
-      avatarUrl: '/demo.jpg',
-    },
-    content: '/thumbnail-social-pages.jpg',
-    messageType: 'IMAGE',
-    parentMessage: '',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-  {
-    id: 4,
-    sender: {
-      id: 1,
-      fullName: 'B',
-      avatarUrl: '/none-avatar.png',
-    },
-    content: 'Waoo! That looks great',
-    messageType: 'TEXT',
-    parentMessage: '',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-  {
-    id: 4,
-    sender: {
-      id: 1,
-      fullName: 'B',
-      avatarUrl: '/none-avatar.png',
-    },
-    content:
-      'I see that you have been using our app. Is there anything problems with our app ?',
-    messageType: 'TEXT',
-    parentMessage: '',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-  {
-    id: 5,
-    sender: {
-      id: 1,
-      fullName: 'A',
-      avatarUrl: '/demo.jpg',
-    },
-    content: 'No. It is great !',
-    messageType: 'TEXT',
-    parentMessage: '3',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-  {
-    id: 3,
-    sender: {
-      id: 1,
-      fullName: 'B',
-      avatarUrl: '/none-avatar.png',
-    },
-    content: '/thumbnail-social-pages.jpg',
-    messageType: 'IMAGE',
-    parentMessage: '3',
-    createAt: 'String',
-    updateAt: 'String',
-    isDelete: 'Boolean',
-  },
-]
-
-export default function Page() {
+export default function Page({ params }: { params: { inboxId: string } }) {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [onReply, setOnReply] = useState(false)
+  const bottomRef = useRef(null)
+  const [totalPages, setTotalPages] = useState(1)
 
+  const [hasMore, setHasMore] = useState(true)
+  const curPage = useRef(0)
+  const [messages, setMessages] = useState([])
+
+  useEffect(() => {
+    // Scroll to the bottom when the component mounts
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/${params.inboxId}`,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}` },
+        }
+      )
+      .then(({ data: { totalPages, messages } }) => {
+        setTotalPages(totalPages)
+        setMessages(messages)
+        setHasMore(totalPages > 1)
+      })
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
+  }, [])
   const handleReply = () => {
     setOnReply((e) => !e)
   }
@@ -167,34 +96,39 @@ export default function Page() {
     })
   }
   return (
-    <div>
-      <header className="relative flex flex-1 top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 z-10">
+    <div className="flex flex-col relative h-full">
+      <header className="relative flex flex-0 top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 z-10 h-[70px]">
         <Link
           href={`/profile/id/about`}
           className="flex items-center gap-3 hover:bg-[#cbcbcb] w-fit p-2 rounded-lg">
-          <Badge color="green" placement="bottom-end">
-            <Avatar
-              placeholder={undefined}
-              src="/authentication.png"
-              alt="avatar"
-              size="md"
-            />
-          </Badge>
+          {/* <Badge color="green" placement="bottom-end"> */}
+          <Avatar
+            placeholder={undefined}
+            src="/authentication.png"
+            alt="avatar"
+            size="md"
+          />
+          {/* </Badge> */}
 
           <div>
             <p className="text-md font-bold">Trần Phúc</p>
-            <p className="text-sm">Đang hoạt động</p>
+            {/* <p className="text-sm">Đang hoạt động</p> */}
           </div>
         </Link>
       </header>
 
-      <div className="relative w-full h-full max-h-[75vh] px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0">
-        {chatDataTemp.map((chat) => (
-          <DisplayChat chat={chat} key={chat.id} handleReply={handleReply} />
+      <div className="relative w-full h-full px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0">
+        {messages.map((message) => (
+          <DisplayMessage
+            message={message}
+            key={message.id}
+            handleReply={handleReply}
+          />
         ))}
+        <div ref={bottomRef}></div>
       </div>
 
-      <div className="fixed bottom-0 flex w-full flex-row items-end gap-2 p-2 bg-[#f0f2f5]">
+      <div className="relative h-[70px] flex w-full flex-row items-end gap-2 p-2 bg-[#f0f2f5]">
         <Button
           placeholder={undefined}
           variant="text"

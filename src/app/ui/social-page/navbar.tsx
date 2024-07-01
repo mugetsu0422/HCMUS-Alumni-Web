@@ -142,7 +142,7 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className="sticky top-0 z-10 px-3 lg:pl-10 py-4 lg:py-0 border-b-2 border-slate-700 h-[5.4rem] items-center"
+      className="fixed top-0 z-10 px-3 lg:pl-10 py-4 lg:py-0 border-b-2 border-slate-700 h-[--navbar-height] items-center"
       shadow={false}>
       <div className="mx-auto flex items-center justify-between text-blue-gray-900">
         <Link href="/home-page">

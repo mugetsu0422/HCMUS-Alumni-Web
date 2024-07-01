@@ -70,3 +70,11 @@ export const FRIEND_TABS = [
     url: 'requests',
   },
 ]
+
+export const MESSAGE_TYPE = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  VIDEO: 'VIDEO',
+  SOUND: 'SOUND',
+}
