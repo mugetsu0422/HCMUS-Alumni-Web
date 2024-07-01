@@ -154,10 +154,10 @@ export class NotificationUrlBuilder {
         case 'request_join_group':
           return `/groups/${this.notification.entityId}/member-requests`
         case 'interact_post_group':
-          groupId = getGroupId(this.notification.entityId)
+          // groupId = getGroupId(this.notification.entityId)
           return `/groups/${groupId}/posts/${this.notification.entityId}`
         case 'comment_post_group':
-          groupId = getGroupId(this.notification.parentId)
+          // groupId = getGroupId(this.notification.parentId)
           return `/groups/${groupId}/posts/${this.notification.parentId}/comments/${this.notification.entityId}`
         default:
           return '#'

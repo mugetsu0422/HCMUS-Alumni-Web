@@ -6,9 +6,7 @@ import { NOTIFICATION_STATUS } from '@/app/constant'
 import moment from 'moment'
 import { useState } from 'react'
 import {
-  NotificationEntityTable,
   NotificationProps,
-  NotificationType,
   NotificationUrlBuilder,
 } from '@/helper/notification-url-builder'
 
@@ -27,7 +25,6 @@ export default function NotificationItem({
     )
   })
 
-  console.log(url)
   return (
     <Link
       href={url}
