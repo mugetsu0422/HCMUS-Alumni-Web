@@ -36,7 +36,7 @@ import Link from 'next/link'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 import { JWT_COOKIE, GROUP_PRIVACY, GROUP_TABS } from '@/app/constant'
 import { nunito } from '@/app/ui/fonts'
-import NoData from '@/app/ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 
 const GroupContext = createContext(null)
 export const useGroupContext = () => {
@@ -58,7 +58,7 @@ export default function GroupLayout({
     return parts[3]
   })
 
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [group, setGroup] = useState(null)
   const [openDialogDeleteGroup, setOpenDialogDeleteGroup] = useState(false)
@@ -121,12 +121,12 @@ export default function GroupLayout({
         setIsLoading(false)
       })
       .catch((error) => {
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) return <NoData />
+  if (notFound) return <NotFound404 />
 
   if (!isLoading)
     return (

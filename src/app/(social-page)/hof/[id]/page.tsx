@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect } from 'react'
 import { nunito } from '../../../ui/fonts'
-import NoData from '../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '../../../constant'
@@ -11,7 +11,7 @@ import moment from 'moment'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [hof, setHof] = useState(null)
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -30,14 +30,14 @@ export default function Page({ params }: { params: { id: string } }) {
         setIsLoading(false)
       })
       .catch((error) => {
-        setNoData(true)
+        return setNotFound(true)
       })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   if (!isLoading)

@@ -10,16 +10,16 @@ export default function NotFound404() {
             404
           </h1>
           <p className="mb-4 text-3xl tracking-tight font-bold text-[var(--blue-05)] md:text-4xl">
-            Something&apos;s missing.
+            Không tìm thấy tài nguyên
           </p>
-          <p className="mb-4 text-lg font-light text-gray-700">
+          {/* <p className="mb-4 text-lg font-light text-gray-700">
             Sorry, we can&apos;t find that page. You&apos;ll find lots to
             explore on the home page.
-          </p>
+          </p> */}
           {/* <a
-            href="#"
-            className="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">
-            Back to Homepage
+            href="home-page"
+            className="inline-flex text-black bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">
+            Quay về trang chủ
           </a> */}
         </div>
       </div>

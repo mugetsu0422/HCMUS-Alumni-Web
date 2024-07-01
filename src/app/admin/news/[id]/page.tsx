@@ -18,7 +18,7 @@ import { FACULTIES, JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
 import toast from 'react-hot-toast'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import NoData from '../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
@@ -28,7 +28,7 @@ import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [content, setContent] = useState(null)
   const [selectedTags, setSelectedTags] = useState([])
   const [summaryCharCount, setSummaryCharCount] = useState(0)
@@ -157,12 +157,12 @@ export default function Page({ params }: { params: { id: string } }) {
         setContent(data.content)
       })
       .catch((e) => {
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
   return (
     <div

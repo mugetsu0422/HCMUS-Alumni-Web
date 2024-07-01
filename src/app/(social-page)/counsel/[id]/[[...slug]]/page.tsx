@@ -40,9 +40,8 @@ import Comments from '@/app/ui/common/comments'
 import ReactionDialog from '@/app/ui/common/reaction-dialog'
 import ImageGrid from '@/app/ui/counsel/image-grid'
 import { nunito } from '@/app/ui/fonts'
-import NoData from '@/app/ui/no-data'
-import DeletePostDialog from '@/app/ui/social-page/counsel/delete-post-dialog'
 import NotFound404 from '@/app/ui/common/not-found-404'
+import DeletePostDialog from '@/app/ui/social-page/counsel/delete-post-dialog'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 
 export default function Page({

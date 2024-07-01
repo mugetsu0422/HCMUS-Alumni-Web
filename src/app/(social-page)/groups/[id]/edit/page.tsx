@@ -16,7 +16,7 @@ import { ReactTags } from 'react-tag-autocomplete'
 import { JWT_COOKIE, TAGS_LIMIT } from '@/app/constant'
 import ErrorInput from '@/app/ui/error-input'
 import { nunito } from '@/app/ui/fonts'
-import NoData from '@/app/ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 
 const privacyValue = [
   {
@@ -34,7 +34,7 @@ const privacyValue = [
 export default function Page({ params }: { params: { id: string } }) {
   const [previewImage, setPreviewImage] = useState(null)
   const [imageFile, setImageFile] = useState(null)
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedTags, setSelectedTags] = useState([])
   const router = useRouter()
@@ -70,7 +70,7 @@ export default function Page({ params }: { params: { id: string } }) {
       })
       .catch((error) => {
         console.error(error)
-        setNoData(true)
+        return setNotFound(true)
       })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,8 +192,8 @@ export default function Page({ params }: { params: { id: string } }) {
     [selectedTags]
   )
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   return (

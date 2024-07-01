@@ -14,7 +14,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
-import NoData from '../../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -26,7 +26,7 @@ export default function Page({ params }: { params: { id: string } }) {
     formState: { errors },
   } = useForm()
 
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [currentImages, setCurrentImages] = useState([])
   const [previewImages, setPreviewImages] = useState([])
   const [addedImageFiles, setAddedImageFiles] = useState([])
@@ -199,13 +199,13 @@ export default function Page({ params }: { params: { id: string } }) {
         setCurrentImages(pictures)
       })
       .catch((error) => {
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   return (

@@ -27,7 +27,6 @@ import CustomToaster from '@/app/ui/common/custom-toaster'
 import { JWT_COOKIE } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'
-import NoData from '@/app/ui/no-data'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 

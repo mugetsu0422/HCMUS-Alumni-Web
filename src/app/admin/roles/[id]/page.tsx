@@ -21,7 +21,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
 import { useRouter } from 'next/navigation'
-import NoData from '../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
@@ -54,7 +54,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [permissionCategories, setPermissionCategories] = useState([])
   const [selectedRolePermissionMap, setSelectedRolePermissionMap] =
     useState<Map<any, any>>()
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [permissionHeaderVisibility, setPermissionHeaderVisibility] =
     useState(null)
   const [descriptionCharCount, setDescriptionCharCount] = useState(0)
@@ -197,13 +197,13 @@ export default function Page({ params }: { params: { id: string } }) {
       )
       .catch((err) => {
         console.error(err)
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
   return (
     <div
