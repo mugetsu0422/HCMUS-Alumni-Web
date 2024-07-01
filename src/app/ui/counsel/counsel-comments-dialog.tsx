@@ -226,7 +226,10 @@ export default function CommentsDialog({
         className="sticky bottom-0 h-fit py-3 bg-white">
         <form
           className="flex flex-start items-start w-full gap-2"
-          onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+          onSubmit={(e) => {
+            onUploadComment(e, null, uploadComment)
+            setUploadComment('')
+          }}>
           <Avatar placeholder={undefined} src={'/demo.jpg'} alt="avatar user" />
           <Textarea
             rows={1}
@@ -239,6 +242,7 @@ export default function CommentsDialog({
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
+            value={uploadComment}
             onChange={handleUploadCommentChange}
           />
           <Button
