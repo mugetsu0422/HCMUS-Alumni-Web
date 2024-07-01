@@ -188,9 +188,8 @@ export default function Page({
         } = relatedNewsRes
 
         setNews(news)
-        if (comment) {
-          setComments([comment])
-        } else setComments(comments)
+        if (comment) setComments([comment])
+        else setComments(comments)
         setRelatedNews(relatedNews)
         setIsLoading(false)
       })
