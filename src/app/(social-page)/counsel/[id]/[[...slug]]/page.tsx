@@ -160,7 +160,6 @@ export default function Page({
         }
       )
       .then(() => {
-        setUploadComment('')
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {

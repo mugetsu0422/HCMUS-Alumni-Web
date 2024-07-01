@@ -15,7 +15,7 @@ const SingleCommentIndicator = forwardRef<
   ) => {
 
     return (
-      <div ref={ref} className="w-full flex justify-center items-center gap-2 scroll-mt-5">
+      <div ref={ref} className="w-full flex justify-center items-center gap-2 scroll-mt-[var(--navbar-height)]">
         {parentCommentUrl ? (
           <a
             href={`${parentCommentUrl}`}
