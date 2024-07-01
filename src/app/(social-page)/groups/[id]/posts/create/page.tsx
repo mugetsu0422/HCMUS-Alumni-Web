@@ -13,7 +13,7 @@ import {
 import { Button, Input, Textarea, Checkbox } from '@material-tailwind/react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'

@@ -17,7 +17,7 @@ import { TagFill, SendFill, XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import { nunito } from '../fonts'
 import Comments from '../common/comments'
-import ImageGird from './image-grid'
+import ImageGrid from './image-grid'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { useForm } from 'react-hook-form'
@@ -166,7 +166,7 @@ export default function CommentsDialog({
                 Xem thêm
               </span> */}
             </div>
-            {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
+            {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
         </div>
 

@@ -134,31 +134,16 @@ export class NotificationUrlBuilder {
     entityTable: NotificationEntityTable,
     type: NotificationType
   ): string {
-    const getGroupId = (postId: string) => {
-      axios
-        .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${postId}`, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        })
-        .then(({ data }) => {
-          return data.groupId
-        })
-        .catch((error) => {
-          return ''
-        })
-    }
-    let groupId = null
     if (type === 'CREATE') {
       switch (entityTable) {
         case 'request_join_group':
           return `/groups/${this.notification.entityId}/member-requests`
         case 'interact_post_group':
-          // groupId = getGroupId(this.notification.entityId)
-          return `/groups/${groupId}/posts/${this.notification.entityId}`
-        case 'comment_post_group':
-          // groupId = getGroupId(this.notification.parentId)
-          return `/groups/${groupId}/posts/${this.notification.parentId}/comments/${this.notification.entityId}`
+          return `/groups/${this.notification.parentId}/posts/${this.notification.entityId}`
+        case 'comment_post_group': {
+          const [postId, groupId] = this.notification.parentId.split(',')
+          return `/groups/${groupId}/posts/${postId}/comments/${this.notification.entityId}`
+        }
         default:
           return '#'
       }

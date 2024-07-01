@@ -38,7 +38,7 @@ import {
 } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import ReactionDialog from '@/app/ui/common/reaction-dialog'
-import ImageGird from '@/app/ui/counsel/image-grid'
+import ImageGrid from '@/app/ui/counsel/image-grid'
 import { nunito } from '@/app/ui/fonts'
 import NoData from '@/app/ui/no-data'
 import DeletePostDialog from '@/app/ui/social-page/counsel/delete-post-dialog'
@@ -562,7 +562,6 @@ export default function Page({
         </div>
 
         <div>
-          {/* this is the header of the body */}
           <div className="mt-3">
             <p className="text-xl uppercase font-bold text-black">
               {post.title}
@@ -579,10 +578,9 @@ export default function Page({
             </div>
           </div>
 
-          {/* this is the content of the body */}
           <div className="flex flex-col gap-2 whitespace-pre-line">
             {post.content}
-            {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
+            {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
 
           {votes.length !== 0 && (

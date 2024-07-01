@@ -1,20 +1,22 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import ErrorInput from '../../../../ui/error-input'
-import { nunito } from '../../../../ui/fonts'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import { JWT_COOKIE } from '../../../../constant'
-import { useForm } from 'react-hook-form'
-import NoData from '../../../../ui/no-data'
+import { Controller, useForm } from 'react-hook-form'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import { useRouter } from 'next/navigation'
+import { ReactTags } from 'react-tag-autocomplete'
+import { JWT_COOKIE, TAGS_LIMIT } from '@/app/constant'
+import ErrorInput from '@/app/ui/error-input'
+import { nunito } from '@/app/ui/fonts'
+import NoData from '@/app/ui/no-data'
 
 const privacyValue = [
   {
@@ -34,8 +36,12 @@ export default function Page({ params }: { params: { id: string } }) {
   const [imageFile, setImageFile] = useState(null)
   const [noData, setNoData] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedTags, setSelectedTags] = useState([])
+  const router = useRouter()
+  const tagsInputRef = useRef(null)
 
   const {
+    control,
     register,
     handleSubmit,
     setValue,
@@ -49,11 +55,17 @@ export default function Page({ params }: { params: { id: string } }) {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(({ data: groups }) => {
-        setValue('name', groups.name)
-        setValue('description', groups.description)
-        setValue('privacy', groups.privacy)
-        setPreviewImage({ src: groups.coverUrl })
+      .then(({ data: group }) => {
+        setValue('name', group.name)
+        setValue('description', group.description)
+        setValue('privacy', group.privacy)
+        setSelectedTags(
+          group.tags.map((tag) => ({
+            value: tag.name,
+            label: tag.name,
+          }))
+        )
+        setPreviewImage({ src: group.coverUrl })
         setIsLoading(false)
       })
       .catch((error) => {
@@ -65,10 +77,14 @@ export default function Page({ params }: { params: { id: string } }) {
   }, [])
 
   const onSubmit = async (data) => {
+    const { tagsDummy, ...rest } = data
     const group = {
-      name: data.name,
-      description: data.description,
-      privacy: data.privacy,
+      ...rest,
+      tagNames: selectedTags
+        .map((tag) => {
+          return tag.value
+        })
+        .join(','),
       cover: imageFile,
     }
 
@@ -163,6 +179,19 @@ export default function Page({ params }: { params: { id: string } }) {
     setImageFile(null)
   }
 
+  const onAddTags = useCallback(
+    (newTag) => {
+      setSelectedTags([...selectedTags, newTag])
+    },
+    [selectedTags]
+  )
+  const onDeleteTags = useCallback(
+    (tagIndex) => {
+      setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
+    },
+    [selectedTags]
+  )
+
   if (noData) {
     return <NoData />
   }
@@ -239,23 +268,58 @@ export default function Page({ params }: { params: { id: string } }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="hashtag" className="text-xl font-bold">
-            Hashtag
-          </label>
-          <Input
-            size="lg"
-            crossOrigin={undefined}
-            type="text"
-            labelProps={{
-              className: 'before:content-none after:content-none',
+          <ReactTags
+            ref={tagsInputRef}
+            id="tags-input-validity-description"
+            suggestions={[]}
+            selected={selectedTags}
+            onAdd={onAddTags}
+            onDelete={onDeleteTags}
+            isInvalid={selectedTags.length > TAGS_LIMIT}
+            ariaErrorMessage="tags-input-error"
+            ariaDescribedBy="tags-input-validity-description"
+            allowNew={true}
+            activateFirstOption={true}
+            placeholderText="Nhập thẻ"
+            newOptionText="Thêm thẻ %value%"
+            noOptionsText="Không tim thấy the %value%"
+            classNames={{
+              root: `${styles['react-tags']}`,
+              rootIsActive: `${styles['is-active']}`,
+              rootIsDisabled: `${styles['is-disabled']}`,
+              rootIsInvalid: `${styles['is-invalid']}`,
+              label: `${styles['react-tags__label']}`,
+              tagList: `${styles['react-tags__list']}`,
+              tagListItem: `${styles['react-tags__list-item']}`,
+              tag: `${styles['react-tags__tag']}`,
+              tagName: `${styles['react-tags__tag-name']}`,
+              comboBox: `${styles['react-tags__combobox']}`,
+              input: `${styles['react-tags__combobox-input']}`,
+              listBox: `${styles['react-tags__listbox']}`,
+              option: `${styles['react-tags__listbox-option']}`,
+              optionIsActive: `${styles['is-active']}`,
+              highlight: `${styles['react-tags__listbox-option-highlight']}`,
             }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-            //   {...register('hashtag')}
           />
-          {/* <ErrorInput
-          // This is the error message
-          errors={errors?.hashtag?.message}
-        /> */}
+          <Controller
+            name="tagsDummy"
+            control={control}
+            render={() => <input type="text" className="hidden" />}
+            rules={{
+              validate: {
+                validateTagsInput: () => {
+                  if (selectedTags.length > 5) {
+                    tagsInputRef.current.input.focus()
+                    return false
+                  }
+                  return true
+                },
+              },
+            }}
+          />
+          {selectedTags.length > TAGS_LIMIT && (
+            <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+          )}
         </div>
 
         <div className="container flex flex-col relative mx-auto my-2">

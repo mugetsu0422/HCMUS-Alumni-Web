@@ -33,7 +33,6 @@ export default function Page({ params }: { params: { id: string } }) {
   const [deleteImageIds, setDeleteImageIds] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const router = useRouter()
-  const [votes, setVotes] = useState([])
   const tagsInputRef = useRef(null)
 
   const onDragOver = (event) => {
@@ -188,7 +187,7 @@ export default function Page({ params }: { params: { id: string } }) {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
-      .then(({ data: { title, content, tags, pictures, votes } }) => {
+      .then(({ data: { title, content, tags, pictures } }) => {
         setValue('title', title)
         setValue('content', content)
         setSelectedTags(
@@ -197,7 +196,6 @@ export default function Page({ params }: { params: { id: string } }) {
             label: tag.name,
           }))
         )
-        setVotes(votes)
         setCurrentImages(pictures)
       })
       .catch((error) => {
@@ -307,8 +305,6 @@ export default function Page({ params }: { params: { id: string } }) {
           <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
         )}
 
-        <VotingPostForm votes={votes} />
-
         <AddImagePost
           onDragOver={onDragOver}
           onDrop={onDrop}
@@ -376,37 +372,6 @@ function AddImagePost({
             </div>
           )}
         </div>
-      </div>
-    </div>
-  )
-}
-
-function VotingPostForm({ votes }) {
-  return (
-    <div className="w-full   rounded-lg ">
-      <div className="mb-4">
-        <div className="flex text-gray-700 text-xl font-bold mb-2 ">
-          Bình chọn
-        </div>
-        {votes.map(({ name }, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <Input
-              crossOrigin={undefined}
-              disabled={true}
-              type="text"
-              value={name}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              label={`Lựa chọn ${index + 1}`}
-            />
-            <Button
-              variant="text"
-              placeholder={undefined}
-              className="mr-1 p-2 cursor-pointer"
-              disabled={true}>
-              <XLg className="text-lg" />
-            </Button>
-          </div>
-        ))}
       </div>
     </div>
   )
