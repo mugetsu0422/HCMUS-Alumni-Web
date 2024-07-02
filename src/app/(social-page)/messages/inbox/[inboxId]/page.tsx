@@ -6,8 +6,9 @@ import { Button, Avatar, Badge, Textarea } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faImage } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import { XLg } from 'react-bootstrap-icons'
+import { XLg, PencilFill } from 'react-bootstrap-icons'
 import toast from 'react-hot-toast'
+import DisplayChat from '@/app/ui/social-page/messages/DisplayChat'
 
 const chatDataTemp = [
   {
@@ -90,7 +91,7 @@ const chatDataTemp = [
     },
     content: 'No. It is great !',
     messageType: 'TEXT',
-    parentMessage: '',
+    parentMessage: '3',
     createAt: 'String',
     updateAt: 'String',
     isDelete: 'Boolean',
@@ -104,7 +105,7 @@ const chatDataTemp = [
     },
     content: '/thumbnail-social-pages.jpg',
     messageType: 'IMAGE',
-    parentMessage: '',
+    parentMessage: '3',
     createAt: 'String',
     updateAt: 'String',
     isDelete: 'Boolean',
@@ -114,6 +115,11 @@ const chatDataTemp = [
 export default function Page() {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
+  const [onReply, setOnReply] = useState(false)
+
+  const handleReply = () => {
+    setOnReply((e) => !e)
+  }
 
   const removeImage = (index, event) => {
     event.stopPropagation()
@@ -161,8 +167,8 @@ export default function Page() {
     })
   }
   return (
-    <>
-      <header className="fixed flex top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 mt-20 z-10">
+    <div>
+      <header className="relative flex flex-1 top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 z-10">
         <Link
           href={`/profile/id/about`}
           className="flex items-center gap-3 hover:bg-[#cbcbcb] w-fit p-2 rounded-lg">
@@ -182,37 +188,13 @@ export default function Page() {
         </Link>
       </header>
 
-      <div className="relative w-full h-full max-h-[80vh] px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0 mt-20">
+      <div className="relative w-full h-full max-h-[75vh] px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0">
         {chatDataTemp.map((chat) => (
-          <div
-            key={chat.id}
-            className={` items-start gap-x-2 my-3 ${
-              chat.sender.fullName === 'B' ? 'flex' : 'flex flex-row-reverse'
-            }`}>
-            <Avatar
-              placeholder={undefined}
-              size="md"
-              src={chat.sender.avatarUrl} //Điều kiện này sau này thay đổi + scr ảnh :((
-              alt="avatar"
-            />
-            {chat.messageType === 'TEXT' && (
-              <div className="py-2 px-3 h-fit w-fit max-w-[200px] lg:max-w-[250px] xl:max-w-[300px]  2xl:max-w-[350px] text-wrap bg-[var(--hcmus-logo)] text-white text-sm font-light rounded-2xl">
-                <p>{chat.content}</p>
-              </div>
-            )}
-
-            {chat.messageType === 'IMAGE' && (
-              <img
-                src={chat.content}
-                alt="message"
-                className="w-[200px] h-[112.5px] sm:w-[320px] sm:h-[180px] lg:w-[380px] lg:h-[213px] 2xl:w-[440px] 2xl:h-[247.5px] rounded-xl object-contain object-center"
-              />
-            )}
-          </div>
+          <DisplayChat chat={chat} key={chat.id} handleReply={handleReply} />
         ))}
       </div>
 
-      <div className="relative w-full flex-1 flex items-end gap-2 p-2 bg-[#f6f6f6]">
+      <div className="fixed bottom-0 flex w-full flex-row items-end gap-2 p-2 bg-[#f0f2f5]">
         <Button
           placeholder={undefined}
           variant="text"
@@ -222,7 +204,19 @@ export default function Page() {
         </Button>
 
         <div className="w-full">
-          {
+          {onReply && (
+            <div className="flex items-center gap-2">
+              <p> Bạn đang phản hồi tin nhắn </p>
+              <Button
+                placeholder={undefined}
+                className=" p-2 cursor-pointe hover:bg-black opacity-75 h-fit w-fit"
+                onClick={handleReply}>
+                <XLg />
+              </Button>
+            </div>
+          )}
+
+          {previewImages.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-start p-2">
               {previewImages.map((image, index) => (
                 <div
@@ -237,20 +231,19 @@ export default function Page() {
                   </Button>
                   <img
                     src={image.src}
-                    alt="Ảnh được kéo thả"
+                    alt="Ảnh gửi tin nhắn"
                     className="w-32 h-24 object-cover rounded-md"
                   />
                 </div>
               ))}
             </div>
-          }
-
+          )}
           <Textarea
             rows={1}
-            placeholder="Nhập tin nhắn"
-            className="min-h-full border-1 focus:border-transparent rounded-full  grow "
+            placeholder="Aa"
+            className="min-h-[90%] !border-0 focus:border-transparent text-base"
             containerProps={{
-              className: 'grid h-full',
+              className: 'grid h-[90%]',
             }}
             labelProps={{
               className: 'before:content-none after:content-none',
@@ -268,6 +261,6 @@ export default function Page() {
           />
         </Button>
       </div>
-    </>
+    </div>
   )
 }
