@@ -2,16 +2,17 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Avatar, Badge, Textarea } from '@material-tailwind/react'
+import { Button, Avatar, Textarea } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faImage } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import { XLg, PencilFill } from 'react-bootstrap-icons'
+import { XLg } from 'react-bootstrap-icons'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '@/app/constant'
 import DisplayMessage from '@/app/ui/social-page/messages/DisplayMessage'
+import WebSocketManager from '../../../../../config/WebSocketManager.js'
 
 export default function Page({ params }: { params: { inboxId: string } }) {
   const [previewImages, setPreviewImages] = useState([])
@@ -19,15 +20,16 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   const [onReply, setOnReply] = useState(false)
   const bottomRef = useRef(null)
   const [totalPages, setTotalPages] = useState(1)
-
   const [hasMore, setHasMore] = useState(true)
   const curPage = useRef(0)
   const [messages, setMessages] = useState([])
+  const [messageContent, setMessageContent] = useState('')
 
   useEffect(() => {
     // Scroll to the bottom when the component mounts
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
 
+    // Fetch initial messages
     axios
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/${params.inboxId}`,
@@ -45,9 +47,22 @@ export default function Page({ params }: { params: { inboxId: string } }) {
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )
       })
+
+    // Connect to WebSocket
+    WebSocketManager.connect(params.inboxId, showMessage)
+
+    return () => {
+      WebSocketManager.disconnect()
+    }
   }, [])
+
+  const showMessage = (message) => {
+    setMessages((prevMessages) => [...prevMessages, message])
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   const handleReply = () => {
-    setOnReply((e) => !e)
+    setOnReply((prev) => !prev)
   }
 
   const removeImage = (index, event) => {
@@ -58,6 +73,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     setPreviewImages(newImages)
     setImageFiles((prev) => prev.filter((_, i) => i !== index))
   }
+
   const onClickDropzone = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -95,24 +111,40 @@ export default function Page({ params }: { params: { inboxId: string } }) {
       }
     })
   }
+
+  const sendMessage = () => {
+    if (!messageContent.trim()) {
+      return
+    }
+
+    // Send message via WebSocket
+    WebSocketManager.send(
+      '/app/send-message/' + params.inboxId,
+      {},
+      JSON.stringify({
+        senderId: Cookies.get('userId'),
+        content: messageContent,
+        parentMessageId: null,
+      })
+    )
+
+    setMessageContent('')
+  }
+
   return (
     <div className="flex flex-col relative h-full">
       <header className="relative flex flex-0 top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 z-10 h-[70px]">
         <Link
           href={`/profile/id/about`}
           className="flex items-center gap-3 hover:bg-[#cbcbcb] w-fit p-2 rounded-lg">
-          {/* <Badge color="green" placement="bottom-end"> */}
           <Avatar
             placeholder={undefined}
             src="/authentication.png"
             alt="avatar"
             size="md"
           />
-          {/* </Badge> */}
-
           <div>
             <p className="text-md font-bold">Trần Phúc</p>
-            {/* <p className="text-sm">Đang hoạt động</p> */}
           </div>
         </Link>
       </header>
@@ -143,7 +175,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
               <p> Bạn đang phản hồi tin nhắn </p>
               <Button
                 placeholder={undefined}
-                className=" p-2 cursor-pointe hover:bg-black opacity-75 h-fit w-fit"
+                className=" p-2 cursor-pointer hover:bg-black opacity-75 h-fit w-fit"
                 onClick={handleReply}>
                 <XLg />
               </Button>
@@ -153,9 +185,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
           {previewImages.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-start p-2">
               {previewImages.map((image, index) => (
-                <div
-                  key={image.src}
-                  className="relative flex flex-col items-end">
+                <div key={index} className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
                     className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
@@ -165,13 +195,14 @@ export default function Page({ params }: { params: { inboxId: string } }) {
                   </Button>
                   <img
                     src={image.src}
-                    alt="Ảnh gửi tin nhắn"
+                    alt={`Preview ${index}`}
                     className="w-32 h-24 object-cover rounded-md"
                   />
                 </div>
               ))}
             </div>
           )}
+
           <Textarea
             rows={1}
             placeholder="Aa"
@@ -182,13 +213,16 @@ export default function Page({ params }: { params: { inboxId: string } }) {
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
           />
         </div>
 
         <Button
           placeholder={undefined}
           variant="text"
-          className="p-2 w-fit h-fit">
+          className="p-2 w-fit h-fit"
+          onClick={sendMessage}>
           <FontAwesomeIcon
             icon={faPaperPlane}
             className="text-xl text-[#64748B]"

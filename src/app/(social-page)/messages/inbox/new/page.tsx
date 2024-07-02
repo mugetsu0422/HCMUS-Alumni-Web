@@ -9,19 +9,17 @@ import Link from 'next/link'
 import { XLg } from 'react-bootstrap-icons'
 import toast from 'react-hot-toast'
 import { nunito } from '@/app/ui/fonts'
-import SockJS from 'sockjs-client'
-import Stomp from 'stompjs'
-import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Autosuggest from 'react-autosuggest'
+import WebSocketManager from '../../../../../config/WebSocketManager'
+import { JWT_COOKIE } from '@/app/constant'
 
 export default function Page() {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
-  const [stompClient, setStompClient] = useState(null)
   const [currentInboxId, setCurrentInboxId] = useState(null)
   const userId = Cookies.get('userId')
   const curPage = useRef(0)
@@ -29,15 +27,21 @@ export default function Page() {
   const params = new URLSearchParams(searchParams)
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const [hasMore, setHasMore] = useState(true)
-
   const [suggestions, setSuggestions] = useState([])
   const [friendName, setFriendName] = useState('')
 
   useEffect(() => {
-    if (currentInboxId) {
-      connectToWebSocket()
+    const showMessage = (message) => {
+      console.log('Message from server:', message)
+      // Handle the message received from the server
     }
-  }, [currentInboxId])
+
+    WebSocketManager.connect(userId, showMessage)
+
+    return () => {
+      WebSocketManager.disconnect()
+    }
+  }, [userId])
 
   const resetCurPage = () => {
     params.delete('page')
@@ -52,18 +56,8 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    //replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }, 500)
-
-  function connectToWebSocket() {
-    const socket = new SockJS('http://localhost:8080/ws')
-    const client = Stomp.over(socket)
-    client.connect({}, (frame) => {
-      console.log('Connected: ' + frame)
-      setStompClient(client)
-    })
-  }
 
   function sendMessage() {
     const messageInput = document.getElementById('message') as
@@ -78,7 +72,7 @@ export default function Page() {
     const messageContent = messageInput.value
 
     if (messageContent && currentInboxId) {
-      stompClient.send(
+      WebSocketManager.send(
         '/app/send-message/' + currentInboxId,
         {},
         JSON.stringify({
@@ -99,6 +93,7 @@ export default function Page() {
     setPreviewImages(newImages)
     setImageFiles((prev) => prev.filter((_, i) => i !== index))
   }
+
   const onClickDropzone = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -107,7 +102,7 @@ export default function Page() {
     input.click()
 
     input.addEventListener('change', (event) => {
-      const files = (event.target as HTMLInputElement).files // Type cast here
+      const files = (event.target as HTMLInputElement).files
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           if (files[i].size > 1024 * 1024 * 5) {
@@ -214,11 +209,11 @@ export default function Page() {
       <div className="relative w-full h-full max-h-[80vh] px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0 mt-20">
         <div className="mx-auto flex flex-col items-center gap-1">
           {suggestions.length === 1 &&
-            suggestions.map(({ avatarUrl, fullName }) => (
-              <>
+            suggestions.map(({ avatarUrl, fullName, id }) => (
+              <div key={id}>
                 <Avatar placeholder={undefined} src={avatarUrl} size="xl" />
                 <p className="font-semibold text-base text-black">{fullName}</p>
-              </>
+              </div>
             ))}
         </div>
       </div>
@@ -235,40 +230,31 @@ export default function Page() {
         </Button>
 
         <div className="relative h-[70px] flex w-full flex-row items-end gap-2 p-2 bg-[#f0f2f5]">
-          {
-            <div className="flex flex-wrap gap-3 justify-start p-2">
-              {previewImages.map((image, index) => (
-                <div
-                  key={image.src}
-                  className="relative flex flex-col items-end">
-                  <Button
-                    placeholder={undefined}
-                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                    onClick={(event) => removeImage(index, event)} // Pass event object
-                  >
-                    <XLg />
-                  </Button>
-                  <img
-                    src={image.src}
-                    alt="Ảnh được kéo thả"
-                    className="w-32 h-24 object-cover rounded-md"
-                  />
-                </div>
-              ))}
-            </div>
-          }
+          <div className="flex flex-wrap gap-3 justify-start p-2">
+            {previewImages.map((image, index) => (
+              <div key={image.src} className="relative flex flex-col items-end">
+                <Button
+                  placeholder={undefined}
+                  className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                  onClick={(event) => removeImage(index, event)}>
+                  <XLg />
+                </Button>
+                <img
+                  src={image.src}
+                  alt="Ảnh được kéo thả"
+                  className="w-32 h-24 object-cover rounded-md"
+                />
+              </div>
+            ))}
+          </div>
 
           <Textarea
             id="message"
             rows={1}
             placeholder="Aa"
             className="min-h-[90%] !border-0 focus:border-transparent text-base"
-            containerProps={{
-              className: 'grid h-[90%]',
-            }}
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
+            containerProps={{ className: 'grid h-[90%]' }}
+            labelProps={{ className: 'before:content-none after:content-none' }}
           />
         </div>
 

@@ -1,6 +1,7 @@
 // 'use client'
 import './globals.css'
 import { inter } from './ui/fonts'
+import ClientApplication from './../config/ClientApplication'
 
 export const metadata = {
   title: {
@@ -14,7 +15,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className} scrollbar-webkit-main`}>
-        {children}
+        <ClientApplication>{children}</ClientApplication>
       </body>
     </html>
   )
