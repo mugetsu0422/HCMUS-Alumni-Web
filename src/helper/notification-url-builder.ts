@@ -1,10 +1,4 @@
-import {
-  JWT_COOKIE,
-  NOTIFICATION_ENTITY_TABLE,
-  NOTIFICATION_TYPE,
-} from '@/app/constant'
-import axios from 'axios'
-import Cookies from 'js-cookie'
+import { NOTIFICATION_ENTITY_TABLE, NOTIFICATION_TYPE } from '@/app/constant'
 
 interface UserProps {
   id: number
@@ -62,7 +56,7 @@ export class NotificationUrlBuilder {
     const entity = this.NOTIFICATION_ENTITY_TABLE_MAPPING[entityTable]
     switch (entity) {
       case 'user':
-        return `/user/${type}`
+        return this.handleUser(entityTable, type)
       case 'news':
         return this.handleNews(entityTable, type)
       case 'events':
@@ -71,6 +65,24 @@ export class NotificationUrlBuilder {
         return this.handleCounsel(entityTable, type)
       case 'groups':
         return this.handleGroups(entityTable, type)
+    }
+  }
+
+  private handleUser(
+    entityTable: NotificationEntityTable,
+    type: NotificationType
+  ): string {
+    if (type === 'CREATE') {
+      switch (entityTable) {
+        case 'request_friend':
+          return `#`
+        default:
+          return '#'
+      }
+    } else if (type === 'UPDATE') {
+      return `#`
+    } else if (type === 'DELETE') {
+      return `#`
     }
   }
 

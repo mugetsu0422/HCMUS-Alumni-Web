@@ -20,8 +20,12 @@ const useFcmToken = () => {
           setNotificationPermissionStatus(permission)
 
           if (permission === 'granted') {
+            const sw = await navigator.serviceWorker.register(
+              `/firebase-messaging-sw.js?client=${process.env.NEXT_PUBLIC_CLIENT_HOST}`
+            )
             const currentToken = await getToken(messaging, {
               vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+              serviceWorkerRegistration: sw,
             })
             const storageToken = localStorage.getItem('notificationToken')
 
