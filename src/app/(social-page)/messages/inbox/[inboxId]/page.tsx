@@ -24,6 +24,9 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   const curPage = useRef(0)
   const [messages, setMessages] = useState([])
   const [messageContent, setMessageContent] = useState('')
+  const [inboxInformation, setInboxInformation] = useState([])
+  const userId = Cookies.get('userId')
+  const [idParentsMessage, getIdParentsMessage] = useState(null)
 
   useEffect(() => {
     // Scroll to the bottom when the component mounts
@@ -37,10 +40,11 @@ export default function Page({ params }: { params: { inboxId: string } }) {
           headers: { Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}` },
         }
       )
-      .then(({ data: { totalPages, messages } }) => {
+      .then(({ data: { totalPages, messages, inbox } }) => {
         setTotalPages(totalPages)
         setMessages(messages)
         setHasMore(totalPages > 1)
+        setInboxInformation(inbox.members)
       })
       .catch((error) => {
         toast.error(
@@ -56,13 +60,18 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     }
   }, [])
 
-  const showMessage = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message])
+  function showMessage(message) {
+    var messages = document.getElementById('chat-messages')
+    var p = document.createElement('p')
+    p.textContent = message.sender.fullName + ': ' + message.content
+    messages.appendChild(p)
+
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  const handleReply = () => {
+  const handleReply = (id) => {
     setOnReply((prev) => !prev)
+    getIdParentsMessage(id)
   }
 
   const removeImage = (index, event) => {
@@ -124,7 +133,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
       JSON.stringify({
         senderId: Cookies.get('userId'),
         content: messageContent,
-        parentMessageId: null,
+        parentMessageId: idParentsMessage,
       })
     )
 
@@ -134,22 +143,27 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   return (
     <div className="flex flex-col relative h-full">
       <header className="relative flex flex-0 top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 z-10 h-[70px]">
-        <Link
-          href={`/profile/id/about`}
-          className="flex items-center gap-3 hover:bg-[#cbcbcb] w-fit p-2 rounded-lg">
-          <Avatar
-            placeholder={undefined}
-            src="/authentication.png"
-            alt="avatar"
-            size="md"
-          />
-          <div>
-            <p className="text-md font-bold">Trần Phúc</p>
-          </div>
-        </Link>
+        {inboxInformation
+          .filter((e) => e.user.id !== userId)
+          .map(({ user }) => (
+            <Link
+              href={`/profile/${user.id}/about`}
+              className="flex items-center gap-3 hover:bg-[#cbcbcb] w-fit p-2 rounded-lg"
+              key={user.id}>
+              <Avatar
+                placeholder={undefined}
+                src={user.avatarUrl}
+                alt="avatar"
+                size="md"
+              />
+              <div>
+                <p className="text-md font-bold">{user.fullName}</p>
+              </div>
+            </Link>
+          ))}
       </header>
 
-      <div className="relative w-full h-full px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0">
+      <div className="relative w-full h-full px-4 overflow-x-auto scrollbar-webkit flex flex-col-reverse z-0">
         {messages.map((message) => (
           <DisplayMessage
             message={message}
@@ -157,6 +171,8 @@ export default function Page({ params }: { params: { inboxId: string } }) {
             handleReply={handleReply}
           />
         ))}
+        <div className="flex flex-1" id="chat-messages"></div>
+
         <div ref={bottomRef}></div>
       </div>
 

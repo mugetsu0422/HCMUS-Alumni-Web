@@ -17,7 +17,7 @@ export default function DisplayMessage({ message, handleReply }) {
     <div
       key={message.id}
       className={` items-end gap-x-2 my-3 ${
-        message.sender.fullName === userID ? 'flex flex-row-reverse' : 'flex'
+        message.sender.id === userID ? 'flex flex-row-reverse' : 'flex'
       }`}>
       <Avatar
         placeholder={undefined}
@@ -30,7 +30,7 @@ export default function DisplayMessage({ message, handleReply }) {
           {/* Content of message */}
           <div
             className={`flex flex-col ${
-              message.sender.fullName === userID ? 'items-end' : 'items-start'
+              message.sender.id === userID ? 'items-end' : 'items-start'
             } `}
             onMouseEnter={handleHover}
             onMouseLeave={handleHover}>
@@ -53,20 +53,18 @@ export default function DisplayMessage({ message, handleReply }) {
 
             <div
               className={`gap-2 items-center ${
-                message.sender.fullName === userID
-                  ? 'flex flex-row-reverse'
-                  : 'flex'
+                message.sender.id === userID ? 'flex flex-row-reverse' : 'flex'
               }`}>
               <div className="relative py-2 px-3 h-fit w-fit max-w-[200px] lg:max-w-[250px] xl:max-w-[300px]  2xl:max-w-[350px] text-wrap bg-[var(--hcmus-logo)] text-white text-sm font-light rounded-2xl z-10">
                 {message.content}
               </div>
               {isHovered && (
                 <Button
-                  onClick={handleReply}
+                  onClick={() => handleReply(message.id)}
                   placeholder={undefined}
                   className="p-2"
                   variant="text">
-                  {message.sender.fullName === userID ? (
+                  {message.sender.id === userID ? (
                     <ArrowReturnRight className="text-base" />
                   ) : (
                     <ArrowReturnLeft className="text-base" />
@@ -99,9 +97,7 @@ export default function DisplayMessage({ message, handleReply }) {
             )}
             <div
               className={` ${
-                message.sender.fullName === 'A'
-                  ? 'flex flex-row-reverse'
-                  : 'flex'
+                message.sender.id === userID ? 'flex flex-row-reverse' : 'flex'
               } gap-2 items-center`}>
               <img
                 src={message.content}
@@ -114,7 +110,7 @@ export default function DisplayMessage({ message, handleReply }) {
                   placeholder={undefined}
                   className="p-2"
                   variant="text">
-                  {message.sender.fullName === 'A' ? (
+                  {message.sender.id === userID ? (
                     <ArrowReturnRight className="text-base" />
                   ) : (
                     <ArrowReturnLeft className="text-base" />

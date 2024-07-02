@@ -218,8 +218,6 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="flex flex-1" id="chat-messages"></div>
-
       <div className="relative w-full flex-1 flex items-end gap-2 p-2 bg-[#f6f6f6]">
         <Button
           placeholder={undefined}
