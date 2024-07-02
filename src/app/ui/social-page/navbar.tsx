@@ -127,8 +127,10 @@ export default function MyNavbar() {
 
           <Button placeholder={undefined} variant="text" size="sm">
             <Link href={`messages/inbox`}>
-              <Badge content={2} color="blue">
-                <ChatDotsFill className="text-2xl text-[--text-navbar]" />
+              <Badge invisible={true} content={undefined} className="bg-[var(--blue-05)]">
+                <div className="h-[24px] w-[24px]">
+                  <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                </div>
               </Badge>
             </Link>
           </Button>

@@ -154,8 +154,6 @@ export default function NotificationPopover() {
       .catch((error) => {})
   }
 
-
-
   return (
     <Popover
       placement="bottom-end"
@@ -163,11 +161,13 @@ export default function NotificationPopover() {
       handler={popoverHandler}>
       <PopoverHandler>
         <Button placeholder={undefined} variant="text" size="sm">
-          <Badge content={2} color="blue" className="">
-            <FontAwesomeIcon
-              icon={faBell}
-              className="text-2xl text-[--text-navbar]"
-            />
+          <Badge invisible={false} content={undefined} className="bg-[var(--blue-05)]">
+            <div className="h-[24px] w-[24px]">
+              <FontAwesomeIcon
+                icon={faBell}
+                className="h-full w-full text-[--text-navbar]"
+              />
+            </div>
           </Badge>
         </Button>
       </PopoverHandler>
