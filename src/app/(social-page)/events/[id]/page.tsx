@@ -208,9 +208,12 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-          id: postCommentToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: postCommentToast,
+          }
+        )
       })
   }
   const onFetchChildrenComments = async (
