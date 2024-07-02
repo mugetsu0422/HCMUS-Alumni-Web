@@ -2,12 +2,15 @@
 import NotificationToast from '@/app/ui/common/notification-toast'
 import firebaseApp from '@/config/firebase'
 import useFcmToken from '@/hooks/use-fcm-token'
+import { increment } from '@/lib/features/notifications/notification-counter'
+import { useAppDispatch } from '@/lib/hooks'
 import { getMessaging, onMessage } from 'firebase/messaging'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 export default function FirebaseForeground() {
   const { notificationPermissionStatus } = useFcmToken()
+  const dispatch = useAppDispatch()
 
   const onDimiss = (id: number): void => {
     toast.dismiss(id.toString())
@@ -18,6 +21,7 @@ export default function FirebaseForeground() {
       if (notificationPermissionStatus === 'granted') {
         const messaging = getMessaging(firebaseApp)
         const unsubscribe = onMessage(messaging, (payload) => {
+          dispatch(increment())
           const notification = JSON.parse(payload.data.body)
           toast.custom(
             <NotificationToast
@@ -36,29 +40,8 @@ export default function FirebaseForeground() {
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notificationPermissionStatus])
 
   return null // This component is primarily for handling foreground notifications
-  // return <Temp />
 }
-
-// function Temp() {
-//   return (
-//     <>
-//       <div
-//         onClick={() => {
-//           toast.success('New Notification', {
-//             position: 'bottom-right',
-//           })
-//         }}>
-//         Temp
-//       </div>
-//       <div
-//         onClick={() => {
-//           toast.success('New Notification 2', {})
-//         }}>
-//         Temp 2
-//       </div>
-//     </>
-//   )
-// }

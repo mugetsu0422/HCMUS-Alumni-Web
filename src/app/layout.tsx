@@ -3,7 +3,7 @@ import './globals.css'
 import FirebaseForeground from '@/config/firebase-foreground'
 import { inter } from './ui/fonts'
 import CustomToaster from './ui/common/custom-toaster'
-import { Toaster } from 'react-hot-toast'
+import StoreProvider from '@/config/store-provider'
 
 export const metadata = {
   title: {
@@ -18,9 +18,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         className={`${inter.className} overflow-x-auto scrollbar-webkit-main`}>
-        <CustomToaster />
-        <FirebaseForeground />
-        {children}
+        <StoreProvider>
+          <CustomToaster />
+          <FirebaseForeground />
+          {children}
+        </StoreProvider>
       </body>
     </html>
   )

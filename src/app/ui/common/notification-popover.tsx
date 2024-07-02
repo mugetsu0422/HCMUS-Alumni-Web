@@ -16,6 +16,8 @@ import React, { useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Cookies from 'js-cookie'
 import NotificationItem from '@/app/ui/common/notification-item'
+import { reset } from '@/lib/features/notifications/notification-counter'
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 
 const data = [
   {
@@ -107,8 +109,23 @@ export default function NotificationPopover() {
   const [totalPages, setTotalPages] = useState(0)
   const page = useRef(0)
 
+  const notificationCount = useAppSelector(
+    (state) => state.notificationCounter.value
+  )
+  const dispatch = useAppDispatch()
+
   const popoverHandler = () => {
-    if (!openNotification && !notifications.length && hasMore) {
+    const isNewNoti = !openNotification && notificationCount
+    const notOpened = !openNotification && !notifications.length && hasMore
+
+    if (isNewNoti || notOpened) {
+      if (isNewNoti) {
+        localStorage.setItem('notificationCount', '0')
+        dispatch(reset())
+        page.current = 0
+        setHasMore(true)
+      }
+
       axios
         .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/notification`, {
           headers: {
@@ -161,7 +178,10 @@ export default function NotificationPopover() {
       handler={popoverHandler}>
       <PopoverHandler>
         <Button placeholder={undefined} variant="text" size="sm">
-          <Badge invisible={false} content={undefined} className="bg-[var(--blue-05)]">
+          <Badge
+            invisible={!notificationCount}
+            content={notificationCount}
+            className="bg-[var(--blue-05)]">
             <div className="h-[24px] w-[24px]">
               <FontAwesomeIcon
                 icon={faBell}
