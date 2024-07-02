@@ -63,36 +63,36 @@ export default function EventsListItem({
         </Link>
         <div className="flex flex-col gap-1">
           <p className="flex items-start gap-1 text-md w-full">
-            <div className="">
+            <span className="">
               <GeoAltFill className="text-[--blue-02]" />
-            </div>
+            </span>
             <span className="w-fit">Địa điểm:</span>
             <span className="whitespace-nowrap text-ellipsis overflow-hidden text-wrap">
               {event.organizationLocation}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
-            <div>
+            <span>
               <Clock className="text-[--blue-02]" />
-            </div>
+            </span>
             <span>Thời gian:</span>
             <span>
               {moment(event.organizationTime).format('DD-MM-YYYY HH:mm:ss')}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
-            <div>
+            <span>
               <BarChartFill className="text-[--blue-02]" />
-            </div>
+            </span>
             <span>Số người tham gia:</span>
             <span>
               {event.participants} / {event.maximumParticipants}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
-            <div>
+            <span>
               <BarChartFill className="text-[--blue-02]" />
-            </div>
+            </span>
             <span>Số người tối thiểu: </span>
             <span>{event.minimumParticipants}</span>
           </p>

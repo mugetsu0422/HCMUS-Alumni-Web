@@ -13,7 +13,7 @@ import {
 import { Button, Input, Textarea, Checkbox } from '@material-tailwind/react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -235,7 +235,7 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
-      <CustomToaster />
+      
       <div className="w-full flex">
         <Link href={`/groups/${params.id}`}>
           <Button

@@ -17,7 +17,7 @@ import { TagFill, SendFill, XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import { nunito } from '../fonts'
 import Comments from '../common/comments'
-import ImageGird from './image-grid'
+import ImageGrid from './image-grid'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { useForm } from 'react-hook-form'
@@ -166,7 +166,7 @@ export default function CommentsDialog({
                 Xem thêm
               </span> */}
             </div>
-            {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
+            {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
         </div>
 
@@ -226,7 +226,10 @@ export default function CommentsDialog({
         className="sticky bottom-0 h-fit py-3 bg-white">
         <form
           className="flex flex-start items-start w-full gap-2"
-          onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+          onSubmit={(e) => {
+            onUploadComment(e, null, uploadComment)
+            setUploadComment('')
+          }}>
           <Avatar placeholder={undefined} src={'/demo.jpg'} alt="avatar user" />
           <Textarea
             rows={1}
@@ -239,6 +242,7 @@ export default function CommentsDialog({
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
+            value={uploadComment}
             onChange={handleUploadCommentChange}
           />
           <Button

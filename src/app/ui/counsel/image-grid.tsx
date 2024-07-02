@@ -87,7 +87,7 @@ function DialogViewImage({
   )
 }
 
-export default function ImageGird({ pictures }) {
+export default function ImageGrid({ pictures }) {
   const [openDialogViewImage, setOpenDialogViewImage] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 

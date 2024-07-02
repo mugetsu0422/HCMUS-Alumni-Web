@@ -19,7 +19,7 @@ import {
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import NoData from '../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import moment from 'moment'
@@ -45,7 +45,7 @@ const getTodayDate = () => {
 }
 
 export default function Page({ params }: { params: { id: string } }) {
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
   const tagsInputRef = useRef(null)
@@ -159,19 +159,19 @@ export default function Page({ params }: { params: { id: string } }) {
         )
       })
       .catch((e) => {
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      <CustomToaster />
+      
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>

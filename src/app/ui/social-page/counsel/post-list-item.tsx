@@ -34,7 +34,7 @@ import {
   COMMENT_PAGE_SIZE,
 } from '../../../constant'
 import CommentsDialog from '../../counsel/counsel-comments-dialog'
-import ImageGird from '../../counsel/image-grid'
+import ImageGrid from '../../counsel/image-grid'
 import { nunito } from '../../fonts'
 import ReactionDialog from '../../common/reaction-dialog'
 import clsx from 'clsx'
@@ -518,7 +518,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
                 </span>
               )}
             </div>
-            {post.pictures.length > 0 && <ImageGird pictures={post.pictures} />}
+            {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
 
           {votes.length !== 0 && (

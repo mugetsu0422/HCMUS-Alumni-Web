@@ -1,15 +1,19 @@
 'use client'
 
-import React from 'react'
-import { Avatar, List, ListItem } from '@material-tailwind/react'
-import Link from 'next/link'
+import React, { useEffect, useRef, useState } from 'react'
+import { List, Spinner } from '@material-tailwind/react'
 import { roboto } from '@/app/ui/fonts'
+import { JWT_COOKIE } from '@/app/constant'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import NotificationItem from '@/app/ui/common/notification-item'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
-const notifications = [
+const data = [
   {
     id: '1',
     imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
     time: '2 phút trước',
     link: '#',
     isRead: false,
@@ -17,7 +21,7 @@ const notifications = [
   {
     id: '2',
     imageUrl: '/demo.jpg',
-    notification: 'Trần Phúc đã bình luận bài viết của bạn của bạn.',
+    content: 'Trần Phúc đã bình luận bài viết của bạn của bạn.',
     time: '2 phút trước',
     link: '#',
     isRead: true,
@@ -25,7 +29,7 @@ const notifications = [
   {
     id: '3',
     imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
     time: '2 phút trước',
     link: '#',
     isRead: true,
@@ -33,7 +37,7 @@ const notifications = [
   {
     id: '4',
     imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
     time: '2 phút trước',
     link: '#',
     isRead: true,
@@ -41,7 +45,47 @@ const notifications = [
   {
     id: '5',
     imageUrl: '/demo.jpg',
-    notification: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    time: '2 phút trước',
+    link: '#',
+    isRead: true,
+  },
+  {
+    id: '6',
+    imageUrl: '/demo.jpg',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    time: '2 phút trước',
+    link: '#',
+    isRead: false,
+  },
+  {
+    id: '7',
+    imageUrl: '/demo.jpg',
+    content: 'Trần Phúc đã bình luận bài viết của bạn của bạn.',
+    time: '2 phút trước',
+    link: '#',
+    isRead: true,
+  },
+  {
+    id: '8',
+    imageUrl: '/demo.jpg',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    time: '2 phút trước',
+    link: '#',
+    isRead: true,
+  },
+  {
+    id: '9',
+    imageUrl: '/demo.jpg',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
+    time: '2 phút trước',
+    link: '#',
+    isRead: true,
+  },
+  {
+    id: '10',
+    imageUrl: '/demo.jpg',
+    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
     time: '2 phút trước',
     link: '#',
     isRead: true,
@@ -49,6 +93,54 @@ const notifications = [
 ]
 
 export default function Page() {
+  const [notifications, setNotifications] = useState([])
+  const [hasMore, setHasMore] = useState(true)
+  const [totalPages, setTotalPages] = useState(0)
+  const page = useRef(0)
+
+  const onFetchMore = () => {
+    page.current++
+    if (page.current >= totalPages) {
+      setHasMore(false)
+      return
+    }
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/notification?page=${page.current}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { notifications } }) => {
+        setNotifications((prev) => prev.concat(notifications))
+      })
+      .catch((error) => {})
+  }
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/notification`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(
+        ({ data: { totalUnreadNotification, totalPages, notifications } }) => {
+          // setNotifications(data)
+
+          if (!totalPages) {
+            setHasMore(false)
+            return
+          }
+          setTotalPages(totalPages)
+          setNotifications(notifications)
+        }
+      )
+      .catch((error) => {})
+  }, [])
+
   return (
     <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
       <p
@@ -56,26 +148,23 @@ export default function Page() {
         THÔNG BÁO
       </p>
       <List placeholder={undefined}>
-        {notifications.map(
-          ({ id, imageUrl, notification, time, link, isRead }) => (
-            <Link href={link} key={id}>
-              <ListItem
-                placeholder={undefined}
-                className="flex gap-2 items-center justify-between">
-                <Avatar placeholder={undefined} src={imageUrl} />
-                <div className="w-full">
-                  <p className="text-black ">{notification}</p>
-                  <p>{time}</p>
-                </div>
-                <span
-                  className={`mx-auto block h-[10px] w-[10px] rounded-full ${
-                    !isRead ? 'bg-[--blue-05]' : ''
-                  } `}
-                />
-              </ListItem>
-            </Link>
-          )
-        )}
+        <InfiniteScroll
+          className="flex flex-col"
+          dataLength={notifications.length}
+          next={onFetchMore}
+          hasMore={hasMore}
+          loader={
+            <div className="h-10 my-5 flex justify-center">
+              <Spinner className="h-8 w-8"></Spinner>
+            </div>
+          }>
+          {notifications.map((notification) => (
+            <NotificationItem
+              notification={notification}
+              key={notification.id}
+            />
+          ))}
+        </InfiniteScroll>
       </List>
     </div>
   )

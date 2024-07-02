@@ -125,7 +125,7 @@ export default function GroupLayout({
 
   return (
     <div className="sticky top-0 flex flex-1 overflow-hidden">
-      <CustomToaster />
+      
       <div className="relative flex flex-1 h-full overflow-x-auto">
         {
           <div
