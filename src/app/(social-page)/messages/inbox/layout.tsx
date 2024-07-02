@@ -139,7 +139,7 @@ export default function GroupLayout({
 
   return (
     <>
-      <CustomToaster />
+      
       {isSideBarOpen ? (
         ''
       ) : (

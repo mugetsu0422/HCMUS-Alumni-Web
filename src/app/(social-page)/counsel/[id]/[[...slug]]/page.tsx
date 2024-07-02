@@ -494,7 +494,7 @@ export default function Page({
     return (
       <div
         className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto`}>
-        <CustomToaster />
+        
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <Link href="#">

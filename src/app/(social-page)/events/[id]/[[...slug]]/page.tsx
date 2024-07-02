@@ -388,7 +388,7 @@ export default function Page({
       <>
         <div
           className={`${nunito.className} flex flex-col gap-6 w-[75%] max-w-[1366px] bg-[--blue-04] rounded-lg m-auto lg:px-10 lg:py-10 mt-16 mb-16`}>
-          <CustomToaster />
+          
           <div className="flex flex-col xl:flex-row items-center justify-center m-auto gap-x-10">
             <img
               src={event?.thumbnail}

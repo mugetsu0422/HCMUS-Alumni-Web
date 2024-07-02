@@ -183,7 +183,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
-      <CustomToaster />
+      
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1400px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công

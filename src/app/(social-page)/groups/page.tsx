@@ -119,7 +119,7 @@ export default function Page() {
 
   return (
     <>
-      <CustomToaster />
+      
       <Thumbnail />
       <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
         <div className="flex justify-between">

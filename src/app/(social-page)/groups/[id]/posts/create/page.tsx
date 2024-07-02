@@ -235,7 +235,7 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
-      <CustomToaster />
+      
       <div className="w-full flex">
         <Link href={`/groups/${params.id}`}>
           <Button

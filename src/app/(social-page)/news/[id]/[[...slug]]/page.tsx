@@ -235,7 +235,7 @@ export default function Page({
   if (!isLoading)
     return (
       <div className="flex flex-col xl:flex-row m-auto max-w-[1000px] w-[80%]">
-        <CustomToaster />
+        
         <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
           <div className="flex justify-between items-start">
             {news?.faculty ? (

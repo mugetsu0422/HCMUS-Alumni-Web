@@ -133,7 +133,7 @@ export default function GroupLayout({
       <div
         className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
         <div className="relative">
-          <CustomToaster />
+          
           <img
             src={group.coverUrl}
             alt="group cover"
