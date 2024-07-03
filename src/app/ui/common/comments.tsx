@@ -348,12 +348,13 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
 
               {isOpenInputComments && (
                 <form
-                  onSubmit={(e) =>
+                  onSubmit={(e) => {
                     onUploadComment(e, comment.id, uploadComment)
-                  }>
+                  }}>
                   <Textarea
                     placeholder="Bình luận"
                     resize={true}
+                    value={uploadComment}
                     onChange={handleUploadCommentChange}
                     className="mt-2 h-[100px] w-[93%] bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
                     labelProps={{

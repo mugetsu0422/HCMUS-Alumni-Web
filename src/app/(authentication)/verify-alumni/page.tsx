@@ -463,7 +463,7 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-[20rem] m-auto sm:pt-[10rem] 2xl:pt-0 flex flex-col items-center sm:items-start`}>
-      <CustomToaster />
+      
       <p className="text-3xl text-[var(--blue-01)] font-bold">BẮT ĐẦU</p>
       <p className="mt-2 text-[var(--text)] font-medium">
         Hãy thiết lập hồ sơ của bạn. Những thông tin này sẽ giúp chúng tôi xét

@@ -1,4 +1,3 @@
-import { off } from "process"
 import { useState, useLayoutEffect } from "react"
 
 export const useTruncatedElement = ({ ref }) => {

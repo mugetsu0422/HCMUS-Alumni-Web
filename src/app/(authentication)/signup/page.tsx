@@ -340,7 +340,7 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      <CustomToaster />
+      
       <Typography
         variant="h2"
         color="blue-gray"
