@@ -1,10 +1,10 @@
 // 'use client'
 import './globals.css'
-import FirebaseForeground from '@/config/firebase-foreground'
+import FirebaseForeground from '@/config/notification/firebase-foreground'
 import { inter } from './ui/fonts'
 import CustomToaster from './ui/common/custom-toaster'
 import StoreProvider from '@/config/store-provider'
-import ClientApplication from './../config/ClientApplication'
+import Socket from '@/config/socket/socket'
 
 export const metadata = {
   title: {
@@ -21,7 +21,8 @@ export default function RootLayout({ children }) {
         <StoreProvider>
           <CustomToaster />
           <FirebaseForeground />
-          <ClientApplication>{children}</ClientApplication>
+          <Socket />
+          {children}
         </StoreProvider>
       </body>
     </html>

@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import notificationCounter from './features/notifications/notification-counter'
+import notificationCounter from './features/notification/notification-counter'
 
 export const makeStore = () => {
   return configureStore({
