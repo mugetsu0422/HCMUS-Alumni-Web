@@ -332,7 +332,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                 {!isEditingComment ? (
                   <>
                     <p className="text-[var(--secondary)]">
-                      {moment(comment.createAt).locale('vi').local().fromNow()}
+                      {moment(comment.createAt).locale('vi').local().fromNow(true)}
                     </p>
                     <div
                       onClick={() => setIsOpenInputComments((e) => !e)}

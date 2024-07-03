@@ -130,7 +130,7 @@ export default function CommentsDialog({
               {post.creator.fullName}
             </p>
             <p className="text-sm text-[--secondary]">
-              {moment(post.publishedAt).locale('vi').local().fromNow()}
+              {moment(post.publishedAt).locale('vi').local().fromNow(true)}
             </p>
           </div>
         </div>

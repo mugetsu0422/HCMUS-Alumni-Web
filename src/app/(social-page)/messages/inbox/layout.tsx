@@ -1,71 +1,83 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
-import { nunito, plusJakartaSans } from '@/app/ui/fonts'
-import { Avatar, Button, Input } from '@material-tailwind/react'
-import Link from 'next/link'
+import { nunito } from '@/app/ui/fonts'
+import { Button, Input, Spinner } from '@material-tailwind/react'
 import { XLg, PlusCircle, Search, PencilSquare } from 'react-bootstrap-icons'
-import { useForm } from 'react-hook-form'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import Cookies from 'js-cookie'
-import { JWT_COOKIE, MESSAGE_TYPE } from '@/app/constant'
+import { JWT_COOKIE } from '@/app/constant'
 import 'moment/locale/vi'
-import moment from 'moment'
 import toast from 'react-hot-toast'
+import clsx from 'clsx'
+import InboxItem from '@/app/ui/social-page/messages/inbox-item'
+import { useRouter, useSearchParams } from 'next/navigation'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 export default function GroupLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: any
 }) {
-  const { register, reset } = useForm({
-    defaultValues: {
-      title: '',
-    },
-  })
+  const router = useRouter()
+  const searchParams = useSearchParams()!
+  const [query, setQuery] = useState('')
+  const [queryInput, setQueryInput] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const curPage = useRef(0)
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
-  const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  const router = useRouter()
   const [totalPages, setTotalPages] = useState(1)
-  const [listInboxes, setListInboxes] = useState([])
+  const [inboxes, setInboxes] = useState([])
   const userID = Cookies.get('userId')
 
-  const resetCurPage = () => {
-    params.delete('page')
-    curPage.current = 0
-    setHasMore(true)
-  }
-
-  const onSearch = useDebouncedCallback((keyword) => {
-    if (keyword) {
-      params.set('title', keyword)
-    } else {
-      params.delete('title')
-    }
-    resetCurPage()
-    //replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
+  const onSearch = useDebouncedCallback((query) => {
+    setQuery(query)
   }, 500)
+
+  const onFetchMore = () => {
+    curPage.current++
+    if (curPage.current >= totalPages) {
+      setHasMore(false)
+      return
+    }
+
+    let params = ''
+    if (query !== '') {
+      params = `query=${query}`
+    }
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox?page=${curPage.current}&${params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { inboxes } }) => {
+        setInboxes((prev) => prev.concat(inboxes))
+      })
+      .catch((err) => {})
+  }
 
   useEffect(() => {
     curPage.current = 0
     setHasMore(true)
+    let params = ''
+    if (query !== '') {
+      params = `?query=${query}`
+    }
     // Fetch list of inboxes
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox${myParams}`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox${params}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       })
       .then(({ data: { totalPages, inboxes } }) => {
         setTotalPages(totalPages)
-        setListInboxes(inboxes)
+        setInboxes(inboxes)
         setHasMore(totalPages > 1)
       })
       .catch((error) => {
@@ -73,7 +85,7 @@ export default function GroupLayout({
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )
       })
-  }, [myParams])
+  }, [query])
 
   return (
     <div className="flex overflow-hidden h-[--min-height-view]">
@@ -97,60 +109,54 @@ export default function GroupLayout({
               size="lg"
               crossOrigin={undefined}
               label="Tìm kiếm"
-              containerProps={{ className: 'min-w-full w-full shrink' }}
-              {...register('title', {
-                onChange: (e) => onSearch(e.target.value),
-              })}
-              icon={<Search className="hidden md:block" />}
-              className="w-full shrink"
+              containerProps={{ className: 'flex flex-1 shrink' }}
+              value={queryInput}
+              onChange={(e) => {
+                setQueryInput(e.target.value)
+                onSearch(e.target.value)
+              }}
+              icon={
+                <XLg
+                  onClick={() => {
+                    setQueryInput('')
+                    setQuery('')
+                  }}
+                  className={clsx({
+                    hidden: queryInput === '',
+                    'hover:cursor-pointer': true,
+                  })}
+                />
+              }
             />
           </div>
           <div
+            id="inboxList"
             className={`relative shrink h-full overflow-y-auto overflow-x-hidden scrollbar-webkit`}>
-            <div className="w-full flex flex-col mx-auto flex-1 lg:flex-0 h-full pr-2">
-              {listInboxes.map(({ members, latestMessage }) =>
+            <InfiniteScroll
+              dataLength={inboxes.length}
+              next={onFetchMore}
+              hasMore={hasMore}
+              loader={
+                <div className="h-10 flex justify-center ">
+                  <Spinner className="h-8 w-8"></Spinner>
+                </div>
+              }
+              scrollableTarget="inboxList"
+              className="w-full flex flex-col mx-auto flex-1 lg:flex-0 h-full pr-2">
+              {inboxes.map(({ members, latestMessage }) =>
                 members
-                  .filter((e) => e.id.userId != userID)
+                  .filter((member) => member.id.userId != userID)
                   .map(({ id, user }) => (
-                    <Link
-                      href={`/messages/inbox/${id.inboxId}`}
+                    <InboxItem
                       key={id.inboxId}
-                      className={`${plusJakartaSans.className} p-3 pr-0 flex flex-0 h-fit rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer w-full`}>
-                      <Avatar
-                        placeholder={undefined}
-                        src={user.avatarUrl}
-                        size="lg"
-                        alt="user avatar"
-                      />
-                      {
-                        <div className="hidden ml-2 md:flex w-full items-center">
-                          <div className="max-w-[250px] flex flex-col">
-                            <p className="font-bold text-black text-base truncate">
-                              {user.fullName}
-                            </p>
-                            <div className="text-[14px] text-[--text-navbar]">
-                              <span className={`truncate shrink w-full`}>
-                                {latestMessage.messageType === MESSAGE_TYPE.TEXT
-                                  ? latestMessage.sender.id === userID
-                                    ? 'Bạn: ' + latestMessage.content
-                                    : latestMessage.content
-                                  : `${latestMessage.sender.fullName} đã gửi 1 phương tiện`}
-                              </span>
-                              <span> · </span>
-                              <span>
-                                {moment(latestMessage.createAt)
-                                  .locale('vi')
-                                  .local()
-                                  .fromNow()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      }
-                    </Link>
+                      id={id}
+                      user={user}
+                      latestMessage={latestMessage}
+                      currentInboxId={1}
+                    />
                   ))
               )}
-            </div>
+            </InfiniteScroll>
           </div>
         </div>
       </div>

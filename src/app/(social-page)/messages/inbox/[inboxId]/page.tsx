@@ -13,7 +13,7 @@ import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '@/app/constant'
 import DisplayMessage from '@/app/ui/social-page/messages/DisplayMessage'
 
-export default function Page({ params }: { params: { inboxId: string } }) {
+export default function Page({ params }: { params: { inboxId: number } }) {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [onReply, setOnReply] = useState(false)
@@ -29,7 +29,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
 
   useEffect(() => {
     // Scroll to the bottom when the component mounts
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    bottomRef.current?.scrollIntoView({ behavior: 'instant' })
 
     // Fetch initial messages
     axios

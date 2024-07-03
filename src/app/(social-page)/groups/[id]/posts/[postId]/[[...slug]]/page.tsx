@@ -517,7 +517,7 @@ export default function Page({
             <div className="flex flex-col gap-1">
               <p className="font-bold text-lg">{post.creator.fullName}</p>
               <p className="text-sm text-[--secondary]">
-                {moment(post.publishedAt).locale('vi').local().fromNow()}
+                {moment(post.publishedAt).locale('vi').local().fromNow(true)}
               </p>
             </div>
           </div>

@@ -431,7 +431,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
               <Link
                 href={`/groups/${post.groupId}/posts/${post.id}`}
                 className="text-sm text-[--secondary] hover:underline">
-                {moment(post.publishedAt).locale('vi').local().fromNow()}
+                {moment(post.publishedAt).locale('vi').local().fromNow(true)}
               </Link>
             </div>
           </div>
