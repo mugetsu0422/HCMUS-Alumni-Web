@@ -12,7 +12,6 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '@/app/constant'
 import DisplayMessage from '@/app/ui/social-page/messages/DisplayMessage'
-import WebSocketManager from '../../../../../config/WebSocketManager.js'
 
 export default function Page({ params }: { params: { inboxId: string } }) {
   const [previewImages, setPreviewImages] = useState([])
@@ -53,11 +52,11 @@ export default function Page({ params }: { params: { inboxId: string } }) {
       })
 
     // Connect to WebSocket
-    WebSocketManager.connect(params.inboxId, showMessage)
+    // WebSocketManager.connect(params.inboxId, showMessage)
 
-    return () => {
-      WebSocketManager.disconnect()
-    }
+    // return () => {
+    //   WebSocketManager.disconnect()
+    // }
   }, [])
 
   function showMessage(message) {
@@ -127,15 +126,15 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     }
 
     // Send message via WebSocket
-    WebSocketManager.send(
-      '/app/send-message/' + params.inboxId,
-      {},
-      JSON.stringify({
-        senderId: Cookies.get('userId'),
-        content: messageContent,
-        parentMessageId: idParentsMessage,
-      })
-    )
+    // WebSocketManager.send(
+    //   '/app/send-message/' + params.inboxId,
+    //   {},
+    //   JSON.stringify({
+    //     senderId: Cookies.get('userId'),
+    //     content: messageContent,
+    //     parentMessageId: idParentsMessage,
+    //   })
+    // )
 
     setMessageContent('')
   }

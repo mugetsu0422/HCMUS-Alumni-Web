@@ -14,7 +14,6 @@ import axios from 'axios'
 import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Autosuggest from 'react-autosuggest'
-import WebSocketManager from '../../../../../config/WebSocketManager'
 import { JWT_COOKIE } from '@/app/constant'
 
 export default function Page() {
@@ -36,11 +35,7 @@ export default function Page() {
       // Handle the message received from the server
     }
 
-    WebSocketManager.connect(userId, showMessage)
-
-    return () => {
-      WebSocketManager.disconnect()
-    }
+    // WebSocketManager.connect(userId, showMessage)
   }, [userId])
 
   const resetCurPage = () => {
@@ -71,18 +66,18 @@ export default function Page() {
 
     const messageContent = messageInput.value
 
-    if (messageContent && currentInboxId) {
-      WebSocketManager.send(
-        '/app/send-message/' + currentInboxId,
-        {},
-        JSON.stringify({
-          senderId: userId,
-          content: messageContent,
-          parentMessageId: null,
-        })
-      )
-      messageInput.value = ''
-    }
+    // if (messageContent && currentInboxId) {
+    //   WebSocketManager.send(
+    //     '/app/send-message/' + currentInboxId,
+    //     {},
+    //     JSON.stringify({
+    //       senderId: userId,
+    //       content: messageContent,
+    //       parentMessageId: null,
+    //     })
+    //   )
+    //   messageInput.value = ''
+    // }
   }
 
   const removeImage = (index, event) => {
