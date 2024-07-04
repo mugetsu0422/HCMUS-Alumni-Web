@@ -7,17 +7,14 @@ import { useForm } from 'react-hook-form'
 import ErrorInput from '../../ui/error-input'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import bcrypt from 'bcryptjs'
 import {
   EMAIL_ACTIVATION_CODE_TIMER,
   JWT_COOKIE,
   JWT_EXPIRED_TIME,
-  SALT,
 } from '../../constant'
 import Countdown from 'react-countdown'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
-import CustomToaster from '@/app/ui/common/custom-toaster'
 
 const FormContext = createContext(null)
 
@@ -33,8 +30,6 @@ function Step1() {
   } = useForm()
 
   const onSubmit = async (data) => {
-    // const salt = await bcrypt.genSaltSync(SALT);
-    // const hash = await bcrypt.hashSync(data.password, salt)
     setInputs({
       email: data.email,
       pass: data.password,

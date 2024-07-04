@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import notificationCounter from './features/notification/notification-counter'
+import socketResponse from './features/message/socket-response'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       notificationCounter: notificationCounter,
+      socketResponse: socketResponse,
     },
   })
 }

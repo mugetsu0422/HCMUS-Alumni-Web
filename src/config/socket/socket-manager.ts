@@ -2,6 +2,7 @@ import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 
 class SocketManager {
+  private userId: string
   private stompClient: Stomp.Client | null
   private subscribedTopics: Set<string>
 
@@ -19,8 +20,9 @@ class SocketManager {
     return SocketManager.instance
   }
 
-  public connect(userId: string, showMessage: (message: string) => void): void {
+  public connect(userId: string, showMessage: (message: any) => void): void {
     if (!this.stompClient || !this.stompClient.connected) {
+      this.userId = userId
       const socket = new SockJS(`${process.env.NEXT_PUBLIC_SERVER_HOST}/ws`)
       this.stompClient = Stomp.over(socket)
       this.stompClient.debug = null
@@ -38,14 +40,14 @@ class SocketManager {
 
   private subscribeToMessages(
     userId: string,
-    showMessage: (message: string) => void
+    showMessage: (message: any) => void
   ): void {
     if (this.stompClient && this.stompClient.connected) {
       const topic = `/user/${userId}/queue/messages`
       if (!this.subscribedTopics.has(topic)) {
         console.log(`Subscribing to topic: ${topic}`)
         this.stompClient.subscribe(topic, (res) => {
-          showMessage(JSON.parse(res.body).message)
+          showMessage(JSON.parse(res.body))
         })
         this.subscribedTopics.add(topic)
       } else {
@@ -65,9 +67,22 @@ class SocketManager {
     }
   }
 
-  public send(destination: string, headers = {}, message: string): void {
+  public send(
+    inboxId: number,
+    headers = {},
+    content: string,
+    parentMessageId: number | null = null
+  ): void {
     if (this.stompClient && this.stompClient.connected) {
-      this.stompClient.send(destination, headers, message)
+      this.stompClient.send(
+        `/app/send-message/${inboxId}`,
+        headers,
+        JSON.stringify({
+          senderId: this.userId,
+          content: content,
+          parentMessageId: parentMessageId,
+        })
+      )
     } else {
       console.error('Unable to send, client not connected.')
     }

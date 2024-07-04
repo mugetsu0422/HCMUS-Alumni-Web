@@ -15,7 +15,7 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
       href={`/messages/inbox/${id.inboxId}`}
       key={id.inboxId}
       className={clsx(plusJakartaSans.className, {
-        'p-3 pr-0 flex flex-0 h-fit rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer w-full':
+        'p-3 flex flex-0 h-fit rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer w-full justify-center':
           true,
         'bg-[--highlight-bg]': id.inboxId === currentInboxId,
       })}>
@@ -24,23 +24,26 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
         src={user.avatarUrl}
         size="lg"
         alt="user avatar"
+        className="grow-0 shrink-0"
       />
       {
-        <div className="hidden ml-2 md:flex w-full items-center">
-          <div className="max-w-[250px] flex flex-col">
-            <p className="font-bold text-black text-base truncate">
+        <div className="hidden ml-2 lg:flex flex-1 items-center">
+          <div className="flex flex-col">
+            <p className="max-w-[200px] font-bold text-black text-[15px] truncate">
               {user.fullName}
             </p>
-            <div className="text-[14px] text-[--text-navbar]">
-              <span className={`truncate shrink w-full`}>
+            <div className="max-w-[200px] flex text-[13px] text-[--text-navbar]">
+              <span className={`max-w-[150px] truncate`}>
                 {latestMessage.messageType === MESSAGE_TYPE.TEXT
                   ? latestMessage.sender.id === userID
                     ? 'Bạn: ' + latestMessage.content
                     : latestMessage.content
-                  : `${latestMessage.sender.fullName} đã gửi 1 phương tiện`}
+                  : `${latestMessage.sender.fullName.substring(
+                      latestMessage.sender.fullName.lastIndexOf(' ') + 1
+                    )} đã gửi 1 phương tiện`}
               </span>
-              <span> · </span>
-              <span>
+              <span className="grow-0 shrink-0"> · </span>
+              <span className="grow-0 shrink-0">
                 {moment(latestMessage.createAt)
                   .locale('vi')
                   .local()

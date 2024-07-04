@@ -90,7 +90,7 @@ export default function GroupLayout({
   return (
     <div className="flex overflow-hidden h-[--min-height-view]">
       <div
-        className={`flex h-full overflow-hidden border-[#eeeeee] border-r-2 min-w-[100px] w-[360px]`}>
+        className={`flex h-full overflow-hidden border-[#eeeeee] border-r-2 min-w-[150px] w-[150px] lg:w-[360px]`}>
         <div className="flex flex-col p-4 gap-y-4 w-full h-full">
           <div className="flex flex-0 flex-col gap-2 justify-between">
             <div
@@ -109,7 +109,9 @@ export default function GroupLayout({
               size="lg"
               crossOrigin={undefined}
               label="Tìm kiếm"
-              containerProps={{ className: 'flex flex-1 shrink' }}
+              containerProps={{
+                className: 'flex flex-1 shrink !min-w-[100px]',
+              }}
               value={queryInput}
               onChange={(e) => {
                 setQueryInput(e.target.value)
