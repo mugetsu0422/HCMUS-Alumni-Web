@@ -36,6 +36,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   const userId = Cookies.get('userId')
   const [parentMessage, setParentMessage] = useState(null)
   const [notFound, setNotFound] = useState(false)
+  const textAreaRef = useRef(null)
 
   const socketResponse = useAppSelector((state) => state.socketResponse)
   const dispatch = useAppDispatch()
@@ -107,6 +108,9 @@ export default function Page({ params }: { params: { inboxId: string } }) {
 
   const handleReply = (message) => {
     setParentMessage(message)
+    if (textAreaRef.current) {
+      textAreaRef.current.focus()
+    }
   }
 
   const sendMessage = () => {
@@ -328,6 +332,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
           )}
 
           <TextareaAutosize
+            ref={textAreaRef}
             spellCheck="false"
             placeholder="Aa"
             className={clsx(

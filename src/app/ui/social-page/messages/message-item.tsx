@@ -96,7 +96,9 @@ function MessageContent() {
           className={`w-full gap-2 items-center ${
             message.sender.id === userID ? 'flex flex-row-reverse' : 'flex'
           }`}>
-          <div className="flex-1 flex justify-end">{msg}</div>
+          <div className={clsx('flex-1 flex', {
+            'justify-end': message.sender.id === userID,
+          })}>{msg}</div>
           <Tooltip
             anchorSelect={`#msg-${message.id}`}
             content={DateFormatter.formatMessageDate(message.createAt)}

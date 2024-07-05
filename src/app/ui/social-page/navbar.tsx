@@ -7,11 +7,7 @@ import {
   Badge,
   Avatar,
   Button,
-  Popover,
-  PopoverHandler,
-  PopoverContent,
   MenuItem,
-  Typography,
   Menu,
   MenuHandler,
   MenuList,
@@ -20,20 +16,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faBars,
   faComments,
   faNewspaper,
   faCalendarDays,
   faCertificate,
-  faBell,
   faUsers,
   faUserGroup,
 } from '@fortawesome/free-solid-svg-icons'
 import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import NotificationPopover from '../common/notification-popover'
 import { inter } from '../fonts'
-import { useAppDispatch, useAppSelector } from '@/lib/hooks'
-import { resetUnreadInboxCounter } from '@/lib/features/message/inbox-manager'
+import { useAppSelector } from '@/lib/hooks'
 
 // nav list component
 const navListItems = [
@@ -253,7 +246,6 @@ function NavList() {
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
   const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
-  const dispatch = useAppDispatch()
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 

@@ -24,6 +24,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import NotificationPopover from '@/app/ui/common/notification-popover'
 import { inter } from '@/app/ui/fonts'
+import { useAppSelector } from '@/lib/hooks'
 
 // nav list component
 const navListItems = [
@@ -252,7 +253,7 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
-  //const [message, setMessage] = React.useState('')
+  const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -310,18 +311,22 @@ export default function MyNavbar() {
         <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
           <NotificationPopover />
 
-          <Button placeholder={undefined} variant="text" size="sm">
-            <Link href={`messages/inbox`}>
+          <Link href={`messages/inbox`}>
+            <Button
+              placeholder={undefined}
+              className="h-full w-full"
+              variant="text"
+              size="sm">
               <Badge
-                invisible={true}
-                content={undefined}
+                invisible={!unreadInboxSet.length}
+                content={unreadInboxSet.length}
                 className="bg-[var(--blue-05)]">
                 <div className="h-[24px] w-[24px]">
                   <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
                 </div>
               </Badge>
-            </Link>
-          </Button>
+            </Button>
+          </Link>
 
           <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
         </div>
