@@ -13,6 +13,7 @@ import clsx from 'clsx'
 import InboxItem from '@/app/ui/social-page/messages/inbox-item'
 import { useRouter, useSearchParams } from 'next/navigation'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useAppSelector } from '@/lib/hooks'
 
 export default function GroupLayout({
   children,
@@ -30,6 +31,8 @@ export default function GroupLayout({
   const [totalPages, setTotalPages] = useState(1)
   const [inboxes, setInboxes] = useState([])
   const userID = Cookies.get('userId')
+
+  const activeInboxId = useAppSelector((state) => state.socketResponse.activeInboxId)
 
   const onSearch = useDebouncedCallback((query) => {
     setQuery(query)
@@ -99,7 +102,7 @@ export default function GroupLayout({
               <Button
                 onClick={() => router.push('/messages/inbox/new')}
                 placeholder={undefined}
-                className={`p-2 'm-auto'`}
+                className={`p-2 m-auto'`}
                 variant="text">
                 <PencilSquare className="text-xl xl:text-2xl" />
               </Button>
@@ -110,7 +113,7 @@ export default function GroupLayout({
               crossOrigin={undefined}
               label="Tìm kiếm"
               containerProps={{
-                className: 'flex flex-1 shrink !min-w-[100px]',
+                className: 'flex flex-1 shrink !min-w-[100px] -z-10',
               }}
               value={queryInput}
               onChange={(e) => {
@@ -133,7 +136,7 @@ export default function GroupLayout({
           </div>
           <div
             id="inboxList"
-            className={`relative shrink h-full overflow-y-auto overflow-x-hidden scrollbar-webkit`}>
+            className={`shrink h-full overflow-y-auto overflow-x-hidden scrollbar-webkit`}>
             <InfiniteScroll
               dataLength={inboxes.length}
               next={onFetchMore}
@@ -154,7 +157,7 @@ export default function GroupLayout({
                       id={id}
                       user={user}
                       latestMessage={latestMessage}
-                      currentInboxId={1}
+                      currentInboxId={activeInboxId}
                     />
                   ))
               )}

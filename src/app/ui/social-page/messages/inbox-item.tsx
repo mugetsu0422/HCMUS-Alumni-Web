@@ -6,6 +6,7 @@ import React from 'react'
 import { plusJakartaSans } from '@/app/ui/fonts'
 import Cookies from 'js-cookie'
 import clsx from 'clsx'
+import { useAppSelector } from '@/lib/hooks'
 
 export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
   const userID = Cookies.get('userId')
@@ -15,9 +16,10 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
       href={`/messages/inbox/${id.inboxId}`}
       key={id.inboxId}
       className={clsx(plusJakartaSans.className, {
-        'p-3 flex flex-0 h-fit rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer w-full justify-center':
+        'p-3 flex flex-0 h-fit rounded-lg hover:cursor-pointer w-full justify-center':
           true,
         'bg-[--highlight-bg]': id.inboxId === currentInboxId,
+        'hover:bg-blue-gray-50': id.inboxId !== currentInboxId,
       })}>
       <Avatar
         placeholder={undefined}

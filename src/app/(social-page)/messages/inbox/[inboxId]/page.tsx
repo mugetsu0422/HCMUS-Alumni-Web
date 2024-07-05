@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Avatar, Textarea, Spinner } from '@material-tailwind/react'
+import { Button, Avatar, Spinner } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faImage } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
@@ -17,6 +17,7 @@ import TextareaAutosize from 'react-textarea-autosize'
 import clsx from 'clsx'
 import SocketManager from '@/config/socket/socket-manager'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
+import { setActiveInboxId } from '@/lib/features/message/socket-response'
 
 export default function Page({ params }: { params: { inboxId: string } }) {
   const [previewImages, setPreviewImages] = useState([])
@@ -32,6 +33,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   const [parentMessage, setParentMessage] = useState(null)
 
   const socketResponse = useAppSelector((state) => state.socketResponse)
+  const dispatch = useAppDispatch()
 
   const onFetchMore = () => {
     curPage.current++
@@ -98,29 +100,24 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     })
   }
 
-  function showMessage(message) {
-    var messages = document.getElementById('chat-messages')
-    var p = document.createElement('p')
-    p.textContent = message.sender.fullName + ': ' + message.content
-    messages.appendChild(p)
-
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   const handleReply = (message) => {
     setParentMessage(message)
   }
 
+  const sendMessage = () => {
+    if (messageContent.trim()) {
+      sendTextMessage()
+    }
+    if (imageFiles.length > 0) {
+      sendMediaMessage()
+    }
+    setParentMessage(null)
+  }
+
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if ((event.key === 'Enter' && !event.shiftKey) || event.type === 'click') {
       event.preventDefault()
-      if (messageContent.trim()) {
-        sendTextMessage()
-      }
-      if (imageFiles.length > 0) {
-        sendMediaMessage()
-      }
-      setParentMessage(null)
+      sendMessage()
     }
   }
 
@@ -175,6 +172,8 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   }
 
   useEffect(() => {
+    dispatch(setActiveInboxId(parseInt(params.inboxId)))
+
     // Fetch initial messages
     axios
       .get(
@@ -209,13 +208,13 @@ export default function Page({ params }: { params: { inboxId: string } }) {
 
   return (
     <div className="flex flex-col relative h-full">
-      <header className="relative flex flex-0 top-0 w-full bg-[--blue-04] px-4 py-2 border-[#eeeeee] border-b-2 z-10 h-[70px]">
+      <header className="flex flex-0 top-0 w-full px-2 py-1 border-[#eeeeee] border-b-2">
         {inboxInformation
           .filter((e) => e.user.id !== userId)
           .map(({ user }) => (
             <Link
               href={`/profile/${user.id}/about`}
-              className="flex items-center gap-3 hover:bg-[#cbcbcb] w-fit p-2 rounded-lg"
+              className="flex items-center gap-3 hover:bg-blue-gray-50 w-fit p-1 rounded-lg"
               key={user.id}>
               <Avatar
                 placeholder={undefined}
@@ -292,7 +291,9 @@ export default function Page({ params }: { params: { inboxId: string } }) {
           {previewImages.length > 0 && (
             <div className="w-[calc(100%-1px)] flex flex-1 gap-3 p-2 rounded-t-xl bg-[--comment-input] overflow-x-auto scrollbar-webkit">
               {previewImages.map((image, index) => (
-                <div key={index} className="w-fit h-fit shrink-0 grow-0 relative">
+                <div
+                  key={index}
+                  className="w-fit h-fit shrink-0 grow-0 relative">
                   <div
                     title="Remove image"
                     className="w-fit h-fit p-2 flex items-center justify-center cursor-pointer bg-black hover:bg-black opacity-75 absolute top-0 right-0 rounded-xl"
@@ -332,7 +333,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
           placeholder={undefined}
           variant="text"
           className="p-2 w-fit h-fit grow-0 shrink-0"
-          onClick={sendTextMessage}>
+          onClick={handleKeyDown}>
           <FontAwesomeIcon
             icon={faPaperPlane}
             className="text-xl text-[#64748B]"

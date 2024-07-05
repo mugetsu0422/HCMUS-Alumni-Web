@@ -6,7 +6,7 @@ export default function RootLayout({ children }) {
   return (
     <>
       <Navbar />
-      <main className="relative top-[--navbar-height] min-h-[--min-height-view]">
+      <main className="">
         {children}
       </main>
     </>

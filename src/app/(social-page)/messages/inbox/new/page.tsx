@@ -12,73 +12,51 @@ import { nunito } from '@/app/ui/fonts'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import { useDebouncedCallback } from 'use-debounce'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Autosuggest from 'react-autosuggest'
-import { JWT_COOKIE } from '@/app/constant'
+import { JWT_COOKIE, MESSAGE_TYPE } from '@/app/constant'
+import { useAppDispatch } from '@/lib/hooks'
+import { setActiveInboxId } from '@/lib/features/message/socket-response'
+import clsx from 'clsx'
+import SocketManager from '@/config/socket/socket-manager'
+import TextareaAutosize from 'react-textarea-autosize'
+import { useRouter } from 'next/navigation'
 
 export default function Page() {
+  const router = useRouter()
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [currentInboxId, setCurrentInboxId] = useState(null)
   const userId = Cookies.get('userId')
-  const curPage = useRef(0)
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
-  const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  const [hasMore, setHasMore] = useState(true)
+  const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
-  const [friendName, setFriendName] = useState('')
+  const [selectedUser, setSelectedUser] = useState(null)
+
+  const [messages, setMessages] = useState([])
+  const [messageContent, setMessageContent] = useState('')
+
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    const showMessage = (message) => {
-      console.log('Message from server:', message)
-      // Handle the message received from the server
-    }
+    dispatch(setActiveInboxId(null))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const onSearch = useDebouncedCallback((query) => {
+    if (!query.trim()) return
 
-    // WebSocketManager.connect(userId, showMessage)
-  }, [userId])
-
-  const resetCurPage = () => {
-    params.delete('page')
-    curPage.current = 0
-    setHasMore(true)
-  }
-
-  const onSearch = useDebouncedCallback((keyword) => {
-    if (keyword) {
-      params.set('title', keyword)
-    } else {
-      params.delete('title')
-    }
-    resetCurPage()
-    setMyParams(`?${params.toString()}`)
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user?fullName=${query}&pageSize=25`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { users } }) => {
+        setSuggestions(users)
+      })
+      .catch((error) => {})
   }, 500)
-
-  function sendMessage() {
-    const messageInput = document.getElementById('message') as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-
-    if (!messageInput) {
-      console.error('No element found with ID "message"')
-      return
-    }
-
-    const messageContent = messageInput.value
-
-    // if (messageContent && currentInboxId) {
-    //   WebSocketManager.send(
-    //     '/app/send-message/' + currentInboxId,
-    //     {},
-    //     JSON.stringify({
-    //       senderId: userId,
-    //       content: messageContent,
-    //       parentMessageId: null,
-    //     })
-    //   )
-    //   messageInput.value = ''
-    // }
-  }
 
   const removeImage = (index, event) => {
     event.stopPropagation()
@@ -97,7 +75,7 @@ export default function Page() {
     input.click()
 
     input.addEventListener('change', (event) => {
-      const files = (event.target as HTMLInputElement).files
+      const files = (event.target as HTMLInputElement).files // Type cast here
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           if (files[i].size > 1024 * 1024 * 5) {
@@ -119,7 +97,9 @@ export default function Page() {
           const reader = new FileReader()
           reader.onload = (event) => {
             newImages.push({ src: event.target.result })
-            setPreviewImages(newImages)
+            setPreviewImages((prev) =>
+              prev.concat([{ src: event.target.result }])
+            )
           }
           reader.readAsDataURL(file)
         }
@@ -127,135 +107,236 @@ export default function Page() {
     })
   }
 
-  const renderSuggestion = (suggestion) => <div>{suggestion.fullName}</div>
+  const onSuggestionsFetchRequested = ({ value }) => {
+    onSearch(value)
+  }
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([])
+  }
+  const getSuggestionValue = (suggestion) => {
+    return suggestion.fullName
+  }
+  const renderSuggestion = (suggestion) => (
+    <div className="flex flex-row gap-2 cursor-pointer p-2 hover:bg-blue-gray-50 rounded-lg">
+      <Avatar placeholder={undefined} size="sm" src={suggestion.avatarUrl} />
+      <span className="flex items-center truncate">{suggestion.fullName}</span>
+    </div>
+  )
+  const onSuggestionSelected = (event, { suggestion, method }) => {
+    if (method === 'enter') {
+      event.preventDefault()
+    }
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/individual/${suggestion.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { inboxId } }) => {
+        router.push(`/messages/inbox/${inboxId}`)
+      })
+      .catch((error) => {
+        if (error.response?.data?.error?.code === 90505) {
+          setSelectedUser(suggestion)
+        } else {
+          toast.error(
+            error.response?.data?.error?.message || 'Lỗi không xác định'
+          )
+        }
+      })
+  }
+
+  const sendTextMessage = (inboxId: number) => {
+    if (!messageContent.trim()) {
+      return
+    }
+
+    const socket = SocketManager.getInstance()
+    socket.send(inboxId, {}, messageContent, null)
+    setMessageContent('')
+  }
+
+  const sendMediaMessage = (inboxId: number) => {
+    const copy = [...imageFiles]
+    setImageFiles([])
+    setPreviewImages([])
+
+    copy.forEach((file) => {
+      axios
+        .postForm(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/${inboxId}/media`,
+          {
+            media: file,
+            messageType: MESSAGE_TYPE.IMAGE,
+            parentMessageId: null,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        .catch((error) => {
+          toast.error(
+            error.response?.data?.error?.message || 'Lỗi không xác định'
+          )
+        })
+    })
+  }
+  const sendMessage = (inboxId: number) => {
+    if (messageContent.trim()) {
+      sendTextMessage(inboxId)
+    }
+    if (imageFiles.length > 0) {
+      sendMediaMessage(inboxId)
+    }
+  }
+
+  const handleKeyDown = (event) => {
+    if ((event.key === 'Enter' && !event.shiftKey) || event.type === 'click') {
+      event.preventDefault()
+
+      // Create new inbox
+      axios
+        .post(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox`,
+          { members: [{ userId: selectedUser.id }] },
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        .then(({ data: { inboxId } }) => {
+          sendMessage(inboxId)
+          router.push(`/messages/inbox/${inboxId}`)
+        })
+        .catch((error) => {
+          toast.error(
+            error.response?.data?.error?.message || 'Lỗi không xác định'
+          )
+        })
+    }
+  }
 
   return (
     <div className="flex flex-col relative h-full">
-      <header className="fixed flex items-start gap-1 top-0 w-[87%] px-4 py-4 border-[#eeeeee] border-b-2 mt-20 z-10">
+      <header className="flex items-center gap-1 top-0 w-full px-4 py-4 border-[#eeeeee] border-b-2 z-10">
         <p
           className={`${nunito.className} font-medium text-base w-fit text-nowrap`}>
           Gửi tin nhắn đến:
         </p>
-        <label htmlFor="friend">
-          <Autosuggest
-            inputProps={{
-              placeholder: 'Tìm kiếm',
-              autoComplete: 'off',
-              name: 'friend',
-              id: 'friend',
-              value: friendName,
-              onChange: (_event, { newValue }) => {
-                setFriendName(newValue)
-              },
-            }}
-            suggestions={suggestions}
-            onSuggestionsFetchRequested={async () => {
-              if (!friendName) {
-                setSuggestions([])
-                return
-              }
-              try {
-                const response = await axios.get(
-                  `${process.env.NEXT_PUBLIC_SERVER_HOST}/user?fullName=${friendName}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-                    },
-                  }
-                )
-                setSuggestions(
-                  response.data.users.map((user) => ({
-                    id: user.id,
-                    fullName: user.fullName,
-                    avatarUrl: user.avatarUrl,
-                  }))
-                )
-                console.log(suggestions)
-              } catch (error) {
-                toast.error(
-                  error.response?.data?.error?.message || 'Lỗi không xác định'
-                )
-                setSuggestions([])
-              }
-            }}
-            onSuggestionsClearRequested={() => {
-              setSuggestions(suggestions)
-            }}
-            getSuggestionValue={(suggestion) => suggestion.fullName}
-            renderSuggestion={renderSuggestion}
-            onSuggestionsSelected={(event, { suggestion, method }) => {
-              if (method === 'enter') {
-                event.preventDefault()
-              }
-              setFriendName(suggestion.fullName)
-            }}
-          />
-        </label>
+        <Autosuggest
+          suggestions={suggestions}
+          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={onSuggestionsClearRequested}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={renderSuggestion}
+          onSuggestionSelected={onSuggestionSelected}
+          inputProps={{
+            spellCheck: false,
+            value: query,
+            onChange: (_, { newValue }) => {
+              setQuery(newValue)
+            },
+          }}
+          theme={{
+            input: 'outline-none',
+            container: 'relative',
+            suggestionsContainer: '',
+            suggestionsContainerOpen:
+              'block absolute w-[300px] h-[400px] overflow-y-auto scrollbar-webkit bg-white border-2 border-solid rounded-lg border-[--highlight-bg] p-2 shadow-lg shadow-black/30',
+          }}
+        />
 
-        <Link href="/messages/inbox/">
+        {/* <Link href="/messages/inbox/">
           <Button
             placeholder={undefined}
             className="cursor-pointer bg-white opacity-75 ml-2 p-0">
             <XLg className="text-black text-base bg-white" />
           </Button>
-        </Link>
+        </Link> */}
       </header>
 
-      <div className="relative w-full h-full max-h-[80vh] px-4 overflow-x-auto scrollbar-webkit flex flex-col z-0 mt-20">
-        <div className="mx-auto flex flex-col items-center gap-1">
-          {suggestions.length === 1 &&
-            suggestions.map(({ avatarUrl, fullName, id }) => (
-              <div key={id}>
-                <Avatar placeholder={undefined} src={avatarUrl} size="xl" />
-                <p className="font-semibold text-base text-black">{fullName}</p>
-              </div>
-            ))}
+      {selectedUser && (
+        <div className="w-full flex justify-center pt-4">
+          <div className="flex flex-col gap-1 justify-center items-center">
+            <Avatar
+              placeholder={undefined}
+              src={selectedUser.avatarUrl}
+              size="lg"
+            />
+            <p className="font-semibold text-base text-black">
+              {selectedUser.fullName}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="relative w-full flex-1 flex items-end gap-2 p-2 bg-[#f6f6f6]">
+      <div
+        id="messageList"
+        className="w-full h-full px-4 overflow-x-auto scrollbar-webkit flex flex-col-reverse"></div>
+
+      <div className="relative h-fit flex w-full flex-row items-end gap-2 p-2 bg-[white]">
         <Button
           placeholder={undefined}
           variant="text"
-          className="p-2 w-fit h-fit"
+          className="p-2 w-fit h-fit grow-0 shrink-0"
           onClick={onClickDropzone}>
           <FontAwesomeIcon icon={faImage} className="text-xl text-[#64748B]" />
         </Button>
 
-        <div className="relative h-[70px] flex w-full flex-row items-end gap-2 p-2 bg-[#f0f2f5]">
-          <div className="flex flex-wrap gap-3 justify-start p-2">
-            {previewImages.map((image, index) => (
-              <div key={image.src} className="relative flex flex-col items-end">
-                <Button
-                  placeholder={undefined}
-                  className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                  onClick={(event) => removeImage(index, event)}>
-                  <XLg />
-                </Button>
-                <img
-                  src={image.src}
-                  alt="Ảnh được kéo thả"
-                  className="w-32 h-24 object-cover rounded-md"
-                />
-              </div>
-            ))}
-          </div>
+        <div className="h-full w-full flex flex-1 flex-col justify-center rounded-xl bg-[--comment-input]">
+          {previewImages.length > 0 && (
+            <div className="w-[calc(100%-1px)] flex flex-1 gap-3 p-2 rounded-t-xl bg-[--comment-input] overflow-x-auto scrollbar-webkit">
+              {previewImages.map((image, index) => (
+                <div
+                  key={index}
+                  className="w-fit h-fit shrink-0 grow-0 relative">
+                  <div
+                    title="Remove image"
+                    className="w-fit h-fit p-2 flex items-center justify-center cursor-pointer bg-black hover:bg-black opacity-75 absolute top-0 right-0 rounded-xl"
+                    onClick={(event) => removeImage(index, event)} // Pass event object
+                  >
+                    <XLg className="w-[14px] h-[14px] text-white" />
+                  </div>
+                  <img
+                    src={image.src}
+                    alt={`Preview ${index}`}
+                    className="w-20 h-20 object-contain rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
-          <Textarea
-            id="message"
-            rows={1}
+          <TextareaAutosize
+            spellCheck="false"
             placeholder="Aa"
-            className="min-h-[90%] !border-0 focus:border-transparent text-base"
-            containerProps={{ className: 'grid h-[90%]' }}
-            labelProps={{ className: 'before:content-none after:content-none' }}
+            className={clsx(
+              'h-full w-full scrollbar-webkit resize-none p-1 px-3 rounded-xl bg-[--comment-input] outline-none',
+              {
+                'rounded-t-none': previewImages.length > 0,
+              }
+            )}
+            minRows={1}
+            maxRows={6}
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
         </div>
 
         <Button
+          disabled={!messageContent.trim() && previewImages.length === 0}
           placeholder={undefined}
           variant="text"
-          className="p-2 w-fit h-fit"
-          onClick={sendMessage}>
+          className="p-2 w-fit h-fit grow-0 shrink-0"
+          onClick={handleKeyDown}
+        >
           <FontAwesomeIcon
             icon={faPaperPlane}
             className="text-xl text-[#64748B]"
