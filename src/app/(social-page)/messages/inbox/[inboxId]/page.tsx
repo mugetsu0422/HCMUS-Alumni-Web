@@ -17,12 +17,16 @@ import TextareaAutosize from 'react-textarea-autosize'
 import clsx from 'clsx'
 import SocketManager from '@/config/socket/socket-manager'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
-import { setActiveInboxId } from '@/lib/features/message/socket-response'
+import {
+  handleIncomingMessage,
+  markAsRead,
+  setActiveInboxId,
+} from '@/lib/features/message/inbox-manager'
+import NotFound404 from '@/app/ui/common/not-found-404'
 
 export default function Page({ params }: { params: { inboxId: string } }) {
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
-  const bottomRef = useRef(null)
   const [totalPages, setTotalPages] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const curPage = useRef(0)
@@ -31,6 +35,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   const [inboxInformation, setInboxInformation] = useState([])
   const userId = Cookies.get('userId')
   const [parentMessage, setParentMessage] = useState(null)
+  const [notFound, setNotFound] = useState(false)
 
   const socketResponse = useAppSelector((state) => state.socketResponse)
   const dispatch = useAppDispatch()
@@ -122,7 +127,6 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   }
 
   const removeImage = (index, event) => {
-    console.log('remove image')
     event.stopPropagation()
     const newImages = previewImages.filter(
       (image, imageIndex) => imageIndex !== index
@@ -189,6 +193,10 @@ export default function Page({ params }: { params: { inboxId: string } }) {
         setInboxInformation(inbox.members)
       })
       .catch((error) => {
+        if (error.response.status === 403) {
+          setNotFound(true)
+          return
+        }
         toast.error(
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )
@@ -205,6 +213,14 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketResponse])
+
+  useEffect(() => {
+    dispatch(markAsRead(parseInt(params.inboxId)))
+  })
+
+  if (notFound) {
+    return <NotFound404 />
+  }
 
   return (
     <div className="flex flex-col relative h-full">

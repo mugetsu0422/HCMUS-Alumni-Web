@@ -13,7 +13,11 @@ import clsx from 'clsx'
 import InboxItem from '@/app/ui/social-page/messages/inbox-item'
 import { useRouter, useSearchParams } from 'next/navigation'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useAppSelector } from '@/lib/hooks'
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
+import {
+  handleIncomingMessage,
+  setInboxes,
+} from '@/lib/features/message/inbox-manager'
 
 export default function GroupLayout({
   children,
@@ -29,10 +33,14 @@ export default function GroupLayout({
   const [hasMore, setHasMore] = useState(true)
   const curPage = useRef(0)
   const [totalPages, setTotalPages] = useState(1)
-  const [inboxes, setInboxes] = useState([])
   const userID = Cookies.get('userId')
 
-  const activeInboxId = useAppSelector((state) => state.socketResponse.activeInboxId)
+  const socketResponse = useAppSelector((state) => state.socketResponse)
+  const inboxes = useAppSelector((state) => state.inboxManager.inboxes)
+  const activeInboxId = useAppSelector(
+    (state) => state.inboxManager.activeInboxId
+  )
+  const dispatch = useAppDispatch()
 
   const onSearch = useDebouncedCallback((query) => {
     setQuery(query)
@@ -59,7 +67,7 @@ export default function GroupLayout({
         }
       )
       .then(({ data: { inboxes } }) => {
-        setInboxes((prev) => prev.concat(inboxes))
+        dispatch(setInboxes({ type: 'concat', newInboxes: inboxes }))
       })
       .catch((err) => {})
   }
@@ -80,7 +88,7 @@ export default function GroupLayout({
       })
       .then(({ data: { totalPages, inboxes } }) => {
         setTotalPages(totalPages)
-        setInboxes(inboxes)
+        dispatch(setInboxes({ type: 'set', newInboxes: inboxes }))
         setHasMore(totalPages > 1)
       })
       .catch((error) => {
@@ -88,13 +96,27 @@ export default function GroupLayout({
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
+
+  useEffect(() => {
+    if (socketResponse.message) {
+      // Messages from an inbox different from the current inbox
+      dispatch(
+        handleIncomingMessage({
+          incomingInbox: socketResponse.inbox,
+          incomingMessage: socketResponse.message,
+        })
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketResponse])
 
   return (
     <div className="flex overflow-hidden h-[--min-height-view]">
       <div
         className={`flex h-full overflow-hidden border-[#eeeeee] border-r-2 min-w-[150px] w-[150px] lg:w-[360px]`}>
-        <div className="flex flex-col p-4 gap-y-4 w-full h-full">
+        <div className="flex flex-col p-2 lg:p-4 gap-y-4 w-full h-full">
           <div className="flex flex-0 flex-col gap-2 justify-between">
             <div
               className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2 flex justify-between items-center`}>
@@ -147,8 +169,8 @@ export default function GroupLayout({
                 </div>
               }
               scrollableTarget="inboxList"
-              className="w-full flex flex-col mx-auto flex-1 lg:flex-0 h-full pr-2">
-              {inboxes.map(({ members, latestMessage }) =>
+              className="w-full flex flex-col items-center mx-auto flex-1 lg:flex-0 h-full pr-2">
+              {inboxes.map(({ members, latestMessage, hasRead = null }) =>
                 members
                   .filter((member) => member.id.userId != userID)
                   .map(({ id, user }) => (
@@ -158,6 +180,7 @@ export default function GroupLayout({
                       user={user}
                       latestMessage={latestMessage}
                       currentInboxId={activeInboxId}
+                      hasRead={hasRead}
                     />
                   ))
               )}

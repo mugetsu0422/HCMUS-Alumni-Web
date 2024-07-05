@@ -6,9 +6,14 @@ import React from 'react'
 import { plusJakartaSans } from '@/app/ui/fonts'
 import Cookies from 'js-cookie'
 import clsx from 'clsx'
-import { useAppSelector } from '@/lib/hooks'
 
-export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
+export default function InboxItem({
+  id,
+  user,
+  latestMessage,
+  currentInboxId,
+  hasRead,
+}) {
   const userID = Cookies.get('userId')
 
   return (
@@ -16,7 +21,7 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
       href={`/messages/inbox/${id.inboxId}`}
       key={id.inboxId}
       className={clsx(plusJakartaSans.className, {
-        'p-3 flex flex-0 h-fit rounded-lg hover:cursor-pointer w-full justify-center':
+        'p-3 flex flex-0 h-fit rounded-lg hover:cursor-pointer w-fit lg:w-full justify-center':
           true,
         'bg-[--highlight-bg]': id.inboxId === currentInboxId,
         'hover:bg-blue-gray-50': id.inboxId !== currentInboxId,
@@ -34,7 +39,11 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
             <p className="max-w-[200px] font-bold text-black text-[15px] truncate">
               {user.fullName}
             </p>
-            <div className="max-w-[200px] flex text-[13px] text-[--text-navbar]">
+            <div
+              className={clsx('max-w-[200px] flex gap-[2px] text-[13px]', {
+                'text-[--text-navbar]': hasRead === null || hasRead === true,
+                'font-bold': hasRead === false,
+              })}>
               <span className={`max-w-[150px] truncate`}>
                 {latestMessage.messageType === MESSAGE_TYPE.TEXT
                   ? latestMessage.sender.id === userID
@@ -44,8 +53,8 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
                       latestMessage.sender.fullName.lastIndexOf(' ') + 1
                     )} đã gửi 1 phương tiện`}
               </span>
-              <span className="grow-0 shrink-0"> · </span>
-              <span className="grow-0 shrink-0">
+              <span className="grow-0 shrink-0">·</span>
+              <span className="grow-0 shrink-0 text-[--text-navbar] font-normal">
                 {moment(latestMessage.createAt)
                   .locale('vi')
                   .local()
@@ -55,6 +64,14 @@ export default function InboxItem({ id, user, latestMessage, currentInboxId }) {
           </div>
         </div>
       }
+      <div className="flex justify-center items-center">
+        <span
+          className={clsx({
+            'mx-auto block h-[12px] w-[12px] rounded-full': true,
+            'bg-[--blue-05]': hasRead === false,
+          })}
+        />
+      </div>
     </Link>
   )
 }

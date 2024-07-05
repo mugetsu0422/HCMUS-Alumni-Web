@@ -45,7 +45,6 @@ class SocketManager {
     if (this.stompClient && this.stompClient.connected) {
       const topic = `/user/${userId}/queue/messages`
       if (!this.subscribedTopics.has(topic)) {
-        console.log(`Subscribing to topic: ${topic}`)
         this.stompClient.subscribe(topic, (res) => {
           showMessage(JSON.parse(res.body))
         })
@@ -61,7 +60,6 @@ class SocketManager {
   public disconnect(): void {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.disconnect(() => {
-        console.log('Disconnected')
         this.subscribedTopics.clear()
       })
     }

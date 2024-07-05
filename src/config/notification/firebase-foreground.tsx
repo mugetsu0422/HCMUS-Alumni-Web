@@ -21,8 +21,9 @@ export default function FirebaseForeground() {
       if (notificationPermissionStatus === 'granted') {
         const messaging = getMessaging(firebaseApp)
         const unsubscribe = onMessage(messaging, (payload) => {
-          dispatch(increment())
           const notification = JSON.parse(payload.data.body)
+          if (notification.entityTable === 'message') return
+          dispatch(increment())
           toast.custom(
             <NotificationToast
               notification={notification}

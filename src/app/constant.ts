@@ -46,6 +46,7 @@ export const NOTIFICATION_ENTITY_TABLE = [
   'request_join_group',
   'interact_post_group',
   'comment_post_group',
+  'message'
 ] as const
 export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
