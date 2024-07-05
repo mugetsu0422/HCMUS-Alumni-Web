@@ -27,7 +27,6 @@
     "**/*.ts",
     "**/*.tsx",
     "build/types/**/*.ts",
-    "src/lib/store.js"
   ],
   "exclude": ["node_modules"]
 }
