@@ -1,9 +1,10 @@
 // 'use client'
 import './globals.css'
-import FirebaseForeground from '@/config/firebase-foreground'
+import FirebaseForeground from '@/config/notification/firebase-foreground'
 import { inter } from './ui/fonts'
 import CustomToaster from './ui/common/custom-toaster'
 import StoreProvider from '@/config/store-provider'
+import Socket from '@/config/socket/socket'
 
 export const metadata = {
   title: {
@@ -16,11 +17,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} overflow-x-auto scrollbar-webkit-main`}>
+      <body className={`${inter.className} scrollbar-webkit-main`}>
         <StoreProvider>
           <CustomToaster />
           <FirebaseForeground />
+          <Socket />
           {children}
         </StoreProvider>
       </body>

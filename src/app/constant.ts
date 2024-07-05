@@ -1,4 +1,3 @@
-export const SALT = 15
 export const EMAIL_ACTIVATION_CODE_TIMER = 59000 // 59s
 export const JWT_COOKIE = 'jwt'
 export const JWT_EXPIRED_TIME = 3 // 3 days
@@ -9,6 +8,7 @@ export const CHILDREN_COMMENTS_PAGE_SIZE = 50
 export const REACTION_PAGE_SIZE = 50
 export const TAGS_LIMIT = 5
 export const VOTE_OPTIONS_LIMIT = 10
+export const MESSAGE_PAGE_SIZE = 20
 export const FACULTIES = [
   { id: '1', name: 'Công nghệ Thông tin' },
   { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
@@ -46,6 +46,7 @@ export const NOTIFICATION_ENTITY_TABLE = [
   'request_join_group',
   'interact_post_group',
   'comment_post_group',
+  'message'
 ] as const
 export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
@@ -87,3 +88,10 @@ export const FRIEND_TABS = [
     url: 'requests',
   },
 ]
+export const MESSAGE_TYPE = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  VIDEO: 'VIDEO',
+  SOUND: 'SOUND',
+}

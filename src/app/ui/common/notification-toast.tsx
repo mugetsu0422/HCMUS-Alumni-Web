@@ -55,7 +55,7 @@ export default function NotificationToast({
           {notification.notificationMessage}
         </p>
         <p className={`text-sm text-[--blue-05]`}>
-          {moment(notification.createAt).locale('vi').local().fromNow()}
+          {moment(notification.createAt).locale('vi').local().fromNow(true)}
         </p>
       </div>
     </Link>

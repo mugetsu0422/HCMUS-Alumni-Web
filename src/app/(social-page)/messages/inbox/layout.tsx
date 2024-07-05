@@ -1,216 +1,197 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
-import { nunito, plusJakartaSans } from '@/app/ui/fonts'
-import { Avatar, Button, Input } from '@material-tailwind/react'
-import Link from 'next/link'
+import { nunito } from '@/app/ui/fonts'
+import { Button, Input, Spinner } from '@material-tailwind/react'
 import { XLg, PlusCircle, Search, PencilSquare } from 'react-bootstrap-icons'
-import CustomToaster from '@/app/ui/common/custom-toaster'
-import { useForm } from 'react-hook-form'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
-
-const dataTemp = [
-  { name: 'Trần Phúc', time: '11:00', latestMes: 'Xin chào bạn', isRead: true },
-  { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: true },
-  { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: false },
-  { name: 'QQQQQ', time: '11:00', latestMes: '122212213', isRead: false },
-  {
-    name: 'QQQQQ',
-    time: '11:00',
-    latestMes: '122212213',
-    isOline: true,
-    isRead: true,
-  },
-  {
-    name: 'QQQQQ',
-    time: '11:00',
-    latestMes: '121111111111111111',
-    isOline: true,
-    isRead: false,
-  },
-  {
-    name: 'QQQQQ',
-    time: '11:00',
-    latestMes: '122212213',
-    isOline: true,
-    isRead: true,
-  },
-  {
-    name: 'QQQQQ',
-    time: '11:00',
-    latestMes: '111111111111121555555555555555555555555555111111',
-    isOline: true,
-    isRead: true,
-  },
-  {
-    name: 'QQQQQ',
-    time: '11:00',
-    latestMes: '111111111111121555555555555555555555555555111111',
-    isOline: true,
-    isRead: true,
-  },
-  {
-    name: 'QQQQQ',
-    time: '11:00',
-    latestMes: '111111111111121555555555555555555555555555111111',
-    isOline: true,
-    isRead: true,
-  },
-  {
-    name: 'End mes',
-    time: '11:00',
-    latestMes: '111111111111121555555555555555555555555555111111',
-    isRead: true,
-  },
-]
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { JWT_COOKIE } from '@/app/constant'
+import 'moment/locale/vi'
+import toast from 'react-hot-toast'
+import clsx from 'clsx'
+import InboxItem from '@/app/ui/social-page/messages/inbox-item'
+import { useRouter, useSearchParams } from 'next/navigation'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
+import {
+  handleIncomingMessage,
+  setInboxes,
+} from '@/lib/features/message/inbox-manager'
 
 export default function GroupLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: any
 }) {
-  const { register, reset } = useForm({
-    defaultValues: {
-      title: '',
-    },
-  })
-  const [isSmallerThanLg, setIsSmallerThanLg] = useState(true)
-  const [isSmallerThan2XL, setIsSmallerThan2XL] = React.useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()!
+  const [query, setQuery] = useState('')
+  const [queryInput, setQueryInput] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const curPage = useRef(0)
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
-  const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  const router = useRouter()
+  const [totalPages, setTotalPages] = useState(1)
+  const userID = Cookies.get('userId')
 
-  const resetCurPage = () => {
-    params.delete('page')
-    curPage.current = 0
-    setHasMore(true)
-  }
+  const socketResponse = useAppSelector((state) => state.socketResponse)
+  const inboxes = useAppSelector((state) => state.inboxManager.inboxes)
+  const activeInboxId = useAppSelector(
+    (state) => state.inboxManager.activeInboxId
+  )
+  const dispatch = useAppDispatch()
 
-  const onSearch = useDebouncedCallback((keyword) => {
-    if (keyword) {
-      params.set('title', keyword)
-    } else {
-      params.delete('title')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
+  const onSearch = useDebouncedCallback((query) => {
+    setQuery(query)
   }, 500)
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 900) {
-        if (window.innerWidth <= 690) {
-          setIsSmallerThan2XL(true)
-          setIsSmallerThanLg(false)
-        } else {
-          setIsSmallerThan2XL(false)
-          setIsSmallerThanLg(false)
+  const onFetchMore = () => {
+    curPage.current++
+    if (curPage.current >= totalPages) {
+      setHasMore(false)
+      return
+    }
+
+    let params = ''
+    if (query !== '') {
+      params = `query=${query}`
+    }
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox?page=${curPage.current}&${params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
         }
-      } else {
-        setIsSmallerThanLg(true)
-      }
+      )
+      .then(({ data: { inboxes } }) => {
+        dispatch(setInboxes({ type: 'concat', newInboxes: inboxes }))
+      })
+      .catch((err) => {})
+  }
+
+  useEffect(() => {
+    curPage.current = 0
+    setHasMore(true)
+    let params = ''
+    if (query !== '') {
+      params = `?query=${query}`
     }
-    //handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
+    // Fetch list of inboxes
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox${params}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data: { totalPages, inboxes } }) => {
+        setTotalPages(totalPages)
+        dispatch(setInboxes({ type: 'set', newInboxes: inboxes }))
+        setHasMore(totalPages > 1)
+      })
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+
+  useEffect(() => {
+    if (socketResponse.message) {
+      // Messages from an inbox different from the current inbox
+      dispatch(
+        handleIncomingMessage({
+          incomingInbox: socketResponse.inbox,
+          incomingMessage: socketResponse.message,
+        })
+      )
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketResponse])
 
   return (
-    <div className="sticky top-0 flex flex-1 overflow-hidden">
-      
-      <div className="relative flex flex-1 h-full overflow-x-auto">
-        {
-          <div
-            className={`relative left-0 shrink h-full overflow-hidden border-[#eeeeee] border-r-2 z-20`}>
-            <div className="flex flex-1 flex-col p-4 gap-y-6 w-full">
-              <div className="flex flex-1 flex-col gap-2 justify-between">
-                <div
-                  className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2 flex justify-between items-center`}>
-                  {isSmallerThanLg && <p>Nhắn tin</p>}
-                  <Button
-                    onClick={() => router.push('/messages/inbox/new')}
-                    placeholder={undefined}
-                    className={`p-2 ${!isSmallerThanLg && 'm-auto'} `}
-                    variant="text">
-                    <PencilSquare className="text-xl xl:text-2xl" />
-                  </Button>
-                </div>
-
-                <Input
-                  size="lg"
-                  crossOrigin={undefined}
-                  placeholder="Tìm kiếm bạn bè"
-                  containerProps={{ className: 'w-full shrink' }}
-                  {...register('title', {
-                    onChange: (e) => onSearch(e.target.value),
-                  })}
-                  icon={<Search />}
-                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full shrink"
-                  labelProps={{
-                    className: 'before:content-none after:content-none',
-                  }}
-                />
-              </div>
-
-              <div
-                className={`relative shrink h-full max-h-[65vh] overflow-y-auto overflow-x-hidden scrollbar-webkit`}>
-                <div className="relative flex flex-col mx-auto flex-1 lg:flex-0 h-full gap-3 w-fit max-w-[18rem] pr-2">
-                  {dataTemp.map(
-                    ({ name, time, latestMes, isRead, isOline }, idx) => (
-                      <Link
-                        href={`/messages/inbox/id`}
-                        key={idx}
-                        className={`${plusJakartaSans.className}relative flex flex-1 justify-around rounded-lg hover:bg-blue-gray-50 hover:cursor-pointer pt-2 pb-2 pl-2 pr-4 w-full`}>
-                        <Avatar
-                          placeholder={undefined}
-                          src="/demo.jpg"
-                          size="md"
-                          alt="user avatar"
-                        />
-                        {isSmallerThanLg && (
-                          <div className="flex-1 flex ml-2 shrink w-fit max-w-[100vw] justify-around">
-                            <div className="flex-1 flex flex-col w-[90vw] max-w-[200px]">
-                              <p className="font-bold text-black text-base">
-                                {name}
-                              </p>
-                              <p
-                                className={`truncate shrink w-full max-w-[90px] 2xl:max-w-[150px] ${
-                                  !isRead && 'font-semibold text-[--secondary]'
-                                } text-[14px]`}>
-                                {latestMes}
-                              </p>
-                            </div>
-
-                            <div className="absolute right-4">
-                              <p>{time}</p>
-                              {!isRead && (
-                                <span className="mx-auto mt-1 block h-2 w-2 rounded-full bg-[var(--warning)] content-['']" />
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </Link>
-                    )
-                  )}
-                </div>
-              </div>
+    <div className="flex overflow-hidden h-[--min-height-view]">
+      <div
+        className={`flex h-full overflow-hidden border-[#eeeeee] border-r-2 min-w-[150px] w-[150px] lg:w-[360px]`}>
+        <div className="flex flex-col p-2 lg:p-4 gap-y-4 w-full h-full">
+          <div className="flex flex-0 flex-col gap-2 justify-between">
+            <div
+              className={`${nunito.className} text-xl xl:text-2xl font-bold text-black pt-2 flex justify-between items-center`}>
+              <p className="hidden sm:block">Nhắn tin</p>
+              <Button
+                onClick={() => router.push('/messages/inbox/new')}
+                placeholder={undefined}
+                className={`p-2 m-auto'`}
+                variant="text">
+                <PencilSquare className="text-xl xl:text-2xl" />
+              </Button>
             </div>
-          </div>
-        }
 
-        <main
-          className={`relative flex-1 w-[92%] min-w-[250px] h-full flex flex-col overflow-hidden`}>
-          {children}
-        </main>
+            <Input
+              size="lg"
+              crossOrigin={undefined}
+              label="Tìm kiếm"
+              containerProps={{
+                className: 'flex flex-1 shrink !min-w-[100px] -z-10',
+              }}
+              value={queryInput}
+              onChange={(e) => {
+                setQueryInput(e.target.value)
+                onSearch(e.target.value)
+              }}
+              icon={
+                <XLg
+                  onClick={() => {
+                    setQueryInput('')
+                    setQuery('')
+                  }}
+                  className={clsx({
+                    hidden: queryInput === '',
+                    'hover:cursor-pointer': true,
+                  })}
+                />
+              }
+            />
+          </div>
+          <div
+            id="inboxList"
+            className={`shrink h-full overflow-y-auto overflow-x-hidden scrollbar-webkit`}>
+            <InfiniteScroll
+              dataLength={inboxes.length}
+              next={onFetchMore}
+              hasMore={hasMore}
+              loader={
+                <div className="h-10 flex justify-center ">
+                  <Spinner className="h-8 w-8"></Spinner>
+                </div>
+              }
+              scrollableTarget="inboxList"
+              className="w-full flex flex-col items-center mx-auto flex-1 lg:flex-0 h-full pr-2">
+              {inboxes.map(({ members, latestMessage, hasRead = null }) =>
+                members
+                  .filter((member) => member.id.userId != userID)
+                  .map(({ id, user }) => (
+                    <InboxItem
+                      key={id.inboxId}
+                      id={id}
+                      user={user}
+                      latestMessage={latestMessage}
+                      currentInboxId={activeInboxId}
+                      hasRead={hasRead}
+                    />
+                  ))
+              )}
+            </InfiniteScroll>
+          </div>
+        </div>
       </div>
+
+      <main className={`min-w-[250px] h-full flex flex-col flex-auto`}>
+        {children}
+      </main>
     </div>
   )
 }

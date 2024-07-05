@@ -1,4 +1,3 @@
-// store.js
 import { createSlice } from '@reduxjs/toolkit'
 // Define the type for the state
 interface NotificationCounterState {

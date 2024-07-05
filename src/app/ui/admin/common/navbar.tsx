@@ -14,19 +14,17 @@ import {
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronDown, ChevronUp } from 'react-bootstrap-icons'
+import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faBell,
-  faEnvelope,
   faNewspaper,
   faCalendarDays,
   faCertificate,
-  faComments,
-  faUserPen,
   faUser,
 } from '@fortawesome/free-solid-svg-icons'
-import { inter } from '../../fonts'
+import NotificationPopover from '@/app/ui/common/notification-popover'
+import { inter } from '@/app/ui/fonts'
+import { useAppSelector } from '@/lib/hooks'
 
 // nav list component
 const navListItems = [
@@ -221,7 +219,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         <FontAwesomeIcon icon={icon} className="text-2xl" />
         {label}
       </MenuItem>
-      <ul className="ml-6 flex w-full flex-col gap-1 lg:hidden text-[--text-navbar] font-medium text-base hover:text-[var(--blue-05)]">
+      <ul className="ml-6 flex w-full flex-col gap-1 lg:hidden text-[--text-navbar] font-medium text-base">
         {renderItemsForMobile}
       </ul>
     </React.Fragment>
@@ -231,14 +229,14 @@ function NavListMenu({ label, icon, navListMenuItems }) {
 function NavList() {
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
-      {navListItems.map(({ label, subMenu, icon, link }) => (
-        <li className="group cursor-pointer lg:py-3" key={label}>
+      {navListItems.map(({ label, subMenu, icon, link }, idx) => (
+        <li className={`group cursor-pointer lg:py-3`} key={label}>
           {subMenu ? (
             <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
               href={link}
-              className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
+              className={`text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2`}>
               <MenuItem
                 placeholder={undefined}
                 className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
@@ -255,7 +253,7 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
-  //const [message, setMessage] = React.useState('')
+  const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -270,7 +268,7 @@ export default function MyNavbar() {
     <Navbar
       placeholder={undefined}
       fullWidth={true}
-      className={`px-3 lg:pl-6 py-5 lg:py-0 `}>
+      className={`z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
       <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
         <Link href="/">
           <Image
@@ -310,24 +308,25 @@ export default function MyNavbar() {
           icon={faBars}
         /> */}
 
-        <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
-          <Badge content={2} color="blue">
-            <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon
-                icon={faBell}
-                className="text-2xl text-[--text-navbar]"
-              />
-            </Button>
-          </Badge>
+        <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
+          <NotificationPopover />
 
-          <Badge content={2} color="blue">
-            <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon
-                icon={faEnvelope}
-                className="text-2xl text-[--text-navbar] "
-              />
+          <Link href={`messages/inbox`}>
+            <Button
+              placeholder={undefined}
+              className="h-full w-full"
+              variant="text"
+              size="sm">
+              <Badge
+                invisible={!unreadInboxSet.length}
+                content={unreadInboxSet.length}
+                className="bg-[var(--blue-05)]">
+                <div className="h-[24px] w-[24px]">
+                  <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                </div>
+              </Badge>
             </Button>
-          </Badge>
+          </Link>
 
           <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
         </div>

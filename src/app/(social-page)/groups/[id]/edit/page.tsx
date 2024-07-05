@@ -157,7 +157,6 @@ export default function Page({ params }: { params: { id: string } }) {
       }
 
       const file = files[0]
-      console.log(file)
       if (file.size > 1024 * 1024 * 5) {
         toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
         return

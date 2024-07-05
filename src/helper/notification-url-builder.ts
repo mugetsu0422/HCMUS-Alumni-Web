@@ -47,6 +47,7 @@ export class NotificationUrlBuilder {
     request_join_group: 'groups',
     interact_post_group: 'groups',
     comment_post_group: 'groups',
+    message: 'messages/inbox',
   }
 
   public constructUrl(
@@ -65,6 +66,10 @@ export class NotificationUrlBuilder {
         return this.handleCounsel(entityTable, type)
       case 'groups':
         return this.handleGroups(entityTable, type)
+      case 'messages/inbox':
+        return this.handleMessages(entityTable, type)
+      default:
+        return '#'
     }
   }
 
@@ -165,6 +170,24 @@ export class NotificationUrlBuilder {
         case 'request_join_group':
           return `/groups/${this.notification.entityId}`
       }
+    } else if (type === 'DELETE') {
+      return `#`
+    }
+  }
+
+  private handleMessages(
+    entityTable: NotificationEntityTable,
+    type: NotificationType
+  ): string {
+    if (type === 'CREATE') {
+      switch (entityTable) {
+        case 'message':
+          return `/messages/inbox/${this.notification.parentId}`
+        default:
+          return '#'
+      }
+    } else if (type === 'UPDATE') {
+      return `#`
     } else if (type === 'DELETE') {
       return `#`
     }

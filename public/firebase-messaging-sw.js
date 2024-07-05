@@ -15,6 +15,7 @@ class NotificationUrlBuilder {
       request_join_group: 'groups',
       interact_post_group: 'groups',
       comment_post_group: 'groups',
+      message: 'messages/inbox',
     };
   }
 
@@ -31,6 +32,8 @@ class NotificationUrlBuilder {
         return this.client + this.handleCounsel(entityTable, type);
       case 'groups':
         return this.client + this.handleGroups(entityTable, type);
+      case 'messages/inbox':
+        return this.handleMessages(entityTable, type)
       default:
         return '#';
     }
@@ -124,6 +127,21 @@ class NotificationUrlBuilder {
       return '#';
     }
   }
+
+  handleMessages(entityTable, type) {
+    if (type === 'CREATE') {
+      switch (entityTable) {
+        case 'message':
+          return `/messages/inbox/${this.notification.parentId}`
+        default:
+          return '#'
+      }
+    } else if (type === 'UPDATE') {
+      return `#`
+    } else if (type === 'DELETE') {
+      return `#`
+    }
+  }
 }
 
 self.addEventListener('fetch', () => {
@@ -191,7 +209,6 @@ self.addEventListener('push', (e) => {
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
   const jsonBody = JSON.parse(payload.data.body)
   const notificationTitle = payload.data.notification.title;
   const notificationOptions = {
