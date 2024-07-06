@@ -38,12 +38,12 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           onClick={() => {
             onDelete(id)
             handleOpen()
@@ -77,12 +77,14 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className}  ${
+            isHidden ? 'bg-[--blue-05]' : 'bg-[--delete]'
+          }  text-white normal-case text-md`}
           onClick={() => {
             onHideOrShow(id, statusId)
             handleOpen()
@@ -126,7 +128,9 @@ export default function NewsListItem({
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -150,7 +154,9 @@ export default function NewsListItem({
         setIsHidden(!isHidden)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -158,7 +164,6 @@ export default function NewsListItem({
   return (
     <div
       className={`${nunito.className} border border-t-0 gap-2 border-[#CDCDCD] w-[1220px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      <CustomToaster />
       <div className="h-[120px] w-[180px]">
         <img
           src={imgSrc}

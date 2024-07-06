@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import Filter from '../../../ui/admin/filter'
-import CardInformation from '../../../ui/admin/card-information-pending'
+import Filter from '../../../ui/admin/verify-alumni/filter'
+import CardInformation from '../../../ui/admin/verify-alumni/card-information-pending'
 import { nunito } from '../../../ui/fonts'
 import { Button } from '@material-tailwind/react'
 import axios from 'axios'
@@ -77,7 +77,7 @@ export default function Page() {
 
   return (
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 py-4 px-10">
-      <CustomToaster />
+      
       <p
         className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
         Yêu cầu xét duyệt cựu sinh viên - #{totalCount}

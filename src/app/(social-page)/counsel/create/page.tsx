@@ -98,14 +98,12 @@ export default function Page() {
     }
 
     if (files.length > 0) {
-      const newImages = [...previewImages]
       for (const file of files) {
         setImageFiles((prev) => prev.concat(file))
 
         const reader = new FileReader()
         reader.onload = (event) => {
-          newImages.push({ src: event.target.result })
-          setPreviewImages(newImages)
+          setPreviewImages((old) => [...old, { src: event.target.result }])
         }
         reader.readAsDataURL(file)
       }
@@ -132,7 +130,6 @@ export default function Page() {
           return
         }
 
-        const newImages = [...previewImages]
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
 
@@ -140,8 +137,7 @@ export default function Page() {
 
           const reader = new FileReader()
           reader.onload = (event) => {
-            newImages.push({ src: event.target.result })
-            setPreviewImages(newImages)
+            setPreviewImages((old) => [...old, { src: event.target.result }])
           }
           reader.readAsDataURL(file)
         }
@@ -220,7 +216,7 @@ export default function Page() {
           })
           .catch((error) => {
             toast.error(
-              error.response.data.error.message || 'Lỗi không xác định',
+              error.response?.data?.error?.message || 'Lỗi không xác định',
               {
                 id: postToast,
               }
@@ -228,7 +224,7 @@ export default function Page() {
           })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
           id: postToast,
         })
       })
@@ -237,7 +233,7 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
-      <CustomToaster />
+      
       <div className="w-full flex">
         <Link href={'/counsel'}>
           <Button

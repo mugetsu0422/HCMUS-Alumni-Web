@@ -2,7 +2,7 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useState } from 'react'
+import React, { Fragment, useCallback, useState, useRef } from 'react'
 import {
   XLg,
   ArrowLeft,
@@ -10,34 +10,65 @@ import {
   Image,
   BarChartLine,
 } from 'react-bootstrap-icons'
-import { Button, Input, Textarea } from '@material-tailwind/react'
-import { useForm } from 'react-hook-form'
+import { Button, Input, Textarea, Checkbox } from '@material-tailwind/react'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import CustomToaster from '@/app/ui/common/custom-toaster'
-import { JWT_COOKIE } from '@/app/constant'
+import { JWT_COOKIE, TAGS_LIMIT } from '@/app/constant'
 import ErrorInput from '@/app/ui/error-input'
 import { nunito } from '@/app/ui/fonts'
+import { useRouter } from 'next/navigation'
 
 export default function Page({ params }: { params: { id: string } }) {
+  const router = useRouter()
   const {
+    control,
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      title: '',
+      content: '',
+      tagsDummy: '',
+      votes: null,
+      allowAddOptions: false,
+      allowMultipleVotes: false,
+    },
+  })
+
+  const voteFieldArray = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormProvider)
+    name: 'votes', // unique name for your Field Array
+    rules: {
+      maxLength: 10,
+    },
+  })
 
   const [previewImages, setPreviewImages] = useState([])
   const [imageFiles, setImageFiles] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
-  const [openAddingPost, setOpenAddingPost] = useState(false)
+  const [openAddingPoll, setOpenAddingPoll] = useState(false)
   const [openAddinImage, setOpenAddinImage] = useState(false)
+  const tagsInputRef = useRef(null)
 
-  const handleOpenAdingPost = () => {
-    setOpenAddingPost((e) => !e)
+  const handleOpenAddingPost = () => {
+    if (openAddingPoll) {
+      voteFieldArray.remove()
+      setValue('allowAddOptions', false)
+      setValue('allowMultipleVotes', false)
+    } else {
+      for (let i = 0; i < 3; i++) {
+        voteFieldArray.append({ name: '' })
+      }
+    }
+    setOpenAddingPoll((e) => !e)
   }
 
   const handleOpenAdingImage = () => {
@@ -65,14 +96,12 @@ export default function Page({ params }: { params: { id: string } }) {
     }
 
     if (files.length > 0) {
-      const newImages = [...previewImages]
       for (const file of files) {
         setImageFiles((prev) => prev.concat(file))
 
         const reader = new FileReader()
         reader.onload = (event) => {
-          newImages.push({ src: event.target.result })
-          setPreviewImages(newImages)
+          setPreviewImages((old) => [...old, { src: event.target.result }])
         }
         reader.readAsDataURL(file)
       }
@@ -107,8 +136,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
           const reader = new FileReader()
           reader.onload = (event) => {
-            newImages.push({ src: event.target.result })
-            setPreviewImages(newImages)
+            setPreviewImages((old) => [...old, { src: event.target.result }])
           }
           reader.readAsDataURL(file)
         }
@@ -137,10 +165,11 @@ export default function Page({ params }: { params: { id: string } }) {
   )
 
   const onSubmit = (data) => {
+    const { tagsDummy, ...rest } = data
     const post = {
-      ...data,
+      ...rest,
       tags: selectedTags.map((tag) => {
-        return { id: tag.value }
+        return { name: tag.value }
       }),
     }
 
@@ -157,8 +186,16 @@ export default function Page({ params }: { params: { id: string } }) {
           },
         }
       )
-      .then(({ data: postData }) => {
+      .then(({ data: { id } }) => {
         // Update post if there are images
+        if (imageFiles.length === 0) {
+          toast.success('Đăng thành công', {
+            id: postToast,
+          })
+          router.push(`/groups/${params.id}/posts/${id}`)
+          return
+        }
+
         const form = new FormData()
         for (const image of imageFiles) {
           form.append('addedImages', image)
@@ -166,7 +203,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
         axios
           .put(
-            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${postData}/images`,
+            `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${id}/images`,
             form,
             {
               headers: {
@@ -178,6 +215,7 @@ export default function Page({ params }: { params: { id: string } }) {
             toast.success('Đăng thành công', {
               id: postToast,
             })
+            router.push(`/groups/${params.id}/posts/${id}`)
           })
           .catch((err) => {
             console.error(err)
@@ -196,8 +234,8 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[600px] w-[80%] m-auto`}>
-      <CustomToaster />
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
+      
       <div className="w-full flex">
         <Link href={`/groups/${params.id}`}>
           <Button
@@ -238,13 +276,20 @@ export default function Page({ params }: { params: { id: string } }) {
         />
 
         <ReactTags
-          activateFirstOption={true}
-          placeholderText="Thêm thẻ"
-          selected={selectedTags}
+          ref={tagsInputRef}
+          id="tags-input-validity-description"
           suggestions={[]}
+          selected={selectedTags}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
-          noOptionsText="No matching countries"
+          isInvalid={selectedTags.length > TAGS_LIMIT}
+          ariaErrorMessage="tags-input-error"
+          ariaDescribedBy="tags-input-validity-description"
+          allowNew={true}
+          activateFirstOption={true}
+          placeholderText="Nhập thẻ"
+          newOptionText="Thêm thẻ %value%"
+          noOptionsText="Không tim thấy the %value%"
           classNames={{
             root: `${styles['react-tags']}`,
             rootIsActive: `${styles['is-active']}`,
@@ -263,9 +308,29 @@ export default function Page({ params }: { params: { id: string } }) {
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
-
-        {openAddingPost && (
-          <VotingPostForm handleOpenAdingPost={handleOpenAdingPost} />
+        <Controller
+          name="tagsDummy"
+          control={control}
+          render={() => <input type="text" className="hidden" />}
+          rules={{
+            validate: {
+              validateTagsInput: () => {
+                if (selectedTags.length > 5) {
+                  tagsInputRef.current.input.focus()
+                  return false
+                }
+                return true
+              },
+            },
+          }}
+        />
+        {openAddingPoll && (
+          <VotingPostForm
+            handleOpenAddingPost={handleOpenAddingPost}
+            register={register}
+            voteFieldArray={voteFieldArray}
+            errors={errors}
+          />
         )}
 
         {openAddinImage && (
@@ -279,9 +344,9 @@ export default function Page({ params }: { params: { id: string } }) {
           />
         )}
 
-        {!openAddingPost && (
+        {!openAddingPoll && (
           <Button
-            onClick={handleOpenAdingPost}
+            onClick={handleOpenAddingPost}
             placeholder={undefined}
             className="bg-[--blue-02] w-full m-auto normal-case flex gap-2 items-center justify-center">
             <BarChartLine className="text-xl" />
@@ -354,7 +419,7 @@ function AddImagePost({
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
-                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                     onClick={(event) => removeImage(index, event)} // Pass event object
                   >
                     <XLg />
@@ -374,76 +439,88 @@ function AddImagePost({
   )
 }
 
-function VotingPostForm({ handleOpenAdingPost }) {
-  const [title, setTitle] = useState('')
-  const [options, setOptions] = useState([''])
-  const [posts, setPosts] = useState([])
-
-  const addPost = (post) => {
-    setPosts([...posts, post])
-  }
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options]
-    newOptions[index] = value
-    setOptions(newOptions)
-  }
-
-  const handleAddOption = () => {
-    setOptions([...options, ''])
-  }
-
-  const handleRemoveOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index)
-    setOptions(newOptions)
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    addPost({ options })
-    setOptions([''])
-  }
+function VotingPostForm({
+  handleOpenAddingPost,
+  register,
+  voteFieldArray,
+  errors,
+}) {
+  const { fields, append, remove } = voteFieldArray
 
   return (
-    <form onSubmit={handleSubmit} className="w-full   rounded-lg ">
+    <div className="w-full rounded-lg ">
       <div className="mb-4">
         <div className="flex justify-between text-gray-700 text-xl font-bold mb-2 ">
           Tạo bình chọn
           <Button
             variant="text"
             placeholder={undefined}
-            className="z-10 mr-1 p-2 cursor-pointer"
-            onClick={handleOpenAdingPost} // Pass event object
+            className="mr-1 p-2 cursor-pointer"
+            onClick={handleOpenAddingPost} // Pass event object
           >
             <XLg className="text-lg" />
           </Button>
         </div>
-        {options.map((option, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <Input
-              size="lg"
+        <div className="flex flex-col gap-4">
+          {fields.map((field, index) => {
+            return (
+              <Fragment key={field.id}>
+                <div className="flex items-center">
+                  <Input
+                    crossOrigin={undefined}
+                    type="text"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    label={`Lựa chọn ${index + 1}`}
+                    {...register(`votes.${index}.name`, {
+                      required: 'Vui lòng nhập tên lựa chọn',
+                    })}
+                  />
+                  <Button
+                    variant="text"
+                    placeholder={undefined}
+                    className="mr-1 p-2 cursor-pointer"
+                    onClick={() => remove(index)} // Pass event object
+                  >
+                    <XLg className="text-lg" />
+                  </Button>
+                </div>
+                <ErrorInput
+                  // This is the error message
+                  errors={errors?.votes?.[index]?.name?.message}
+                />
+              </Fragment>
+            )
+          })}
+          <div className="flex flex-col">
+            <Checkbox
               crossOrigin={undefined}
-              type="text"
-              value={option}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              label={`Lựa chọn ${index + 1}`}
+              type="checkbox"
+              label="Cho phép mọi người thêm lựa chọn"
+              className="h-6 w-6"
+              color="blue"
+              labelProps={{ className: 'text-black font-medium' }}
+              {...register('allowAddOptions')}
             />
-            <Button
-              placeholder={undefined}
-              onClick={() => handleRemoveOption(index)}
-              className="ml-2 px-3 py-2 bg-red-400 rounded text-nowrap normal-case ">
-              <p className="text-black"> Xóa lựa chọn </p>
-            </Button>
+            <Checkbox
+              crossOrigin={undefined}
+              type="checkbox"
+              label="Cho phép mọi người chọn nhiều lựa chọn"
+              className="h-6 w-6"
+              color="blue"
+              labelProps={{ className: 'text-black font-medium' }}
+              {...register('allowMultipleVotes')}
+            />
           </div>
-        ))}
+        </div>
+
         <Button
+          disabled={fields.length >= TAGS_LIMIT}
           placeholder={undefined}
-          onClick={handleAddOption}
-          className="mt-2 bg-blue-500 text-white px-3 py-2 rounded normal-case">
+          onClick={() => append({ name: '' })}
+          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
           Thêm lựa chọn
         </Button>
       </div>
-    </form>
+    </div>
   )
 }

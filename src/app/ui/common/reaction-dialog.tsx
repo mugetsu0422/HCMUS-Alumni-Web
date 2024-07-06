@@ -120,7 +120,7 @@ export default function ReactionDialog({
               <Spinner className="h-8 w-8"></Spinner>
             </div>
           }
-          scrollableTarget="scrollableParticipants">
+          scrollableTarget="scrollableReaction">
           {users.map(({ creator: { id, fullName, avatarUrl } }) => (
             <div key={id} className="flex items-center justify-between">
               <div className="flex gap-3 items-center">

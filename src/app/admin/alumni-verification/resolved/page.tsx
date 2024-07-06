@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import Filter from '../../../ui/admin/filter'
+import Filter from '../../../ui/admin/verify-alumni/filter'
 import { nunito } from '../../../ui/fonts'
 import { Button } from '@material-tailwind/react'
-import CardInformation from '../../../ui/admin/card-information-resolved'
+import CardInformation from '../../../ui/admin/verify-alumni/card-information-resolved'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'

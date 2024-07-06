@@ -19,41 +19,13 @@ import toast, { Toaster } from 'react-hot-toast'
 import Image from 'next/image'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import DateTimeLocalPickerDialog from '../../../ui/admin/date-time-picker-dialog'
+import DateTimeLocalPickerDialog from '../../../ui/admin/common/date-time-picker-dialog'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { useRouter } from 'next/navigation'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ tạo bài viết?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          Không
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/news')
-          }}>
-          Hủy
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page() {
   const [content, setContent] = useState(null)
@@ -164,7 +136,7 @@ export default function Page() {
         id: postToast,
       })
     } catch (error) {
-      toast.error(error.response.data.error.message || 'Lỗi không xác định', {
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
         id: postToast,
       })
     }
@@ -173,7 +145,7 @@ export default function Page() {
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      <CustomToaster />
+      
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>
@@ -345,9 +317,10 @@ export default function Page() {
               className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog
+            <CancelChangesDialog
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
+              backUrl={'/admin/news'}
             />
             <Button
               onClick={async () => {

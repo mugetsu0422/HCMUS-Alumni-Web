@@ -94,10 +94,10 @@ function TextEditor({
               },
               imageCompress: {
                 quality: 0.85,
-                maxWidth: 1000,
-                maxHeight: 1000,
+                maxWidth: 2000,
+                maxHeight: 2000,
                 imageType: 'image/jpeg',
-                keepImageTypes: ['image/jpeg', 'image/png'],
+                keepImageTypes: ['image/jpeg'],
                 debug: false,
                 suppressErrorLogging: false,
                 insertIntoEditor: undefined,

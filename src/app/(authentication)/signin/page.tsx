@@ -293,7 +293,7 @@ export default function Page() {
         }
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 
@@ -324,14 +324,14 @@ export default function Page() {
       Cookies.set('permissions', permissions, { expires: 3 })
       router.push('/home-page')
     } catch (error) {
-      toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
 
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      <CustomToaster />
+      
       {isForceChangePassword ? (
         <ForceChangePasswordForm
           forceChangePasswordForm={forceChangePasswordForm}

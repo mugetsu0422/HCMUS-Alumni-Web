@@ -38,12 +38,12 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
         <Button
           placeholder={undefined}
           onClick={handleOpen}
-          className="mr-1 bg-[--delete-filter] text-black">
+          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}>
           Hủy
         </Button>
         <Button
           placeholder={undefined}
-          className="mr-1 bg-[--delete]"
+          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
           onClick={() => {
             onDelete(id)
             handleOpen()
@@ -73,7 +73,7 @@ export default function RolesListItem({ role }: { role: Role }) {
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 
@@ -81,7 +81,7 @@ export default function RolesListItem({ role }: { role: Role }) {
   return (
     <div
       className={`${nunito.className} border border-t-0 gap-2 border-[#CDCDCD] w-[1220px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      <CustomToaster />
+      
       <div className="flex">
         <p className="h-full w-[250px] p-2 font-[600] text-black align-middle flex items-center justify-center">
           {role.name}

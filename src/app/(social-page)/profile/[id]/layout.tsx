@@ -26,23 +26,11 @@ import Image from 'next/image'
 import ChangeAvatarUser from '@/app/ui/social-page/profile/ChangeAvatarUser'
 import ChangeCoverUser from '@/app/ui/social-page/profile/ChangeCoverUser'
 import CustomToaster from '@/app/ui/common/custom-toaster'
-
-const user = {
-  fullName: 'Trương Samuel',
-  numberOfFriends: 500,
-  numberBegin: 2020,
-  faculties: 'Công nghệ thông tin',
-  MSSV: 20127610,
-  DOB: '01/01/2002',
-  gender: 'Nam',
-  phoneNumber: '0123456789',
-  email: 'tsamuel20@clc.fitus.edu.vn',
-  verify: true,
-}
+import { JWT_COOKIE } from '@/app/constant'
 
 const FormContext = createContext(null)
 
-function AvatarAndCoverUser({ register, getValues }) {
+function AvatarAndCoverUser({ register, getValues, user }) {
   const {
     setInputs,
     croppedAvatar,
@@ -54,6 +42,56 @@ function AvatarAndCoverUser({ register, getValues }) {
   const [openChangeCover, setOpenChangeCover] = useState(false)
   const handleOpenChangeCover = () => {
     setOpenChangeCover((e) => !e)
+  }
+
+  const handleChangeAvatar = () => {
+    const formData = new FormData()
+
+    formData.append('avatar', getValues('avatar')[0]) // Ensure this is a File object
+
+    axios
+      .putForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/avatar`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+      .then((response) => {
+        // Handle success response
+        toast.success('Avatar updated successfully')
+      })
+      .catch((error) => {
+        // Handle error response
+        toast.error('Failed to update avatar')
+        console.log(error)
+      })
+  }
+
+  const handleChangeCover = () => {
+    const formData = new FormData()
+    formData.append('cover', getValues('cover')[0]) // Ensure this is a File object
+
+    axios
+      .put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/cover`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+      .then((response) => {
+        toast.success('Cover updated successfully')
+      })
+      .catch((error) => {
+        toast.error('Failed to update cover')
+      })
   }
 
   return (
@@ -83,6 +121,7 @@ function AvatarAndCoverUser({ register, getValues }) {
         setCoverImage={setCoverImage}
         handleOpenChangeCover={handleOpenChangeCover}
         openChangeCover={openChangeCover}
+        handleChangeCover={handleChangeCover}
       />
 
       <div className="absolute top-[70%] ml-[2vw] 2xl:ml-[1.5vw] lg:top-[50%] xl:top-[70%] flex flex-col items-end">
@@ -98,14 +137,15 @@ function AvatarAndCoverUser({ register, getValues }) {
           getValues={getValues}
           setInputs={setInputs}
           setCroppedAvatar={setCroppedAvatar}
+          handleChangeAvatar={handleChangeAvatar}
         />
       </div>
 
       <div className="mt-6 flex justify-between items-center ml-[24vw] md:ml-[16vw] xl:ml-[17vw] 2xl:ml-[17%]">
         <div className="flex flex-col">
           <p className="text-[28px] font-bold flex items-center gap-2">
-            {user.fullName}
-            {user.verify ? (
+            {user?.fullName}
+            {user?.alumniVerification?.status === 'APPROVED' ? (
               <Tooltip
                 className="bg-[--blue-05] mt-1"
                 content="Tài khoản đã xác thực"
@@ -131,8 +171,8 @@ function AvatarAndCoverUser({ register, getValues }) {
           </p>
 
           <div className="flex items-center gap-2">
-            <p className="text-black font-bold">{user.numberOfFriends}</p>
-            <p className="text-[--secondary]">bạn bè</p>
+            {/* <p className="text-black font-bold">{user.numberOfFriends}</p>
+            <p className="text-[--secondary]">bạn bè</p> */}
           </div>
         </div>
       </div>
@@ -147,6 +187,47 @@ export default function GroupLayout({
   children: React.ReactNode
   params: { id: string }
 }) {
+  const [inputs, setInputs] = useState({ avatar: null, cover: null })
+  const userId = Cookies.get('userId')
+  const router = useRouter()
+  const [croppedAvatar, setCroppedAvatar] = useState('')
+  const [coverImage, setCoverImage] = useState('')
+  const pathname = usePathname()
+  const [activeTab, setActiveTab] = useState(() => {
+    const parts = pathname.split('/')
+    if (parts[3] === undefined) return ''
+    return parts[3]
+  })
+  const [user, setUser] = useState(null)
+
+  const handleClickTab = (url) => {
+    setActiveTab(url)
+    router.push(`/profile/${params.id}/${url}`)
+  }
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setUser(data.user)
+        setCroppedAvatar(
+          data?.user?.avatarUrl === null
+            ? '/placeholderImage.png'
+            : data?.user?.avatarUrl
+        )
+        setCoverImage(
+          data?.user?.coverUrl === null
+            ? '/placeholderImage.png'
+            : data?.user?.coverUrl
+        )
+      })
+      .catch((error) => {})
+  }, [userId])
+
   const {
     register,
     handleSubmit,
@@ -155,27 +236,10 @@ export default function GroupLayout({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      avatar: null,
-      cover: null,
+      avatar: croppedAvatar,
+      cover: coverImage,
     },
   })
-  const [inputs, setInputs] = useState({ avatar: null, cover: null })
-  const userId = Cookies.get('userId')
-
-  const pathname = usePathname()
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState(() => {
-    const parts = pathname.split('/')
-    if (parts[3] === undefined) return ''
-    return parts[3]
-  })
-  const [croppedAvatar, setCroppedAvatar] = useState('/none-avatar.png')
-  const [coverImage, setCoverImage] = useState('/thumbnail-social-pages.jpg')
-
-  const handleClickTab = (url) => {
-    setActiveTab(url)
-    router.push(`/profile/${params.id}/${url}`)
-  }
 
   return (
     <div
@@ -189,7 +253,11 @@ export default function GroupLayout({
           coverImage: coverImage,
           setCoverImage: setCoverImage,
         }}>
-        <AvatarAndCoverUser register={register} getValues={getValues} />
+        <AvatarAndCoverUser
+          register={register}
+          getValues={getValues}
+          user={user}
+        />
       </FormContext.Provider>
 
       <main className="mt-10">

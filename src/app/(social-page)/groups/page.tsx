@@ -3,18 +3,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { roboto } from '../../ui/fonts'
 import { Button, Spinner } from '@material-tailwind/react'
-import { JWT_COOKIE, POST_STATUS } from '../../constant'
+import { JWT_COOKIE } from '../../constant'
 import Cookies from 'js-cookie'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import GroupsListItem from '../../ui/social-page/groups/groups-list-item'
-import { useForm } from 'react-hook-form'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import axios, { AxiosResponse } from 'axios'
 import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGroup'
 import { Plus } from 'react-bootstrap-icons'
 import Link from 'next/link'
-import { Toaster } from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 
@@ -84,7 +82,7 @@ export default function Page() {
         setGroups(groups.concat(addedGroups))
       })
       .catch((error) => {
-        console.log(error.response.data.error.message || 'Lỗi không xác định')
+        console.log(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onJoinGroup = (groupId: string): Promise<AxiosResponse<any, any>> => {
@@ -110,18 +108,18 @@ export default function Page() {
         },
       })
       .then(({ data: { totalPages, groups } }) => {
-        if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setGroups(groups)
+        setHasMore(totalPages > 1)
       })
       .catch((error) => {
-        console.log(error.response.data.error.message || 'Lỗi không xác định')
+        console.log(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }, [myParams])
 
   return (
     <>
-      <CustomToaster />
+      
       <Thumbnail />
       <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
         <div className="flex justify-between">

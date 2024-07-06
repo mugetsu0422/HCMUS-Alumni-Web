@@ -21,8 +21,9 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
 import { useRouter } from 'next/navigation'
-import NoData from '../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 const roleNameToCategoryName = (roleName) => {
   switch (roleName) {
@@ -49,40 +50,11 @@ const roleNameToCategoryName = (roleName) => {
   }
 }
 
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ các thay đổi?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          <span>Không</span>
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/roles')
-          }}>
-          <span>Hủy</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
-
 export default function Page({ params }: { params: { id: string } }) {
   const [permissionCategories, setPermissionCategories] = useState([])
   const [selectedRolePermissionMap, setSelectedRolePermissionMap] =
     useState<Map<any, any>>()
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [permissionHeaderVisibility, setPermissionHeaderVisibility] =
     useState(null)
   const [descriptionCharCount, setDescriptionCharCount] = useState(0)
@@ -138,9 +110,12 @@ export default function Page({ params }: { params: { id: string } }) {
         })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
-          id: putToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: putToast,
+          }
+        )
       })
   }
 
@@ -222,18 +197,18 @@ export default function Page({ params }: { params: { id: string } }) {
       )
       .catch((err) => {
         console.error(err)
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      <CustomToaster />
+      
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>
@@ -351,9 +326,10 @@ export default function Page({ params }: { params: { id: string } }) {
               className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog
+            <CancelChangesDialog
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
+              backUrl={'/admin/roles'}
             />
             <Button
               placeholder={undefined}

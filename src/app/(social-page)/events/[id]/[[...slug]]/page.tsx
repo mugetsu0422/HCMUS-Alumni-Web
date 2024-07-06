@@ -7,7 +7,6 @@ import {
   BarChartFill,
   TagFill,
 } from 'react-bootstrap-icons'
-import { nunito } from '../../../ui/fonts'
 import {
   Button,
   Dialog,
@@ -18,16 +17,18 @@ import {
   Textarea,
 } from '@material-tailwind/react'
 import axios, { AxiosResponse } from 'axios'
-import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
-import NoData from '../../../ui/no-data'
 import moment from 'moment'
 import { XLg } from 'react-bootstrap-icons'
 import Link from 'next/link'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import Comments from '../../../ui/common/comments'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import { JWT_COOKIE } from '@/app/constant'
+import Comments from '@/app/ui/common/comments'
+import { nunito } from '@/app/ui/fonts'
+import NotFound404 from '@/app/ui/common/not-found-404'
+import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 
 const PARTICIPANT_FETCH_LIMIT = 50
 
@@ -99,9 +100,13 @@ function ParticipantsDialog({
   )
 }
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function Page({
+  params,
+}: {
+  params: { id: string; slug: string[] }
+}) {
   const [event, setEvent] = useState(null)
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [openParticipantsDialog, setOpenParticipantsDialog] = useState(false)
   const [isParticipated, setIsParticipated] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
@@ -110,6 +115,9 @@ export default function Page({ params }: { params: { id: string } }) {
   const [uploadComment, setUploadComment] = useState('')
   const [comments, setComments] = useState([])
   const [commentPage, setCommentPage] = useState(0)
+  const [isSingleComment, setIsSingleComment] = useState(false)
+
+  const singleCommentRef = useRef(null)
 
   // Event's participants
   const onParticipate = async (eventId) => {
@@ -144,7 +152,7 @@ export default function Page({ params }: { params: { id: string } }) {
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
-      toast.error(error.response.data.error.message || 'Lỗi không xác định')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
   // Fetch event participants
@@ -208,9 +216,12 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định', {
-          id: postCommentToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: postCommentToast,
+          }
+        )
       })
   }
   const onFetchChildrenComments = async (
@@ -275,6 +286,28 @@ export default function Page({ params }: { params: { id: string } }) {
 
   // Initial fetch
   useEffect(() => {
+    let commentId = ''
+
+    if (params.slug) {
+      const [firstSlug, secondSlug] = params.slug
+
+      if (params.slug.length === 1) {
+        if (firstSlug !== 'comments') {
+          return setNotFound(true)
+        }
+      } else if (params.slug.length === 2) {
+        if (firstSlug === 'comments') {
+          // Fetch specific comment
+          commentId = `/${secondSlug}`
+          setIsSingleComment(true)
+          // return
+        }
+      } else {
+        // Return 404
+        return setNotFound(true)
+      }
+    }
+
     const detailsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`,
       {
@@ -292,7 +325,7 @@ export default function Page({ params }: { params: { id: string } }) {
       }
     )
     const commentsPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments${commentId}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -303,18 +336,28 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(([detailsRes, isParticipatedRes, commentsRes]) => {
         const { data: event } = detailsRes
         const isParticipated = isParticipatedRes.data[0].isParticipated
-        const { comments } = commentsRes.data
+        const { comments, comment } = commentsRes.data
 
         setIsParticipated(isParticipated)
         setEvent(event)
-        setComments(comments)
+        if (comment) setComments([comment])
+        else setComments(comments)
         setIsLoading(false)
       })
       .catch((error) => {
-        setNoData(true)
+        setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Scroll to the single comment
+  useEffect(() => {
+    if (singleCommentRef.current) {
+      singleCommentRef.current.scrollIntoView({
+        behavior: 'instant',
+      })
+    }
+  }, [isLoading])
 
   // Fetch more comments
   useEffect(() => {
@@ -332,12 +375,12 @@ export default function Page({ params }: { params: { id: string } }) {
       .then(({ data: { comments: fetchedComments } }) => {
         setComments(comments.concat(fetchedComments))
       })
-      .catch((errror) => {})
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   if (!isLoading)
@@ -345,7 +388,7 @@ export default function Page({ params }: { params: { id: string } }) {
       <>
         <div
           className={`${nunito.className} flex flex-col gap-6 w-[75%] max-w-[1366px] bg-[--blue-04] rounded-lg m-auto lg:px-10 lg:py-10 mt-16 mb-16`}>
-          <CustomToaster />
+          
           <div className="flex flex-col xl:flex-row items-center justify-center m-auto gap-x-10">
             <img
               src={event?.thumbnail}
@@ -474,22 +517,32 @@ export default function Page({ params }: { params: { id: string } }) {
               ({event?.childrenCommentNumber})
             </span>
           </p>
-          <Comments
-            comments={comments}
-            onUploadComment={onUploadComment}
-            onEditComment={onEditComment}
-            onDeleteComment={onDeleteComment}
-            onFetchChildrenComments={onFetchChildrenComments}
-          />
-
-          {comments.length < event?.childrenCommentNumber && (
-            <Button
-              onClick={onFetchComments}
-              className="bg-[--blue-02] normal-case text-sm gap-1"
-              placeholder={undefined}>
-              Tải thêm
-            </Button>
+          {isSingleComment && (
+            <SingleCommentIndicator
+              ref={singleCommentRef}
+              parentCommentUrl={comments[0]?.parentId}
+              fullPostUrl={`/events/${params.id}`}
+            />
           )}
+          {
+            <Comments
+              comments={comments}
+              onUploadComment={onUploadComment}
+              onEditComment={onEditComment}
+              onDeleteComment={onDeleteComment}
+              onFetchChildrenComments={onFetchChildrenComments}
+            />
+          }
+
+          {!isSingleComment &&
+            comments.length < event?.childrenCommentNumber && (
+              <Button
+                onClick={onFetchComments}
+                className="bg-[--blue-02] normal-case text-sm gap-1"
+                placeholder={undefined}>
+                Tải thêm
+              </Button>
+            )}
         </div>
       </>
     )

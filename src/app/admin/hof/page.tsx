@@ -16,6 +16,7 @@ import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 function FuntionSection({
   onSearch,
@@ -182,6 +183,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
+      
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1400px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công

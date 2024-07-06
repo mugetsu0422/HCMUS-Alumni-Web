@@ -26,7 +26,7 @@ import {
   faUserPen,
   faUser,
 } from '@fortawesome/free-solid-svg-icons'
-import { inter } from '../fonts'
+import { inter } from '../../fonts'
 
 // nav list component
 const navListItems = [

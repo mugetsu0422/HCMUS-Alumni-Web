@@ -11,13 +11,16 @@ import toast from 'react-hot-toast'
 import Cropper from 'react-easy-crop'
 import { Camera } from 'react-bootstrap-icons'
 import { ConfirmChangeAvatarDialog } from './dialogs'
+import axios from 'axios'
+import { JWT_COOKIE } from '@/app/constant'
+import { Cookies } from 'js-cookie'
 
-// Khi có API thì có thể bỏ setCroppedAvatar
 export default function ChangeAvatarUser({
   register,
   getValues,
   setInputs,
   setCroppedAvatar,
+  handleChangeAvatar,
 }) {
   const [open, setOpen] = useState(false)
   const [avatarForCropping, setAvatarForCropping] = useState(null)
@@ -58,48 +61,53 @@ export default function ChangeAvatarUser({
   }
 
   const handleCrop = async () => {
-    const croppedImageBitmap = await createImageBitmap(
-      avatarForCropping.file,
-      croppedAreaPixels.x,
-      croppedAreaPixels.y,
-      croppedAreaPixels.width,
-      croppedAreaPixels.height
-    )
-    const canvas = document.createElement('canvas') as HTMLCanvasElement
+    try {
+      const croppedImageBitmap = await createImageBitmap(
+        avatarForCropping.file,
+        croppedAreaPixels.x,
+        croppedAreaPixels.y,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height
+      )
 
-    // resize it to the size of our ImageBitmap
-    canvas.width = croppedImageBitmap.width
-    canvas.height = croppedImageBitmap.height
+      const canvas = document.createElement('canvas')
+      canvas.width = croppedImageBitmap.width
+      canvas.height = croppedImageBitmap.height
+      const ctx = canvas.getContext('2d') // Changed from 'bitmaprenderer' to '2d'
+      ctx.drawImage(croppedImageBitmap, 0, 0)
 
-    // get a bitmaprenderer context
-    const ctx = canvas.getContext('bitmaprenderer')
-    ctx.transferFromImageBitmap(croppedImageBitmap)
+      const croppedImageBlob = await new Promise<Blob>((resolve) => {
+        if (avatarForCropping.file.type === 'image/jpeg') {
+          canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.8) // Add a non-null assertion
+        } else {
+          canvas.toBlob((blob) => resolve(blob!), avatarForCropping.file.type) // Add a non-null assertion
+        }
+      })
 
-    // get it back as a Blob
-    const croppedImageBlob = (await new Promise((res) => {
-      if (avatarForCropping.file.type == 'image/jpeg') {
-        canvas.toBlob(res, 'image/jpeg', 0.8)
-      } else {
-        canvas.toBlob(res)
+      const reader = new FileReader()
+      reader.onload = () => {
+        setCroppedAvatar(reader.result as string)
       }
-    })) as Blob
+      reader.readAsDataURL(croppedImageBlob)
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      setCroppedAvatar(reader.result as string)
+      const originalAvatarFile = getValues('avatar')[0]
+      const avatarFile = new File([croppedImageBlob], originalAvatarFile.name, {
+        type: originalAvatarFile.type,
+      })
+
+      setInputs((values) => ({
+        ...values,
+        avatar: avatarFile,
+      }))
+
+      handleOpen()
+      handleChangeAvatar()
+    } catch (error) {
+      console.error('Error during cropping process:', error)
+      // toast.error(
+      //   'An error occurred while cropping the image. Please try again.'
+      // )
     }
-    reader.readAsDataURL(croppedImageBlob)
-
-    const originalAvatarFile = getValues('avatar')[0]
-    const avatarFile = new File([croppedImageBlob], originalAvatarFile.name, {
-      type: originalAvatarFile.type,
-    })
-    setInputs((values) => ({
-      ...values,
-      avatar: avatarFile,
-    }))
-
-    handleOpen()
   }
 
   return (

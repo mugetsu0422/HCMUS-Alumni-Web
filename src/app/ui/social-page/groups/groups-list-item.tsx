@@ -2,7 +2,7 @@
 import React from 'react'
 import { nunito } from '../../fonts'
 import { Button, Avatar, Spinner } from '@material-tailwind/react'
-import { Dot } from 'react-bootstrap-icons'
+import { Dot, TagsFill } from 'react-bootstrap-icons'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -20,7 +20,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
     onJoinGroup(group.id)
       .then((data) => {})
       .catch((error) => {
-        toast.error(error.response.data.error?.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
       })
       .finally(() => {
         setIsJoining(false)
@@ -43,7 +43,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
           variant="rounded"
         />
         <div className="max-w-[600px] min-w-[350px] w-[80%]">
-          <p className="text-[18px] font-[500] text-justify">{group.name}</p>
+          <p className="text-[18px] font-[500] text-justify -mb-[2px]">{group.name}</p>
           {!group.isJoined && (
             <>
               <p className="flex items-center text-[#65676b]">
@@ -56,6 +56,14 @@ export default function GroupsListItem({ group, onJoinGroup }) {
                 )}
               </p>
             </>
+          )}
+          {group.tags.length > 0 && (
+            <div className="flex text-[13px] items-center gap-1 text-[#65676b]">
+              <TagsFill className="text-[--blue-05] " />
+              {group.tags.map(({ id, name }) => (
+                <span key={id}>{name}</span>
+              ))}
+            </div>
           )}
           <p className="text-[#65676b] text-[13px] line-clamp-2 w-[90%] xl:w-[100%]">
             {group.description}

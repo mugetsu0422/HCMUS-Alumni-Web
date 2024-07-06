@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   PersonFill,
   Mortarboard,
@@ -12,21 +12,19 @@ import {
   Envelope,
   PencilFill,
   PersonCheckFill,
+  InfoCircle,
+  BookHalf,
+  Link45deg,
 } from 'react-bootstrap-icons'
 import { Button, Input } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
 import { FACULTIES, GENDER } from '@/app/constant'
-
-const user = {
-  fullName: 'Trương Samuel',
-  numberBegin: 2020,
-  faculties: 'Sinh học - Công nghệ sinh học',
-  MSSV: 20127610,
-  DOB: '01/01/2002',
-  gender: 'Nữ',
-  phoneNumber: '0123456789',
-  email: 'tsamuel20@clc.fitus.edu.vn',
-}
+import axios from 'axios'
+import { JWT_COOKIE } from '@/app/constant'
+import Cookies from 'js-cookie'
+import ErrorInput from '@/app/ui/error-input'
+import Link from 'next/link'
+import toast from 'react-hot-toast'
 
 export default function Page() {
   const [onpenEdit, setOpenEdit] = useState(false)
@@ -34,10 +32,14 @@ export default function Page() {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
   const tomorrowString = tomorrow.toISOString().split('T')[0]
+  const [user, setUser] = useState(null)
+  const userId = Cookies.get('userId')
+  const [dob, setDob] = useState(null)
 
   const {
     register,
     handleSubmit,
+    setValue,
     trigger,
     formState: { errors },
   } = useForm()
@@ -46,10 +48,83 @@ export default function Page() {
     setOpenEdit((e) => !e)
   }
 
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        console.log(data)
+        setUser(data)
+        setValue('fullName', data.user.fullName)
+        setValue('socialMediaLink', data.user.socialMediaLink)
+        setValue('phone', data.user.phone)
+        setValue('sex', data.user.sex.id)
+        setValue('aboutMe', data.user.aboutMe)
+        setValue('dob', data.user.dob)
+        setValue('faculty', data.user.faculty.Id)
+        setValue('graduationYear', data.alumni.graduationYear)
+        setValue('alumClass', data.alumni.alumClass)
+        setValue('studentId', data.alumniVerification.studentId)
+        setValue('beginningYear', data.alumniVerification.beginningYear)
+      })
+      .catch((error) => {})
+  }, [userId])
+
+  const onSubmit = async (data) => {
+    const userData = {
+      aboutMe: data.aboutMe,
+      fullName: data.fullName,
+      facultyId: data.facultyId,
+      sexId: data.sex,
+      phone: data.phone,
+      dob: new Date(`${dob}`).getTime(),
+      socialMediaLink: data.socialMediaLink,
+    }
+
+    const alumniData = {
+      alumClass: data.alumClass,
+      graduationYear: data.graduationYear,
+    }
+
+    const userVerification = {
+      studentId: data.studentId,
+      beginningYear: data.beginningYear,
+    }
+
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
+        { profileRequestDto: { user: userData, alumni: alumniData } },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+        userVerification,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      toast.success('Cập nhật thành công')
+    } catch (error) {
+      toast.error(error?.response?.data?.error?.message || 'Lỗi không xác định')
+    }
+  }
+
   return (
     <div className="overflow-x-auto scrollbar-webkit-main">
       {/* Thông tin cá nhân */}
-      <div className="w-full flex flex-col gap-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <p className="text-[18px] lg:text-[22px] font-bold">
             Thông tin cơ bản
@@ -81,10 +156,46 @@ export default function Page() {
               </Button>
 
               <Button
+                type="submit"
                 className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-4"
                 placeholder={undefined}>
                 Cập nhật
               </Button>
+            </div>
+          )}
+        </div>
+
+        {/* About me */}
+
+        <div className="flex items-start gap-4">
+          <InfoCircle className="text-[20px] lg:text-[24px]" />
+          {!onpenEdit ? (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {user?.user?.aboutMe}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Mô tả bản thân
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <label className="text-lg font-bold text-black">
+                Mô tả bản thân
+              </label>
+              <Input
+                crossOrigin={undefined}
+                variant="outlined"
+                type="text"
+                {...register('aboutMe', {
+                  required: 'Vui lòng nhập thành tựu',
+                })}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              <ErrorInput errors={errors?.aboutMe?.message} />
             </div>
           )}
         </div>
@@ -96,7 +207,7 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user.fullName}
+                {user?.user?.fullName}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">Tên</p>
             </div>
@@ -107,27 +218,94 @@ export default function Page() {
                 crossOrigin={undefined}
                 variant="outlined"
                 type="text"
-                // {...register('name', {
-                //   required: 'Vui lòng nhập thành tựu',
-                // })}
+                {...register('fullName', {
+                  required: 'Vui lòng nhập thành tựu',
+                })}
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
                 className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
               />
-              {/* <ErrorInput errors={errors?.name?.message} /> */}
+              <ErrorInput errors={errors?.fullName?.message} />
+            </div>
+          )}
+        </div>
+
+        {/* Lớp - Năm tốt nghiệp */}
+
+        <div className="flex items-start gap-4">
+          <BookHalf className="text-[20px] lg:text-[24px]" />
+          {!onpenEdit ? (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {user?.alumni?.alumClass}
+                {user?.alumni?.alumClass &&
+                  user?.alumni?.graduationYear &&
+                  ' - '}
+                {user?.alumni?.graduationYear}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Lớp - Năm tốt nghiệp
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-lg font-bold text-black">Lớp</label>
+                <Input
+                  crossOrigin={undefined}
+                  variant="outlined"
+                  type="text"
+                  {...register('alumClass', {
+                    required: 'Vui lòng nhập lớp',
+                  })}
+                  labelProps={{
+                    className: 'before:content-none after:content-none',
+                  }}
+                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                />
+                <div className="flex flex-col gap-2">
+                  <label className="text-lg font-bold text-black">
+                    Năm tốt nghiệp
+                  </label>
+                  <Input
+                    crossOrigin={undefined}
+                    variant="outlined"
+                    type="number"
+                    {...register('graduationYear', {
+                      pattern: {
+                        value: /^\d{4}$/,
+                        message: 'Vui lòng nhập đúng 4 chữ số',
+                      },
+                    })}
+                    onInput={(e) => {
+                      const input = e.target as HTMLInputElement
+                      input.value = input.value.trim().slice(0, 4)
+                    }} //
+                    labelProps={{
+                      className: 'before:content-none after:content-none',
+                    }}
+                    className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                  />
+                </div>
+
+                {/* <ErrorInput errors={errors?.title?.message} /> */}
+              </div>
             </div>
           )}
         </div>
 
         {/* Khóa - Khoa */}
-
         <div className="flex items-start gap-4">
           <Mortarboard className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user.numberBegin} - {user.faculties}
+                {user?.alumniVerification?.beginningYear}{' '}
+                {user?.alumniVerification?.beginningYear &&
+                  user?.faculty?.name &&
+                  ' - '}
+                {user?.faculty?.name}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Khóa - Khoa
@@ -135,21 +313,6 @@ export default function Page() {
             </div>
           ) : (
             <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-lg font-bold text-black">Khoa</label>
-                <select
-                  className="h-10 text-[14px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-                  {...register('facultyId')}>
-                  <option value={0}>Không</option>
-                  {FACULTIES.map(({ id, name }) => {
-                    return (
-                      <option key={id} value={id}>
-                        {name}
-                      </option>
-                    )
-                  })}
-                </select>
-              </div>
               <div className="flex flex-col gap-2">
                 <label className="text-lg font-bold text-black">Khóa</label>
                 <Input
@@ -161,6 +324,7 @@ export default function Page() {
                       value: /^\d{4}$/,
                       message: 'Vui lòng nhập đúng 4 chữ số',
                     },
+                    required: 'Vui lòng nhập khóa',
                   })}
                   onInput={(e) => {
                     const input = e.target as HTMLInputElement
@@ -171,6 +335,22 @@ export default function Page() {
                   }}
                   className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
                 />
+                <div className="flex flex-col gap-2">
+                  <label className="text-lg font-bold text-black">Khoa</label>
+                  <select
+                    className="h-10 text-[14px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+                    {...register('facultyId')}>
+                    <option value={0}>Không</option>
+                    {FACULTIES.map(({ id, name }) => {
+                      return (
+                        <option key={id} value={id}>
+                          {name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                </div>
+
                 {/* <ErrorInput errors={errors?.title?.message} /> */}
               </div>
             </div>
@@ -184,7 +364,7 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user.MSSV}
+                {user?.alumni?.studentId}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Mã số sinh viên
@@ -199,11 +379,12 @@ export default function Page() {
                 crossOrigin={undefined}
                 variant="outlined"
                 type="number"
-                {...register('MSSV', {
+                {...register('studentId', {
                   pattern: {
-                    value: /^\d{4}$/,
-                    message: 'Vui lòng nhập đúng 4 chữ số',
+                    value: /^\d{8}$/,
+                    message: 'Vui lòng nhập đúng 8 chữ số',
                   },
+                  required: 'Vui lòng nhập mã số sinh viên',
                 })}
                 onInput={(e) => {
                   const input = e.target as HTMLInputElement
@@ -226,7 +407,7 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user.DOB}
+                {user?.user?.dob}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Ngày sinh
@@ -237,14 +418,14 @@ export default function Page() {
               <label className="text-lg font-bold text-black">Ngày sinh</label>
               <input
                 className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
-                id="date"
+                id="dob"
                 type="date"
                 defaultValue={tomorrowString}
                 onFocus={(e) => e.target.showPicker()}
-                //onChange={(e) => onChange({ date: e.target.value })}
-                // {...register('date', {})}
+                onChange={(e) => setDob(e.target.value)}
+                {...register('dob', {})}
               />
-              {/* <ErrorInput errors={errors?.name?.message} /> */}
+              <ErrorInput errors={errors?.dob?.message} />
             </div>
           )}
         </div>
@@ -252,7 +433,7 @@ export default function Page() {
         {/* Giới tính */}
 
         <div className="flex items-start gap-4">
-          {user.gender == 'Nam' ? (
+          {user?.user?.sex?.name === 'Nam' ? (
             <GenderMale className="text-[20px] lg:text-[24px]" />
           ) : (
             <GenderFemale className="text-[20px] lg:text-[24px]" />
@@ -261,7 +442,7 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user.gender}
+                {user?.user?.sex?.name}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Giới tính
@@ -272,7 +453,7 @@ export default function Page() {
               <label className="text-lg font-bold text-black">Giới tính</label>
               <select
                 className="h-10 text-[14px] hover:cursor-pointer pl-3 pr-2 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-                {...register('gender')}>
+                {...register('sex')}>
                 <option value={0}>Không</option>
                 {GENDER.map(({ id, name }) => {
                   return (
@@ -285,7 +466,7 @@ export default function Page() {
             </div>
           )}
         </div>
-      </div>
+      </form>
 
       {/* Thông tin liên hệ */}
       <div className="w-full flex flex-col gap-4 mt-4">
@@ -298,7 +479,7 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user.phoneNumber}
+                {user?.user?.phone}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Di động
@@ -313,13 +494,46 @@ export default function Page() {
                 crossOrigin={undefined}
                 variant="outlined"
                 type="number"
-                // {...register('name', {
-                //   required: 'Vui lòng nhập thành tựu',
-                // })}
+                {...register('phone')}
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
                 className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+              />
+              {/* <ErrorInput errors={errors?.name?.message} /> */}
+            </div>
+          )}
+        </div>
+        {/* href={user && user.socialMediaLink} */}
+        <div className="flex items-start gap-4">
+          <Link45deg className="text-[20px] lg:text-[24px]" />
+          {!onpenEdit ? (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {user?.user?.socialMediaLink}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Trang cá nhân
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <label className="text-lg font-bold text-black">
+                Trang cá nhân
+              </label>
+              <Input
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+                {...register('socialMediaLink', {
+                  pattern: {
+                    value:
+                      /(https?:\/)?(www\.)?(?:facebook\.com|linkedin\.com)\/(?:[^\s\/]+)/,
+                    message: 'Hãy nhập đúng đường dẫn',
+                  },
+                })}
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                crossOrigin={undefined}
               />
               {/* <ErrorInput errors={errors?.name?.message} /> */}
             </div>
@@ -330,7 +544,7 @@ export default function Page() {
           <Envelope className="text-[20px] lg:text-[24px]" />
           <div>
             <p className="text-base lg:text-[20px] font-semibold">
-              {user.email}
+              {user?.user?.email}
             </p>
             <p className="text-[12px] lg:text-base text-[--secondary]">Email</p>
           </div>

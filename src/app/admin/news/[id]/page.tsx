@@ -1,11 +1,6 @@
 'use client'
 
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import TextEditor from '../../../ui/admin/text-editor/TextEditor'
 import { nunito } from '../../../ui/fonts'
 import {
@@ -23,45 +18,17 @@ import { FACULTIES, JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
 import toast from 'react-hot-toast'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '../../../ui/error-input'
-import NoData from '../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { useRouter } from 'next/navigation'
 import CustomToaster from '@/app/ui/common/custom-toaster'
-
-function CancelDialog({ open, handleOpen }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
-      <DialogHeader placeholder={undefined}>Huỷ</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn có muốn huỷ các thay đổi?
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          className={`${nunito.className} mr-4 bg-[--delete-filter] text-black normal-case text-md`}
-          placeholder={undefined}
-          onClick={handleOpen}>
-          <span>Không</span>
-        </Button>
-        <Button
-          className={`${nunito.className} bg-[--delete] text-white normal-case text-md`}
-          placeholder={undefined}
-          onClick={() => {
-            router.push('/admin/news')
-          }}>
-          <span>Hủy</span>
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
+import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [news, setNews] = useState(null)
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [content, setContent] = useState(null)
   const [selectedTags, setSelectedTags] = useState([])
   const [summaryCharCount, setSummaryCharCount] = useState(0)
@@ -123,9 +90,11 @@ export default function Page({ params }: { params: { id: string } }) {
     const news = {
       title: data.title,
       thumbnail: data.thumbnail[0] || null,
-      tagNames: selectedTags.map((tag) => {
-        return tag.value
-      }).join(','),
+      tagNames: selectedTags
+        .map((tag) => {
+          return tag.value
+        })
+        .join(','),
       facultyId: data.facultyId,
     }
 
@@ -157,9 +126,12 @@ export default function Page({ params }: { params: { id: string } }) {
         id: putToast,
       })
     } catch (error) {
-      toast.error(error.response.data.error.message || 'Lỗi không xác định', {
-        id: putToast,
-      })
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
+        {
+          id: putToast,
+        }
+      )
     }
   }
 
@@ -185,17 +157,17 @@ export default function Page({ params }: { params: { id: string } }) {
         setContent(data.content)
       })
       .catch((e) => {
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      <CustomToaster />
+      
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>
@@ -364,9 +336,10 @@ export default function Page({ params }: { params: { id: string } }) {
               className={`${nunito.className} bg-[--delete-filter] text-black normal-case text-md`}>
               Hủy
             </Button>
-            <CancelDialog
+            <CancelChangesDialog
               open={openCancelDialog}
               handleOpen={handleOpenCancelDialog}
+              backUrl={'/admin/news'}
             />
             <Button
               placeholder={undefined}

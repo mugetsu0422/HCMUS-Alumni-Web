@@ -7,8 +7,8 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import toast, { Toaster } from 'react-hot-toast'
 import ErrorInput from '../../ui/error-input'
 import { roboto } from '../../ui/fonts'
-import axios from 'axios'
-import { JWT_COOKIE } from '../../constant'
+import axios, { AxiosResponse } from 'axios'
+import { JWT_COOKIE, USER_GROUP_STATUS } from '../../constant'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 import SortHeader from '@/app/ui/admin/user/sort-header'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -17,69 +17,26 @@ import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { useDebouncedCallback } from 'use-debounce'
 import UserListItem from '@/app/ui/admin/user/user-list-item'
 import FilterAdminUser from '@/app/ui/admin/user/filter-admin-user'
+import Pagination from '@/app/ui/common/pagination'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
-  onFilterFaculties: (keyword: string) => void
+  onFilterRole: (keyword: string) => void
   onResetAll: () => void
+  roles: any[]
 }
-
-const users = [
-  {
-    id: '1',
-    fullName: 'Trương Samuel',
-    email: 'tsamuel@gmail.com',
-    permissions: [
-      { id: '1', name: 'Đăng bài tư vấn' },
-      { id: '2', name: 'Tham gia sự kiện' },
-      { id: '3', name: 'Bình luận bài tư vấn' },
-      { id: '4', name: 'Xem tin tức' },
-      { id: '5', name: 'Bình luận tin tức' },
-    ],
-    status: { id: 1, name: 'Bình thường' },
-    isLock: true,
-  },
-  {
-    id: '2',
-    fullName: 'Huỳnh Cao Nguyên',
-    email: 'hcnguyen@gmail.com',
-    permissions: [
-      { id: '1', name: 'Đăng bài tư vấn' },
-      { id: '2', name: 'Tham gia sự kiện' },
-      { id: '3', name: 'Bình luận bài tư vấn' },
-      { id: '4', name: 'Xem tin tức' },
-      { id: '5', name: 'Bình luận tin tức' },
-    ],
-    status: { id: 1, name: 'Bình thường' },
-    isLock: false,
-  },
-  {
-    id: '3',
-    fullName: 'Trần Hồng Minh Phúc',
-    email: 'thmphuc@gmail.com',
-    permissions: [
-      { id: '1', name: 'Đăng bài tư vấn' },
-      { id: '2', name: 'Tham gia sự kiện' },
-      { id: '3', name: 'Bình luận bài tư vấn' },
-      { id: '4', name: 'Xem tin tức' },
-      { id: '5', name: 'Bình luận tin tức' },
-    ],
-    status: { id: 1, name: 'Bình thường' },
-    isLock: false,
-  },
-]
 
 function FuntionSection({
   onSearch,
   onResetAll,
-  onFilterFaculties,
+  onFilterRole,
+  roles,
 }: FunctionSectionProps) {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
   const { register, reset } = useForm({
     defaultValues: {
-      title: params.get('title'),
+      fullName: params.get('fullName'),
     },
   })
 
@@ -93,8 +50,8 @@ function FuntionSection({
             crossOrigin={undefined}
             placeholder={undefined}
             icon={<Search />}
-            defaultValue={params.get('title')}
-            {...register('title', {
+            defaultValue={params.get('fullName')}
+            {...register('fullName', {
               onChange: (e) => onSearch(e.target.value),
             })}
             labelProps={{
@@ -108,9 +65,10 @@ function FuntionSection({
         </div>
 
         <FilterAdminUser
-          onFilterFaculties={onFilterFaculties}
+          onFilterRole={onFilterRole}
+          roles={roles}
           params={{
-            facultyId: params.get('facultyId'),
+            roleIds: params.get('roleIds'),
           }}
         />
       </div>
@@ -129,27 +87,17 @@ function FuntionSection({
 }
 
 export default function Page() {
-  const [openCancelDialog, setOpenCancelDialog] = useState(false)
-  const [roles, setRoles] = useState([])
-  const [selectedRoles, setSelectedRoles] = useState(new Set())
   const pathname = usePathname()
   const { replace } = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
-  const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
-  const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  const [selectedTags, setSelectedTags] = useState(() => {
-    const tagNames = params.get('tagNames')
-    if (!tagNames) return []
-    return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
-  })
 
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm()
+  const [myParams, setMyParams] = useState(`?${params.toString()}`)
+  const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [users, setUsers] = useState([])
+  const [roles, setRoles] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const resetCurPage = () => {
     params.delete('page')
@@ -157,71 +105,37 @@ export default function Page() {
   }
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
-      params.set('title', keyword)
+      params.set('fullName', keyword)
     } else {
-      params.delete('title')
+      params.delete('fullName')
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }, 500)
-
   const onResetAll = () => {
     resetCurPage()
     replace(pathname)
-    setSelectedTags([])
     setMyParams(``)
   }
-
-  const onFilterFaculties = (facultyId: string) => {
-    if (facultyId != '0') {
-      params.set('facultyId', facultyId)
-    } else {
-      params.delete('facultyId')
-    }
-    resetCurPage()
+  const onNextPage = () => {
+    if (curPage == totalPages) return
+    params.set('page', curPage.toString())
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
+    setCurPage((curPage) => {
+      return curPage + 1
+    })
   }
-  const onAddTags = useCallback(
-    (newTag) => {
-      const newTags = [...selectedTags, newTag]
-      setSelectedTags(newTags)
-      params.set('tagNames', newTags.map(({ value }) => value).join(','))
-      resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
-      setMyParams(`?${params.toString()}`)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedTags]
-  )
-  const onDeleteTags = useCallback(
-    (tagIndex) => {
-      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
-      setSelectedTags(newTags)
-      if (newTags.length == 0) {
-        params.delete('tagNames')
-      } else {
-        params.set('tagNames', newTags.map(({ value }) => value).join(','))
-      }
-      resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
-      setMyParams(`?${params.toString()}`)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedTags]
-  )
-
-  //-------------
-
-  const onClickRoleCheckbox = (roleId: number) => {
-    if (selectedRoles.has(roleId)) {
-      selectedRoles.delete(roleId)
-    } else {
-      selectedRoles.add(roleId)
-    }
+  const onPrevPage = () => {
+    if (curPage == 1) return
+    params.set('page', (curPage - 2).toString())
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+    setCurPage((curPage) => {
+      return curPage - 1
+    })
   }
-
   const onOrder = (name: string, order: string) => {
     params.delete('page')
     setCurPage(1)
@@ -230,72 +144,114 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }
-
-  const onSubmit = (data) => {
-    const user = {
-      email: data.email,
-      fullName: data.fullName,
-      roles: Array.from(selectedRoles).map((roleId) => ({ id: roleId })),
+  const onFilterRole = (roleIds: string) => {
+    if (roleIds != '0') {
+      params.set('roleIds', roleIds)
+    } else {
+      params.delete('roleIds')
     }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?${params.toString()}`)
+  }
 
-    axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user`, user, {
+  const onLockUser = (userId: string): Promise<AxiosResponse<any, any>> => {
+    return axios.putForm(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/status`,
+      { statusId: USER_GROUP_STATUS['Khóa'] },
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then((data) => {
-        toast.success('Cấp tài khoản thành công')
-      })
-      .catch((error) => {
-        toast.error(error.response.data.error.message || 'Lỗi không xác định')
-      })
+      }
+    )
+  }
+  const onUnlockUser = (userId: string): Promise<AxiosResponse<any, any>> => {
+    return axios.putForm(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/status`,
+      { statusId: USER_GROUP_STATUS['Bình thường'] },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
 
   useEffect(() => {
-    // Fetch roles
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/roles?pageSize=50`, {
+    const rolesPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/roles?pageSize=50`,
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then(({ data: { totalPages, roles } }) => {
+      }
+    )
+
+    const usersPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user${myParams}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    Promise.all([rolesPromise, usersPromise])
+      .then(([rolesRes, usersRes]) => {
+        const {
+          data: { roles },
+        } = rolesRes
+        const {
+          data: { totalPages, users },
+        } = usersRes
+
+        setTotalPages(totalPages)
+        setUsers(users)
         setRoles(roles)
+        setIsLoading(false)
       })
-      .catch((error) => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+      .catch((err) => {})
+  }, [myParams])
 
-  return (
-    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] w-[1000px] mt-[3vw]">
-      <CustomToaster />
-      <p
-        className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
-        Quản lý người dùng
-      </p>
+  if (!isLoading)
+    return (
+      <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] w-[1000px] mt-[3vw]">
+        
+        <p
+          className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
+          Quản lý người dùng
+        </p>
 
-      <FuntionSection
-        onSearch={onSearch}
-        onResetAll={onResetAll}
-        onFilterFaculties={onFilterFaculties}
-      />
+        <FuntionSection
+          onSearch={onSearch}
+          onResetAll={onResetAll}
+          onFilterRole={onFilterRole}
+          roles={roles}
+        />
 
-      <div className="overflow-x-auto">
-        <SortHeader onOrder={onOrder} />
-        <div className="relative mb-10">
-          {users.map(({ id, fullName, email, permissions, isLock }) => (
-            <UserListItem
-              key={id}
-              id={id}
-              fullName={fullName}
-              email={email}
-              permissions={permissions}
-              isLock={isLock}
-            />
-          ))}
+        <div className="overflow-x-auto">
+          <SortHeader onOrder={onOrder} />
+          <div className="relative mb-10">
+            {users.map((user) => (
+              <UserListItem
+                key={user.id}
+                user={user}
+                onLockUser={onLockUser}
+                onUnlockUser={onUnlockUser}
+              />
+            ))}
+          </div>
         </div>
+
+        {totalPages > 1 && (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        )}
       </div>
-    </div>
-  )
+    )
 }

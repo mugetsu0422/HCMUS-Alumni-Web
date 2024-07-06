@@ -31,6 +31,28 @@ export const POST_STATUS = {
   Ẩn: 3,
   Xoá: 4,
 }
+export const USER_GROUP_STATUS = {
+  Khóa: 1,
+  'Bình thường': 2,
+  Xóa: 3,
+}
+export const NOTIFICATION_STATUS = {
+  'Chưa xem': 1,
+  'Đã xem': 2,
+  Xóa: 3,
+}
+export const NOTIFICATION_ENTITY_TABLE = [
+  'request_friend',
+  'comment_news',
+  'comment_event',
+  'interact_post_advise',
+  'comment_post_advise',
+  'group',
+  'request_join_group',
+  'interact_post_group',
+  'comment_post_group',
+] as const
+export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
   Like: 1,
 }
@@ -81,6 +103,21 @@ export const GROUP_TABS = [
     label: 'Xét duyệt',
     url: 'member-requests',
     rolesRequired: ['CREATOR', 'ADMIN'],
+  },
+]
+
+export const FRIEND_TABS = [
+  {
+    label: 'Bạn bè',
+    url: '',
+  },
+  {
+    label: 'Khám phá',
+    url: 'explore',
+  },
+  {
+    label: 'Lời mời kết bạn',
+    url: 'requests',
   },
 ]
 

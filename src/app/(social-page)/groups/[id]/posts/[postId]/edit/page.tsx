@@ -1,20 +1,26 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+  Fragment,
+} from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
-import { JWT_COOKIE } from '../../../../../../constant'
+import { useRouter, usePathname } from 'next/navigation'
+import { JWT_COOKIE, TAGS_LIMIT } from '../../../../../../constant'
 import ErrorInput from '../../../../../../ui/error-input'
 import { nunito } from '../../../../../../ui/fonts'
-import NoData from '../../../../../../ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page({
@@ -23,21 +29,21 @@ export default function Page({
   params: { id: string; postId: string }
 }) {
   const {
+    control,
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm()
 
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [currentImages, setCurrentImages] = useState([])
   const [previewImages, setPreviewImages] = useState([])
   const [addedImageFiles, setAddedImageFiles] = useState([])
   const [deleteImageIds, setDeleteImageIds] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const router = useRouter()
-  const [options, setOptions] = useState([''])
-  const [votes, setVotes] = useState([])
+  const tagsInputRef = useRef(null)
 
   const onDragOver = (event) => {
     event.preventDefault()
@@ -66,7 +72,7 @@ export default function Page({
 
         const reader = new FileReader()
         reader.onload = (event) => {
-          newImages.push({ src: event.target.result })
+          newImages.push({ pictureUrl: event.target.result })
           setPreviewImages(newImages)
         }
         reader.readAsDataURL(file)
@@ -102,7 +108,7 @@ export default function Page({
 
           const reader = new FileReader()
           reader.onload = (event) => {
-            newImages.push({ src: event.target.result })
+            newImages.push({ pictureUrl: event.target.result })
             setPreviewImages(newImages)
           }
           reader.readAsDataURL(file)
@@ -110,14 +116,19 @@ export default function Page({
       }
     })
   }
-  const removeImage = (index, event) => {
+
+  const removeCurrentImage = (index, id, event) => {
     event.stopPropagation()
     const newImages = previewImages.filter(
       (image, imageIndex) => imageIndex !== index
     )
+    setCurrentImages(newImages)
     setPreviewImages(newImages)
     setAddedImageFiles((prev) => prev.filter((_, i) => i !== index))
+
+    setDeleteImageIds((prev) => prev.concat(id))
   }
+
   const onAddTags = useCallback(
     (newTag) => {
       setSelectedTags([...selectedTags, newTag])
@@ -132,12 +143,14 @@ export default function Page({
   )
 
   const onSubmit = (data) => {
+    const { tagsDummy, ...rest } = data
     const post = {
-      ...data,
+      ...rest,
       tags: selectedTags.map((tag) => {
-        return { id: tag.value }
+        return { name: tag.value }
       }),
     }
+
     const imagesForm = new FormData()
     for (const image of addedImageFiles) {
       imagesForm.append('addedImages', image)
@@ -190,33 +203,33 @@ export default function Page({
           },
         }
       )
-      .then(({ data: { title, content, tags, pictures, votes } }) => {
+      .then(({ data: { title, content, tags, pictures } }) => {
         setValue('title', title)
         setValue('content', content)
-        // setSelectedTags(
-        //   tags.map((tag) => {
-        //     const { id } = tag
-        //     return TAGS.find(({ value }) => value === id)
-        //   })
-        // )
-        setVotes(votes)
+        setSelectedTags(
+          tags.map((tag) => ({
+            value: tag.name,
+            label: tag.name,
+          }))
+        )
+        setPreviewImages(pictures)
         setCurrentImages(pictures)
       })
       .catch((err) => {
         console.error(err)
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   return (
     <div
-      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
-      <CustomToaster />
+      className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
+      
       <div className="w-full flex">
         <Button
           onClick={() => router.push(`/groups/${params.id}`)}
@@ -256,15 +269,21 @@ export default function Page({
           // This is the error message
           errors={errors?.content?.message}
         />
-
         <ReactTags
-          activateFirstOption={true}
-          placeholderText="Thêm thẻ"
-          selected={selectedTags}
+          ref={tagsInputRef}
+          id="tags-input-validity-description"
           suggestions={[]}
+          selected={selectedTags}
           onAdd={onAddTags}
           onDelete={onDeleteTags}
-          noOptionsText="No matching countries"
+          isInvalid={selectedTags.length > TAGS_LIMIT}
+          ariaErrorMessage="tags-input-error"
+          ariaDescribedBy="tags-input-validity-description"
+          allowNew={true}
+          activateFirstOption={true}
+          placeholderText="Nhập thẻ"
+          newOptionText="Thêm thẻ %value%"
+          noOptionsText="Không tim thấy the %value%"
           classNames={{
             root: `${styles['react-tags']}`,
             rootIsActive: `${styles['is-active']}`,
@@ -283,13 +302,31 @@ export default function Page({
             highlight: `${styles['react-tags__listbox-option-highlight']}`,
           }}
         />
-        <VotingPostForm votes={votes} />
+        <Controller
+          name="tagsDummy"
+          control={control}
+          render={() => <input type="text" className="hidden" />}
+          rules={{
+            validate: {
+              validateTagsInput: () => {
+                if (selectedTags.length > 5) {
+                  tagsInputRef.current.input.focus()
+                  return false
+                }
+                return true
+              },
+            },
+          }}
+        />
+        {selectedTags.length > TAGS_LIMIT && (
+          <ErrorInput errors={`Tối đa ${TAGS_LIMIT} thẻ được thêm`} />
+        )}
 
         <AddImagePost
           onDragOver={onDragOver}
           onDrop={onDrop}
           onClickDropzone={onClickDropzone}
-          removeImage={removeImage}
+          removeCurrentImage={removeCurrentImage}
           previewImages={previewImages}
         />
 
@@ -309,7 +346,7 @@ function AddImagePost({
   onDragOver,
   onDrop,
   onClickDropzone,
-  removeImage,
+  removeCurrentImage,
   previewImages,
 }) {
   return (
@@ -333,17 +370,19 @@ function AddImagePost({
             <div className="mt-4 flex flex-wrap gap-3 justify-center">
               {previewImages.map((image, index) => (
                 <div
-                  key={image.src}
+                  key={image.index}
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
-                    className="z-10 -mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                    onClick={(event) => removeImage(index, event)} // Pass event object
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    onClick={(event) =>
+                      removeCurrentImage(index, image.id, event)
+                    } // Pass event object
                   >
                     <XLg />
                   </Button>
                   <img
-                    src={image.src}
+                    src={image.pictureUrl}
                     alt="Ảnh được kéo thả"
                     className="w-48 h-48 object-cover rounded-md"
                   />
@@ -352,43 +391,6 @@ function AddImagePost({
             </div>
           )}
         </div>
-      </div>
-    </div>
-  )
-}
-
-function VotingPostForm({ votes }) {
-  return (
-    <div className="w-full   rounded-lg ">
-      <div className="mb-4">
-        <div className="flex text-gray-700 text-xl font-bold mb-2 ">
-          Tạo bình chọn
-        </div>
-        {votes &&
-          votes.map(({ name }, index) => (
-            <div key={index} className="flex items-center mb-2">
-              <Input
-                crossOrigin={undefined}
-                disabled={true}
-                type="text"
-                value={name}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                label={`Lựa chọn ${index + 1}`}
-              />
-              <Button
-                placeholder={undefined}
-                disabled={true}
-                className="ml-2 bg-red-500 text-white rounded text-nowrap normal-case text-[13px]">
-                Xóa lựa chọn
-              </Button>
-            </div>
-          ))}
-        <Button
-          placeholder={undefined}
-          disabled={true}
-          className="mt-2 bg-blue-500 text-white px-4 py-2 rounded normal-case">
-          Thêm lựa chọn
-        </Button>
       </div>
     </div>
   )

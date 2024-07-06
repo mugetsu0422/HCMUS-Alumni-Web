@@ -21,6 +21,7 @@ export default function ChangeCoverUser({
   setCoverImage,
   handleOpenChangeCover,
   openChangeCover,
+  handleChangeCover,
 }) {
   const [coverForCropping, setCoverForCropping] = useState(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -57,49 +58,53 @@ export default function ChangeCoverUser({
   }
 
   const handleCrop = async () => {
-    const croppedImageBitmap = await createImageBitmap(
-      coverForCropping.file,
-      croppedAreaPixels.x,
-      croppedAreaPixels.y,
-      croppedAreaPixels.width,
-      croppedAreaPixels.height
-    )
-    const canvas = document.createElement('canvas') as HTMLCanvasElement
-
-    // resize it to the size of our ImageBitmap
-    canvas.width = croppedImageBitmap.width
-    canvas.height = croppedImageBitmap.height
-
-    // get a bitmaprenderer context
-    const ctx = canvas.getContext('bitmaprenderer')
-    ctx.transferFromImageBitmap(croppedImageBitmap)
-
-    // get it back as a Blob
-    const croppedImageBlob = (await new Promise((res) => {
-      if (coverForCropping.file.type == 'image/jpeg') {
-        canvas.toBlob(res, 'image/jpeg', 0.8)
-      } else {
-        canvas.toBlob(res)
-      }
-    })) as Blob
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      setCoverImage(reader.result as string)
+    try {
+      const croppedImageBitmap = await createImageBitmap(
+        coverForCropping.file,
+        croppedAreaPixels.x,
+        croppedAreaPixels.y,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height
+      );
+  
+      const canvas = document.createElement('canvas');
+      canvas.width = croppedImageBitmap.width;
+      canvas.height = croppedImageBitmap.height;
+      const ctx = canvas.getContext('2d'); // Changed from 'bitmaprenderer' to '2d'
+      ctx.drawImage(croppedImageBitmap, 0, 0);
+  
+      const croppedImageBlob = await new Promise<Blob>((resolve) => {
+        if (coverForCropping.file.type === 'image/jpeg') {
+          canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.8); // Add a non-null assertion
+        } else {
+          canvas.toBlob((blob) => resolve(blob!), coverForCropping.file.type); // Add a non-null assertion
+        }
+      });
+  
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(croppedImageBlob);
+  
+      const originalCoverFile = getValues('cover')[0];
+      const coverFile = new File([croppedImageBlob], originalCoverFile.name, {
+        type: originalCoverFile.type,
+      });
+  
+      setInputs((values) => ({
+        ...values,
+        cover: coverFile,
+      }));
+  
+      handleOpenChangeCover();
+      handleChangeCover();
+    } catch (error) {
+      console.error("Error during cropping process:", error);
+      //toast.error("An error occurred while cropping the image. Please try again.");
     }
-    reader.readAsDataURL(croppedImageBlob)
-
-    const originalCoverFile = getValues('cover')[0]
-    const coverFile = new File([croppedImageBlob], originalCoverFile.name, {
-      type: originalCoverFile.type,
-    })
-    setInputs((values) => ({
-      ...values,
-      cover: coverFile,
-    }))
-
-    handleOpenChangeCover()
-  }
+  };
+  
 
   return (
     <>
