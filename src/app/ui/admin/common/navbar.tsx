@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import {
   Navbar,
   Collapse,
@@ -25,6 +25,8 @@ import {
 import NotificationPopover from '@/app/ui/common/notification-popover'
 import { inter } from '@/app/ui/fonts'
 import { useAppSelector } from '@/lib/hooks'
+
+const NavbarContext = createContext(null)
 
 // nav list component
 const navListItems = [
@@ -77,6 +79,7 @@ const navListItems = [
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {
+  const { toggleIsNavOpen } = useContext(NavbarContext)
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -115,6 +118,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
           {subMenu.map(({ title, link }) => (
             <Link
+              onClick={toggleIsNavOpen}
               href={link}
               key={title}
               className="focus-visible:outline-none">
@@ -128,7 +132,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         </MenuList>
       </Menu>
     ) : (
-      <Link href={link} key={title}>
+      <Link onClick={toggleIsNavOpen} href={link} key={title}>
         <MenuItem
           placeholder={undefined}
           className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -163,6 +167,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
             className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
             {subMenu.map(({ title, link }) => (
               <Link
+                onClick={toggleIsNavOpen}
                 href={link}
                 key={title}
                 className="focus-visible:outline-none">
@@ -176,7 +181,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           </MenuList>
         </Menu>
       ) : (
-        <Link href={link} key={title}>
+        <Link onClick={toggleIsNavOpen} href={link} key={title}>
           <MenuItem
             placeholder={undefined}
             className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -227,6 +232,8 @@ function NavListMenu({ label, icon, navListMenuItems }) {
 }
 
 function NavList() {
+  const { toggleIsNavOpen } = useContext(NavbarContext)
+
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
       {navListItems.map(({ label, subMenu, icon, link }, idx) => (
@@ -235,6 +242,7 @@ function NavList() {
             <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
+              onClick={toggleIsNavOpen}
               href={link}
               className={`text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2`}>
               <MenuItem
@@ -265,78 +273,77 @@ export default function MyNavbar() {
   }, [isNavOpen])
 
   return (
-    <Navbar
-      placeholder={undefined}
-      fullWidth={true}
-      className={`z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
-      <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
-        <Link href="/">
-          <Image
-            className="hidden lg:block"
-            src="/logo-square.png"
-            alt="log"
-            width={80}
-            height={80}
-          />
-        </Link>
-
-        <div className="hidden lg:block">
-          <NavList />
-        </div>
-
-        <Button
-          placeholder={undefined}
-          onClick={toggleIsNavOpen}
-          variant="text"
-          className="mr-auto lg:hidden text-[var(--blue-02)] px-3 py-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            className="bi bi-list w-8 h-8"
-            viewBox="0 0 16 16">
-            <path
-              fillRule="evenodd"
-              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+    <NavbarContext.Provider
+      value={{
+        toggleIsNavOpen,
+      }}>
+      <Navbar
+        placeholder={undefined}
+        fullWidth={true}
+        className={`sticky top-0 z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
+        <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
+          <Link href="/">
+            <Image
+              className="hidden lg:block"
+              src="/logo-square.png"
+              alt="log"
+              width={80}
+              height={80}
             />
-          </svg>
-        </Button>
-        {/* <FontAwesomeIcon
-          onClick={toggleIsNavOpen}
-          className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
-          icon={faBars}
-        /> */}
-
-        <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
-          <NotificationPopover />
-
-          <Link href={`messages/inbox`}>
-            <Button
-              placeholder={undefined}
-              className="h-full w-full"
-              variant="text"
-              size="sm">
-              <Badge
-                invisible={!unreadInboxSet.length}
-                content={unreadInboxSet.length}
-                className="bg-[var(--blue-05)]">
-                <div className="h-[24px] w-[24px]">
-                  <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
-                </div>
-              </Badge>
-            </Button>
           </Link>
-
-          <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+          <div className="hidden lg:block">
+            <NavList />
+          </div>
+          <Button
+            placeholder={undefined}
+            onClick={toggleIsNavOpen}
+            variant="text"
+            className="mr-auto lg:hidden text-[var(--blue-02)] px-3 py-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-list w-8 h-8"
+              viewBox="0 0 16 16">
+              <path
+                fillRule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+          </Button>
+          {/* <FontAwesomeIcon
+            onClick={toggleIsNavOpen}
+            className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
+            icon={faBars}
+          /> */}
+          <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
+            <NotificationPopover />
+            <Link href={`messages/inbox`}>
+              <Button
+                placeholder={undefined}
+                className="h-full w-full"
+                variant="text"
+                size="sm">
+                <Badge
+                  invisible={!unreadInboxSet.length}
+                  content={unreadInboxSet.length}
+                  className="bg-[var(--blue-05)]">
+                  <div className="h-[24px] w-[24px]">
+                    <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                  </div>
+                </Badge>
+              </Button>
+            </Link>
+            <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+          </div>
         </div>
-      </div>
-
-      <Collapse
-        open={isNavOpen}
-        className="overflow-scroll overflow-x-hidden scrollbar-webkit">
-        <NavList />
-      </Collapse>
-    </Navbar>
+        <Collapse
+          open={isNavOpen}
+          className="overflow-scroll overflow-x-hidden scrollbar-webkit">
+          <NavList />
+        </Collapse>
+      </Navbar>
+    </NavbarContext.Provider>
   )
 }

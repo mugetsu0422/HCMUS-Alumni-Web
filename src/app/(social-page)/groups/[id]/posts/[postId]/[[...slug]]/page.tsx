@@ -43,6 +43,7 @@ import { nunito } from '@/app/ui/fonts'
 import DeletePostDialog from '@/app/ui/social-page/counsel/delete-post-dialog'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
+import ReactTextareaAutosize from 'react-textarea-autosize'
 
 export default function Page({
   params,
@@ -503,7 +504,6 @@ export default function Page({
       <div
         ref={postRef}
         className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto scroll-mt-[var(--navbar-height)]`}>
-        
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <Link href="#">
@@ -673,17 +673,12 @@ export default function Page({
                 src={'/demo.jpg'}
                 alt="avatar user"
               />
-              <Textarea
-                rows={1}
-                resize={true}
+              <ReactTextareaAutosize
+                spellCheck="false"
+                minRows={1}
+                maxRows={8}
                 placeholder="Bình luận của bạn"
-                className="min-h-full !border-0 focus:border-transparent w-full !bg-[var(--comment-input)]"
-                containerProps={{
-                  className: 'grid h-full',
-                }}
-                labelProps={{
-                  className: 'before:content-none after:content-none',
-                }}
+                className="focus:border-transparent w-full bg-[var(--comment-input)] scrollbar-webkit-main resize-none p-2 px-3 rounded-xl outline-none text-black"
                 value={uploadComment}
                 onChange={handleUploadCommentChange}
               />
