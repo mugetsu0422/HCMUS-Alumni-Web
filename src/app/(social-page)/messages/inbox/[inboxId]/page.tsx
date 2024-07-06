@@ -38,6 +38,7 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   const [notFound, setNotFound] = useState(false)
   const textAreaRef = useRef(null)
 
+  const inboxes = useAppSelector((state) => state.inboxManager.inboxes)
   const socketResponse = useAppSelector((state) => state.socketResponse)
   const dispatch = useAppDispatch()
 
@@ -210,6 +211,11 @@ export default function Page({ params }: { params: { inboxId: string } }) {
 
   useEffect(() => {
     if (socketResponse.message && socketResponse.inbox.id == params.inboxId) {
+      const socketManager = SocketManager.getInstance()
+      socketManager.markAsRead(
+        parseInt(params.inboxId),
+        socketResponse.message.id
+      )
       setMessages((prev) => {
         if (prev.length === 0) return []
         return [socketResponse.message].concat(prev)
@@ -219,8 +225,19 @@ export default function Page({ params }: { params: { inboxId: string } }) {
   }, [socketResponse])
 
   useEffect(() => {
-    dispatch(markAsRead(parseInt(params.inboxId)))
-  })
+    if (inboxes.length > 0) {
+      dispatch(markAsRead(parseInt(params.inboxId)))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inboxes])
+
+  useEffect(() => {
+    if (messages.length > 0 && socketResponse.isSocketConnected) {
+      const socketManager = SocketManager.getInstance()
+      socketManager.markAsRead(parseInt(params.inboxId), messages[0].id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketResponse.isSocketConnected, messages])
 
   if (notFound) {
     return <NotFound404 />

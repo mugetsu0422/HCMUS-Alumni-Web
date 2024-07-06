@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 interface SocketResponseState {
+  isSocketConnected: boolean
   message: any
   inbox: any
 }
@@ -8,6 +9,7 @@ interface SocketResponseState {
 const socketResponseSlice = createSlice({
   name: 'socketResponse',
   initialState: {
+    isSocketConnected: false,
     message: null,
     inbox: null,
   } as SocketResponseState,
@@ -16,8 +18,11 @@ const socketResponseSlice = createSlice({
       state.message = action.payload.message
       state.inbox = action.payload.inbox
     },
+    setSocketConnected: (state) => {
+      state.isSocketConnected = true
+    },
   },
 })
 
-export const { setSocketResponse } = socketResponseSlice.actions
+export const { setSocketResponse, setSocketConnected } = socketResponseSlice.actions
 export default socketResponseSlice.reducer

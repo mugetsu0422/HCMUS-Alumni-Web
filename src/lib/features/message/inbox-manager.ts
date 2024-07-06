@@ -22,10 +22,7 @@ const inboxManagerSlicers = createSlice({
     setInboxes: (state, action: PayloadAction<SetInboxesPayload>) => {
       const { type, newInboxes } = action.payload
       if (type === 'set') {
-        state.inboxes = newInboxes.map((inbox) => ({
-          ...inbox,
-          hasRead: !state.unreadInboxSet.includes(inbox.id),
-        }));
+        state.inboxes = newInboxes
       } else if (type === 'concat') {
         state.inboxes = state.inboxes.concat(newInboxes)
       }
@@ -33,7 +30,7 @@ const inboxManagerSlicers = createSlice({
     },
     markAsRead: (state, action: PayloadAction<number>) => {
       const inboxIndex = state.inboxes.findIndex(
-        (inbox) => inbox.id === action.payload
+        (inbox) => inbox.id === action.payload && !inbox.hasRead
       )
       if (inboxIndex !== -1) {
         state.inboxes[inboxIndex].hasRead = true

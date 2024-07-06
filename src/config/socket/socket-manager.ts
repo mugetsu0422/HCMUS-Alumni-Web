@@ -20,7 +20,11 @@ class SocketManager {
     return SocketManager.instance
   }
 
-  public connect(userId: string, showMessage: (message: any) => void): void {
+  public connect(
+    userId: string,
+    showMessage: (message: any) => void,
+    onConnect: () => void
+  ): void {
     if (!this.stompClient || !this.stompClient.connected) {
       this.userId = userId
       const socket = new SockJS(`${process.env.NEXT_PUBLIC_SERVER_HOST}/ws`)
@@ -29,7 +33,7 @@ class SocketManager {
       this.stompClient.connect(
         {},
         (frame) => {
-          this.subscribeToMessages(userId, showMessage)
+          this.subscribeToMessages(userId, showMessage, onConnect)
         },
         (error) => {
           console.error('Error during connection: ' + error)
@@ -40,7 +44,8 @@ class SocketManager {
 
   private subscribeToMessages(
     userId: string,
-    showMessage: (message: any) => void
+    showMessage: (message: any) => void,
+    onConnect: () => void
   ): void {
     if (this.stompClient && this.stompClient.connected) {
       const topic = `/user/${userId}/queue/messages`
@@ -49,6 +54,8 @@ class SocketManager {
           showMessage(JSON.parse(res.body))
         })
         this.subscribedTopics.add(topic)
+        onConnect()
+        console.log(`Subscribed to topic successfully`)
       } else {
         console.warn(`Already subscribed to topic: ${topic}`)
       }
@@ -79,6 +86,21 @@ class SocketManager {
           senderId: this.userId,
           content: content,
           parentMessageId: parentMessageId,
+        })
+      )
+    } else {
+      console.error('Unable to send, client not connected.')
+    }
+  }
+
+  public markAsRead(inboxId: number, lastReadMessageId: number) {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.send(
+        `/app/read-inbox/${inboxId}`,
+        {},
+        JSON.stringify({
+          userId: this.userId,
+          lastReadMessageId: lastReadMessageId,
         })
       )
     } else {
