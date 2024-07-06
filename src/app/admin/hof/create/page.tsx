@@ -45,7 +45,7 @@ export default function Page() {
       thumbnail: data.thumbnail[0],
       position: data.position,
       summary: data.summary,
-      emailOfUser: data.emailOfUser || null,
+      emailOfUser: data.emailOfUser.trim() || null,
       facultyId: data.facultyId || null,
       beginningYear: data.beginningYear || null,
       scheduledTime: openDialog

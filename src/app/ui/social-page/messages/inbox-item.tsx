@@ -41,7 +41,7 @@ export default function InboxItem({
             </p>
             <div
               className={clsx('max-w-[200px] flex gap-[2px] text-[13px]', {
-                'text-[--text-navbar]': hasRead === null || hasRead === true,
+                'text-[--text-navbar]': hasRead === true,
                 'font-bold': hasRead === false,
               })}>
               <span className={`max-w-[150px] truncate`}>
@@ -69,6 +69,7 @@ export default function InboxItem({
           className={clsx({
             'mx-auto block h-[12px] w-[12px] rounded-full': true,
             'bg-[--blue-05]': hasRead === false,
+            hidden: hasRead === true,
           })}
         />
       </div>
