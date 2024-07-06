@@ -25,6 +25,7 @@ import Cookies from 'js-cookie'
 import ErrorInput from '@/app/ui/error-input'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { usePathname } from 'next/navigation'
 
 export default function Page() {
   const [onpenEdit, setOpenEdit] = useState(false)
@@ -33,7 +34,10 @@ export default function Page() {
   tomorrow.setDate(tomorrow.getDate() + 1)
   const tomorrowString = tomorrow.toISOString().split('T')[0]
   const [user, setUser] = useState(null)
+  const pathname = usePathname()
   const userId = Cookies.get('userId')
+  const part = pathname.split('/')
+  const isProfileLoginUser = userId === part[2]
   const [dob, setDob] = useState(null)
 
   const {
@@ -50,7 +54,7 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${part[2]}/profile`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
@@ -71,7 +75,7 @@ export default function Page() {
         setValue('beginningYear', data.alumniVerification.beginningYear)
       })
       .catch((error) => {})
-  }, [userId])
+  }, [part[2]])
 
   const onSubmit = async (data) => {
     const userData = {
@@ -130,7 +134,8 @@ export default function Page() {
             Thông tin cơ bản
           </p>
 
-          {!onpenEdit ? (
+        {isProfileLoginUser && 
+          (!onpenEdit ? (
             <div className="flex gap-2">
               <Button
                 className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
@@ -162,7 +167,8 @@ export default function Page() {
                 Cập nhật
               </Button>
             </div>
-          )}
+          ))
+        }
         </div>
 
         {/* About me */}

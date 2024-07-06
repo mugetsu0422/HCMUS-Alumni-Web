@@ -350,6 +350,7 @@ export default function WorksListItem({
   startTime,
   endTime,
   isWorking,
+  isProfileLoginUser,
 }) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
 
@@ -372,13 +373,14 @@ export default function WorksListItem({
           </p>
         </div>
       </div>
-      <Button
+
+    {isProfileLoginUser && <Button
         placeholder={undefined}
         className="p-2 rounded-full bg-[#E4E4E7]"
         onClick={handleOpenEditDialog}
         variant="text">
         <PencilFill className="text-[14px] lg:text-lg" />
-      </Button>
+      </Button>}
 
       <DialogEditWorks
         openDialogEdit={openEditDialog}

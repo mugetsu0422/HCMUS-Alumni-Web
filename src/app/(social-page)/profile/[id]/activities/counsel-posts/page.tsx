@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 import { Star, PencilFill, TagFill } from 'react-bootstrap-icons'
-import PostListItem from '../../../../../ui/social-page/profile/profile-post-list-items'
+import PostListItem from '@/app/ui/social-page/counsel/post-list-item'
 import { Spinner } from '@material-tailwind/react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import axios from 'axios'
@@ -46,9 +46,8 @@ export default function Page() {
   }
 
   useEffect(() => {
-    // Posts list
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${userId}`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
@@ -57,6 +56,7 @@ export default function Page() {
         if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setPosts(posts)
+        console.log(posts)
 
         setIsLoading(false)
       })
@@ -66,7 +66,6 @@ export default function Page() {
   return (
     <div>
       <div className="w-full flex flex-col gap-4">
-        <p className="text-[18px] lg:text-[22px] font-bold">Tư vấn & cố vấn</p>
         <div className="w-full flex flex-col gap-4">
           {posts.length > 0 ? (
             !isLoading && (

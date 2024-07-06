@@ -25,6 +25,7 @@ export default function Page() {
   const pathname = usePathname()
   const parts = pathname.split('/')
   const userIdParams = parts[2]
+  const isProfileLoginUser = userId === userIdParams
 
   function handleOpenDialogAddWorks() {
     setOpenDialogAddWorks((e) => !e)
@@ -65,14 +66,18 @@ export default function Page() {
       {/* Thông tin cá nhân */}
       <div className="w-full flex flex-col gap-4">
         <p className="text-[18px] lg:text-[22px] font-bold">Công việc</p>
-        <Button
-          placeholder={undefined}
-          className="w-fit  normal-case text-[--blue-05] text-[15px] font-light flex items-center gap-4 px-2"
-          onClick={handleOpenDialogAddWorks}
-          variant="text">
-          <PlusCircle className="text-xl" />
-          Thêm nơi làm việc
-        </Button>
+
+        {isProfileLoginUser && (
+          <Button
+            placeholder={undefined}
+            className="w-fit  normal-case text-[--blue-05] text-[15px] font-light flex items-center gap-4 px-2"
+            onClick={handleOpenDialogAddWorks}
+            variant="text">
+            <PlusCircle className="text-xl" />
+            Thêm nơi làm việc
+          </Button>
+        )}
+
         {works?.length > 0 ? (
           works?.map(
             ({
@@ -91,6 +96,7 @@ export default function Page() {
                 startTime={startTime}
                 endTime={endTime}
                 isWorking={isWorking}
+                isProfileLoginUser={isProfileLoginUser}
               />
             )
           )
@@ -108,15 +114,16 @@ export default function Page() {
 
       <div className="w-full flex flex-col gap-4 mt-4">
         <p className="text-[18px] lg:text-[22px] font-bold">Học vấn</p>
-        <Button
-          placeholder={undefined}
-          className="w-fit  normal-case text-[--blue-05] text-[15px] font-light flex items-center gap-4 px-2"
-          onClick={handleOpenDialogAddEducation}
-          variant="text">
-          <PlusCircle className="text-xl" />
-          Thêm trình độ học vấn
-        </Button>
-
+        {isProfileLoginUser && (
+          <Button
+            placeholder={undefined}
+            className="w-fit  normal-case text-[--blue-05] text-[15px] font-light flex items-center gap-4 px-2"
+            onClick={handleOpenDialogAddEducation}
+            variant="text">
+            <PlusCircle className="text-xl" />
+            Thêm trình độ học vấn
+          </Button>
+        )}
         <DialogAddEducation
           handleOpenDialogAddEducation={handleOpenDialogAddEducation}
           openDialogAddEducation={openDialogAddEducation}
@@ -125,6 +132,7 @@ export default function Page() {
           <EducationListItem
             key={education.educationId}
             education={education}
+            isProfileLoginUser={isProfileLoginUser}
           />
         ))}
       </div>

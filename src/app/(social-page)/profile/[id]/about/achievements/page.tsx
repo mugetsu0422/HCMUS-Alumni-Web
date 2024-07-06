@@ -18,6 +18,7 @@ export default function Page() {
   const parts = pathname.split('/')
   const userIdParams = parts[2]
   const userId = Cookies.get('userId')
+  const isProfileLoginUser = userId === userIdParams
 
   useEffect(() => {
     axios
@@ -46,20 +47,23 @@ export default function Page() {
           Thành tựu nổi bật
         </p>
         <div className="w-full flex flex-col gap-4">
-          <Button
-            placeholder={undefined}
-            className="w-fit  normal-case text-[--blue-05] text-[15px] font-light flex items-center gap-4 px-2"
-            onClick={handleOpenDialogAdd}
-            variant="text">
-            <PlusCircle className="text-xl" />
-            Thêm nơi thành tựu nổi bật
-          </Button>
+          {isProfileLoginUser && (
+            <Button
+              placeholder={undefined}
+              className="w-fit  normal-case text-[--blue-05] text-[15px] font-light flex items-center gap-4 px-2"
+              onClick={handleOpenDialogAdd}
+              variant="text">
+              <PlusCircle className="text-xl" />
+              Thêm nơi thành tựu nổi bật
+            </Button>
+          )}
 
           {achievements?.length > 0 ? (
             achievements?.map((achivement) => (
               <AchievementListItem
                 key={achivement?.achievementId}
                 achivement={achivement}
+                isProfileLoginUser={isProfileLoginUser}
               />
             ))
           ) : (

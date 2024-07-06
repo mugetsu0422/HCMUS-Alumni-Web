@@ -261,40 +261,40 @@ function DialogEditEducation({
           </div>
 
           <div>
-              <label
-                className="text-lg font-bold text-black mr-4"
-                htmlFor="startTime">
-                Ngày bắt đầu
-              </label>
-              <input
-                className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
-                id="startTime"
-                type="date"
-                //min={todayString}
-                //defaultValue={tomorrowString}
-                onFocus={(e) => e.target.showPicker()}
-                //onChange={(e) => onChange({ date: e.target.value })}
-                {...register('startTime', {})}
-              />
-            </div>
+            <label
+              className="text-lg font-bold text-black mr-4"
+              htmlFor="startTime">
+              Ngày bắt đầu
+            </label>
+            <input
+              className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+              id="startTime"
+              type="date"
+              //min={todayString}
+              //defaultValue={tomorrowString}
+              onFocus={(e) => e.target.showPicker()}
+              //onChange={(e) => onChange({ date: e.target.value })}
+              {...register('startTime', {})}
+            />
+          </div>
 
-            <div>
-              <label
-                className="text-lg font-bold text-black mr-4"
-                htmlFor="endTime">
-                Ngày kết thúc
-              </label>
-              <input
-                className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
-                id="endTime"
-                type="date"
-                //min={todayString}
-                //defaultValue={tomorrowString}
-                onFocus={(e) => e.target.showPicker()}
-                //onChange={(e) => onChange({ date: e.target.value })}
-                {...register('endTime', {})}
-              />
-            </div>
+          <div>
+            <label
+              className="text-lg font-bold text-black mr-4"
+              htmlFor="endTime">
+              Ngày kết thúc
+            </label>
+            <input
+              className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+              id="endTime"
+              type="date"
+              //min={todayString}
+              //defaultValue={tomorrowString}
+              onFocus={(e) => e.target.showPicker()}
+              //onChange={(e) => onChange({ date: e.target.value })}
+              {...register('endTime', {})}
+            />
+          </div>
         </DialogBody>
         <DialogFooter placeholder={undefined}>
           <Button
@@ -315,7 +315,7 @@ function DialogEditEducation({
   )
 }
 
-export default function EducationListItem({ education }) {
+export default function EducationListItem({ education, isProfileLoginUser }) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
 
   function handleOpenEditDialog() {
@@ -341,13 +341,15 @@ export default function EducationListItem({ education }) {
           </p>
         </div>
       </div>
-      <Button
-        placeholder={undefined}
-        onClick={handleOpenEditDialog}
-        className="p-2 rounded-full bg-[#E4E4E7]"
-        variant="text">
-        <PencilFill className="text-[14px] lg:text-lg" />
-      </Button>
+      {isProfileLoginUser && (
+        <Button
+          placeholder={undefined}
+          onClick={handleOpenEditDialog}
+          className="p-2 rounded-full bg-[#E4E4E7]"
+          variant="text">
+          <PencilFill className="text-[14px] lg:text-lg" />
+        </Button>
+      )}
 
       <DialogEditEducation
         openDialogEdit={openEditDialog}

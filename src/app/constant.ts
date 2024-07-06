@@ -131,3 +131,14 @@ export const PROFILE_JOINED_EVENTS_TABS = [
     url: 'counsel-posts',
   },
 ]
+
+export const PROFILE_COUNSEL_TABS = [
+  {
+    label: 'Bài viết',
+    url: '',
+  },
+  {
+    label: 'Bình luận',
+    url: 'counsel-comments',
+  },
+]

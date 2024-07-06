@@ -276,7 +276,7 @@ function DialogEditAchievements({
   )
 }
 
-export default function AchievementListItem({ achivement }) {
+export default function AchievementListItem({ achivement, isProfileLoginUser }) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
   function handleOpenDialogEdit() {
     setOpenEditDialog((e) => !e)
@@ -300,13 +300,13 @@ export default function AchievementListItem({ achivement }) {
           </p>
         </div>
       </div>
-      <Button
+     {isProfileLoginUser && <Button
         placeholder={undefined}
         onClick={handleOpenDialogEdit}
         className="p-2 rounded-full bg-[#E4E4E7]"
         variant="text">
         <PencilFill className="text-[14px] lg:text-lg" />
-      </Button>
+      </Button>}
 
       <DialogEditAchievements
         openEditDialog={openEditDialog}
