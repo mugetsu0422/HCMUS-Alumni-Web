@@ -47,7 +47,7 @@ function SmallTrendingNews({ news }) {
 
 function BigTrendingNews({ news }) {
   return (
-    <div className="relative w-[50%] h-full max-h-[480px] flex flex-1">
+    <div className="relative w-[45%] h-full max-h-[480px] flex flex-1">
       {news.slice(0, 1).map(({ id, title, summary, thumbnail }) => (
         <div key={id} className="flex flex-col gap-3">
           <Link href={`/news/${id}`} className="h-full">
