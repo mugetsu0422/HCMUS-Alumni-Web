@@ -10,7 +10,7 @@ import Cookies from 'js-cookie'
 import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 import { Controller, useForm } from 'react-hook-form'
 import ErrorInput from '@/app/ui/error-input'
-import NoData from '@/app/ui/no-data'
+import NotFound404 from '@/app/ui/common/not-found-404'
 import toast from 'react-hot-toast'
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -21,7 +21,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter()
 
   const [isLoading, setIsLoading] = useState(true)
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
 
   const handleOpenCancelChangesDialog = () => {
     setOpenCancelChangesDialog((prev) => !prev)
@@ -97,18 +97,18 @@ export default function Page({ params }: { params: { id: string } }) {
         setIsLoading(false)
       })
       .catch((err) => {
-        setNoData(true)
+        return setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (noData) return <NoData />
+  if (notFound) return <NotFound404 />
 
   if (!isLoading)
     return (
       <div
         className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-        <CustomToaster />
+        
         <>
           <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
             Thông tin chi tiết

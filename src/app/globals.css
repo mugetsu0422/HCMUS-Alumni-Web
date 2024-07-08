@@ -26,6 +26,9 @@
     --highlight-bg: #e7f3ff;
     --toast-success: #003f88;
     --toast-error: #ea7b7b;
+
+    --navbar-height: 86px;
+    --min-height-view: calc(100vh - 86px);
 }
 
 @media (prefers-color-scheme: dark) {

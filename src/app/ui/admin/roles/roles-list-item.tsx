@@ -81,7 +81,7 @@ export default function RolesListItem({ role }: { role: Role }) {
   return (
     <div
       className={`${nunito.className} border border-t-0 gap-2 border-[#CDCDCD] w-[1220px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      <CustomToaster />
+      
       <div className="flex">
         <p className="h-full w-[250px] p-2 font-[600] text-black align-middle flex items-center justify-center">
           {role.name}

@@ -248,7 +248,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                           defaultValue={comment.content}
                           //value={}
                           placeholder="Bình luận"
-                          resize={true}
+                          resize={false}
                           onChange={handleEditCommentChange}
                           className="mt-2 h-[100px] w-full bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
                           labelProps={{
@@ -332,7 +332,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                 {!isEditingComment ? (
                   <>
                     <p className="text-[var(--secondary)]">
-                      {moment(comment.createAt).locale('vi').local().fromNow()}
+                      {moment(comment.createAt).locale('vi').local().fromNow(true)}
                     </p>
                     <div
                       onClick={() => setIsOpenInputComments((e) => !e)}
@@ -348,12 +348,13 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
 
               {isOpenInputComments && (
                 <form
-                  onSubmit={(e) =>
+                  onSubmit={(e) => {
                     onUploadComment(e, comment.id, uploadComment)
-                  }>
+                  }}>
                   <Textarea
                     placeholder="Bình luận"
-                    resize={true}
+                    resize={false}
+                    value={uploadComment}
                     onChange={handleUploadCommentChange}
                     className="mt-2 h-[100px] w-[93%] bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
                     labelProps={{
@@ -416,30 +417,6 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
               )}
           </div>
         </div>
-        {/* {isOpenInputComments && depth >= 2 && (
-        <form onSubmit={(e) => onUploadComment(e, comment.id, uploadComment)}>
-          <Textarea
-            placeholder="Bình luận"
-            resize={true}
-            onChange={handleUploadCommentChange}
-            className="mt-2 h-[100px] w-[93%] bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: 'w-[93%] before:content-none after:content-none w-fit',
-            }}
-          />
-
-          <div className="flex justify-end gap-x-4 pt-2 mr-2">
-            <Button
-              placeholder={undefined}
-              size="md"
-              type="submit"
-              disabled={!uploadComment.trim()}
-              className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-              Đăng
-            </Button>
-          </div>
-        </form>
-      )} */}
       </div>
     )
   )

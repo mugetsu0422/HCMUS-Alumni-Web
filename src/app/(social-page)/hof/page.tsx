@@ -246,7 +246,7 @@ export default function Page() {
 
   return (
     <>
-      <CustomToaster />
+      
 
       <Thumbnail />
       <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">

@@ -124,7 +124,7 @@ export default function Page() {
 
   return (
     <>
-      <CustomToaster />
+      
       <Thumbnail />
       <div className="mt-4 mb-8 max-w-[850px] w-[80%] m-auto flex flex-col gap-6">
         <SearchAndFilter

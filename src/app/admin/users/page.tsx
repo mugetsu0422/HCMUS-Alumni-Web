@@ -217,7 +217,7 @@ export default function Page() {
   if (!isLoading)
     return (
       <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] w-[1000px] mt-[3vw]">
-        <CustomToaster />
+        
         <p
           className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
           Quản lý người dùng

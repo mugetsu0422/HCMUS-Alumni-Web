@@ -1,27 +1,37 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ClockFill, EyeFill, TagFill } from 'react-bootstrap-icons'
 import { Textarea, Button } from '@material-tailwind/react'
-import Comments from '../../../ui/common/comments'
-import { nunito } from '../../../ui/fonts'
 import axios, { AxiosResponse } from 'axios'
-import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
-import NoData from '../../../ui/no-data'
 import moment from 'moment'
 import toast from 'react-hot-toast'
-import RelatedNews from '../../../ui/social-page/news/related-news'
 import CustomToaster from '@/app/ui/common/custom-toaster'
+import { JWT_COOKIE } from '@/app/constant'
+import Comments from '@/app/ui/common/comments'
+import { nunito } from '@/app/ui/fonts'
+import RelatedNews from '@/app/ui/social-page/news/related-news'
+import { useRouter } from 'next/navigation'
+import NotFound404 from '@/app/ui/common/not-found-404'
+import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function Page({
+  params,
+}: {
+  params: { id: string; slug: string[] }
+}) {
+  const router = useRouter()
   const [news, setNews] = useState(null)
   const [relatedNews, setRelatedNews] = useState([])
-  const [noData, setNoData] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [uploadComment, setUploadComment] = useState('')
   const [comments, setComments] = useState([])
   const [commentPage, setCommentPage] = useState(0)
+  const [isSingleComment, setIsSingleComment] = useState(false)
+
+  const singleCommentRef = useRef(null)
 
   // Function to handle changes in the textarea
   const handleUploadCommentChange = (event) => {
@@ -53,9 +63,12 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-          id: postCommentToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: postCommentToast,
+          }
+        )
       })
   }
   const onEditComment = (
@@ -117,53 +130,83 @@ export default function Page({ params }: { params: { id: string } }) {
 
   // Initial fetch
   useEffect(() => {
-    try {
-      const news = axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      const comments = axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      const relatedNews = axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
+    let commentId = ''
 
-      Promise.all([news, comments, relatedNews]).then(
-        ([newsRes, commentRes, relatedNewsRes]) => {
-          const { data: news } = newsRes
-          const {
-            data: { comments },
-          } = commentRes
-          const {
-            data: { news: relatedNews },
-          } = relatedNewsRes
+    if (params.slug) {
+      const [firstSlug, secondSlug] = params.slug
 
-          setNews(news)
-          setComments(comments)
-          setRelatedNews(relatedNews)
-          setIsLoading(false)
+      if (params.slug.length === 1) {
+        if (firstSlug !== 'comments') {
+          return setNotFound(true)
         }
-      )
-    } catch (error) {
-      setNoData(true)
+      } else if (params.slug.length === 2) {
+        if (firstSlug === 'comments') {
+          // Fetch specific comment
+          commentId = `/${secondSlug}`
+          setIsSingleComment(true)
+          // return
+        }
+      } else {
+        // Return 404
+        return setNotFound(true)
+      }
     }
+
+    const news = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    const comments = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    const relatedNews = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    Promise.all([news, comments, relatedNews])
+      .then(([newsRes, commentRes, relatedNewsRes]) => {
+        const { data: news } = newsRes
+        const {
+          data: { comments, comment },
+        } = commentRes
+        const {
+          data: { news: relatedNews },
+        } = relatedNewsRes
+
+        setNews(news)
+        if (comment) setComments([comment])
+        else setComments(comments)
+        setRelatedNews(relatedNews)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        setNotFound(true)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Scroll to the single comment
+  useEffect(() => {
+    if (singleCommentRef.current) {
+      singleCommentRef.current.scrollIntoView({
+        behavior: 'instant',
+      })
+    }
+  }, [isLoading])
 
   // Fetch more comments
   useEffect(() => {
@@ -185,14 +228,14 @@ export default function Page({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
-  if (noData) {
-    return <NoData />
+  if (notFound) {
+    return <NotFound404 />
   }
 
   if (!isLoading)
     return (
       <div className="flex flex-col xl:flex-row m-auto max-w-[1000px] w-[80%]">
-        <CustomToaster />
+        
         <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
           <div className="flex justify-between items-start">
             {news?.faculty ? (
@@ -272,6 +315,13 @@ export default function Page({ params }: { params: { id: string } }) {
                 ({news?.childrenCommentNumber})
               </span>
             </p>
+            {isSingleComment && (
+              <SingleCommentIndicator
+                ref={singleCommentRef}
+                parentCommentUrl={comments[0]?.parentId}
+                fullPostUrl={`/news/${params.id}`}
+              />
+            )}
             <Comments
               comments={comments}
               onUploadComment={onUploadComment}
@@ -280,14 +330,15 @@ export default function Page({ params }: { params: { id: string } }) {
               onFetchChildrenComments={onFetchChildrenComments}
             />
 
-            {comments.length < news?.childrenCommentNumber && (
-              <Button
-                onClick={onFetchComments}
-                className="bg-[--blue-02] normal-case text-sm gap-1"
-                placeholder={undefined}>
-                Tải thêm
-              </Button>
-            )}
+            {!isSingleComment &&
+              comments.length < news?.childrenCommentNumber && (
+                <Button
+                  onClick={onFetchComments}
+                  className="bg-[--blue-02] normal-case text-sm gap-1"
+                  placeholder={undefined}>
+                  Tải thêm
+                </Button>
+              )}
 
             <RelatedNews news={relatedNews} />
           </div>
