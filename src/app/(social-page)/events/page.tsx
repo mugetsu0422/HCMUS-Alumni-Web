@@ -135,7 +135,7 @@ export default function Page() {
   }
 
   useEffect(() => {
-    // News list
+    // Events list
     axios
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&statusId=${POST_STATUS['Bình thường']}`,
@@ -167,9 +167,11 @@ export default function Page() {
 
             setTotalPages(totalPages)
             setEvents(events)
+            console.log(events)
           })
       })
-      .catch((error) => {})
+      .catch((error) => {
+      })
   }, [myParams])
 
   return (
