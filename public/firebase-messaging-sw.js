@@ -43,7 +43,7 @@ class NotificationUrlBuilder {
     if (type === 'CREATE') {
       switch (entityTable) {
         case 'request_friend':
-          return `#`
+          return `/friends/requests`
         default:
           return '#'
       }
