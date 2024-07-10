@@ -1,19 +1,27 @@
 'use client'
 import React, { useState } from 'react'
 import { Tabs, TabsHeader, Tab } from '@material-tailwind/react'
-import { PROFILE_JOINED_EVENTS_TABS } from '../../../../constant'
+import { PROFILE_ACTIVITIES_TABS } from '../../../../constant'
 import { usePathname, useRouter } from 'next/navigation'
 import clsx from 'clsx'
+import Cookies from 'js-cookie'
 
 function ProfileAboutTags({ params }) {
   const pathname = usePathname()
   const router = useRouter()
-
+  const parts = pathname.split('/')
   const [activeTab, setActiveTab] = useState(() => {
-    const parts = pathname.split('/')
     if (parts[4] === undefined || parts[4] === 'posts') return ''
     return parts[4]
   })
+
+  const userIdParams = parts[2]
+  const userId = Cookies.get('userId')
+  const isProfileLoginUser = userId === userIdParams
+
+  const tabsToRender = isProfileLoginUser
+    ? PROFILE_ACTIVITIES_TABS
+    : [PROFILE_ACTIVITIES_TABS[0]]
 
   const handleClickTab = (url) => {
     setActiveTab(url)
@@ -33,7 +41,7 @@ function ProfileAboutTags({ params }) {
           indicatorProps={{
             className: 'bg-[#e6f0fb] shadow-none rounded-none z-0',
           }}>
-          {PROFILE_JOINED_EVENTS_TABS.map(({ label, url }) => (
+          {tabsToRender.map(({ label, url }) => (
             <Tab
               placeholder={undefined}
               key={label}

@@ -52,7 +52,7 @@ export function DialogAddEducation({
       )
       .then(() => toast.success('Thêm học vấn thành công'))
       .catch((error) => {
-        console.log(error)
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 
@@ -211,7 +211,7 @@ function DialogEditEducation({
       )
       .then(() => toast.success('Cập nhật học vấn thành công'))
       .catch((error) => {
-        console.log(error)
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

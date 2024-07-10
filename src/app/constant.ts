@@ -121,13 +121,13 @@ export const FRIEND_TABS = [
   },
 ]
 
-export const PROFILE_JOINED_EVENTS_TABS = [
+export const PROFILE_ACTIVITIES_TABS = [
   {
     label: 'Hoạt động đã tham gia',
     url: '',
   },
   {
-    label: 'Tư vấn & cố vấn',
+    label: 'Tư vấn',
     url: 'counsel-posts',
   },
 ]

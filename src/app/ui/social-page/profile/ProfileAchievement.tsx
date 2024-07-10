@@ -46,7 +46,9 @@ export function DialogAddAchievements({ openDialogAdd, handleOpenDialogAdd }) {
       )
       .then(() => toast.success('Thêm thành tựu thành công'))
       .catch((error) => {
-        console.log(error)
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -189,7 +191,9 @@ function DialogEditAchievements({
       )
       .then(() => toast.success('Cập nhật thành tựu thành công'))
       .catch((error) => {
-        console.log(error)
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
   return (
@@ -276,7 +280,10 @@ function DialogEditAchievements({
   )
 }
 
-export default function AchievementListItem({ achivement, isProfileLoginUser }) {
+export default function AchievementListItem({
+  achivement,
+  isProfileLoginUser,
+}) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
   function handleOpenDialogEdit() {
     setOpenEditDialog((e) => !e)
@@ -300,13 +307,15 @@ export default function AchievementListItem({ achivement, isProfileLoginUser }) 
           </p>
         </div>
       </div>
-     {isProfileLoginUser && <Button
-        placeholder={undefined}
-        onClick={handleOpenDialogEdit}
-        className="p-2 rounded-full bg-[#E4E4E7]"
-        variant="text">
-        <PencilFill className="text-[14px] lg:text-lg" />
-      </Button>}
+      {isProfileLoginUser && (
+        <Button
+          placeholder={undefined}
+          onClick={handleOpenDialogEdit}
+          className="p-2 rounded-full bg-[#E4E4E7]"
+          variant="text">
+          <PencilFill className="text-[14px] lg:text-lg" />
+        </Button>
+      )}
 
       <DialogEditAchievements
         openEditDialog={openEditDialog}

@@ -7,35 +7,12 @@ import {
   Tabs,
   TabsHeader,
   Button,
-  Dialog,
-  DialogFooter,
-  DialogBody,
-  DialogHeader,
+
 } from '@material-tailwind/react'
 import { usePathname, useRouter } from 'next/navigation'
 import clsx from 'clsx'
 import Cookies from 'js-cookie'
 
-function ConfirmDialog({ open, handleOpen, userIdParams }) {
-  const router = useRouter()
-
-  return (
-    <Dialog placeholder={undefined} open={open} handler={handleOpen} size="xs">
-      <DialogHeader placeholder={undefined}>Thông báo</DialogHeader>
-      <DialogBody placeholder={undefined}>
-        Bạn không có quyền xem thông tin này !
-      </DialogBody>
-      <DialogFooter placeholder={undefined}>
-        <Button
-          placeholder={undefined}
-          className="bg-[--blue-05]"
-          onClick={() => router.push(`/profile/${userIdParams}/activities`)}>
-          Xác nhận
-        </Button>
-      </DialogFooter>
-    </Dialog>
-  )
-}
 
 export default function GroupLayout({
   children,
@@ -52,34 +29,16 @@ export default function GroupLayout({
     if (parts[5] === undefined) return ''
     return parts[5]
   })
-  const userIdParams = parts[2]
-  const userId = Cookies.get('userId')
-  const isProfileLoginUser = userId === userIdParams
-
-  const [open, setOpen] = useState(false)
-  function handleOpen() {
-    setOpen((e) => !e)
-  }
 
   const handleClickTab = (url) => {
     setActiveTab(url)
     router.push(`/profile/${params.id}/activities/counsel-posts/${url}`)
   }
 
-  useEffect(() => {
-    {
-      isProfileLoginUser && handleOpen()
-    }
-  }, [isProfileLoginUser])
-
   return (
-    <div className="w-full flex flex-col gap-4">
-      <ConfirmDialog
-        open={open}
-        handleOpen={handleOpen}
-        userIdParams={userIdParams}
-      />
-      <p className="text-[18px] lg:text-[22px] font-bold">Tư vấn & cố vấn</p>
+    <div className="w-full flex flex-col gap-4" suppressHydrationWarning={true}>
+     
+      <p className="text-[18px] lg:text-[22px] font-bold">Tư vấn </p>
       <Tabs value={activeTab || ''} className="flex">
         <TabsHeader
           placeholder={undefined}

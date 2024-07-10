@@ -21,6 +21,7 @@
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.0",
+    "codegpt-nextjs": "file:../../../.vscode/extensions/danielsanmedium.dscodegpt-3.4.20/standalone",
     "firebase": "^10.12.2",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",

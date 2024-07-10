@@ -54,7 +54,9 @@ export function DialogAddWorks({
       })
       .then(() => toast.success('Thêm công việc thành công'))
       .catch((error) => {
-        console.log(error)
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -227,7 +229,9 @@ function DialogEditWorks({ openDialogEdit, handleOpenDialogEdit, jobId }) {
       )
       .then(() => toast.success('Cập nhật công việc thành công'))
       .catch((error) => {
-        console.log(error)
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -374,13 +378,15 @@ export default function WorksListItem({
         </div>
       </div>
 
-    {isProfileLoginUser && <Button
-        placeholder={undefined}
-        className="p-2 rounded-full bg-[#E4E4E7]"
-        onClick={handleOpenEditDialog}
-        variant="text">
-        <PencilFill className="text-[14px] lg:text-lg" />
-      </Button>}
+      {isProfileLoginUser && (
+        <Button
+          placeholder={undefined}
+          className="p-2 rounded-full bg-[#E4E4E7]"
+          onClick={handleOpenEditDialog}
+          variant="text">
+          <PencilFill className="text-[14px] lg:text-lg" />
+        </Button>
+      )}
 
       <DialogEditWorks
         openDialogEdit={openEditDialog}

@@ -62,12 +62,12 @@ function AvatarAndCoverUser({ register, getValues, user, isProfileLoginUser }) {
       )
       .then((response) => {
         // Handle success response
-        toast.success('Avatar updated successfully')
+        toast.success('Đổi ảnh đại diện thành công')
       })
       .catch((error) => {
-        // Handle error response
-        toast.error('Failed to update avatar')
-        console.log(error)
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -87,10 +87,12 @@ function AvatarAndCoverUser({ register, getValues, user, isProfileLoginUser }) {
         }
       )
       .then((response) => {
-        toast.success('Cover updated successfully')
+        toast.success('Đổi ảnh bìa thành công')
       })
       .catch((error) => {
-        toast.error('Failed to update cover')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -214,7 +216,7 @@ export default function GroupLayout({
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${part[2]}/profile`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Navbar,
   Collapse,
@@ -30,6 +30,9 @@ import {
 import { ChatDotsFill } from 'react-bootstrap-icons'
 import NotificationPopover from '../common/notification-popover'
 import Cookies from 'js-cookie'
+import axios from 'axios'
+import { JWT_COOKIE } from '@/app/constant'
+import { useRouter } from 'next/navigation'
 
 // nav list component
 const navListItems = [
@@ -98,14 +101,43 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
-
+  const [userAvatar, setUserAvatar] = React.useState('')
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
+
+  const userId = Cookies.get('userId')
+  const permissions = Cookies.get('permissions')
+
+  const router = useRouter()
+
+  const handleLogout = () => {
+    // Clear the cookies
+    Cookies.remove('userId')
+    Cookies.remove('jwt')
+    Cookies.remove('permissions')
+
+    // Redirect to sign-in page
+    router.push('/signin')
+  }
 
   React.useEffect(() => {
     window.addEventListener(
       'resize',
       () => window.innerWidth >= 1150 && setIsNavOpen(false) // 960 = lg (tailwind)
     )
+  }, [])
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setUserAvatar(data?.user?.avatarUrl)
+        console.log(permissions)
+      })
+      .catch((error) => {})
   }, [])
 
   return (
@@ -156,27 +188,25 @@ export default function MyNavbar() {
                 variant="text"
                 size="sm"
                 className="p-0 rounded-full">
-                <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+                <Avatar placeholder={undefined} src={userAvatar} alt="avatar" />
               </Button>
             </MenuHandler>
             <MenuList placeholder={undefined}>
               <MenuItem placeholder={undefined}>
                 <Link
-                  href={`/profile/${Cookies.get('userId')}/about`}
+                  href={`/profile/${userId}/about`}
                   className="flex items-center gap-2">
                   <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
                   Trang cá nhân
                 </Link>
               </MenuItem>
 
-              <MenuItem placeholder={undefined}>
-                <Link href={`/signin`} className="flex items-center gap-2">
-                  <FontAwesomeIcon
-                    icon={faRightFromBracket}
-                    className="text-xl"
-                  />
-                  Đăng xuất
-                </Link>
+              <MenuItem placeholder={undefined} onClick={handleLogout}>
+                <FontAwesomeIcon
+                  icon={faRightFromBracket}
+                  className="text-xl"
+                />
+                Đăng xuất
               </MenuItem>
             </MenuList>
           </Menu>

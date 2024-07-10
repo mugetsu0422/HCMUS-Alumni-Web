@@ -21,7 +21,10 @@ export default function Page() {
   const { replace } = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
+  const parts = pathname.split('/')
+  const userIdParams = parts[2]
   const userId = Cookies.get('userId')
+  const isProfileLoginUser = userId === userIdParams
 
   const onFetchMore = () => {
     curPage.current++
@@ -47,11 +50,14 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/users/${userIdParams}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(({ data: { totalPages, posts } }) => {
         if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
@@ -61,13 +67,13 @@ export default function Page() {
         setIsLoading(false)
       })
       .catch((err) => {})
-  }, [userId])
+  }, [userIdParams])
 
   return (
     <div>
       <div className="w-full flex flex-col gap-4">
         <div className="w-full flex flex-col gap-4">
-          {posts.length > 0 ? (
+          {posts.length > 0 && isProfileLoginUser ? (
             !isLoading && (
               <InfiniteScroll
                 dataLength={posts.length}

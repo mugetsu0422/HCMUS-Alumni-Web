@@ -5,17 +5,11 @@ import { Avatar, Button } from '@material-tailwind/react'
 
 import Link from 'next/link'
 
-const user = {
-  imageUrl: '/demo.jpg',
-  fullName: 'Trương Samuel',
-  id: '1',
-}
-
-export default function CreatePost() {
+export default function CreatePost({userAvatar}) {
   return (
     <div className="flex gap-4 items-center">
       <Avatar
-        src={user.imageUrl}
+        src={userAvatar}
         alt="user avatar"
         size="lg"
         placeholder={undefined}

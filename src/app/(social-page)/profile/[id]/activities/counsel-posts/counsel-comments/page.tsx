@@ -51,8 +51,12 @@ export default function Page() {
   const [comments, setComments] = useState([])
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
-  const userId = Cookies.get('userId')
   const curPage = useRef(0)
+  const pathname = usePathname()
+  const parts = pathname.split('/')
+  const userIdParams = parts[2]
+  const userId = Cookies.get('userId')
+  const isProfileLoginUser = userId === userIdParams
 
   const onFetchMore = () => {
     curPage.current++
@@ -60,7 +64,23 @@ export default function Page() {
       setHasMore(false)
       return
     }
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/users/${userIdParams}/comments?page=${curPage.current}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { comments } }) => {
+        setComments((prev) => prev.concat(comments))
+        setIsLoading(false)
+      })
+      .catch((err) => {})
   }
+
   useEffect(() => {
     axios
       .get(
@@ -75,8 +95,6 @@ export default function Page() {
         if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setComments(comments)
-        console.log(comments)
-
         setIsLoading(false)
       })
       .catch((err) => {})
@@ -86,7 +104,7 @@ export default function Page() {
     <div>
       <div className="w-full flex flex-col gap-4">
         <div className="w-full flex flex-col gap-4">
-          {comments?.length > 0 ? (
+          {(comments?.length > 0 && isProfileLoginUser) ? (
             !isLoading && (
               <InfiniteScroll
                 dataLength={comments.length}

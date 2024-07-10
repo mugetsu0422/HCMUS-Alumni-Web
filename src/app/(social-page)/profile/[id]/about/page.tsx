@@ -123,6 +123,32 @@ export default function Page() {
     }
   }
 
+  const onSendRequest = () => {
+    const verification = {
+      avatar: user?.user?.avatarUrl,
+      fullName: user?.user?.fullName,
+      studentId: user?.alumniVerification?.studentId,
+      beginningYear: user?.alumniVerification?.beginningYear,
+      socialMediaLink: user?.user?.socialMediaLink,
+    }
+    axios
+      .put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+        verification,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => toast.success('Cập nhật thành tựu thành công'))
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
+  }
+
   return (
     <div className="overflow-x-auto scrollbar-webkit-main">
       {/* Thông tin cá nhân */}
@@ -134,41 +160,41 @@ export default function Page() {
             Thông tin cơ bản
           </p>
 
-        {isProfileLoginUser && 
-          (!onpenEdit ? (
-            <div className="flex gap-2">
-              <Button
-                className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
-                placeholder={undefined}
-                onClick={handleOpenEdit}>
-                <PencilFill /> Chỉnh sửa thông tin
-              </Button>
+          {isProfileLoginUser &&
+            (!onpenEdit ? (
+              <div className="flex gap-2">
+                <Button
+                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
+                  placeholder={undefined}
+                  onClick={handleOpenEdit}>
+                  <PencilFill /> Chỉnh sửa thông tin
+                </Button>
 
-              <Button
-                placeholder={undefined}
-                className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
-                <PersonCheckFill className="text-base" />
-                Yêu cầu xét duyệt
-              </Button>
-            </div>
-          ) : (
-            <div className="flex gap-3">
-              <Button
-                className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-4"
-                placeholder={undefined}
-                onClick={handleOpenEdit}>
-                Hủy
-              </Button>
+                <Button
+                  onClick={onSendRequest}
+                  placeholder={undefined}
+                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
+                  <PersonCheckFill className="text-base" />
+                  Yêu cầu xét duyệt
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <Button
+                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-4"
+                  placeholder={undefined}
+                  onClick={handleOpenEdit}>
+                  Hủy
+                </Button>
 
-              <Button
-                type="submit"
-                className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-4"
-                placeholder={undefined}>
-                Cập nhật
-              </Button>
-            </div>
-          ))
-        }
+                <Button
+                  type="submit"
+                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-4"
+                  placeholder={undefined}>
+                  Cập nhật
+                </Button>
+              </div>
+            ))}
         </div>
 
         {/* About me */}

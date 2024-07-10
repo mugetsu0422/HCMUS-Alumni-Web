@@ -32,6 +32,8 @@ export default function Page() {
     if (!tagNames) return []
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
+  const userId = Cookies.get('userId')
+  const [userAvatar, setUserAvatar] = useState('')
 
   const resetCurPage = () => {
     params.delete('page')
@@ -106,25 +108,36 @@ export default function Page() {
 
   useEffect(() => {
     // Posts list
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel${myParams}`, {
+    const postsPrmoise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel${myParams}`,
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then(({ data: { totalPages, posts } }) => {
-        setTotalPages(totalPages)
-        setPosts(posts)
-        setHasMore(totalPages > 1)
+      }
+    )
 
+    const userPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([postsPrmoise, userPromise])
+      .then(([postsPromise, userPromise]) => {
+        setTotalPages(postsPromise.data.totalPages)
+        setPosts(postsPromise.data.posts)
+        setHasMore(totalPages > 1)
+        setUserAvatar(userPromise.data?.user?.avatarUrl)
         setIsLoading(false)
       })
       .catch((err) => {})
-  }, [myParams])
+  }, [myParams, userId])
 
   return (
     <>
-      
       <Thumbnail />
       <div className="mt-4 mb-8 max-w-[850px] w-[80%] m-auto flex flex-col gap-6">
         <SearchAndFilter
@@ -137,7 +150,7 @@ export default function Page() {
             title: params.get('title'),
           }}
         />
-        <CreatePost />
+        <CreatePost userAvatar={userAvatar} />
         {!isLoading && (
           <InfiniteScroll
             dataLength={posts.length}

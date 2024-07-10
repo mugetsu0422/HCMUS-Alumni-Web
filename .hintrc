@@ -1,13 +1,8 @@
 {
-  "extends": [
-    "development"
-  ],
+  "extends": ["development"],
   "hints": {
     "axe/forms": "off",
-<<<<<<< HEAD
-    "axe/parsing": "off"
-=======
+    "axe/parsing": "off",
     "no-inline-styles": "off"
->>>>>>> c0c38b9d154d3966670b5f3bb650d247ffbb0839
   }
 }

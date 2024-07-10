@@ -17,16 +17,18 @@ import Link from 'next/link'
 import { ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faBell,
-  faEnvelope,
+  faRightFromBracket,
   faNewspaper,
   faCalendarDays,
   faCertificate,
-  faComments,
-  faUserPen,
   faUser,
+  faCircleUser,
 } from '@fortawesome/free-solid-svg-icons'
 import { inter } from '../../fonts'
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import { JWT_COOKIE } from '@/app/constant'
+import { useRouter } from 'next/navigation'
 
 // nav list component
 const navListItems = [
@@ -80,6 +82,9 @@ const navListItems = [
 
 function NavListMenu({ label, icon, navListMenuItems }) {
   const [isMobile, setIsMobile] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
+  const [openSubMenuMobile, setOpenSubMenuMobile] = useState(false)
 
   useEffect(() => {
     window.addEventListener(
@@ -87,10 +92,6 @@ function NavListMenu({ label, icon, navListMenuItems }) {
       () => (window.innerWidth >= 960 ? setIsMobile(false) : setIsMobile(true)) // 960 = lg (tailwind)
     )
   }, [isMobile])
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
-  const [openSubMenuMobile, setOpenSubMenuMobile] = useState(false)
 
   const renderItemsForWeb = navListMenuItems.map(({ title, link, subMenu }) => {
     return subMenu ? (
@@ -255,9 +256,23 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
-  //const [message, setMessage] = React.useState('')
+  const userId = Cookies.get('userId')
+  const [userAvatar, setUserAvatar] = React.useState('')
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
+
+  const router = useRouter()
+
+  const handleLogout = () => {
+    // Clear the cookies
+    Cookies.remove('userId')
+    Cookies.remove('jwt')
+    Cookies.remove('permissions')
+    alert('ok')
+
+    // Redirect to sign-in page
+    router.push('/signin')
+  }
 
   useEffect(() => {
     window.addEventListener(
@@ -265,6 +280,19 @@ export default function MyNavbar() {
       () => window.innerWidth >= 960 && setIsNavOpen(false) // 960 = lg (tailwind)
     )
   }, [isNavOpen])
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(({ data }) => {
+        setUserAvatar(data?.user?.avatarUrl)
+      })
+      .catch((error) => {})
+  }, [])
 
   return (
     <Navbar
@@ -311,25 +339,40 @@ export default function MyNavbar() {
         /> */}
 
         <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
-          <Badge content={2} color="blue">
-            <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon
-                icon={faBell}
-                className="text-2xl text-[--text-navbar]"
-              />
-            </Button>
-          </Badge>
+          <Menu>
+            <MenuHandler>
+              <Button
+                placeholder={undefined}
+                variant="text"
+                size="sm"
+                className="p-0 rounded-full">
+                <Avatar placeholder={undefined} src={userAvatar} alt="avatar" />
+              </Button>
+            </MenuHandler>
+            <MenuList placeholder={undefined}>
+              <MenuItem placeholder={undefined}>
+                <Link
+                  href={`/profile/${userId}/about`}
+                  className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
+                  Trang cá nhân
+                </Link>
+              </MenuItem>
 
-          <Badge content={2} color="blue">
-            <Button placeholder={undefined} variant="text" size="sm">
-              <FontAwesomeIcon
-                icon={faEnvelope}
-                className="text-2xl text-[--text-navbar] "
-              />
-            </Button>
-          </Badge>
-
-          <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+              <MenuItem placeholder={undefined}>
+                <Button
+                  placeholder={undefined}
+                  onClick={() => handleLogout()}
+                  variant="text">
+                  <FontAwesomeIcon
+                    icon={faRightFromBracket}
+                    className="text-xl"
+                  />
+                  Đăng xuất
+                </Button>
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </div>
       </div>
 
