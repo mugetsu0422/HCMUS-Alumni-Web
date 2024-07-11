@@ -150,7 +150,7 @@ function AvatarAndCoverUser({ register, getValues, user, isProfileLoginUser }) {
       <div className="mt-6 flex justify-between items-center ml-[24vw] md:ml-[16vw] xl:ml-[17vw] 2xl:ml-[17%]">
         <div className="flex flex-col">
           <p className="text-[28px] font-bold flex items-center gap-2">
-            {user?.fullName}
+            {user?.user?.fullName}
             {user?.alumniVerification?.status === 'APPROVED' ? (
               <Tooltip
                 className="bg-[--blue-05] mt-1"
@@ -222,7 +222,7 @@ export default function GroupLayout({
         },
       })
       .then(({ data }) => {
-        setUser(data.user)
+        setUser(data)
         setCroppedAvatar(
           data?.user?.avatarUrl === null
             ? '/placeholderImage.png'

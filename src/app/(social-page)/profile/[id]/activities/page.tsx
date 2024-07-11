@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import React, { useState, useEffect } from 'react'
-import { Button } from '@material-tailwind/react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Button, Spinner } from '@material-tailwind/react'
 import { Star, GeoAltFill, Clock, BarChartFill } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import axios from 'axios'
@@ -10,6 +10,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { JWT_COOKIE, POST_STATUS } from '@/app/constant'
 import moment from 'moment'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 function EventListItem({ event }) {
   return (
@@ -87,10 +88,32 @@ export default function Page() {
   const params = new URLSearchParams(searchParams)
   const [joinedEvents, setJoinedEvent] = useState([])
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
+  const curPage = useRef(0)
   const [totalPages, setTotalPages] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
 
-  // News list
+  const onFetchMore = () => {
+    curPage.current++
+    if (curPage.current >= totalPages) {
+      setHasMore(false)
+      return
+    }
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated${myParams}&statusId=${POST_STATUS['Bình thường']}&page=${curPage.current}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { events } }) => {
+        setJoinedEvent(joinedEvents.concat(events))
+      })
+      .catch((err) => {})
+  }
+
   useEffect(() => {
     axios
       .get(
@@ -116,9 +139,19 @@ export default function Page() {
         </p>
         <div className="w-full flex flex-col gap-4">
           {joinedEvents?.length > 0 ? (
-            joinedEvents?.map((event) => (
-              <EventListItem key={event.id} event={event} />
-            ))
+            <InfiniteScroll
+              dataLength={joinedEvents.length}
+              next={onFetchMore}
+              hasMore={hasMore}
+              loader={
+                <div className="h-10 flex justify-center ">
+                  <Spinner className="h-8 w-8"></Spinner>
+                </div>
+              }>
+              {joinedEvents?.map((event) => (
+                <EventListItem key={event.id} event={event} />
+              ))}
+            </InfiniteScroll>
           ) : (
             <div className="flex items-center gap-2">
               <Star className="text-[20px] lg:text-[24px]" /> Không có hoạt động

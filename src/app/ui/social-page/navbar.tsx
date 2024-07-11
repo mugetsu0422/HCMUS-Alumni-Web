@@ -11,7 +11,6 @@ import {
   Menu,
   MenuHandler,
   MenuList,
-  Typography,
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -26,6 +25,7 @@ import {
   faRightFromBracket,
   faCircleUser,
   faUserGroup,
+  faUserPen,
 } from '@fortawesome/free-solid-svg-icons'
 import { ChatDotsFill } from 'react-bootstrap-icons'
 import NotificationPopover from '../common/notification-popover'
@@ -108,6 +108,10 @@ export default function MyNavbar() {
   const permissions = Cookies.get('permissions')
 
   const router = useRouter()
+
+  const checkPermissions = () => {
+    return permissions.split(',').includes('AlumniVerify.Read')
+  }
 
   const handleLogout = () => {
     // Clear the cookies
@@ -200,6 +204,15 @@ export default function MyNavbar() {
                   Trang cá nhân
                 </Link>
               </MenuItem>
+
+              {checkPermissions && (
+                <MenuItem placeholder={undefined}>
+                  <Link href={`/admin`} className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faUserPen} className="text-xl" />
+                    Admin
+                  </Link>
+                </MenuItem>
+              )}
 
               <MenuItem placeholder={undefined} onClick={handleLogout}>
                 <FontAwesomeIcon

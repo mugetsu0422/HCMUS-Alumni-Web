@@ -60,7 +60,6 @@ export default function Page() {
         },
       })
       .then(({ data }) => {
-        console.log(data)
         setUser(data)
         setValue('fullName', data.user.fullName)
         setValue('socialMediaLink', data.user.socialMediaLink)
@@ -132,7 +131,7 @@ export default function Page() {
       socialMediaLink: user?.user?.socialMediaLink,
     }
     axios
-      .put(
+      .post(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
         verification,
         {
@@ -141,7 +140,7 @@ export default function Page() {
           },
         }
       )
-      .then(() => toast.success('Cập nhật thành tựu thành công'))
+      .then(() => toast.success('Gửi yêu cầu xét duyệt lại thành công'))
       .catch((error) => {
         toast.error(
           error.response?.data?.error?.message || 'Lỗi không xác định'
@@ -170,13 +169,17 @@ export default function Page() {
                   <PencilFill /> Chỉnh sửa thông tin
                 </Button>
 
-                <Button
-                  onClick={onSendRequest}
-                  placeholder={undefined}
-                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
-                  <PersonCheckFill className="text-base" />
-                  Yêu cầu xét duyệt
-                </Button>
+                {user?.alumniVerification?.status === 'APPROVED' ? (
+                  ' '
+                ) : (
+                  <Button
+                    onClick={onSendRequest}
+                    placeholder={undefined}
+                    className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
+                    <PersonCheckFill className="text-base" />
+                    Yêu cầu xét duyệt
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="flex gap-3">
