@@ -37,6 +37,7 @@ export const NOTIFICATION_STATUS = {
   Xóa: 3,
 }
 export const NOTIFICATION_ENTITY_TABLE = [
+  'friend',
   'request_friend',
   'comment_news',
   'comment_event',
@@ -46,7 +47,7 @@ export const NOTIFICATION_ENTITY_TABLE = [
   'request_join_group',
   'interact_post_group',
   'comment_post_group',
-  'message'
+  'message',
 ] as const
 export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
