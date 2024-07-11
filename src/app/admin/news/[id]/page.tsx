@@ -90,6 +90,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const news = {
       title: data.title,
       thumbnail: data.thumbnail[0] || null,
+      summary: data.summary,
       tagNames: selectedTags
         .map((tag) => {
           return tag.value

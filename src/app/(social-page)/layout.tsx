@@ -1,13 +1,14 @@
 import '../globals.css'
 import Navbar from '../ui/social-page/navbar'
+import { Provider } from 'react-redux'
 
 export default function RootLayout({ children }) {
   return (
-    <div className="flex flex-col">
-      <div className="relative">
-        <Navbar />
-      </div>
-      <main className="relative ">{children}</main>
-    </div>
+    <>
+      <Navbar />
+      <main className="">
+        {children}
+      </main>
+    </>
   )
 }
