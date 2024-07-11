@@ -57,7 +57,11 @@ class NotificationUrlBuilder {
     } else if (type === 'UPDATE') {
       return `#`
     } else if (type === 'DELETE') {
-      return `profile/${this.notification.entityId}/about`
+      switch (entityTable) {
+        case 'friend':
+        case 'request_friend':
+          return `profile/${this.notification.entityId}/about`
+      }
     }
   }
 
