@@ -19,8 +19,8 @@ export default function GroupLayout({
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState(() => {
     const parts = pathname.split('/')
-    if (parts[3] === undefined || parts[3] === 'posts') return ''
-    return parts[3]
+    if (parts[2] === undefined || parts[2] === 'posts') return ''
+    return parts[2]
   })
 
   const handleClickTab = (url) => {

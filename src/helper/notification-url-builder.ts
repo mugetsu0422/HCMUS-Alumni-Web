@@ -38,6 +38,7 @@ export class NotificationUrlBuilder {
   }
 
   private NOTIFICATION_ENTITY_TABLE_MAPPING: NotificationEntityTableMapping = {
+    friend: 'user',
     request_friend: 'user',
     comment_news: 'news',
     comment_event: 'events',
@@ -80,14 +81,21 @@ export class NotificationUrlBuilder {
     if (type === 'CREATE') {
       switch (entityTable) {
         case 'request_friend':
-          return `#`
+          return `/friends/requests`
+        case 'friend':
+          return `profile/${this.notification.entityId}/about`
         default:
           return '#'
       }
     } else if (type === 'UPDATE') {
       return `#`
     } else if (type === 'DELETE') {
-      return `#`
+      switch (entityTable) {
+        case 'request_friend':
+          return `profile/${this.notification.entityId}/about`
+            default:
+          return '#'
+      }
     }
   }
 
