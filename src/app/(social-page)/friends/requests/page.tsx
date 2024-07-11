@@ -8,7 +8,7 @@ import Link from 'next/link'
 import SearchAndFilterFriends from '../../../ui/social-page/friends/SearchAndFilterFriend'
 import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'

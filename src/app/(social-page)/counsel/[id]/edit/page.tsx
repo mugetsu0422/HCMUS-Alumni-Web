@@ -15,7 +15,7 @@ import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import NotFound404 from '@/app/ui/common/not-found-404'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 export default function Page({ params }: { params: { id: string } }) {
   const {

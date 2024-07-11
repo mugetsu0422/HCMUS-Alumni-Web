@@ -39,6 +39,7 @@ export default function Page() {
   const part = pathname.split('/')
   const isProfileLoginUser = userId === part[2]
   const [dob, setDob] = useState(null)
+  const [isMounted, setIsMounted] = useState(false)
 
   const {
     register,
@@ -131,7 +132,7 @@ export default function Page() {
       socialMediaLink: user?.user?.socialMediaLink,
     }
     axios
-      .post(
+      .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
         verification,
         {
@@ -148,6 +149,14 @@ export default function Page() {
       })
   }
 
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
+
+  if (!isMounted) return null
   return (
     <div className="overflow-x-auto scrollbar-webkit-main">
       {/* Thông tin cá nhân */}

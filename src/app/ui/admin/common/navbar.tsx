@@ -85,7 +85,7 @@ const navListItems = [
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {
-  const { toggleIsNavOpen } = useContext(NavbarContext)
+  const { isNavOpen, toggleIsNavOpen } = useContext(NavbarContext)
   const [isMobile, setIsMobile] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
@@ -123,7 +123,9 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
           {subMenu.map(({ title, link }) => (
             <Link
-              onClick={toggleIsNavOpen}
+              onClick={() => {
+                if (isNavOpen) toggleIsNavOpen()
+              }}
               href={link}
               key={title}
               className="focus-visible:outline-none">
@@ -172,7 +174,9 @@ function NavListMenu({ label, icon, navListMenuItems }) {
             className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
             {subMenu.map(({ title, link }) => (
               <Link
-                onClick={toggleIsNavOpen}
+                onClick={() => {
+                  if (isNavOpen) toggleIsNavOpen()
+                }}
                 href={link}
                 key={title}
                 className="focus-visible:outline-none">
@@ -237,7 +241,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
 }
 
 function NavList() {
-  const { toggleIsNavOpen } = useContext(NavbarContext)
+  const { isNavOpen, toggleIsNavOpen } = useContext(NavbarContext)
 
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
@@ -247,7 +251,9 @@ function NavList() {
             <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
-              onClick={toggleIsNavOpen}
+              onClick={() => {
+                if (isNavOpen) toggleIsNavOpen()
+              }}
               href={link}
               className={`text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2`}>
               <MenuItem
@@ -303,12 +309,14 @@ export default function MyNavbar() {
         setUserAvatar(data?.user?.avatarUrl)
       })
       .catch((error) => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <NavbarContext.Provider
       value={{
         toggleIsNavOpen,
+        isNavOpen,
       }}>
       <Navbar
         placeholder={undefined}
@@ -352,7 +360,7 @@ export default function MyNavbar() {
           /> */}
           <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
             <NotificationPopover />
-            <Link href={`messages/inbox`}>
+            <Link href={`/messages/inbox`} className="group">
               <Button
                 placeholder={undefined}
                 className="h-full w-full"
@@ -363,7 +371,7 @@ export default function MyNavbar() {
                   content={unreadInboxSet.length}
                   className="bg-[var(--blue-05)]">
                   <div className="h-[24px] w-[24px]">
-                    <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                    <ChatDotsFill className="h-full w-full text-[--text-navbar] group-hover:text-[--blue-05]" />
                   </div>
                 </Badge>
               </Button>

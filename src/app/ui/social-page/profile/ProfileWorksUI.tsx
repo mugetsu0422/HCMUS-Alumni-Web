@@ -24,6 +24,7 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 export function DialogAddWorks({
   openDialogAddWorks,
   handleOpenDialogAddWorks,
+  onAddJob,
 }) {
   const {
     register,
@@ -46,18 +47,7 @@ export function DialogAddWorks({
       isWorking: data.isWorking,
     }
 
-    axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/job`, job, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(() => toast.success('Thêm công việc thành công'))
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+    onAddJob(job)
   }
 
   return (

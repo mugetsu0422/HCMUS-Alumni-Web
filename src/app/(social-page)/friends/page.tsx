@@ -16,7 +16,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -147,7 +147,6 @@ export default function Page() {
 
   return (
     <div>
-      <CustomToaster />
       <SearchAndFilterFriends
         onSearch={onSearch}
         params={{

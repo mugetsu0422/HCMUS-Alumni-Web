@@ -23,7 +23,7 @@ import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import { useRouter } from 'next/navigation'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page({ params }: { params: { id: string } }) {

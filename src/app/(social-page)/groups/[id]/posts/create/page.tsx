@@ -18,7 +18,7 @@ import { ReactTags } from 'react-tag-autocomplete'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { JWT_COOKIE, TAGS_LIMIT } from '@/app/constant'
 import ErrorInput from '@/app/ui/error-input'
 import { nunito } from '@/app/ui/fonts'

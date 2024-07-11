@@ -24,7 +24,6 @@ import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
-import CustomToaster from '../../common/custom-toaster'
 import Tag from '../../common/tag'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {

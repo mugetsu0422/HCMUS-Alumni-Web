@@ -70,7 +70,7 @@ export const PROFILE_TABS = [
   },
   {
     label: 'Hoạt động',
-    url: 'activities ',
+    url: 'activities',
   },
 ]
 

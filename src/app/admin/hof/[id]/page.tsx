@@ -21,7 +21,7 @@ import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page({ params }: { params: { id: string } }) {

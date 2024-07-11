@@ -12,7 +12,7 @@ import { roboto } from '../../ui/fonts'
 import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import toast, { Toaster } from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 export default function Page() {
   const pathname = usePathname()

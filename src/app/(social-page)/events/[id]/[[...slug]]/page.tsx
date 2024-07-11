@@ -23,7 +23,7 @@ import { XLg } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { JWT_COOKIE } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'

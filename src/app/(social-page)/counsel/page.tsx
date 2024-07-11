@@ -13,7 +13,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
 import PostListItem from '../../ui/social-page/counsel/post-list-item'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 export default function Page() {
   const pathname = usePathname()

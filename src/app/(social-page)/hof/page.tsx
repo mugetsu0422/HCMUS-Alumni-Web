@@ -16,7 +16,7 @@ import Cookies from 'js-cookie'
 import { Button, Input } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 const PAGE_SIZE = 9
 

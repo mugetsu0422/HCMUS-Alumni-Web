@@ -19,89 +19,6 @@ import NotificationItem from '@/app/ui/common/notification-item'
 import { reset } from '@/lib/features/notification/notification-counter'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 
-const data = [
-  {
-    id: '1',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: false,
-  },
-  {
-    id: '2',
-    imageUrl: '/demo.jpg',
-    content: 'Trần Phúc đã bình luận bài viết của bạn của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '3',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '4',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '5',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '6',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: false,
-  },
-  {
-    id: '7',
-    imageUrl: '/demo.jpg',
-    content: 'Trần Phúc đã bình luận bài viết của bạn của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '8',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '9',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-  {
-    id: '10',
-    imageUrl: '/demo.jpg',
-    content: 'Trương Samuel đã phản hồi bình luận của bạn.',
-    time: '2 phút trước',
-    link: '#',
-    isRead: true,
-  },
-]
-
 export default function NotificationPopover() {
   const [openNotification, setOpenNotification] = useState(false)
   const [notifications, setNotifications] = useState([])
@@ -177,7 +94,11 @@ export default function NotificationPopover() {
       open={openNotification}
       handler={popoverHandler}>
       <PopoverHandler>
-        <Button placeholder={undefined} variant="text" size="sm">
+        <Button
+          placeholder={undefined}
+          variant="text"
+          size="sm"
+          className="group">
           <Badge
             invisible={!notificationCount}
             content={notificationCount}
@@ -185,7 +106,7 @@ export default function NotificationPopover() {
             <div className="h-[24px] w-[24px]">
               <FontAwesomeIcon
                 icon={faBell}
-                className="h-full w-full text-[--text-navbar]"
+                className="h-full w-full text-[--text-navbar] group-hover:text-[--blue-05]"
               />
             </div>
           </Badge>

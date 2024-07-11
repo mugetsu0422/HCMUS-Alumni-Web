@@ -28,7 +28,7 @@ import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import Poll from '@/app/ui/common/poll'
 import {
   JWT_COOKIE,

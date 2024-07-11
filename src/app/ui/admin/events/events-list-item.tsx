@@ -17,7 +17,6 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import Link from 'next/link'
-import CustomToaster from '../../common/custom-toaster'
 import Tag from '../../common/tag'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {

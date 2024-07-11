@@ -33,7 +33,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import clsx from 'clsx'
 import Link from 'next/link'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { JWT_COOKIE, GROUP_PRIVACY, GROUP_TABS } from '@/app/constant'
 import { nunito } from '@/app/ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'

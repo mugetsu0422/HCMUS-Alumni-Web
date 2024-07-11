@@ -13,12 +13,13 @@ import WorksListItem, {
 import EducationListItem, {
   DialogAddEducation,
 } from '@/app/ui/social-page/profile/ProfileEducation'
+import toast from 'react-hot-toast'
 
 export default function Page() {
   const [openDialogAddWorks, setOpenDialogAddWorks] = useState(false)
   const [openDialogAddEducation, setOpenDialogAddEducation] = useState(false)
-  const [works, setWorks] = useState(null)
-  const [educations, setEducations] = useState(null)
+  const [works, setWorks] = useState([])
+  const [educations, setEducations] = useState([])
   const userId = Cookies.get('userId')
 
   const [coverImage, setCoverImage] = useState('')
@@ -33,6 +34,25 @@ export default function Page() {
 
   function handleOpenDialogAddEducation() {
     setOpenDialogAddEducation((e) => !e)
+  }
+
+  const onAddJob = (job) => {
+    axios
+      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/job`, job, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
+      .then(() => {
+        toast.success('Thêm công việc thành công')
+        handleOpenDialogAddWorks()
+        setWorks((prev) => prev.concat(job))
+      })
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
   }
 
   useEffect(() => {
@@ -79,7 +99,7 @@ export default function Page() {
         )}
 
         {works?.length > 0 ? (
-          works?.map(
+          works.map(
             ({
               jobId,
               companyName,
@@ -110,6 +130,7 @@ export default function Page() {
       <DialogAddWorks
         openDialogAddWorks={openDialogAddWorks}
         handleOpenDialogAddWorks={handleOpenDialogAddWorks}
+        onAddJob={onAddJob}
       />
 
       <div className="w-full flex flex-col gap-4 mt-4">

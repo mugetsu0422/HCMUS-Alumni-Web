@@ -10,7 +10,7 @@ import Cookies from 'js-cookie'
 import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'
 import { useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 export default function Page() {
   const status = 'pending'

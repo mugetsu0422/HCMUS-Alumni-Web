@@ -25,7 +25,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import ChangeAvatarUser from '@/app/ui/social-page/profile/ChangeAvatarUser'
 import ChangeCoverUser from '@/app/ui/social-page/profile/ChangeCoverUser'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { JWT_COOKIE } from '@/app/constant'
 
 const FormContext = createContext(null)
@@ -39,6 +39,7 @@ function AvatarAndCoverUser({ register, getValues, user, isProfileLoginUser }) {
     setCoverImage,
   } = useContext(FormContext)
 
+  const [isMounted, setIsMounted] = useState(false)
   const [openChangeCover, setOpenChangeCover] = useState(false)
   const handleOpenChangeCover = () => {
     setOpenChangeCover((e) => !e)
@@ -71,6 +72,13 @@ function AvatarAndCoverUser({ register, getValues, user, isProfileLoginUser }) {
       })
   }
 
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
+
   const handleChangeCover = () => {
     const formData = new FormData()
     formData.append('cover', getValues('cover')[0]) // Ensure this is a File object
@@ -98,14 +106,13 @@ function AvatarAndCoverUser({ register, getValues, user, isProfileLoginUser }) {
 
   return (
     <div className="relative">
-      <CustomToaster />
       <figure className="relative h-40 xl:h-96 w-full">
         <img
           src={coverImage}
           alt="user cover"
           className="w-full h-40 xl:h-96 object-cover object-center"
         />
-        {isProfileLoginUser && (
+        {isMounted && isProfileLoginUser && (
           <figcaption className="absolute bottom-0 left-2/4 flex justify-end w-full -translate-x-2/4 py-2 px-4">
             <Button
               placeholder={undefined}

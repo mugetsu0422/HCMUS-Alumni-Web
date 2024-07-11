@@ -22,7 +22,7 @@ import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 export default function Page() {
   const router = useRouter()

@@ -17,7 +17,6 @@ import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
-import CustomToaster from '../../common/custom-toaster'
 
 type Role = {
   id: number
