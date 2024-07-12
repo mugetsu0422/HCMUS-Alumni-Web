@@ -16,7 +16,7 @@ import React, { useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Cookies from 'js-cookie'
 import NotificationItem from '@/app/ui/common/notification-item'
-import { reset } from '@/lib/features/notifications/notification-counter'
+import { reset } from '@/lib/features/notification/notification-counter'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 
 const data = [

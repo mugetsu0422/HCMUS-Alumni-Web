@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 export const SALT = 15
 import Introduce from './ui/social-page/groups/introduce'
+=======
+>>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
 export const EMAIL_ACTIVATION_CODE_TIMER = 59000 // 59s
 export const JWT_COOKIE = 'jwt'
 export const JWT_EXPIRED_TIME = 3 // 3 days
@@ -10,6 +13,7 @@ export const CHILDREN_COMMENTS_PAGE_SIZE = 50
 export const REACTION_PAGE_SIZE = 50
 export const TAGS_LIMIT = 5
 export const VOTE_OPTIONS_LIMIT = 10
+export const MESSAGE_PAGE_SIZE = 20
 export const FACULTIES = [
   { id: '1', name: 'Công nghệ Thông tin' },
   { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
@@ -42,6 +46,7 @@ export const NOTIFICATION_STATUS = {
   Xóa: 3,
 }
 export const NOTIFICATION_ENTITY_TABLE = [
+  'friend',
   'request_friend',
   'comment_news',
   'comment_event',
@@ -51,6 +56,7 @@ export const NOTIFICATION_ENTITY_TABLE = [
   'request_join_group',
   'interact_post_group',
   'comment_post_group',
+  'message',
 ] as const
 export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
@@ -120,6 +126,7 @@ export const FRIEND_TABS = [
     url: 'requests',
   },
 ]
+<<<<<<< HEAD
 
 export const PROFILE_ACTIVITIES_TABS = [
   {
@@ -142,3 +149,12 @@ export const PROFILE_COUNSEL_TABS = [
     url: 'counsel-comments',
   },
 ]
+=======
+export const MESSAGE_TYPE = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  VIDEO: 'VIDEO',
+  SOUND: 'SOUND',
+}
+>>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0

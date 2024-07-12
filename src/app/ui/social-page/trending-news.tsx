@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import Image from 'next/image'
+import Link from 'next/link'
 /* eslint-disable @next/next/no-img-element */
 const dataTempSmall = [
   {
@@ -23,21 +23,21 @@ const dataTempSmall = [
   },
 ]
 
-function SmallTrendingNews() {
+function SmallTrendingNews({ news }) {
   return (
-    <div className="flex flex-col gap-6">
-      {dataTempSmall.map(({ title, detail, imgSrc }, idx) => (
-        <div className="flex gap-x-4 sm:h-44 2xl:h-36 cursor-pointer" key={idx}>
-          <Image
-            src={imgSrc}
-            width={240}
-            height={0}
-            alt="image news"
-            className="rounded-md "
-          />
-          <div className="w-[16rem] flex flex-col items-center justify-center">
+    <div className="relative flex-1 flex flex-col justify-between w-[60%] gap-6 h-full ">
+      {news.slice(1, 4).map(({ id, title, summary, thumbnail }) => (
+        <div className="flex gap-x-4 sm:h-44 2xl:h-36" key={id}>
+          <Link href={`/news/${id}`} key={id}>
+            <img
+              src={thumbnail}
+              alt="image news"
+              className="rounded-md w-[240px] h-full"
+            />
+          </Link>
+          <div className="w-[18rem] flex flex-col items-start justify-center">
             <p className="sm:sm md:text-lg font-bold">{title}</p>
-            <p className="text-xs">{detail}</p>
+            <p className="text-xs">{summary}</p>
           </div>
         </div>
       ))}
@@ -45,33 +45,35 @@ function SmallTrendingNews() {
   )
 }
 
-function BigTrendingNews() {
+function BigTrendingNews({ news }) {
   return (
-    <figure className="relative right-0 w-fit sm:h-[300px] 2xl:h-[600px] m-auto">
-      <Image
-        className="sm:h-[300px] 2xl:h-[600px] sm:w-[500px] 2xl:w-full rounded-xl object-cover object-center"
-        src="/authentication.png"
-        alt="nature image"
-        width={780}
-        height={600}
-      />
-      <figcaption className="absolute bottom-0 left-2/4 flex 2xl:w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-2xl text-white`}>
-          Ethiopian runners took the top four spots.
+    <div className="relative w-[45%] h-full max-h-[480px] flex flex-1">
+      {news.slice(0, 1).map(({ id, title, summary, thumbnail }) => (
+        <div key={id} className="flex flex-col gap-3">
+          <Link href={`/news/${id}`} className="h-full">
+            <img
+              className="w-full h-full rounded-xl object-cover object-center relative"
+              src={thumbnail}
+              alt="nature image"
+            />
+          </Link>
+          <div className={`text-xl text-black font-bold`}>{title}</div>
+          <p className="text-sm">{summary}</p>
         </div>
-      </figcaption>
-    </figure>
+      ))}
+    </div>
   )
 }
 
-export default function TrendingNews() {
+export default function TrendingNews({ news }) {
   return (
-    <div className="xl:flex-row sm:flex-col sm:justify-between sm:items-center xl:items-stretch flex w-fit h-fit bg-[#ebeef3] rounded-md ">
-      <div className="w-fit h-[45%] pl-8 pr-4 py-6 gap-y-8 flex flex-col">
-        <p className="text-3xl leading-9 font-extrabold">Tin nổi bật </p>
-        <SmallTrendingNews />
+    <div className="relative flex-1 flex-col sm:justify-between sm:items-center xl:items-stretch flex w-full h-[660px] bg-[#ebeef3] rounded-md p-6">
+      <p className="text-3xl leading-9 font-extrabold">Tin nổi bật </p>
+      <div className="relative w-full h-[70%] gap-8 flex justify-between mt-2">
+        <BigTrendingNews news={news} />
+
+        <SmallTrendingNews news={news} />
       </div>
-      <BigTrendingNews />
     </div>
   )
 }

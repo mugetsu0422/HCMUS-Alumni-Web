@@ -1,8 +1,8 @@
 'use client'
 import NotificationToast from '@/app/ui/common/notification-toast'
-import firebaseApp from '@/config/firebase'
+import firebaseApp from '@/config/notification/firebase'
 import useFcmToken from '@/hooks/use-fcm-token'
-import { increment } from '@/lib/features/notifications/notification-counter'
+import { increment } from '@/lib/features/notification/notification-counter'
 import { useAppDispatch } from '@/lib/hooks'
 import { getMessaging, onMessage } from 'firebase/messaging'
 import { useEffect } from 'react'
@@ -21,8 +21,9 @@ export default function FirebaseForeground() {
       if (notificationPermissionStatus === 'granted') {
         const messaging = getMessaging(firebaseApp)
         const unsubscribe = onMessage(messaging, (payload) => {
-          dispatch(increment())
           const notification = JSON.parse(payload.data.body)
+          if (notification.entityTable === 'message') return
+          dispatch(increment())
           toast.custom(
             <NotificationToast
               notification={notification}

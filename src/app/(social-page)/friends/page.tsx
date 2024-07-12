@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import {
   Avatar,
   Button,
@@ -8,45 +8,46 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Spinner,
 } from '@material-tailwind/react'
 import Link from 'next/link'
 import SearchAndFilterFriends from '@/app/ui/social-page/friends/SearchAndFilterFriend'
 import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { JWT_COOKIE } from '@/app/constant'
+import Cookies from 'js-cookie'
+import CustomToaster from '@/app/ui/common/custom-toaster'
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
-const PAGE_SIZE = 9
-
-const friends = [
-  {
-    id: '1',
-    fullName: 'Trương Samuel',
-    avatarUrl: 'demo.jpg',
-  },
-  {
-    id: '2',
-    fullName: 'Trần Hồng Minh Phúc',
-    avatarUrl: 'demo.jpg',
-  },
-  {
-    id: '3',
-    fullName: 'Huỳnh Cao Nguyên',
-    avatarUrl: 'demo.jpg',
-  },
-  {
-    id: '4',
-    fullName: 'Đặng Nguyễn Duy',
-    avatarUrl: 'demo.jpg',
-  },
-]
-
-function FriendListItem({ id, fullName, avatarUrl }) {
+function FriendListItem({ friend }) {
+  const handleDeleteFriend = () => {
+    axios
+      .delete(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/friends/${friend.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Xóa bạn bè thành công')
+      })
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
+  }
   return (
     <div className="flex justify-between w-[80%] m-auto items-center">
       <div className="flex items-center gap-2">
-        <Link href={`/profile/${id}/about`}>
-          <Avatar size="lg" src={avatarUrl} placeholder={undefined} />
+        <Link href={`/profile/${friend.id}/about`}>
+          <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
         </Link>
-        <p>{fullName}</p>
+        <p>{friend.fullName}</p>
       </div>
       <Menu placement="bottom-end">
         <MenuHandler>
@@ -59,7 +60,8 @@ function FriendListItem({ id, fullName, avatarUrl }) {
         <MenuList placeholder={undefined}>
           <MenuItem
             placeholder={undefined}
-            className="flex items-center gap-1 text-black py-3 bg-white">
+            className="flex items-center gap-1 text-black py-3 bg-white"
+            onClick={handleDeleteFriend}>
             Hủy bạn bè
           </MenuItem>
         </MenuList>
@@ -69,87 +71,105 @@ function FriendListItem({ id, fullName, avatarUrl }) {
 }
 
 export default function Page() {
-  const router = useRouter()
   const pathname = usePathname()
   const { replace } = useRouter()
   const searchParams = useSearchParams()
   const params = new URLSearchParams(searchParams)
-  const [curPage, setCurPage] = useState(Number(params.get('page')) + 1 || 1)
+  const curPage = useRef(0)
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
-
-  const onChangeMyParams = () => {
-    setMyParams(`?pageSize=${PAGE_SIZE}&${params.toString()}`)
-  }
+  const [listFriend, setListFriend] = useState([])
+  const userId = Cookies.get('userId')
+  const [totalPages, setTotalPages] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
   const resetCurPage = () => {
     params.delete('page')
-    setCurPage(1)
+    curPage.current = 0
+    setHasMore(true)
   }
 
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
-      params.set('title', keyword)
+      params.set('fullName', keyword)
     } else {
-      params.delete('title')
+      params.delete('fullName')
     }
     resetCurPage()
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
   }, 500)
 
-  const onFilterFaculties = (facultyId: string) => {
-    if (facultyId != '0') {
-      params.set('facultyId', facultyId)
-    } else {
-      params.delete('facultyId')
+  const onFetchMore = () => {
+    curPage.current++
+    if (curPage.current >= totalPages) {
+      setHasMore(false)
+      return
     }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/friends${myParams}&page=${curPage.current}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { friends } }) => {
+        setListFriend(listFriend.concat(friends))
+      })
+      .catch((err) => {})
   }
 
-  const onResetFilter = () => {
-    params.delete('facultyId')
-    params.delete('tagNames')
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    setMyParams(`?${params.toString()}`)
-  }
-
-  const onFilterBeginningYear = useDebouncedCallback((beginningYear) => {
-    if (beginningYear) {
-      params.set('beginningYear', beginningYear)
-    } else {
-      params.delete('beginningYear')
-    }
-    resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
-    onChangeMyParams()
-  }, 500)
+  useEffect(() => {
+    // Friends list
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/friends${myParams}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { totalPages, friends } }) => {
+        if (!totalPages) {
+          setHasMore(false)
+          return
+        }
+        setListFriend(friends)
+        setTotalPages(totalPages)
+        setIsLoading(false)
+      })
+      .catch((error) => {})
+  }, [myParams])
 
   return (
     <div>
+      <CustomToaster />
       <SearchAndFilterFriends
         onSearch={onSearch}
-        onFilter={onFilterFaculties}
-        onResetFilter={onResetFilter}
-        onFilterBeginningYear={onFilterBeginningYear}
         params={{
-          name: params.get('name'),
-          facultyId: params.get('facultyId'),
-          beginningYear: params.get('beginningYear'),
+          fullName: params.get('fullName'),
         }}
       />
-
       <div className="flex flex-col gap-4 mt-6">
-        {friends.map(({ id, fullName, avatarUrl }) => (
-          <FriendListItem
-            id={id}
-            key={id}
-            fullName={fullName}
-            avatarUrl={avatarUrl}
-          />
-        ))}
+        {!isLoading && (
+          <InfiniteScroll
+            dataLength={listFriend.length}
+            next={onFetchMore}
+            hasMore={hasMore}
+            loader={
+              <div className="h-10 flex justify-center ">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            }>
+            {listFriend.map(({ friend }) => (
+              <FriendListItem key={friend.id} friend={friend} />
+            ))}
+          </InfiniteScroll>
+        )}
       </div>
     </div>
   )

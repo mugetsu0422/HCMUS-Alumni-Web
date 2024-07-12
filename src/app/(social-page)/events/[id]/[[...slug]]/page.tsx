@@ -488,7 +488,7 @@ export default function Page({
             <p className="lg:text-[26px] sm:text-lg font-extrabold">
               Thông tin chi tiết
             </p>
-            <p className="text-pretty text-base">{event?.content}</p>
+            <p className="text-pretty text-base whitespace-pre-line">{event?.content}</p>
           </div>
         </div>
 

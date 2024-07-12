@@ -81,9 +81,7 @@ export default function Page() {
       .then(({ data: { totalPages, groups: addedGroups } }) => {
         setGroups(groups.concat(addedGroups))
       })
-      .catch((error) => {
-        console.log(error.response?.data?.error?.message || 'Lỗi không xác định')
-      })
+      .catch((error) => {})
   }
   const onJoinGroup = (groupId: string): Promise<AxiosResponse<any, any>> => {
     return axios.post(
@@ -112,14 +110,11 @@ export default function Page() {
         setGroups(groups)
         setHasMore(totalPages > 1)
       })
-      .catch((error) => {
-        console.log(error.response?.data?.error?.message || 'Lỗi không xác định')
-      })
+      .catch((error) => {})
   }, [myParams])
 
   return (
     <>
-      
       <Thumbnail />
       <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
         <div className="flex justify-between">

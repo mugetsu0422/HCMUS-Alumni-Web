@@ -20,9 +20,8 @@ import Comments from '../common/comments'
 import ImageGrid from './image-grid'
 import moment from 'moment'
 import 'moment/locale/vi'
-import { useForm } from 'react-hook-form'
 import { COMMENT_PAGE_SIZE } from '../../constant'
-import { useTruncatedElement } from '../../../hooks/use-truncated-element'
+import TextareaAutosize from 'react-textarea-autosize'
 
 // interface CounselPostProps {
 //   id: string
@@ -116,7 +115,7 @@ export default function CommentsDialog({
 
       <DialogBody
         placeholder={undefined}
-        className={`${nunito.className} overflow-y-auto scrollbar-webkit-main`}>
+        className={`${nunito.className} flex-1 overflow-y-auto scrollbar-webkit-main`}>
         <div className="flex gap-2 items-center">
           <Link href="#">
             <Avatar
@@ -130,7 +129,7 @@ export default function CommentsDialog({
               {post.creator.fullName}
             </p>
             <p className="text-sm text-[--secondary]">
-              {moment(post.publishedAt).locale('vi').local().fromNow()}
+              {moment(post.publishedAt).locale('vi').local().fromNow(true)}
             </p>
           </div>
         </div>
@@ -221,27 +220,20 @@ export default function CommentsDialog({
         </div>
       </DialogBody>
 
-      <DialogFooter
-        placeholder={undefined}
-        className="sticky bottom-0 h-fit py-3 bg-white">
+      <DialogFooter placeholder={undefined} className="h-fit py-3 bg-white">
         <form
-          className="flex flex-start items-start w-full gap-2"
+          className="h-full flex flex-start items-start w-full gap-2"
           onSubmit={(e) => {
             onUploadComment(e, null, uploadComment)
             setUploadComment('')
           }}>
           <Avatar placeholder={undefined} src={'/demo.jpg'} alt="avatar user" />
-          <Textarea
-            rows={1}
-            resize={true}
+          <TextareaAutosize
+            spellCheck="false"
+            minRows={1}
+            maxRows={8}
             placeholder="Bình luận của bạn"
-            className="min-h-full !border-0 focus:border-transparent w-full !bg-[var(--comment-input)]"
-            containerProps={{
-              className: 'grid h-full',
-            }}
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
+            className="focus:border-transparent w-full bg-[var(--comment-input)] scrollbar-webkit-main resize-none p-2 px-3 rounded-xl outline-none text-black"
             value={uploadComment}
             onChange={handleUploadCommentChange}
           />

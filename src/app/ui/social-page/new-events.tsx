@@ -1,76 +1,71 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import React from 'react'
-import Image from 'next/image'
+import { Carousel, Button } from '@material-tailwind/react'
+import { ArrowLeft, ArrowRight } from 'react-bootstrap-icons'
+import Link from 'next/link'
 
-function BigEvent() {
+export default function NewEvents({ events }) {
   return (
-    <figure className="relative sm:w-[500px] sm:h-[300px] xl:w-[500px] 2xl:w-[650px] xl:h-[528px]">
-      <Image
-        className="sm:w-[500px] sm:h-[300px] xl:h-[528px] xl:w-[600px] 2xl:w-[650px] rounded-xl object-cover object-center"
-        src="/authentication.png"
-        alt="nature image"
-        width={650}
-        height={528}
-      />
-      <figcaption className="absolute bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-2xl text-white`}>
-          Ethiopian runners took the top four spots.
+    <Carousel
+      placeholder={undefined}
+      className="relative  rounded-xl w-full h-[500px] z-10"
+      navigation={({ setActiveIndex, activeIndex, length }) => (
+        <div className="absolute bottom-4 left-2/4 z-50 flex -translate-x-2/4 gap-2">
+          {new Array(length).fill('').map((_, i) => (
+            <span
+              key={i}
+              className={`block h-1 cursor-pointer rounded-2xl transition-all content-[''] ${
+                activeIndex === i ? 'w-8 bg-white' : 'w-4 bg-white/50'
+              }`}
+              onClick={() => setActiveIndex(i)}
+            />
+          ))}
         </div>
-      </figcaption>
-    </figure>
-  )
-}
-
-function SmallEvent() {
-  return (
-    <figure className="relative h-64 sm:w-[500px] xl:w-[300px] ">
-      <Image
-        className="h-60 lg:w-full rounded-xl object-cover object-center"
-        src="/authentication.png"
-        alt="nature image"
-        width={256}
-        height={240}
-      />
-      <figcaption className="absolute  bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-base text-white`}>
-          Ethiopian runners took the top four spots.
-        </div>
-      </figcaption>
-    </figure>
-  )
-}
-
-function MediumEvent() {
-  return (
-    <figure className="relative h-64 w-full">
-      <Image
-        className="h-60 lg:w-full rounded-xl object-cover object-center"
-        src="/authentication.png"
-        alt="nature image"
-        width={614}
-        height={240}
-      />
-      <figcaption className="absolute  bottom-0 left-2/4 flex w-full -translate-x-2/4 justify-between rounded-xl border border-[--layer] bg-[--layer] py-2 px-4 saturate-200 backdrop-blur-sm">
-        <div className={`text-base text-white`}>
-          Ethiopian runners took the top four spots.
-        </div>
-      </figcaption>
-    </figure>
-  )
-}
-
-export default function NewEvents() {
-  return (
-    <div className="sm:flex-col xl:flex-row xl:justify-between m-auto sm:w-[500px] xl:w-full max-w-[1152px] justify-center flex gap-4 items-end my-1 ">
-      <BigEvent />
-      <div className="flex flex-col gap-4">
-        <div className="flex w-[500px] gap-4 relative ">
-          <SmallEvent />
-          <SmallEvent />
-        </div>
-        <MediumEvent />
-      </div>
-    </div>
+      )}
+      prevArrow={({ handlePrev }) => (
+        <Button
+          placeholder={undefined}
+          variant="text"
+          color="blue"
+          size="lg"
+          onClick={handlePrev}
+          className="!absolute top-2/4 left-4 -translate-y-2/4 px-4">
+          <ArrowLeft className="text-2xl text-black" />
+        </Button>
+      )}
+      nextArrow={({ handleNext }) => (
+        <Button
+          placeholder={undefined}
+          variant="text"
+          color="blue"
+          size="lg"
+          onClick={handleNext}
+          className="!absolute top-2/4 !right-4 -translate-y-2/4 px-4">
+          <ArrowRight className="text-2xl text-black" />
+        </Button>
+      )}
+      transition={{ duration: 1 }}
+      autoplay={true}
+      autoplayDelay={10000}
+      loop={true}>
+      {events.slice(0, 10).map(({ id, thumbnail, faculty, title }) => (
+        <Link key={id} href={`/events/${id}`}>
+          <figure className="relative w-full h-full z-10">
+            <img
+              src={thumbnail}
+              alt="thumbnail"
+              className="w-full h-full object-cover object-center rounded-xl"
+            />
+            {faculty && (
+              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
+                {faculty?.name}
+              </figcaption>
+            )}
+          </figure>
+        </Link>
+      ))}
+    </Carousel>
   )
 }

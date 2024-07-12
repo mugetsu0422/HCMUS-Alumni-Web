@@ -67,7 +67,7 @@ export default function NotificationItem({
             'text-[--blue-05]': !isRead,
             'text-gray-600': isRead,
           })}>
-          {moment(notification.createAt).locale('vi').local().fromNow()}
+          {moment(notification.createAt).locale('vi').local().fromNow(true)}
         </p>
       </div>
       <div className="flex justify-center items-center">

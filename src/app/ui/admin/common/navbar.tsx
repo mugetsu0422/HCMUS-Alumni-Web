@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import {
   Navbar,
   Collapse,
@@ -14,21 +14,32 @@ import {
 } from '@material-tailwind/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronDown, ChevronUp } from 'react-bootstrap-icons'
+import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+<<<<<<< HEAD
   faRightFromBracket,
+=======
+>>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
   faNewspaper,
   faCalendarDays,
   faCertificate,
   faUser,
   faCircleUser,
 } from '@fortawesome/free-solid-svg-icons'
+<<<<<<< HEAD
 import { inter } from '../../fonts'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import { JWT_COOKIE } from '@/app/constant'
 import { useRouter } from 'next/navigation'
+=======
+import NotificationPopover from '@/app/ui/common/notification-popover'
+import { inter } from '@/app/ui/fonts'
+import { useAppSelector } from '@/lib/hooks'
+
+const NavbarContext = createContext(null)
+>>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
 
 // nav list component
 const navListItems = [
@@ -81,6 +92,7 @@ const navListItems = [
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {
+  const { toggleIsNavOpen } = useContext(NavbarContext)
   const [isMobile, setIsMobile] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
@@ -118,6 +130,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
           {subMenu.map(({ title, link }) => (
             <Link
+              onClick={toggleIsNavOpen}
               href={link}
               key={title}
               className="focus-visible:outline-none">
@@ -131,7 +144,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         </MenuList>
       </Menu>
     ) : (
-      <Link href={link} key={title}>
+      <Link onClick={toggleIsNavOpen} href={link} key={title}>
         <MenuItem
           placeholder={undefined}
           className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -166,6 +179,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
             className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
             {subMenu.map(({ title, link }) => (
               <Link
+                onClick={toggleIsNavOpen}
                 href={link}
                 key={title}
                 className="focus-visible:outline-none">
@@ -179,7 +193,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           </MenuList>
         </Menu>
       ) : (
-        <Link href={link} key={title}>
+        <Link onClick={toggleIsNavOpen} href={link} key={title}>
           <MenuItem
             placeholder={undefined}
             className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -222,7 +236,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         <FontAwesomeIcon icon={icon} className="text-2xl" />
         {label}
       </MenuItem>
-      <ul className="ml-6 flex w-full flex-col gap-1 lg:hidden text-[--text-navbar] font-medium text-base hover:text-[var(--blue-05)]">
+      <ul className="ml-6 flex w-full flex-col gap-1 lg:hidden text-[--text-navbar] font-medium text-base">
         {renderItemsForMobile}
       </ul>
     </React.Fragment>
@@ -230,16 +244,19 @@ function NavListMenu({ label, icon, navListMenuItems }) {
 }
 
 function NavList() {
+  const { toggleIsNavOpen } = useContext(NavbarContext)
+
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
-      {navListItems.map(({ label, subMenu, icon, link }) => (
-        <li className="group cursor-pointer lg:py-3" key={label}>
+      {navListItems.map(({ label, subMenu, icon, link }, idx) => (
+        <li className={`group cursor-pointer lg:py-3`} key={label}>
           {subMenu ? (
             <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
+              onClick={toggleIsNavOpen}
               href={link}
-              className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
+              className={`text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2`}>
               <MenuItem
                 placeholder={undefined}
                 className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
@@ -256,8 +273,12 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
+<<<<<<< HEAD
   const userId = Cookies.get('userId')
   const [userAvatar, setUserAvatar] = React.useState('')
+=======
+  const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
+>>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -295,41 +316,24 @@ export default function MyNavbar() {
   }, [])
 
   return (
-    <Navbar
-      placeholder={undefined}
-      fullWidth={true}
-      className={`px-3 lg:pl-6 py-5 lg:py-0 `}>
-      <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
-        <Link href="/">
-          <Image
-            className="hidden lg:block"
-            src="/logo-square.png"
-            alt="log"
-            width={80}
-            height={80}
-          />
-        </Link>
-
-        <div className="hidden lg:block">
-          <NavList />
-        </div>
-
-        <Button
-          placeholder={undefined}
-          onClick={toggleIsNavOpen}
-          variant="text"
-          className="mr-auto lg:hidden text-[var(--blue-02)] px-3 py-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            className="bi bi-list w-8 h-8"
-            viewBox="0 0 16 16">
-            <path
-              fillRule="evenodd"
-              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+    <NavbarContext.Provider
+      value={{
+        toggleIsNavOpen,
+      }}>
+      <Navbar
+        placeholder={undefined}
+        fullWidth={true}
+        className={`sticky top-0 z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
+        <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
+          <Link href="/">
+            <Image
+              className="hidden lg:block"
+              src="/logo-square.png"
+              alt="log"
+              width={80}
+              height={80}
             />
+<<<<<<< HEAD
           </svg>
         </Button>
         {/* <FontAwesomeIcon
@@ -373,14 +377,62 @@ export default function MyNavbar() {
               </MenuItem>
             </MenuList>
           </Menu>
+=======
+          </Link>
+          <div className="hidden lg:block">
+            <NavList />
+          </div>
+          <Button
+            placeholder={undefined}
+            onClick={toggleIsNavOpen}
+            variant="text"
+            className="mr-auto lg:hidden text-[var(--blue-02)] px-3 py-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-list w-8 h-8"
+              viewBox="0 0 16 16">
+              <path
+                fillRule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+          </Button>
+          {/* <FontAwesomeIcon
+            onClick={toggleIsNavOpen}
+            className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
+            icon={faBars}
+          /> */}
+          <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
+            <NotificationPopover />
+            <Link href={`messages/inbox`}>
+              <Button
+                placeholder={undefined}
+                className="h-full w-full"
+                variant="text"
+                size="sm">
+                <Badge
+                  invisible={!unreadInboxSet.length}
+                  content={unreadInboxSet.length}
+                  className="bg-[var(--blue-05)]">
+                  <div className="h-[24px] w-[24px]">
+                    <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                  </div>
+                </Badge>
+              </Button>
+            </Link>
+            <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+          </div>
+>>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
         </div>
-      </div>
-
-      <Collapse
-        open={isNavOpen}
-        className="overflow-scroll overflow-x-hidden scrollbar-webkit">
-        <NavList />
-      </Collapse>
-    </Navbar>
+        <Collapse
+          open={isNavOpen}
+          className="overflow-scroll overflow-x-hidden scrollbar-webkit">
+          <NavList />
+        </Collapse>
+      </Navbar>
+    </NavbarContext.Provider>
   )
 }
