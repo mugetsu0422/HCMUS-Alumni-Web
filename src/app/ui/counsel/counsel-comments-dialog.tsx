@@ -22,48 +22,7 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import { COMMENT_PAGE_SIZE } from '../../constant'
 import TextareaAutosize from 'react-textarea-autosize'
-
-// interface CounselPostProps {
-//   id: string
-//   title: string
-//   content: string
-//   childrenCommentNumber: number
-//   updateAt: string
-//   publishedAt: string
-//   tags: { id: string; name: string }[]
-//   status: { name: string }
-//   creator: { id: string; fullName: string; avatarUrl: string }
-//   pictures: { id: string; pictureUrl: string }[]
-//   isReacted: boolean
-//   reactionCount: number
-// }
-// interface CommentProps {
-//   id: string
-//   creator: {
-//     id: string
-//     fullName: string
-//     avatarUrl: string
-//   }
-//   content: string
-//   childrenCommentNumber: number
-//   createAt: string
-//   updateAt: string
-// }
-// type UploadCommentHandler = (
-//   e: React.FormEvent<HTMLFormElement>,
-//   parentId: string | null,
-//   content: string
-// ) => any
-// type FetchChildrenCommentsHandler = (parentId: string) => any
-
-// interface CommentsDialogProps {
-//   post: CounselPostProps
-//   comments: CommentProps[]
-//   openCommentsDialog: boolean
-//   handleOpenCommentDialog: () => void
-//   onUploadComment: UploadCommentHandler
-//   onFetchChildrenComments: FetchChildrenCommentsHandler
-// }
+import checkPermission from '@/app/ui/common/checking-permission'
 
 export default function CommentsDialog({
   post,
@@ -220,32 +179,38 @@ export default function CommentsDialog({
         </div>
       </DialogBody>
 
-      <DialogFooter placeholder={undefined} className="h-fit py-3 bg-white">
-        <form
-          className="h-full flex flex-start items-start w-full gap-2"
-          onSubmit={(e) => {
-            onUploadComment(e, null, uploadComment)
-            setUploadComment('')
-          }}>
-          <Avatar placeholder={undefined} src={'/demo.jpg'} alt="avatar user" />
-          <TextareaAutosize
-            spellCheck="false"
-            minRows={1}
-            maxRows={8}
-            placeholder="Bình luận của bạn"
-            className="focus:border-transparent w-full bg-[var(--comment-input)] scrollbar-webkit-main resize-none p-2 px-3 rounded-xl outline-none text-black"
-            value={uploadComment}
-            onChange={handleUploadCommentChange}
-          />
-          <Button
-            type="submit"
-            placeholder={undefined}
-            variant="text"
-            className="p-2">
-            <SendFill className="text-xl" />
-          </Button>
-        </form>
-      </DialogFooter>
+      {checkPermission('Counsel.Comment.Create') && (
+        <DialogFooter placeholder={undefined} className="h-fit py-3 bg-white">
+          <form
+            className="h-full flex flex-start items-start w-full gap-2"
+            onSubmit={(e) => {
+              onUploadComment(e, null, uploadComment)
+              setUploadComment('')
+            }}>
+            <Avatar
+              placeholder={undefined}
+              src={'/demo.jpg'}
+              alt="avatar user"
+            />
+            <TextareaAutosize
+              spellCheck="false"
+              minRows={1}
+              maxRows={8}
+              placeholder="Bình luận của bạn"
+              className="focus:border-transparent w-full bg-[var(--comment-input)] scrollbar-webkit-main resize-none p-2 px-3 rounded-xl outline-none text-black"
+              value={uploadComment}
+              onChange={handleUploadCommentChange}
+            />
+            <Button
+              type="submit"
+              placeholder={undefined}
+              variant="text"
+              className="p-2">
+              <SendFill className="text-xl" />
+            </Button>
+          </form>
+        </DialogFooter>
+      )}
     </Dialog>
   )
 }

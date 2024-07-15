@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import moment from 'moment'
 import toast from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { JWT_COOKIE } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'

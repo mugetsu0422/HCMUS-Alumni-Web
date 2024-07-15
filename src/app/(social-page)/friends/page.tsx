@@ -16,7 +16,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -42,7 +42,7 @@ function FriendListItem({ friend }) {
       })
   }
   return (
-    <div className="flex justify-between w-[80%] m-auto items-center">
+    <div className="flex justify-between w-[80%] m-auto items-center mt-4">
       <div className="flex items-center gap-2">
         <Link href={`/profile/${friend.id}/about`}>
           <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
@@ -147,30 +147,29 @@ export default function Page() {
 
   return (
     <div>
-      <CustomToaster />
       <SearchAndFilterFriends
         onSearch={onSearch}
         params={{
           fullName: params.get('fullName'),
         }}
       />
-      <div className="flex flex-col gap-4 mt-6">
-        {!isLoading && (
-          <InfiniteScroll
-            dataLength={listFriend.length}
-            next={onFetchMore}
-            hasMore={hasMore}
-            loader={
-              <div className="h-10 flex justify-center ">
-                <Spinner className="h-8 w-8"></Spinner>
-              </div>
-            }>
+      {!isLoading && (
+        <InfiniteScroll
+          dataLength={listFriend.length}
+          next={onFetchMore}
+          hasMore={hasMore}
+          loader={
+            <div className="h-10 flex justify-center ">
+              <Spinner className="h-8 w-8"></Spinner>
+            </div>
+          }>
+          <div className="flex flex-col gap-4 mt-6">
             {listFriend.map(({ friend }) => (
               <FriendListItem key={friend.id} friend={friend} />
             ))}
-          </InfiniteScroll>
-        )}
-      </div>
+          </div>
+        </InfiniteScroll>
+      )}
     </div>
   )
 }

@@ -8,7 +8,6 @@ import { roboto } from '../../ui/fonts'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { FACULTIES } from '../../constant'
 import Pagination from '../../ui/common/pagination'
-import Thumbnail from '../../ui/social-page/thumbnail-image'
 import Link from 'next/link'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
@@ -16,7 +15,7 @@ import Cookies from 'js-cookie'
 import { Button, Input } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 const PAGE_SIZE = 9
 
@@ -245,11 +244,7 @@ export default function Page() {
   }, [myParams])
 
   return (
-    <>
-      
-
-      <Thumbnail />
-      <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+         <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
         <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} text-3xl font-bold text-[var(--blue-02)]`}>
@@ -281,6 +276,5 @@ export default function Page() {
           )}
         </div>
       </div>
-    </>
   )
 }

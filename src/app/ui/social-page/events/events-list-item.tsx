@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import moment from 'moment'
 import toast from 'react-hot-toast'
+import Cookies from 'js-cookie'
+import checkPermission from '../../common/checking-permission'
 
 export default function EventsListItem({
   event,
@@ -16,6 +18,7 @@ export default function EventsListItem({
 }) {
   const [isParticipated, setIsParticipated] = useState(event.isParticipated)
   const [isDisabled, setIsDisabled] = useState(false)
+  const permissions = Cookies.get('permissions')
 
   const onClickParticipation = async () => {
     setIsDisabled(true)
@@ -55,7 +58,7 @@ export default function EventsListItem({
         </figure>
       </Link>
 
-      <div className="flex flex-col gap-2 w-full items-left justify-between">
+      <div className="flex flex-col w-full items-left gap-2">
         <Link
           href={`/events/${event.id}`}
           className="text-[24px] font-semibold w-full line-clamp-2 text-ellipsis overflow-hidden">
@@ -97,25 +100,26 @@ export default function EventsListItem({
             <span>{event.minimumParticipants}</span>
           </p>
         </div>
-        {!isParticipated ? (
-          <Button
-            onClick={() => onClickParticipation()}
-            disabled={isDisabled}
-            placeholder={undefined}
-            size="md"
-            className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
-            Tham gia
-          </Button>
-        ) : (
-          <Button
-            onClick={() => onClickParticipationCancel()}
-            disabled={isDisabled}
-            placeholder={undefined}
-            size="md"
-            className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
-            Huỷ tham gia
-          </Button>
-        )}
+        {checkPermission('Event.Participant.Create') &&
+          (!isParticipated ? (
+            <Button
+              onClick={() => onClickParticipation()}
+              disabled={isDisabled}
+              placeholder={undefined}
+              size="md"
+              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
+              Tham gia
+            </Button>
+          ) : (
+            <Button
+              onClick={() => onClickParticipationCancel()}
+              disabled={isDisabled}
+              placeholder={undefined}
+              size="md"
+              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
+              Huỷ tham gia
+            </Button>
+          ))}
       </div>
     </div>
   )

@@ -6,6 +6,8 @@ import { Dot, TagsFill } from 'react-bootstrap-icons'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
+import checkPermission from '@/app/ui/common/checking-permission'
+import Cookies from 'js-cookie'
 
 export default function GroupsListItem({ group, onJoinGroup }) {
   const router = useRouter()
@@ -20,7 +22,10 @@ export default function GroupsListItem({ group, onJoinGroup }) {
     onJoinGroup(group.id)
       .then((data) => {})
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message.error?.message ||
+            'Lỗi không xác định'
+        )
       })
       .finally(() => {
         setIsJoining(false)
@@ -43,7 +48,9 @@ export default function GroupsListItem({ group, onJoinGroup }) {
           variant="rounded"
         />
         <div className="max-w-[600px] min-w-[350px] w-[80%]">
-          <p className="text-[18px] font-[500] text-justify -mb-[2px]">{group.name}</p>
+          <p className="text-[18px] font-[500] text-justify -mb-[2px]">
+            {group.name}
+          </p>
           {!group.isJoined && (
             <>
               <p className="flex items-center text-[#65676b]">
@@ -71,36 +78,37 @@ export default function GroupsListItem({ group, onJoinGroup }) {
         </div>
       </div>
 
-      {isRequestPending ? (
-        <Button
-          disabled={true}
-          onClick={onClickJoinButton}
-          size="sm"
-          placeholder={undefined}
-          className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
-          {isJoining && <Spinner className="h-[14px] w-[14px]" />}
-          Đang chờ duyệt
-        </Button>
-      ) : isJoined ? (
-        <Link href={`/groups/${group.id}`}>
+      {checkPermission('Group.Join') &&
+        (isRequestPending ? (
           <Button
+            disabled={true}
+            onClick={onClickJoinButton}
             size="sm"
             placeholder={undefined}
-            className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-36 flex justify-center items-center gap-2">
-            Xem nhóm
+            className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+            {isJoining && <Spinner className="h-[14px] w-[14px]" />}
+            Đang chờ duyệt
           </Button>
-        </Link>
-      ) : (
-        <Button
-          disabled={isJoining}
-          onClick={onClickJoinButton}
-          size="sm"
-          placeholder={undefined}
-          className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
-          {isJoining && <Spinner className="h-[14px] w-[14px]" />}
-          Tham gia
-        </Button>
-      )}
+        ) : isJoined ? (
+          <Link href={`/groups/${group.id}`}>
+            <Button
+              size="sm"
+              placeholder={undefined}
+              className="h-fit bg-[#e4e6eb] text-black normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+              Xem nhóm
+            </Button>
+          </Link>
+        ) : (
+          <Button
+            disabled={isJoining}
+            onClick={onClickJoinButton}
+            size="sm"
+            placeholder={undefined}
+            className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+            {isJoining && <Spinner className="h-[14px] w-[14px]" />}
+            Tham gia
+          </Button>
+        ))}
     </div>
   )
 }

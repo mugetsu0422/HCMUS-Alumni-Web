@@ -8,9 +8,9 @@ function LinkIcon({ link }: { link: string }) {
   return (
     <>
       {facebookPattern.test(link) ? (
-        <Facebook className="text-[#1877F2] text-[2.5rem]" />
+        <Facebook className="text-[#adadad] text-[2.5rem]" />
       ) : linkedinPattern.test(link) ? (
-        <Linkedin className="text-[#0077B5] text-[2.5rem]" />
+        <Linkedin className="text-[#adadad] text-[2.5rem]" />
       ) : link ? (
         <p className="decoration-solid underline text-blue-700">Social media</p>
       ) : null}

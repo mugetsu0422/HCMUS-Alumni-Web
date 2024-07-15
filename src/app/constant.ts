@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-export const SALT = 15
-import Introduce from './ui/social-page/groups/introduce'
-=======
->>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
 export const EMAIL_ACTIVATION_CODE_TIMER = 59000 // 59s
 export const JWT_COOKIE = 'jwt'
 export const JWT_EXPIRED_TIME = 3 // 3 days
@@ -75,7 +70,7 @@ export const PROFILE_TABS = [
   },
   {
     label: 'Hoạt động',
-    url: 'activities ',
+    url: 'activities',
   },
 ]
 
@@ -126,7 +121,13 @@ export const FRIEND_TABS = [
     url: 'requests',
   },
 ]
-<<<<<<< HEAD
+export const MESSAGE_TYPE = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  VIDEO: 'VIDEO',
+  SOUND: 'SOUND',
+}
 
 export const PROFILE_ACTIVITIES_TABS = [
   {
@@ -149,12 +150,3 @@ export const PROFILE_COUNSEL_TABS = [
     url: 'counsel-comments',
   },
 ]
-=======
-export const MESSAGE_TYPE = {
-  TEXT: 'TEXT',
-  IMAGE: 'IMAGE',
-  FILE: 'FILE',
-  VIDEO: 'VIDEO',
-  SOUND: 'SOUND',
-}
->>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0

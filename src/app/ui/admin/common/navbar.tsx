@@ -17,29 +17,22 @@ import Link from 'next/link'
 import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-<<<<<<< HEAD
   faRightFromBracket,
-=======
->>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
   faNewspaper,
   faCalendarDays,
   faCertificate,
   faUser,
   faCircleUser,
 } from '@fortawesome/free-solid-svg-icons'
-<<<<<<< HEAD
-import { inter } from '../../fonts'
-import Cookies from 'js-cookie'
-import axios from 'axios'
-import { JWT_COOKIE } from '@/app/constant'
-import { useRouter } from 'next/navigation'
-=======
 import NotificationPopover from '@/app/ui/common/notification-popover'
 import { inter } from '@/app/ui/fonts'
 import { useAppSelector } from '@/lib/hooks'
 
 const NavbarContext = createContext(null)
->>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import { JWT_COOKIE } from '@/app/constant'
+import { useRouter } from 'next/navigation'
 
 // nav list component
 const navListItems = [
@@ -92,7 +85,7 @@ const navListItems = [
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {
-  const { toggleIsNavOpen } = useContext(NavbarContext)
+  const { isNavOpen, toggleIsNavOpen } = useContext(NavbarContext)
   const [isMobile, setIsMobile] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
@@ -130,7 +123,9 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
           {subMenu.map(({ title, link }) => (
             <Link
-              onClick={toggleIsNavOpen}
+              onClick={() => {
+                if (isNavOpen) toggleIsNavOpen()
+              }}
               href={link}
               key={title}
               className="focus-visible:outline-none">
@@ -179,7 +174,9 @@ function NavListMenu({ label, icon, navListMenuItems }) {
             className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
             {subMenu.map(({ title, link }) => (
               <Link
-                onClick={toggleIsNavOpen}
+                onClick={() => {
+                  if (isNavOpen) toggleIsNavOpen()
+                }}
                 href={link}
                 key={title}
                 className="focus-visible:outline-none">
@@ -244,7 +241,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
 }
 
 function NavList() {
-  const { toggleIsNavOpen } = useContext(NavbarContext)
+  const { isNavOpen, toggleIsNavOpen } = useContext(NavbarContext)
 
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
@@ -254,7 +251,9 @@ function NavList() {
             <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
-              onClick={toggleIsNavOpen}
+              onClick={() => {
+                if (isNavOpen) toggleIsNavOpen()
+              }}
               href={link}
               className={`text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2`}>
               <MenuItem
@@ -273,12 +272,9 @@ function NavList() {
 
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
-<<<<<<< HEAD
+  const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
   const userId = Cookies.get('userId')
   const [userAvatar, setUserAvatar] = React.useState('')
-=======
-  const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
->>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -313,12 +309,14 @@ export default function MyNavbar() {
         setUserAvatar(data?.user?.avatarUrl)
       })
       .catch((error) => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
     <NavbarContext.Provider
       value={{
         toggleIsNavOpen,
+        isNavOpen,
       }}>
       <Navbar
         placeholder={undefined}
@@ -333,51 +331,6 @@ export default function MyNavbar() {
               width={80}
               height={80}
             />
-<<<<<<< HEAD
-          </svg>
-        </Button>
-        {/* <FontAwesomeIcon
-          onClick={toggleIsNavOpen}
-          className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
-          icon={faBars}
-        /> */}
-
-        <div className="lg:ml-auto flex gap-2 sm:gap-5 lg:pr-6 items-center">
-          <Menu>
-            <MenuHandler>
-              <Button
-                placeholder={undefined}
-                variant="text"
-                size="sm"
-                className="p-0 rounded-full">
-                <Avatar placeholder={undefined} src={userAvatar} alt="avatar" />
-              </Button>
-            </MenuHandler>
-            <MenuList placeholder={undefined}>
-              <MenuItem placeholder={undefined}>
-                <Link
-                  href={`/profile/${userId}/about`}
-                  className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
-                  Trang cá nhân
-                </Link>
-              </MenuItem>
-
-              <MenuItem placeholder={undefined}>
-                <Button
-                  placeholder={undefined}
-                  onClick={() => handleLogout()}
-                  variant="text">
-                  <FontAwesomeIcon
-                    icon={faRightFromBracket}
-                    className="text-xl"
-                  />
-                  Đăng xuất
-                </Button>
-              </MenuItem>
-            </MenuList>
-          </Menu>
-=======
           </Link>
           <div className="hidden lg:block">
             <NavList />
@@ -407,7 +360,7 @@ export default function MyNavbar() {
           /> */}
           <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
             <NotificationPopover />
-            <Link href={`messages/inbox`}>
+            <Link href={`/messages/inbox`} className="group">
               <Button
                 placeholder={undefined}
                 className="h-full w-full"
@@ -418,14 +371,13 @@ export default function MyNavbar() {
                   content={unreadInboxSet.length}
                   className="bg-[var(--blue-05)]">
                   <div className="h-[24px] w-[24px]">
-                    <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                    <ChatDotsFill className="h-full w-full text-[--text-navbar] group-hover:text-[--blue-05]" />
                   </div>
                 </Badge>
               </Button>
             </Link>
             <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
           </div>
->>>>>>> d1b5e4d2f038dd2cc9d95a9ae5b2e71292867eb0
         </div>
         <Collapse
           open={isNavOpen}

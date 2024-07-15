@@ -9,10 +9,8 @@ import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { roboto } from '../../ui/fonts'
-import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import toast, { Toaster } from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export default function Page() {
   const pathname = usePathname()
@@ -170,14 +168,11 @@ export default function Page() {
             console.log(events)
           })
       })
-      .catch((error) => {
-      })
+      .catch((error) => {})
   }, [myParams])
 
   return (
     <>
-      
-      <Thumbnail />
       <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
         <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
           <p

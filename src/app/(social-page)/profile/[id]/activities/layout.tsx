@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { Tabs, TabsHeader, Tab } from '@material-tailwind/react'
 import { PROFILE_ACTIVITIES_TABS } from '../../../../constant'
 import { usePathname, useRouter } from 'next/navigation'
@@ -18,6 +18,7 @@ function ProfileAboutTags({ params }) {
   const userIdParams = parts[2]
   const userId = Cookies.get('userId')
   const isProfileLoginUser = userId === userIdParams
+  const [isMounted, setIsMounted] = useState(false)
 
   const tabsToRender = isProfileLoginUser
     ? PROFILE_ACTIVITIES_TABS
@@ -27,6 +28,13 @@ function ProfileAboutTags({ params }) {
     setActiveTab(url)
     router.push(`/profile/${params.id}/activities/${url}`)
   }
+
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
+
+  if (!isMounted) return null
   return (
     <div className="w-fit h-fit">
       <p className="text-[20px] lg:text-2xl font-bold mb-4">Hoạt động</p>

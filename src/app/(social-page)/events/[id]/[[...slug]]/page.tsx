@@ -23,12 +23,12 @@ import { XLg } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import CustomToaster from '@/app/ui/common/custom-toaster'
 import { JWT_COOKIE } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 const PARTICIPANT_FETCH_LIMIT = 50
 
@@ -388,7 +388,6 @@ export default function Page({
       <>
         <div
           className={`${nunito.className} flex flex-col gap-6 w-[75%] max-w-[1366px] bg-[--blue-04] rounded-lg m-auto lg:px-10 lg:py-10 mt-16 mb-16`}>
-          
           <div className="flex flex-col xl:flex-row items-center justify-center m-auto gap-x-10">
             <img
               src={event?.thumbnail}
@@ -462,25 +461,26 @@ export default function Page({
                   participantCount={event?.participants}
                   onLoadParticipants={onLoadMoreParticipants}
                 />
-                {!isParticipated ? (
-                  <Button
-                    onClick={() => onParticipate(params.id)}
-                    disabled={isDisabled}
-                    placeholder={undefined}
-                    size="md"
-                    className="bg-[--blue-02] font-medium w-full text-[16px]">
-                    Tham gia
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => onCancelParticipation(params.id)}
-                    disabled={isDisabled}
-                    placeholder={undefined}
-                    size="md"
-                    className="bg-[--blue-02] font-medium w-full text-[16px]">
-                    Huỷ tham gia
-                  </Button>
-                )}
+                {checkPermission('Event.Participant.Create') &&
+                  (isParticipated ? (
+                    <Button
+                      onClick={() => onParticipate(params.id)}
+                      disabled={isDisabled}
+                      placeholder={undefined}
+                      size="md"
+                      className="bg-[--blue-02] font-medium w-full text-[16px]">
+                      Tham gia
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => onCancelParticipation(params.id)}
+                      disabled={isDisabled}
+                      placeholder={undefined}
+                      size="md"
+                      className="bg-[--blue-02] font-medium w-full text-[16px]">
+                      Huỷ tham gia
+                    </Button>
+                  ))}
               </div>
             </div>
           </div>
@@ -488,28 +488,32 @@ export default function Page({
             <p className="lg:text-[26px] sm:text-lg font-extrabold">
               Thông tin chi tiết
             </p>
-            <p className="text-pretty text-base whitespace-pre-line">{event?.content}</p>
+            <p className="text-pretty text-base whitespace-pre-line">
+              {event?.content}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-y-2 w-[75%] max-w-[1366px] m-auto mb-10">
-          <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
-            <Textarea
-              onChange={handleUploadCommentChange}
-              placeholder={undefined}
-              label="Chia sẻ ý kiến của bạn"
-            />
-            <div className="flex justify-end gap-x-4 pt-2 mr-2">
-              <Button
+          {checkPermission('Event.Comment.Create') && (
+            <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+              <Textarea
+                onChange={handleUploadCommentChange}
                 placeholder={undefined}
-                size="md"
-                disabled={!uploadComment.trim()}
-                type="submit"
-                className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-                Đăng
-              </Button>
-            </div>
-          </form>
+                label="Chia sẻ ý kiến của bạn"
+              />
+              <div className="flex justify-end gap-x-4 pt-2 mr-2">
+                <Button
+                  placeholder={undefined}
+                  size="md"
+                  disabled={!uploadComment.trim()}
+                  type="submit"
+                  className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+                  Đăng
+                </Button>
+              </div>
+            </form>
+          )}
 
           <p className="text-xl font-semibold">
             Bình luận{' '}

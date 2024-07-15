@@ -1,7 +1,5 @@
 'use client'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import Thumbnail from '../../ui/social-page/thumbnail-image'
-
 import CreatePost from '../../ui/counsel/create-post'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
@@ -13,7 +11,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
 import PostListItem from '../../ui/social-page/counsel/post-list-item'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 export default function Page() {
   const pathname = usePathname()
@@ -34,7 +32,7 @@ export default function Page() {
   })
   const userId = Cookies.get('userId')
   const [userAvatar, setUserAvatar] = useState('')
-
+  
   const resetCurPage = () => {
     params.delete('page')
     curPage.current = 0
@@ -138,7 +136,6 @@ export default function Page() {
 
   return (
     <>
-      <Thumbnail />
       <div className="mt-4 mb-8 max-w-[850px] w-[80%] m-auto flex flex-col gap-6">
         <SearchAndFilter
           selectedTags={selectedTags}
@@ -150,7 +147,9 @@ export default function Page() {
             title: params.get('title'),
           }}
         />
-        <CreatePost userAvatar={userAvatar} />
+        {checkPermission('Counsel.Create') && (
+          <CreatePost userAvatar={userAvatar} />
+        )}
         {!isLoading && (
           <InfiniteScroll
             dataLength={posts.length}

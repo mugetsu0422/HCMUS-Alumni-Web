@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -13,7 +13,6 @@ import { Camera } from 'react-bootstrap-icons'
 import { ConfirmChangeAvatarDialog } from './dialogs'
 import axios from 'axios'
 import { JWT_COOKIE } from '@/app/constant'
-import { Cookies } from 'js-cookie'
 
 export default function ChangeAvatarUser({
   register,
@@ -28,6 +27,7 @@ export default function ChangeAvatarUser({
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   const handleOpenConfirmDialog = () => {
     setOpenConfirmDialog((e) => !e)
@@ -110,6 +110,14 @@ export default function ChangeAvatarUser({
     }
   }
 
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
+
+  if (!isMounted) return null
   return (
     <>
       <Button

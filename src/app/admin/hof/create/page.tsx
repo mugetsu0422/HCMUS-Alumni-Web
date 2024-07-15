@@ -21,7 +21,7 @@ import { FACULTIES, JWT_COOKIE } from '../../../constant'
 import ImageSkeleton from '../../../ui/skeleton/image-skeleton'
 import DateTimeLocalPickerDialog from '../../../ui/admin/common/date-time-picker-dialog'
 import axios from 'axios'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import CancelChangesDialog from '@/app/ui/admin/common/CancelChangesDialog'
 
 export default function Page() {

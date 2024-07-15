@@ -14,26 +14,21 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 
 function EventListItem({ event }) {
   return (
-    <div key={event.id} className="flex justify-between items-center">
+    <div key={event.id} className="flex justify-between items-center mt-4">
       <div className="flex items-center gap-4">
         <Link href={`/events/${event.id}`}>
-          <figure className="relative w-[80%] h-[15rem] lg:w-[30rem]">
+          <figure className="relative w-[80%] h-[15rem] lg:w-[30rem] z-10">
             <img
               src={event.thumbnail}
               alt="thumbnail"
               className="w-full h-full object-cover object-center rounded-xl"
             />
-            {event?.falculty && (
-              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200 z-10">
+            {event?.faculty && (
+              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200 z-20">
                 {event?.faculty?.name}
               </figcaption>
             )}
           </figure>
-          {/* <img
-            src={thumbnail}
-            alt="event"
-            className="w-40 h-[8rem] lg:w-[16rem] lg:h-[13rem]"
-          /> */}
         </Link>
         <div className="flex flex-col gap-1">
           <p className="text-[20px] lg:text-[24px] font-bold">{event.title}</p>

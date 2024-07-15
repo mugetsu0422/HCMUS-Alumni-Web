@@ -15,7 +15,7 @@ import { JWT_COOKIE, TAGS_LIMIT } from '../../../constant'
 import { useForm, Controller } from 'react-hook-form'
 import moment from 'moment'
 import { useRouter } from 'next/navigation'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { ReactTags } from 'react-tag-autocomplete'
 
 const privacyValue = [

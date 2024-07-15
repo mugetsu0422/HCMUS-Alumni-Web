@@ -2,9 +2,9 @@
 import './globals.css'
 import FirebaseForeground from '@/config/notification/firebase-foreground'
 import { inter } from './ui/fonts'
-import CustomToaster from './ui/common/custom-toaster'
 import StoreProvider from '@/config/store-provider'
 import Socket from '@/config/socket/socket'
+import CustomToaster from '@/app/ui/common/custom-toaster'
 
 export const metadata = {
   title: {

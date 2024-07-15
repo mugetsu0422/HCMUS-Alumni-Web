@@ -4,8 +4,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { roboto } from '../../ui/fonts'
 import { Button, Spinner } from '@material-tailwind/react'
 import { JWT_COOKIE } from '../../constant'
-import Cookies from 'js-cookie'
-import Thumbnail from '../../ui/social-page/thumbnail-image'
 import GroupsListItem from '../../ui/social-page/groups/groups-list-item'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
@@ -14,7 +12,8 @@ import SearchAndFilterGroups from '../../ui/social-page/groups/searchAndFilterGr
 import { Plus } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+import checkPermission from '@/app/ui/common/checking-permission'
+import Cookies from 'js-cookie'
 
 export default function Page() {
   const pathname = usePathname()
@@ -115,22 +114,24 @@ export default function Page() {
 
   return (
     <>
-      <Thumbnail />
       <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
         <div className="flex justify-between">
           <p
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
             NHÓM
           </p>
-          <Link href={'/groups/create'}>
-            <Button
-              placeholder={undefined}
-              size="md"
-              className="text-white bg-[--blue-05] px-4 normal-case text-sm flex items-center justify-center gap-2">
-              <Plus className="text-xl font-semibold" />
-              Tạo nhóm mới
-            </Button>
-          </Link>
+
+          {checkPermission('Group.Create') && (
+            <Link href={'/groups/create'}>
+              <Button
+                placeholder={undefined}
+                size="md"
+                className="text-white bg-[--blue-05] px-4 normal-case text-sm flex items-center justify-center gap-2">
+                <Plus className="text-xl font-semibold" />
+                Tạo nhóm mới
+              </Button>
+            </Link>
+          )}
         </div>
         <SearchAndFilterGroups
           onSearch={onSearch}

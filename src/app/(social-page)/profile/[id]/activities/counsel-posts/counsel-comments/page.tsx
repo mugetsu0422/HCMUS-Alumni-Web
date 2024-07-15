@@ -17,18 +17,16 @@ function CommentListItem({ comment }) {
     <div>
       <Link
         href={`/${comment.postAdvise.id}/comments/${comment.id}`}
-        className="text-[18px] lg:text-[22px] font-bold hover:underline">
-        Bình luận của bài viết: {comment.postAdvise.title}
-      </Link>
-      <div className="flex gap-2">
+        className="">
+        <div className="flex gap-2">
         <Avatar placeholder={undefined} src={comment.creator.avatarUrl} />
         <div>
           <div
             className={clsx({
               'h-fit bg-[var(--comment-input)] p-3 rounded-lg': true,
             })}>
-            <p className="text-lg font-bold text-black">
-              {comment.creator.fullName}
+            <p className="text-lg text-black">
+              <span className="font-bold">{comment.creator.fullName}</span> đã bình luận trong bài viết <span className="font-bold">{comment.postAdvise.title}</span>
             </p>
 
             <p className="text-black font-normal whitespace-pre-line">
@@ -40,6 +38,8 @@ function CommentListItem({ comment }) {
           </p>
         </div>
       </div>
+      </Link>
+
     </div>
   )
 }

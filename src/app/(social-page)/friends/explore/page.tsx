@@ -38,7 +38,7 @@ function FriendListItem({ users }) {
   }
 
   return (
-    <div className="flex justify-between w-[80%] m-auto items-center">
+    <div className="flex justify-between w-[80%] m-auto items-center mt-4">
       <div className="flex items-center gap-2">
         <Link href={`/profile/${users.id}/about`}>
           <Avatar size="lg" src={users.avatarUrl} placeholder={undefined} />

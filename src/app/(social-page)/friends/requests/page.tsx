@@ -8,7 +8,7 @@ import Link from 'next/link'
 import SearchAndFilterFriends from '../../../ui/social-page/friends/SearchAndFilterFriend'
 import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -65,7 +65,7 @@ function FriendListItem({ friend }) {
   }
 
   return (
-    <div className="flex justify-between w-[80%] m-auto items-center">
+    <div className="flex justify-between w-[80%] m-auto items-center mt-4">
       <div className="flex items-center gap-2">
         <Link href={`/profile/${friend.id}/about`}>
           <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />

@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import { roboto, nunito } from '@/app/ui/fonts'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { Input, Switch, Button } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import { JWT_COOKIE } from '@/app/constant'
