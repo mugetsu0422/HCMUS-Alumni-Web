@@ -13,16 +13,12 @@ import PostListItem from '../../../ui/social-page/groups/post-list-item'
 import Introduce from '../../../ui/social-page/groups/introduce'
 import { usePathname } from 'next/navigation'
 import { useGroupContext } from './layout'
+import AvatarUser from '@/app/ui/common/avatar-user'
 
 function CreatePost({ groupId }) {
   return (
     <div className="flex gap-4 items-center">
-      <Avatar
-        src="/authentication.png"
-        alt="user avatar"
-        size="lg"
-        placeholder={undefined}
-      />
+      <AvatarUser />
       <Link
         href={`/groups/${groupId}/posts/create`}
         className=" w-full bg-blue-gray-50 rounded-full">

@@ -9,7 +9,7 @@ import axios from 'axios'
 import { JWT_COOKIE } from '@/app/constant'
 import Cookies from 'js-cookie'
 import { usePathname } from 'next/navigation'
-import { error } from 'console'
+import toast from 'react-hot-toast'
 
 export default function Page() {
   const [openDialogAdd, setOpenDialogAdd] = useState(false)
@@ -19,6 +19,33 @@ export default function Page() {
   const userIdParams = parts[2]
   const userId = Cookies.get('userId')
   const isProfileLoginUser = userId === userIdParams
+
+  function handleOpenDialogAdd() {
+    setOpenDialogAdd((e) => !e)
+  }
+
+  const onAddAchievements = (achivement) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/achievement`,
+        achivement,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Thêm thành tựu thành công')
+        handleOpenDialogAdd()
+        setAchievements((prev) => prev.concat(achivement))
+      })
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
+  }
 
   useEffect(() => {
     axios
@@ -35,10 +62,6 @@ export default function Page() {
       })
       .catch((error) => {})
   }, [])
-
-  function handleOpenDialogAdd() {
-    setOpenDialogAdd((e) => !e)
-  }
 
   return (
     <div>
@@ -76,6 +99,7 @@ export default function Page() {
         <DialogAddAchievements
           openDialogAdd={openDialogAdd}
           handleOpenDialogAdd={handleOpenDialogAdd}
+          onAddAchievements={onAddAchievements}
         />
       </div>
     </div>

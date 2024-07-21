@@ -13,6 +13,8 @@ import { JWT_COOKIE } from '@/app/constant'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 function FriendListItem({ users }) {
+  const [isDelete, setIsDelete] = useState(false)
+
   const onRequest = () => {
     const data = {
       friendId: users.id,
@@ -29,6 +31,7 @@ function FriendListItem({ users }) {
       )
       .then(() => {
         toast.success('Gửi lời mời bạn thành công')
+        setIsDelete(true)
       })
       .catch((error) => {
         toast.error(
@@ -38,21 +41,23 @@ function FriendListItem({ users }) {
   }
 
   return (
-    <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-      <div className="flex items-center gap-2">
-        <Link href={`/profile/${users.id}/about`}>
-          <Avatar size="lg" src={users.avatarUrl} placeholder={undefined} />
-        </Link>
-        <p>{users.fullName}</p>
-      </div>
+    !isDelete && (
+      <div className="flex justify-between w-[80%] m-auto items-center mt-4">
+        <div className="flex items-center gap-2">
+          <Link href={`/profile/${users.id}/about`}>
+            <Avatar size="lg" src={users.avatarUrl} placeholder={undefined} />
+          </Link>
+          <p>{users.fullName}</p>
+        </div>
 
-      <Button
-        onClick={onRequest}
-        placeholder={undefined}
-        className="h-fit bg-[--blue-05] text-white normal-case">
-        Thêm bạn bè
-      </Button>
-    </div>
+        <Button
+          onClick={onRequest}
+          placeholder={undefined}
+          className="h-fit bg-[--blue-05] text-white normal-case">
+          Thêm bạn bè
+        </Button>
+      </div>
+    )
   )
 }
 

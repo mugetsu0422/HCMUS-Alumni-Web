@@ -85,7 +85,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
             onClick={onClickJoinButton}
             size="sm"
             placeholder={undefined}
-            className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+            className="h-fit text-white bg-[--blue-02] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
             {isJoining && <Spinner className="h-[14px] w-[14px]" />}
             Đang chờ duyệt
           </Button>
@@ -104,7 +104,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
             onClick={onClickJoinButton}
             size="sm"
             placeholder={undefined}
-            className="h-fit text-white bg-[--blue-05] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+            className="h-fit text-white bg-[--blue-02] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
             {isJoining && <Spinner className="h-[14px] w-[14px]" />}
             Tham gia
           </Button>

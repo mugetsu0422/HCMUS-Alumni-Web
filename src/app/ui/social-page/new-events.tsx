@@ -64,8 +64,8 @@ export default function NewEvents({ events }) {
               </figcaption>
             )}
             <figcaption className="absolute p-2 bottom-6 left-6 font-bold text-black justify-between rounded-lg bg-white/75 saturate-200 text-lg">
-                {title}
-              </figcaption>
+              {title}
+            </figcaption>
           </figure>
         </Link>
       ))}

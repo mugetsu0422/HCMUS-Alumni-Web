@@ -30,7 +30,7 @@ import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import NotificationPopover from '../common/notification-popover'
 import { inter } from '../fonts'
 import { useAppSelector } from '@/lib/hooks'
-
+import AvatarUser from '../common/avatar-user'
 const NavbarContext = createContext(null)
 import Cookies from 'js-cookie'
 import axios from 'axios'
@@ -383,11 +383,7 @@ export default function MyNavbar() {
                   variant="text"
                   size="sm"
                   className="p-0 rounded-full">
-                  <Avatar
-                    placeholder={undefined}
-                    src={userAvatar}
-                    alt="avatar"
-                  />
+                  <AvatarUser />
                 </Button>
               </MenuHandler>
               <MenuList placeholder={undefined}>

@@ -44,7 +44,7 @@ export default function SearchAndFilter({
           {...register('title', {
             onChange: (e) => onSearch(e.target.value),
           })}
-          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+          className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 focus:!border"
           labelProps={{
             className: 'before:content-none after:content-none',
           }}

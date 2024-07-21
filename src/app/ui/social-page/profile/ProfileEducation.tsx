@@ -24,6 +24,7 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 export function DialogAddEducation({
   openDialogAddEducation,
   handleOpenDialogAddEducation,
+  onAddEducation,
 }) {
   const {
     register,
@@ -40,20 +41,7 @@ export function DialogAddEducation({
       privacy: 'PUBLIC',
       isLearning: false,
     }
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/education`,
-        eudcation,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(() => toast.success('Thêm học vấn thành công'))
-      .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
-      })
+    onAddEducation(eudcation)
   }
 
   return (
@@ -211,7 +199,9 @@ function DialogEditEducation({
       )
       .then(() => toast.success('Cập nhật học vấn thành công'))
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 

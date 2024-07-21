@@ -19,7 +19,11 @@ import moment from 'moment'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-export function DialogAddAchievements({ openDialogAdd, handleOpenDialogAdd }) {
+export function DialogAddAchievements({
+  openDialogAdd,
+  handleOpenDialogAdd,
+  onAddAchievements,
+}) {
   const {
     register,
     handleSubmit,
@@ -34,22 +38,7 @@ export function DialogAddAchievements({ openDialogAdd, handleOpenDialogAdd }) {
       privacy: 'PUBLIC',
     }
 
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/achievement`,
-        achivement,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(() => toast.success('Thêm thành tựu thành công'))
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+    onAddAchievements(achivement)
   }
 
   return (

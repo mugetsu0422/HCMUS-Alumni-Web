@@ -55,6 +55,29 @@ export default function Page() {
       })
   }
 
+  const onAddEducation = (eudcation) => {
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/education`,
+        eudcation,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Thêm học vấn thành công')
+        handleOpenDialogAddEducation()
+        setEducations((prev) => prev.concat(eudcation))
+      })
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      })
+  }
+
   useEffect(() => {
     const worksPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userIdParams}/profile/job`,
@@ -148,6 +171,7 @@ export default function Page() {
         <DialogAddEducation
           handleOpenDialogAddEducation={handleOpenDialogAddEducation}
           openDialogAddEducation={openDialogAddEducation}
+          onAddEducation={onAddEducation}
         />
         {educations?.map((education) => (
           <EducationListItem

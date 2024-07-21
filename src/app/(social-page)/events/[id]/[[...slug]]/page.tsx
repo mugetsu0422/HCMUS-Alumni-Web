@@ -74,27 +74,31 @@ function ParticipantsDialog({
         id="scrollableParticipants"
         placeholder={undefined}
         className="flex flex-col h-[400px] overflow-y-auto scrollbar-webkit-main">
-        <InfiniteScroll
-          className="flex flex-col gap-2"
-          dataLength={participants.length}
-          next={onFetchMore}
-          hasMore={hasMore}
-          loader={
-            <div className="h-10 my-5 flex justify-center">
-              <Spinner className="h-8 w-8"></Spinner>
-            </div>
-          }
-          scrollableTarget="scrollableParticipants">
-          {participants.map(({ id, fullName, avatarUrl }) => (
-            <Link
-              href={`#`}
-              key={id}
-              className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
-              <Avatar placeholder={undefined} src={avatarUrl} alt="avatar" />
-              <p>{fullName}</p>
-            </Link>
-          ))}
-        </InfiniteScroll>
+        {participants.length > 0 ? (
+          <InfiniteScroll
+            className="flex flex-col gap-2"
+            dataLength={participants.length}
+            next={onFetchMore}
+            hasMore={hasMore}
+            loader={
+              <div className="h-10 my-5 flex justify-center">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            }
+            scrollableTarget="scrollableParticipants">
+            {participants.map(({ id, fullName, avatarUrl }) => (
+              <Link
+                href={`#`}
+                key={id}
+                className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
+                <Avatar placeholder={undefined} src={avatarUrl} alt="avatar" />
+                <p>{fullName}</p>
+              </Link>
+            ))}
+          </InfiniteScroll>
+        ) : (
+          <p className="text-black">Hiện không có người tham gia</p>
+        )}
       </DialogBody>
     </Dialog>
   )
@@ -116,8 +120,8 @@ export default function Page({
   const [comments, setComments] = useState([])
   const [commentPage, setCommentPage] = useState(0)
   const [isSingleComment, setIsSingleComment] = useState(false)
-
   const singleCommentRef = useRef(null)
+  const [participant, setParticipant] = useState(0)
 
   // Event's participants
   const onParticipate = async (eventId) => {
@@ -132,6 +136,7 @@ export default function Page({
           },
         }
       )
+      setParticipant((e) => e + 1)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
@@ -149,6 +154,7 @@ export default function Page({
           },
         }
       )
+      setParticipant((e) => e - 1)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
@@ -340,6 +346,7 @@ export default function Page({
 
         setIsParticipated(isParticipated)
         setEvent(event)
+        setParticipant(event.participants)
         if (comment) setComments([comment])
         else setComments(comments)
         setIsLoading(false)
@@ -449,7 +456,7 @@ export default function Page({
                   <BarChartFill className="text-[--blue-02] text-[4.1rem]" />
                   <div className="flex flex-col">
                     <p className="text-[20px] 2xl:text-[30px] font-extrabold">
-                      {event?.participants}
+                      {participant}
                     </p>
                     <p className="text-lg">người tham gia</p>
                   </div>
@@ -462,9 +469,11 @@ export default function Page({
                   onLoadParticipants={onLoadMoreParticipants}
                 />
                 {checkPermission('Event.Participant.Create') &&
-                  (isParticipated ? (
+                  (!isParticipated ? (
                     <Button
-                      onClick={() => onParticipate(params.id)}
+                      onClick={() => {
+                        onParticipate(params.id)
+                      }}
                       disabled={isDisabled}
                       placeholder={undefined}
                       size="md"

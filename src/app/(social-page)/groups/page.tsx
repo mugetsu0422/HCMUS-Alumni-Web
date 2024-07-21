@@ -26,6 +26,14 @@ export default function Page() {
   const [totalPages, setTotalPages] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [groups, setGroups] = useState([])
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
 
   const onSearch = useDebouncedCallback((keyword) => {
     if (keyword) {
@@ -113,56 +121,54 @@ export default function Page() {
   }, [myParams])
 
   return (
-    <>
-      <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
-        <div className="flex justify-between">
-          <p
-            className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
-            NHÓM
-          </p>
+    <div className="mt-4 max-w-[850px] min-w-[500px] w-[80%] m-auto flex flex-col gap-6 h-fit mb-12">
+      <div className="flex justify-between">
+        <p
+          className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+          NHÓM
+        </p>
 
-          {checkPermission('Group.Create') && (
-            <Link href={'/groups/create'}>
-              <Button
-                placeholder={undefined}
-                size="md"
-                className="text-white bg-[--blue-05] px-4 normal-case text-sm flex items-center justify-center gap-2">
-                <Plus className="text-xl font-semibold" />
-                Tạo nhóm mới
-              </Button>
-            </Link>
-          )}
-        </div>
-        <SearchAndFilterGroups
-          onSearch={onSearch}
-          onFilterPrivacy={onFilterPrivacy}
-          onResetFilter={onResetFilter}
-          onFilterMyGroup={onFilterMyGroup}
-          params={{
-            name: params.get('name'),
-            privacy: params.get('privacy'),
-            isJoined: params.get('isJoined'),
-          }}
-        />
-        <InfiniteScroll
-          className="flex flex-col gap-6"
-          dataLength={groups.length}
-          next={onFetchMore}
-          hasMore={hasMore}
-          loader={
-            <div className="h-10 my-5 flex justify-center">
-              <Spinner className="h-8 w-8"></Spinner>
-            </div>
-          }>
-          {groups.map((group) => (
-            <GroupsListItem
-              key={group.id}
-              group={group}
-              onJoinGroup={onJoinGroup}
-            />
-          ))}
-        </InfiniteScroll>
+        {isMounted && checkPermission('Group.Create') && (
+          <Link href={'/groups/create'}>
+            <Button
+              placeholder={undefined}
+              size="md"
+              className="text-white bg-[--blue-02] px-4 normal-case text-sm flex items-center justify-center gap-2">
+              <Plus className="text-xl font-semibold" />
+              Tạo nhóm mới
+            </Button>
+          </Link>
+        )}
       </div>
-    </>
+      <SearchAndFilterGroups
+        onSearch={onSearch}
+        onFilterPrivacy={onFilterPrivacy}
+        onResetFilter={onResetFilter}
+        onFilterMyGroup={onFilterMyGroup}
+        params={{
+          name: params.get('name'),
+          privacy: params.get('privacy'),
+          isJoined: params.get('isJoined'),
+        }}
+      />
+      <InfiniteScroll
+        className="flex flex-col gap-6"
+        dataLength={groups.length}
+        next={onFetchMore}
+        hasMore={hasMore}
+        loader={
+          <div className="h-10 my-5 flex justify-center">
+            <Spinner className="h-8 w-8"></Spinner>
+          </div>
+        }>
+        {groups.map((group) => (
+          <GroupsListItem
+            key={group.id}
+            group={group}
+            onJoinGroup={onJoinGroup}
+          />
+        ))}
+      </InfiniteScroll>
+    </div>
   )
 }

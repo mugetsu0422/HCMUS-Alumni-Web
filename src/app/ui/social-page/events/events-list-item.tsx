@@ -18,7 +18,7 @@ export default function EventsListItem({
 }) {
   const [isParticipated, setIsParticipated] = useState(event.isParticipated)
   const [isDisabled, setIsDisabled] = useState(false)
-  const permissions = Cookies.get('permissions')
+  const [participants, setParticipants] = useState(event.participants)
 
   const onClickParticipation = async () => {
     setIsDisabled(true)
@@ -26,6 +26,7 @@ export default function EventsListItem({
       await onParticipate(event.id)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
+      setParticipants((e) => e + 1)
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra!')
     }
@@ -36,6 +37,7 @@ export default function EventsListItem({
       await onCancelParticipation(event.id)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
+      setParticipants((e) => e - 1)
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra!')
     }
@@ -66,10 +68,10 @@ export default function EventsListItem({
         </Link>
         <div className="flex flex-col gap-1">
           <p className="flex items-start gap-1 text-md w-full">
-            <span className="">
+            <div className="flex items-center gap-1">
               <GeoAltFill className="text-[--blue-02]" />
-            </span>
-            <span className="w-fit">Địa điểm:</span>
+              <p className="text-nowrap">Địa điểm:</p>
+            </div>
             <span className="whitespace-nowrap text-ellipsis overflow-hidden text-wrap">
               {event.organizationLocation}
             </span>
@@ -89,7 +91,7 @@ export default function EventsListItem({
             </span>
             <span>Số người tham gia:</span>
             <span>
-              {event.participants} / {event.maximumParticipants}
+              {participants} / {event.maximumParticipants}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">

@@ -57,7 +57,7 @@ export default function SearchAndFilterFaculty({
             containerProps={{
               className: 'h-[50px]',
             }}
-            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+            className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 focus:border"
           />
         </div>
 
@@ -65,7 +65,7 @@ export default function SearchAndFilterFaculty({
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-md">Khoa</p>
             <select
-              className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+              className="h-[50px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 border disabled:cursor-not-allowed transition-all rounded-md border-blue-gray-200 focus:border-gray-900"
               {...register('facultyId', {
                 onChange: (e) => onFilter(e.target.value),
               })}>

@@ -101,8 +101,7 @@ export default function Page() {
     })
   }
   const onPrevPage = () => {
-    if (curPage == 1) return
-    params.set('page', (curPage - 2).toString())
+    if (curPage == 1) params.set('page', (curPage - 2).toString())
     replace(`${pathname}?${params.toString()}`, { scroll: false })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
@@ -165,7 +164,6 @@ export default function Page() {
 
             setTotalPages(totalPages)
             setEvents(events)
-            console.log(events)
           })
       })
       .catch((error) => {})
