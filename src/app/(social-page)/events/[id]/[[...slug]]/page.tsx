@@ -122,6 +122,8 @@ export default function Page({
   const [isSingleComment, setIsSingleComment] = useState(false)
   const singleCommentRef = useRef(null)
   const [participant, setParticipant] = useState(0)
+  const [numberComments, setNumberComments] = useState(0)
+  const [user, setUser] = useState(null)
 
   // Event's participants
   const onParticipate = async (eventId) => {
@@ -200,14 +202,34 @@ export default function Page({
     e: React.FormEvent<HTMLFormElement>,
     parentId: string | null = null,
     content: string
-  ): void => {
+  ) => {
     e.preventDefault()
+
     const comment = {
-      parentId: parentId,
-      content: content,
+      parentId,
+      content,
+    }
+
+    const renderComment = {
+      id: '1', // You should generate a unique ID here
+      creator: {
+        id: user.id,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
+      },
+      parentId,
+      content,
+      childrenCommentNumber: 0,
+      createAt: Date.now(),
+      updateAt: Date.now(),
+      permissions: {
+        edit: true,
+        delete: true,
+      },
     }
 
     const postCommentToast = toast.loading('Đang đăng')
+
     axios
       .post(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments`,
@@ -220,6 +242,33 @@ export default function Page({
       )
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
+        setNumberComments((e) => e + 1)
+
+        const updateComments = (comments: any[]) => {
+          if (parentId) {
+            // Find the parent comment and add the reply
+            const parentCommentIndex = comments.findIndex(
+              (c) => c.id === parentId
+            )
+            if (parentCommentIndex !== -1) {
+              const parentComment = comments[parentCommentIndex]
+              parentComment.replies = [
+                ...(parentComment.replies || []),
+                renderComment,
+              ]
+              comments[parentCommentIndex] = parentComment
+            } else {
+              // If the parent comment is not found, add the reply to the end of the comments array
+              setComments((prev) => [renderComment, ...prev])
+            }
+          } else {
+            // New comment
+            setComments((prev) => [renderComment, ...prev])
+          }
+          setComments(comments)
+        }
+
+        updateComments(comments)
       })
       .catch((error) => {
         toast.error(
@@ -338,12 +387,29 @@ export default function Page({
         },
       }
     )
-    Promise.all([detailsPromise, isParticipatedPromise, commentsPromise])
-      .then(([detailsRes, isParticipatedRes, commentsRes]) => {
+    const userInfor = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${Cookies.get(
+        'userId'
+      )}/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([
+      detailsPromise,
+      isParticipatedPromise,
+      commentsPromise,
+      userInfor,
+    ])
+      .then(([detailsRes, isParticipatedRes, commentsRes, userRes]) => {
         const { data: event } = detailsRes
         const isParticipated = isParticipatedRes.data[0].isParticipated
         const { comments, comment } = commentsRes.data
 
+        setUser(userRes.data.user)
+        setNumberComments(event?.childrenCommentNumber)
         setIsParticipated(isParticipated)
         setEvent(event)
         setParticipant(event.participants)
@@ -525,10 +591,7 @@ export default function Page({
           )}
 
           <p className="text-xl font-semibold">
-            Bình luận{' '}
-            <span className="font-normal">
-              ({event?.childrenCommentNumber})
-            </span>
+            Bình luận <span className="font-normal">({numberComments})</span>
           </p>
           {isSingleComment && (
             <SingleCommentIndicator

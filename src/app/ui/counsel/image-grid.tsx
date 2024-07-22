@@ -101,7 +101,7 @@ export default function ImageGrid({ pictures }) {
   }
 
   if (pictures.length <= 2) {
-    const height_of_picture = 550 / pictures.length
+    const height_of_picture = 400 / pictures.length
     return (
       <>
         <div className="flex flex-col gap-1">
@@ -136,7 +136,7 @@ export default function ImageGrid({ pictures }) {
               key={id}
               src={pictureUrl}
               alt="image post"
-              className={`w-full h-[275px] object-cover object-center hover:cursor-pointer`}
+              className={`w-full h-[210px] object-cover object-center hover:cursor-pointer`}
             />
           ))}
           <div className="flex gap-1">
@@ -146,7 +146,7 @@ export default function ImageGrid({ pictures }) {
                 key={id}
                 src={pictureUrl}
                 alt="image post"
-                className={`w-[50%] h-[275px] object-cover object-center hover:cursor-pointer`}
+                className={`w-[50%] h-[210px] object-cover object-center hover:cursor-pointer`}
               />
             ))}
           </div>
@@ -172,11 +172,11 @@ export default function ImageGrid({ pictures }) {
                 onClick={() => handleImageClick(idx)}
                 src={pictureUrl}
                 alt="image post"
-                className={`w-full h-[275px] object-cover object-center hover:cursor-pointer z-0`}
+                className={`w-full h-[210px] object-cover object-center hover:cursor-pointer z-0`}
               />
               {pictures.length == 5 && idx == 3 && (
                 <>
-                  <div className="bg-gray-500 opacity-40 z-10 w-full h-[275px] absolute top-0 "></div>
+                  <div className="bg-gray-500 opacity-40 z-10 w-full h-[210px] absolute top-0 "></div>
                   <p
                     className={`${nunito.className} text-[30px] font-semibold text-white opacity-100 absolute top-[45%] left-[45%] z-10`}>
                     + 1
