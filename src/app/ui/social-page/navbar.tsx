@@ -311,7 +311,6 @@ export default function MyNavbar() {
       })
       .then(({ data }) => {
         setUserAvatar(data?.user?.avatarUrl)
-        console.log(permissions)
       })
       .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -358,6 +357,7 @@ export default function MyNavbar() {
               />
             </svg>
           </Button>
+          
           <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
             <NotificationPopover />
             <Link href={`/messages/inbox`} className="group">

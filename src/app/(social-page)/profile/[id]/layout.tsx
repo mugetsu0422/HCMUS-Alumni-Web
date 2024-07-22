@@ -351,8 +351,6 @@ export default function GroupLayout({
       .catch((err) => {})
   }
 
-  setTotalPages(totalPages)
-
   useEffect(() => {
     const userPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${part[2]}/profile`,
@@ -398,6 +396,7 @@ export default function GroupLayout({
         setFriendList(userFriendListRes.data.friends)
 
         setHasMore(userFriendListRes.data.totalPages > 0)
+        setTotalPages(userFriendListRes.data.totalPages) // Set total pages here
       })
       .catch((error) => {})
   }, [userId])

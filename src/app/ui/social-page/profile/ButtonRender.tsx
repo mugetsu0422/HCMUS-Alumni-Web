@@ -13,6 +13,12 @@ import {
   MenuList,
   MenuItem,
 } from '@material-tailwind/react'
+import { usePathname, useRouter } from 'next/navigation'
+import { getDataUser } from '@/lib/features/new-message/new-message'
+import { useDispatch } from 'react-redux'
+import { JWT_COOKIE, MESSAGE_TYPE } from '@/app/constant'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 
 function RenderButton({
   onHandleRequest,
@@ -83,6 +89,34 @@ export default function ButtonRedering({
   handledeletefriend,
 }) {
   const [stateFriend, setStateFriend] = React.useState(user?.isFriendStatus)
+  const pathname = usePathname()
+  const part = pathname.split('/')
+  const router = useRouter()
+  const dispatch = useDispatch()
+
+  const onMessage = () => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/individual/${part[2]}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(({ data: { inboxId } }) => {
+        router.push(`/messages/inbox/${inboxId}`)
+      })
+      .catch((error) => {
+        // Handle the error if the request fails
+        router.push(`/messages/inbox/new`)
+        dispatch(getDataUser({
+          id: user.user.id,
+          fullName: user.user.fullName,
+          avatarUrl: user.user.avatarUrl,
+        }))
+      })
+  }
 
   return (
     !isProfileLoginUser && (
@@ -94,7 +128,10 @@ export default function ButtonRedering({
           setStateFriend={setStateFriend}
         />
 
-        <Button placeholder={undefined} className="bg-[--blue-05] normalcase">
+        <Button
+          onClick={onMessage}
+          placeholder={undefined}
+          className="bg-[--blue-05] normalcase">
           Nhắn tin
         </Button>
       </div>

@@ -2,26 +2,6 @@
 import React from 'react'
 import Link from 'next/link'
 /* eslint-disable @next/next/no-img-element */
-const dataTempSmall = [
-  {
-    title: '6-Year-Old Horse Dies at Belmont Park After Race Injury',
-    detail:
-      'NEW YORK—A 6-year-old horse died after being injured in a race at Belmont Park ahead of next week’s',
-    imgSrc: '/authentication.png',
-  },
-  {
-    title: 'Savilia Blunk Embraces Longer Season with World Cup',
-    detail:
-      'Last year, Savilia Blunk took a more conservative approach to her first season as an Elite Class athlete, skipping some',
-    imgSrc: '/authentication.png',
-  },
-  {
-    title: 'Ryan Garcia is fighting again, this time on social media',
-    detail:
-      'Boxing star Ryan Garcia and his promoter, Hall of Fame fighter Oscar De La Hoya, reignited their war of words via Twitter on',
-    imgSrc: '/authentication.png',
-  },
-]
 
 function SmallTrendingNews({ news }) {
   return (

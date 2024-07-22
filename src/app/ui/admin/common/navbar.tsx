@@ -27,7 +27,7 @@ import {
 import NotificationPopover from '@/app/ui/common/notification-popover'
 import { inter } from '@/app/ui/fonts'
 import { useAppSelector } from '@/lib/hooks'
-
+import AvatarUser from '../../common/avatar-user'
 const NavbarContext = createContext(null)
 import Cookies from 'js-cookie'
 import axios from 'axios'
@@ -285,7 +285,6 @@ export default function MyNavbar() {
     Cookies.remove('userId')
     Cookies.remove('jwt')
     Cookies.remove('permissions')
-    alert('ok')
 
     // Redirect to sign-in page
     router.push('/signin')
@@ -297,20 +296,6 @@ export default function MyNavbar() {
       () => window.innerWidth >= 960 && setIsNavOpen(false) // 960 = lg (tailwind)
     )
   }, [isNavOpen])
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(({ data }) => {
-        setUserAvatar(data?.user?.avatarUrl)
-      })
-      .catch((error) => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <NavbarContext.Provider
@@ -376,7 +361,7 @@ export default function MyNavbar() {
                 </Badge>
               </Button>
             </Link>
-            <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+            <AvatarUser />
           </div>
         </div>
         <Collapse
