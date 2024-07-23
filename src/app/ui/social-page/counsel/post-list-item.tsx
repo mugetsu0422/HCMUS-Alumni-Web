@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Avatar,
   Button,
@@ -40,6 +40,7 @@ import ReactionDialog from '../../common/reaction-dialog'
 import clsx from 'clsx'
 import DeletePostDialog from './delete-post-dialog'
 import Poll from '../../common/poll'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 interface PostProps {
   id: string
@@ -156,7 +157,10 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
       setSelectedVoteIds(new Set(selectedVoteIds))
     } catch (error) {
-      toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
+      toast.error(
+        error.response?.data?.error?.message.error?.message ||
+          'Lỗi không xác định'
+      )
     }
   }
 
@@ -209,9 +213,12 @@ export default function PostListItem({ post }: { post: PostProps }) {
         toast.success('Đăng thành công', { id: postCommentToast })
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-          id: postCommentToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: postCommentToast,
+          }
+        )
       })
   }
   const onFetchChildrenComments = async (
@@ -246,7 +253,9 @@ export default function PostListItem({ post }: { post: PostProps }) {
       )
       .then()
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
   const onCancelReactPost = () => {
@@ -262,7 +271,9 @@ export default function PostListItem({ post }: { post: PostProps }) {
       )
       .then()
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
   function handleReactionClick() {
@@ -302,7 +313,9 @@ export default function PostListItem({ post }: { post: PostProps }) {
         toast.success('Xoá bài viết thành công')
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
   const onEditComment = (
@@ -390,7 +403,9 @@ export default function PostListItem({ post }: { post: PostProps }) {
         setVotesCount(new Map(votesCount))
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
   const onFetchUserVotes = (
@@ -408,7 +423,14 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
     )
   }
+  const [isMounted, setIsMounted] = useState(false)
 
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
   return (
     !isDeleted && (
       <div
@@ -434,53 +456,55 @@ export default function PostListItem({ post }: { post: PostProps }) {
             </div>
           </div>
 
-          <Menu placement="bottom-end">
-            <MenuHandler>
-              <Button
+          {(post.permissions.edit || checkPermission('Counsel.Delete')) && (
+            <Menu placement="bottom-end">
+              <MenuHandler>
+                <Button
+                  placeholder={undefined}
+                  variant="text"
+                  className="rounded-full px-2 py-1">
+                  <ThreeDots className="text-xl text-black" />
+                </Button>
+              </MenuHandler>
+              <MenuList
                 placeholder={undefined}
-                variant="text"
-                className="rounded-full px-2 py-1">
-                <ThreeDots className="text-xl text-black" />
-              </Button>
-            </MenuHandler>
-            <MenuList
-              placeholder={undefined}
-              className={`${nunito.className} max-w-[250px]`}>
-              {post.permissions.edit && (
-                <MenuItem
-                  disabled={post.votes.length ? true : false}
-                  placeholder={undefined}
-                  className={'text-black text-base'}>
-                  <Link
-                    href={`/counsel/${post.id}/edit`}
-                    className="flex items-center gap-2">
+                className={`${nunito.className} max-w-[250px]`}>
+                {post.permissions.edit && (
+                  <MenuItem
+                    disabled={post.votes.length ? true : false}
+                    placeholder={undefined}
+                    className={'text-black text-base'}>
+                    <Link
+                      href={`/counsel/${post.id}/edit`}
+                      className="flex items-center gap-2">
+                      <div>
+                        <Pencil />
+                      </div>
+                      <div>
+                        <p>Chỉnh sửa bài viết</p>
+                        {post.votes.length ? (
+                          <p className="text-sm text-wrap">
+                            Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                          </p>
+                        ) : null}
+                      </div>
+                    </Link>
+                  </MenuItem>
+                )}
+                {post.permissions.delete && (
+                  <MenuItem
+                    onClick={handleOpenDeletePostDialog}
+                    placeholder={undefined}
+                    className={`text-black text-base flex items-center gap-2`}>
                     <div>
-                      <Pencil />
+                      <Trash />
                     </div>
-                    <div>
-                      <p>Chỉnh sửa bài viết</p>
-                      {post.votes.length ? (
-                        <p className="text-sm text-wrap">
-                          Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
-                        </p>
-                      ) : null}
-                    </div>
-                  </Link>
-                </MenuItem>
-              )}
-              {post.permissions.delete && (
-                <MenuItem
-                  onClick={handleOpenDeletePostDialog}
-                  placeholder={undefined}
-                  className={`text-black text-base flex items-center gap-2`}>
-                  <div>
-                    <Trash />
-                  </div>
-                  <p>Xóa bài viết</p>
-                </MenuItem>
-              )}
-            </MenuList>
-          </Menu>
+                    <p>Xóa bài viết</p>
+                  </MenuItem>
+                )}
+              </MenuList>
+            </Menu>
+          )}
         </div>
 
         {/* this is the body of a post */}
@@ -521,7 +545,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
             {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
 
-          {votes.length !== 0 && (
+          {isMounted && votes.length !== 0 && (
             <Poll
               allowMultipleVotes={post.allowMultipleVotes}
               allowAddOptions={post.allowAddOptions}
@@ -588,40 +612,46 @@ export default function PostListItem({ post }: { post: PostProps }) {
             hanldeOpenReactDialog={hanldeOpenReactDialog}
           />
 
-          <div className="flex gap-2">
-            <Button
-              onClick={handleReactionClick}
-              placeholder={undefined}
-              variant="text"
-              className="flex gap-1 py-2 px-1 normal-case w-fit">
-              {isReacted ? (
-                <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
-              ) : (
-                <HandThumbsUp className="text-[16px]" />
-              )}
-              <span
-                className={
-                  isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
-                }>
-                Thích
-              </span>
-            </Button>
+          {checkPermission('Counsel.Reaction.Create') &&
+            checkPermission('Counsel.Comment.Create') && (
+              <div className="flex gap-2 mt-1">
+                <Button
+                  onClick={handleReactionClick}
+                  placeholder={undefined}
+                  variant="text"
+                  className="flex gap-1 py-2 px-1 normal-case w-fit">
+                  {isReacted ? (
+                    <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
+                  ) : (
+                    <HandThumbsUp className="text-[16px]" />
+                  )}
+                  <span
+                    className={
+                      isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
+                    }>
+                    Thích
+                  </span>
+                </Button>
 
-            <Button
-              onClick={() => {
-                if (comments.length === 0 && post.childrenCommentNumber != 0) {
-                  onFetchComments(0, COMMENT_PAGE_SIZE)
-                }
+                <Button
+                  onClick={() => {
+                    if (
+                      comments.length === 0 &&
+                      post.childrenCommentNumber != 0
+                    ) {
+                      onFetchComments(0, COMMENT_PAGE_SIZE)
+                    }
 
-                handleOpenCommentDialog()
-              }}
-              placeholder={undefined}
-              variant="text"
-              className="flex gap-1 py-2 px-4 normal-case w-fit">
-              <Chat className="text-[16px]" />
-              <span className="text-[14px]">Bình luận</span>
-            </Button>
-          </div>
+                    handleOpenCommentDialog()
+                  }}
+                  placeholder={undefined}
+                  variant="text"
+                  className="flex gap-1 py-2 px-4 normal-case w-fit">
+                  <Chat className="text-[16px]" />
+                  <span className="text-[14px]">Bình luận</span>
+                </Button>
+              </div>
+            )}
 
           <CommentsDialog
             post={post}

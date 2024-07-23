@@ -1,7 +1,5 @@
 'use client'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import Thumbnail from '../../ui/social-page/thumbnail-image'
-
 import CreatePost from '../../ui/counsel/create-post'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
@@ -13,7 +11,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
 import PostListItem from '../../ui/social-page/counsel/post-list-item'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 export default function Page() {
   const pathname = usePathname()
@@ -32,7 +30,9 @@ export default function Page() {
     if (!tagNames) return []
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
-
+  const userId = Cookies.get('userId')
+  const [userAvatar, setUserAvatar] = useState('')
+  
   const resetCurPage = () => {
     params.delete('page')
     curPage.current = 0
@@ -106,26 +106,36 @@ export default function Page() {
 
   useEffect(() => {
     // Posts list
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel${myParams}`, {
+    const postsPrmoise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel${myParams}`,
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then(({ data: { totalPages, posts } }) => {
-        setTotalPages(totalPages)
-        setPosts(posts)
-        setHasMore(totalPages > 1)
+      }
+    )
 
+    const userPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([postsPrmoise, userPromise])
+      .then(([postsPromise, userPromise]) => {
+        setTotalPages(postsPromise.data.totalPages)
+        setPosts(postsPromise.data.posts)
+        setHasMore(totalPages > 1)
+        setUserAvatar(userPromise.data?.user?.avatarUrl)
         setIsLoading(false)
       })
       .catch((err) => {})
-  }, [myParams])
+  }, [myParams, userId])
 
   return (
     <>
-      
-      <Thumbnail />
       <div className="mt-4 mb-8 max-w-[850px] w-[80%] m-auto flex flex-col gap-6">
         <SearchAndFilter
           selectedTags={selectedTags}
@@ -137,7 +147,9 @@ export default function Page() {
             title: params.get('title'),
           }}
         />
-        <CreatePost />
+        {checkPermission('Counsel.Create') && (
+          <CreatePost userAvatar={userAvatar} />
+        )}
         {!isLoading && (
           <InfiniteScroll
             dataLength={posts.length}

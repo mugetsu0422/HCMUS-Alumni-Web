@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { inter, nunito } from '../../fonts'
-import { Input, Button } from '@material-tailwind/react'
+import { Input, Button, Avatar } from '@material-tailwind/react'
 import LinkIcon from './link-icon'
 import { CheckCircleFill, XCircleFill } from 'react-bootstrap-icons'
 
@@ -71,13 +71,11 @@ export default function CardInformation({ offset, items }) {
             </div>
             {/* Final line for the profile image */}
             <div className="grid grid-cols-3 gap-3">
-              <Image
-                priority={true}
+              <Avatar
+                placeholder={undefined}
                 src={avatarUrl || ''}
                 alt="profile image"
-                width={200}
-                height={200}
-                className="col-span-1 rounded-full"
+                className="col-span-1 w-full h-full aspect-square"
               />
               <form className="col-span-2 py-8 my-auto">
                 <Input

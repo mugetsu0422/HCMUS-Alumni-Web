@@ -17,16 +17,22 @@ import Link from 'next/link'
 import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+  faRightFromBracket,
   faNewspaper,
   faCalendarDays,
   faCertificate,
   faUser,
+  faCircleUser,
 } from '@fortawesome/free-solid-svg-icons'
 import NotificationPopover from '@/app/ui/common/notification-popover'
 import { inter } from '@/app/ui/fonts'
 import { useAppSelector } from '@/lib/hooks'
-
+import AvatarUser from '../../common/avatar-user'
 const NavbarContext = createContext(null)
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import { JWT_COOKIE } from '@/app/constant'
+import { useRouter } from 'next/navigation'
 
 // nav list component
 const navListItems = [
@@ -79,8 +85,11 @@ const navListItems = [
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {
-  const { toggleIsNavOpen } = useContext(NavbarContext)
+  const { isNavOpen, toggleIsNavOpen } = useContext(NavbarContext)
   const [isMobile, setIsMobile] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
+  const [openSubMenuMobile, setOpenSubMenuMobile] = useState(false)
 
   useEffect(() => {
     window.addEventListener(
@@ -88,10 +97,6 @@ function NavListMenu({ label, icon, navListMenuItems }) {
       () => (window.innerWidth >= 960 ? setIsMobile(false) : setIsMobile(true)) // 960 = lg (tailwind)
     )
   }, [isMobile])
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [openSubMenuWeb, setOpenSubMenuWeb] = useState(false)
-  const [openSubMenuMobile, setOpenSubMenuMobile] = useState(false)
 
   const renderItemsForWeb = navListMenuItems.map(({ title, link, subMenu }) => {
     return subMenu ? (
@@ -118,7 +123,9 @@ function NavListMenu({ label, icon, navListMenuItems }) {
           className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
           {subMenu.map(({ title, link }) => (
             <Link
-              onClick={toggleIsNavOpen}
+              onClick={() => {
+                if (isNavOpen) toggleIsNavOpen()
+              }}
               href={link}
               key={title}
               className="focus-visible:outline-none">
@@ -167,7 +174,9 @@ function NavListMenu({ label, icon, navListMenuItems }) {
             className="bg-white rounded-xl border-2 border-[var(--blue-02)]">
             {subMenu.map(({ title, link }) => (
               <Link
-                onClick={toggleIsNavOpen}
+                onClick={() => {
+                  if (isNavOpen) toggleIsNavOpen()
+                }}
                 href={link}
                 key={title}
                 className="focus-visible:outline-none">
@@ -232,7 +241,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
 }
 
 function NavList() {
-  const { toggleIsNavOpen } = useContext(NavbarContext)
+  const { isNavOpen, toggleIsNavOpen } = useContext(NavbarContext)
 
   return (
     <ul className="mt-2 mb-4 ml-3 lg:ml-5 flex flex-col lg:mb-0 lg:mt-0 lg:flex-row lg:items-center  ">
@@ -242,7 +251,9 @@ function NavList() {
             <NavListMenu label={label} icon={icon} navListMenuItems={subMenu} />
           ) : (
             <Link
-              onClick={toggleIsNavOpen}
+              onClick={() => {
+                if (isNavOpen) toggleIsNavOpen()
+              }}
               href={link}
               className={`text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2`}>
               <MenuItem
@@ -262,8 +273,22 @@ function NavList() {
 export default function MyNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
   const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
+  const userId = Cookies.get('userId')
+  const [userAvatar, setUserAvatar] = React.useState('')
 
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
+
+  const router = useRouter()
+
+  const handleLogout = () => {
+    // Clear the cookies
+    Cookies.remove('userId')
+    Cookies.remove('jwt')
+    Cookies.remove('permissions')
+
+    // Redirect to sign-in page
+    router.push('/signin')
+  }
 
   useEffect(() => {
     window.addEventListener(
@@ -276,6 +301,7 @@ export default function MyNavbar() {
     <NavbarContext.Provider
       value={{
         toggleIsNavOpen,
+        isNavOpen,
       }}>
       <Navbar
         placeholder={undefined}
@@ -319,7 +345,7 @@ export default function MyNavbar() {
           /> */}
           <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
             <NotificationPopover />
-            <Link href={`messages/inbox`}>
+            <Link href={`/messages/inbox`} className="group">
               <Button
                 placeholder={undefined}
                 className="h-full w-full"
@@ -330,12 +356,12 @@ export default function MyNavbar() {
                   content={unreadInboxSet.length}
                   className="bg-[var(--blue-05)]">
                   <div className="h-[24px] w-[24px]">
-                    <ChatDotsFill className="h-full w-full text-[--text-navbar]" />
+                    <ChatDotsFill className="h-full w-full text-[--text-navbar] group-hover:text-[--blue-05]" />
                   </div>
                 </Badge>
               </Button>
             </Link>
-            <Avatar placeholder={undefined} src="/demo.jpg" alt="avatar" />
+            <AvatarUser />
           </div>
         </div>
         <Collapse

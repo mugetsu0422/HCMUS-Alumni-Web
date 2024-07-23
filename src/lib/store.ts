@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import notificationCounter from './features/notification/notification-counter'
 import socketResponse from './features/message/socket-response'
 import inboxManager from './features/message/inbox-manager'
+import newMessageSlice from './features/new-message/new-message'
 
 export const makeStore = () => {
   return configureStore({
@@ -9,6 +10,7 @@ export const makeStore = () => {
       notificationCounter: notificationCounter,
       socketResponse: socketResponse,
       inboxManager: inboxManager,
+      newMessage: newMessageSlice,
     },
   })
 }

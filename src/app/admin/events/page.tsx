@@ -15,7 +15,7 @@ import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3

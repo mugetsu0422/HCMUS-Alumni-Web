@@ -10,7 +10,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import { Controller, useForm } from 'react-hook-form'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { useRouter } from 'next/navigation'
 import { ReactTags } from 'react-tag-autocomplete'
 import { JWT_COOKIE, TAGS_LIMIT } from '@/app/constant'

@@ -135,7 +135,7 @@ export default function GroupLayout({
               crossOrigin={undefined}
               label="Tìm kiếm"
               containerProps={{
-                className: 'flex flex-1 shrink !min-w-[100px] -z-10',
+                className: 'flex flex-1 shrink !min-w-[100px] z-10',
               }}
               value={queryInput}
               onChange={(e) => {

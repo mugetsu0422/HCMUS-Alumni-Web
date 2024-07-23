@@ -23,12 +23,12 @@ import { XLg } from 'react-bootstrap-icons'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import CustomToaster from '@/app/ui/common/custom-toaster'
 import { JWT_COOKIE } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 const PARTICIPANT_FETCH_LIMIT = 50
 
@@ -74,27 +74,31 @@ function ParticipantsDialog({
         id="scrollableParticipants"
         placeholder={undefined}
         className="flex flex-col h-[400px] overflow-y-auto scrollbar-webkit-main">
-        <InfiniteScroll
-          className="flex flex-col gap-2"
-          dataLength={participants.length}
-          next={onFetchMore}
-          hasMore={hasMore}
-          loader={
-            <div className="h-10 my-5 flex justify-center">
-              <Spinner className="h-8 w-8"></Spinner>
-            </div>
-          }
-          scrollableTarget="scrollableParticipants">
-          {participants.map(({ id, fullName, avatarUrl }) => (
-            <Link
-              href={`#`}
-              key={id}
-              className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
-              <Avatar placeholder={undefined} src={avatarUrl} alt="avatar" />
-              <p>{fullName}</p>
-            </Link>
-          ))}
-        </InfiniteScroll>
+        {participants.length > 0 ? (
+          <InfiniteScroll
+            className="flex flex-col gap-2"
+            dataLength={participants.length}
+            next={onFetchMore}
+            hasMore={hasMore}
+            loader={
+              <div className="h-10 my-5 flex justify-center">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            }
+            scrollableTarget="scrollableParticipants">
+            {participants.map(({ id, fullName, avatarUrl }) => (
+              <Link
+                href={`#`}
+                key={id}
+                className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
+                <Avatar placeholder={undefined} src={avatarUrl} alt="avatar" />
+                <p>{fullName}</p>
+              </Link>
+            ))}
+          </InfiniteScroll>
+        ) : (
+          <p className="text-black">Hiện không có người tham gia</p>
+        )}
       </DialogBody>
     </Dialog>
   )
@@ -116,8 +120,10 @@ export default function Page({
   const [comments, setComments] = useState([])
   const [commentPage, setCommentPage] = useState(0)
   const [isSingleComment, setIsSingleComment] = useState(false)
-
   const singleCommentRef = useRef(null)
+  const [participant, setParticipant] = useState(0)
+  const [numberComments, setNumberComments] = useState(0)
+  const [user, setUser] = useState(null)
 
   // Event's participants
   const onParticipate = async (eventId) => {
@@ -132,6 +138,7 @@ export default function Page({
           },
         }
       )
+      setParticipant((e) => e + 1)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
@@ -149,6 +156,7 @@ export default function Page({
           },
         }
       )
+      setParticipant((e) => e - 1)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
@@ -194,14 +202,34 @@ export default function Page({
     e: React.FormEvent<HTMLFormElement>,
     parentId: string | null = null,
     content: string
-  ): void => {
+  ) => {
     e.preventDefault()
+
     const comment = {
-      parentId: parentId,
-      content: content,
+      parentId,
+      content,
+    }
+
+    const renderComment = {
+      id: '1', // You should generate a unique ID here
+      creator: {
+        id: user.id,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
+      },
+      parentId,
+      content,
+      childrenCommentNumber: 0,
+      createAt: Date.now(),
+      updateAt: Date.now(),
+      permissions: {
+        edit: true,
+        delete: true,
+      },
     }
 
     const postCommentToast = toast.loading('Đang đăng')
+
     axios
       .post(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments`,
@@ -214,6 +242,33 @@ export default function Page({
       )
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
+        setNumberComments((e) => e + 1)
+
+        const updateComments = (comments: any[]) => {
+          if (parentId) {
+            // Find the parent comment and add the reply
+            const parentCommentIndex = comments.findIndex(
+              (c) => c.id === parentId
+            )
+            if (parentCommentIndex !== -1) {
+              const parentComment = comments[parentCommentIndex]
+              parentComment.replies = [
+                ...(parentComment.replies || []),
+                renderComment,
+              ]
+              comments[parentCommentIndex] = parentComment
+            } else {
+              // If the parent comment is not found, add the reply to the end of the comments array
+              setComments((prev) => [renderComment, ...prev])
+            }
+          } else {
+            // New comment
+            setComments((prev) => [renderComment, ...prev])
+          }
+          setComments(comments)
+        }
+
+        updateComments(comments)
       })
       .catch((error) => {
         toast.error(
@@ -332,14 +387,32 @@ export default function Page({
         },
       }
     )
-    Promise.all([detailsPromise, isParticipatedPromise, commentsPromise])
-      .then(([detailsRes, isParticipatedRes, commentsRes]) => {
+    const userInfor = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${Cookies.get(
+        'userId'
+      )}/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([
+      detailsPromise,
+      isParticipatedPromise,
+      commentsPromise,
+      userInfor,
+    ])
+      .then(([detailsRes, isParticipatedRes, commentsRes, userRes]) => {
         const { data: event } = detailsRes
         const isParticipated = isParticipatedRes.data[0].isParticipated
         const { comments, comment } = commentsRes.data
 
+        setUser(userRes.data.user)
+        setNumberComments(event?.childrenCommentNumber)
         setIsParticipated(isParticipated)
         setEvent(event)
+        setParticipant(event.participants)
         if (comment) setComments([comment])
         else setComments(comments)
         setIsLoading(false)
@@ -388,7 +461,6 @@ export default function Page({
       <>
         <div
           className={`${nunito.className} flex flex-col gap-6 w-[75%] max-w-[1366px] bg-[--blue-04] rounded-lg m-auto lg:px-10 lg:py-10 mt-16 mb-16`}>
-          
           <div className="flex flex-col xl:flex-row items-center justify-center m-auto gap-x-10">
             <img
               src={event?.thumbnail}
@@ -450,7 +522,7 @@ export default function Page({
                   <BarChartFill className="text-[--blue-02] text-[4.1rem]" />
                   <div className="flex flex-col">
                     <p className="text-[20px] 2xl:text-[30px] font-extrabold">
-                      {event?.participants}
+                      {participant}
                     </p>
                     <p className="text-lg">người tham gia</p>
                   </div>
@@ -462,25 +534,28 @@ export default function Page({
                   participantCount={event?.participants}
                   onLoadParticipants={onLoadMoreParticipants}
                 />
-                {!isParticipated ? (
-                  <Button
-                    onClick={() => onParticipate(params.id)}
-                    disabled={isDisabled}
-                    placeholder={undefined}
-                    size="md"
-                    className="bg-[--blue-02] font-medium w-full text-[16px]">
-                    Tham gia
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => onCancelParticipation(params.id)}
-                    disabled={isDisabled}
-                    placeholder={undefined}
-                    size="md"
-                    className="bg-[--blue-02] font-medium w-full text-[16px]">
-                    Huỷ tham gia
-                  </Button>
-                )}
+                {checkPermission('Event.Participant.Create') &&
+                  (!isParticipated ? (
+                    <Button
+                      onClick={() => {
+                        onParticipate(params.id)
+                      }}
+                      disabled={isDisabled}
+                      placeholder={undefined}
+                      size="md"
+                      className="bg-[--blue-02] font-medium w-full text-[16px]">
+                      Tham gia
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => onCancelParticipation(params.id)}
+                      disabled={isDisabled}
+                      placeholder={undefined}
+                      size="md"
+                      className="bg-[--blue-02] font-medium w-full text-[16px]">
+                      Huỷ tham gia
+                    </Button>
+                  ))}
               </div>
             </div>
           </div>
@@ -488,34 +563,35 @@ export default function Page({
             <p className="lg:text-[26px] sm:text-lg font-extrabold">
               Thông tin chi tiết
             </p>
-            <p className="text-pretty text-base whitespace-pre-line">{event?.content}</p>
+            <p className="text-pretty text-base whitespace-pre-line">
+              {event?.content}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-y-2 w-[75%] max-w-[1366px] m-auto mb-10">
-          <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
-            <Textarea
-              onChange={handleUploadCommentChange}
-              placeholder={undefined}
-              label="Chia sẻ ý kiến của bạn"
-            />
-            <div className="flex justify-end gap-x-4 pt-2 mr-2">
-              <Button
+          {checkPermission('Event.Comment.Create') && (
+            <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+              <Textarea
+                onChange={handleUploadCommentChange}
                 placeholder={undefined}
-                size="md"
-                disabled={!uploadComment.trim()}
-                type="submit"
-                className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-                Đăng
-              </Button>
-            </div>
-          </form>
+                label="Chia sẻ ý kiến của bạn"
+              />
+              <div className="flex justify-end gap-x-4 pt-2 mr-2">
+                <Button
+                  placeholder={undefined}
+                  size="md"
+                  disabled={!uploadComment.trim()}
+                  type="submit"
+                  className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+                  Đăng
+                </Button>
+              </div>
+            </form>
+          )}
 
           <p className="text-xl font-semibold">
-            Bình luận{' '}
-            <span className="font-normal">
-              ({event?.childrenCommentNumber})
-            </span>
+            Bình luận <span className="font-normal">({numberComments})</span>
           </p>
           {isSingleComment && (
             <SingleCommentIndicator

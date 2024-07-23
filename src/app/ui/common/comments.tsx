@@ -25,6 +25,8 @@ import 'moment/locale/vi'
 import { CHILDREN_COMMENTS_PAGE_SIZE } from '../../constant'
 import { AxiosResponse } from 'axios'
 import toast from 'react-hot-toast'
+import Cookies from 'js-cookie'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 const CommentsConxtext = createContext<CommentsContextProps>(null)
 
@@ -87,64 +89,6 @@ interface CommentsProps {
   onDeleteComment: DeleteCommentHandler
   onFetchChildrenComments: FetchChildrenCommentsHandler
 }
-
-// function ChildrenComments({ comment }: ChildrenCommentsProps) {
-//   const [isOpenInputComments, setIsOpenInputComments] = useState(false)
-//   const [comments, setComments] = useState('')
-
-//   // Function to handle changes in the textarea
-//   const handleCommentChange = (event) => {
-//     setComments(event.target.value)
-//   }
-
-//   return (
-//     <div
-//       className={`${nunito.className} flex flex-col border-l-2 border-[#e5e5e5] sm:pl-8 lg:pl-10 py-2`}>
-//       <div className="flex items-center gap-3">
-//         <Avatar
-//           size="sm"
-//           src={comment?.creator.avatarUrl}
-//           alt="avatar user"
-//           placeholder={undefined}
-//         />
-//         <p>{comment?.creator.fullName}</p>
-//       </div>
-//       <p className="sm:pl-8 lg:pl-12 whitespace-pre-line">{comment?.content}</p>
-//       <Button
-//         onClick={() => setIsOpenInputComments((e) => !e)}
-//         placeholder={undefined}
-//         variant="text"
-//         className="py-2 px-2 gap-2 w-fit flex items-center normal-case ml-[40px] my-2">
-//         <Chat className="font-bold text-lg" /> Bình luận
-//       </Button>
-
-//       {isOpenInputComments && (
-//         <>
-//           <Textarea
-//             placeholder="Bình luận"
-//             resize={true}
-//             onChange={handleCommentChange}
-//             className="sm:ml-8 lg:ml-12 h-[30px] w-[93%] bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-//             labelProps={{
-//               className:
-//                 'w-[93%] before:content-none after:content-none sm:ml-8 lg:ml-12 w-fit',
-//             }}
-//           />
-//           <div className="flex justify-end gap-x-4 pt-2 mr-2">
-//             <Button
-//               placeholder={undefined}
-//               size="md"
-//               disabled={!comments.trim()}
-//               type="submit"
-//               className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-//               Đăng
-//             </Button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   )
-// }
 
 function CommentsListItem({ comment, depth }: CommentListItemProps) {
   const [isOpenComments, setIsOpenComments] = useState(false)
@@ -283,7 +227,8 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                   )}
                 </div>
 
-                {!openEditComment && (
+                {(checkPermission('Event.Comment.Delete') ||
+                  comment.permissions.delete) && (
                   <Menu placement="bottom-end">
                     <MenuHandler>
                       <Button
@@ -332,14 +277,19 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
                 {!isEditingComment ? (
                   <>
                     <p className="text-[var(--secondary)]">
-                      {moment(comment.createAt).locale('vi').local().fromNow(true)}
+                      {moment(comment.createAt)
+                        .locale('vi')
+                        .local()
+                        .fromNow(true)}
                     </p>
-                    <div
-                      onClick={() => setIsOpenInputComments((e) => !e)}
-                      className="py-2 px-4 gap-2 w-fit flex items-center normal-case hover:cursor-pointer hover:underline">
-                      <Chat className="font-bold text-lg" />
-                      <p>Bình luận</p>
-                    </div>
+                    {checkPermission('Counsel.Comment.Create') && (
+                      <div
+                        onClick={() => setIsOpenInputComments((e) => !e)}
+                        className="py-2 px-4 gap-2 w-fit flex items-center normal-case hover:cursor-pointer hover:underline">
+                        <Chat className="font-bold text-lg" />
+                        <p>Bình luận</p>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="text-[var(--secondary)]">Đang chỉnh sửa...</p>

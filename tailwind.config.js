@@ -38,15 +38,21 @@ module.exports = withMT({
           '&::-webkit-scrollbar': {
             width: '10px',
             height: '8px',
+            zIndex: 0,
+            position: 'absolute', // This allows stacking elements
           },
           '&::-webkit-scrollbar-track': {
             background: '#f1f1f100',
             borderRadius: '10px',
+            zIndex: 0,
+            position: 'absolute',
           },
 
           '&::-webkit-scrollbar-thumb': {
             backgroundColor: '#c1c1c1',
             borderRadius: '10px',
+            zIndex: 0,
+            position: 'absolute',
           },
         },
       }

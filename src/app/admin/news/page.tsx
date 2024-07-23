@@ -15,7 +15,7 @@ import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { TagSelected, Tag } from 'react-tag-autocomplete'
 
 interface FunctionSectionProps {

@@ -20,6 +20,7 @@ import clsx from 'clsx'
 import SocketManager from '@/config/socket/socket-manager'
 import TextareaAutosize from 'react-textarea-autosize'
 import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
 
 export default function Page() {
   const router = useRouter()
@@ -35,9 +36,12 @@ export default function Page() {
   const [messageContent, setMessageContent] = useState('')
 
   const dispatch = useAppDispatch()
-
+  const mapStateToProps = (state) => ({
+    newMessage: state.newMessage,
+  })
   useEffect(() => {
     dispatch(setActiveInboxId(null))
+    setSelectedUser(mapStateToProps)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const onSearch = useDebouncedCallback((query) => {
@@ -335,8 +339,7 @@ export default function Page() {
           placeholder={undefined}
           variant="text"
           className="p-2 w-fit h-fit grow-0 shrink-0"
-          onClick={handleKeyDown}
-        >
+          onClick={handleKeyDown}>
           <FontAwesomeIcon
             icon={faPaperPlane}
             className="text-xl text-[#64748B]"

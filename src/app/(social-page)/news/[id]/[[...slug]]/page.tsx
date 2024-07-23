@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import moment from 'moment'
 import toast from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 import { JWT_COOKIE } from '@/app/constant'
 import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'
@@ -30,9 +30,9 @@ export default function Page({
   const [comments, setComments] = useState([])
   const [commentPage, setCommentPage] = useState(0)
   const [isSingleComment, setIsSingleComment] = useState(false)
-
+  const [user, setUser] = useState(null)
   const singleCommentRef = useRef(null)
-
+  const [numberComments, setNumberComments] = useState(0)
   // Function to handle changes in the textarea
   const handleUploadCommentChange = (event) => {
     setUploadComment(event.target.value)
@@ -46,6 +46,23 @@ export default function Page({
     const comment = {
       parentId: parentId,
       content: content,
+    }
+    const renderComment = {
+      id: '1',
+      creator: {
+        id: user.id,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
+      },
+      parentId: parentId,
+      content: content,
+      childrenCommentNumber: 0,
+      createAt: Date.now(),
+      updateAt: Date.now(),
+      permissions: {
+        edit: true,
+        delete: true,
+      },
     }
 
     const postCommentToast = toast.loading('Đang đăng')
@@ -61,6 +78,8 @@ export default function Page({
       )
       .then(() => {
         toast.success('Đăng thành công', { id: postCommentToast })
+        setComments((prev) => [renderComment, ...prev])
+        setNumberComments((e) => e + 1)
       })
       .catch((error) => {
         toast.error(
@@ -177,8 +196,19 @@ export default function Page({
       }
     )
 
-    Promise.all([news, comments, relatedNews])
-      .then(([newsRes, commentRes, relatedNewsRes]) => {
+    const userInfor = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${Cookies.get(
+        'userId'
+      )}/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+
+    Promise.all([news, comments, relatedNews, userInfor])
+      .then(([newsRes, commentRes, relatedNewsRes, userRes]) => {
         const { data: news } = newsRes
         const {
           data: { comments, comment },
@@ -187,7 +217,10 @@ export default function Page({
           data: { news: relatedNews },
         } = relatedNewsRes
 
+        setUser(userRes.data.user)
+
         setNews(news)
+        setNumberComments(news?.childrenCommentNumber)
         if (comment) setComments([comment])
         else setComments(comments)
         setRelatedNews(relatedNews)
@@ -235,7 +268,6 @@ export default function Page({
   if (!isLoading)
     return (
       <div className="flex flex-col xl:flex-row m-auto max-w-[1000px] w-[80%]">
-        
         <div className={`mt-10 flex flex-col gap-y-8 mx-0 md:mx-auto w-full`}>
           <div className="flex justify-between items-start">
             {news?.faculty ? (
@@ -310,10 +342,7 @@ export default function Page({
             </form>
 
             <p className="text-xl font-semibold">
-              Bình luận{' '}
-              <span className="font-normal">
-                ({news?.childrenCommentNumber})
-              </span>
+              Bình luận <span className="font-normal">({numberComments})</span>
             </p>
             {isSingleComment && (
               <SingleCommentIndicator

@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import moment from 'moment'
 import toast from 'react-hot-toast'
+import Cookies from 'js-cookie'
+import checkPermission from '../../common/checking-permission'
 
 export default function EventsListItem({
   event,
@@ -16,6 +18,7 @@ export default function EventsListItem({
 }) {
   const [isParticipated, setIsParticipated] = useState(event.isParticipated)
   const [isDisabled, setIsDisabled] = useState(false)
+  const [participants, setParticipants] = useState(event.participants)
 
   const onClickParticipation = async () => {
     setIsDisabled(true)
@@ -23,6 +26,7 @@ export default function EventsListItem({
       await onParticipate(event.id)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
+      setParticipants((e) => e + 1)
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra!')
     }
@@ -33,6 +37,7 @@ export default function EventsListItem({
       await onCancelParticipation(event.id)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
+      setParticipants((e) => e - 1)
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra!')
     }
@@ -55,7 +60,7 @@ export default function EventsListItem({
         </figure>
       </Link>
 
-      <div className="flex flex-col gap-2 w-full items-left justify-between">
+      <div className="flex flex-col w-full items-left gap-2">
         <Link
           href={`/events/${event.id}`}
           className="text-[24px] font-semibold w-full line-clamp-2 text-ellipsis overflow-hidden">
@@ -63,10 +68,10 @@ export default function EventsListItem({
         </Link>
         <div className="flex flex-col gap-1">
           <p className="flex items-start gap-1 text-md w-full">
-            <span className="">
+            <div className="flex items-center gap-1">
               <GeoAltFill className="text-[--blue-02]" />
-            </span>
-            <span className="w-fit">Địa điểm:</span>
+              <p className="text-nowrap">Địa điểm:</p>
+            </div>
             <span className="whitespace-nowrap text-ellipsis overflow-hidden text-wrap">
               {event.organizationLocation}
             </span>
@@ -86,7 +91,7 @@ export default function EventsListItem({
             </span>
             <span>Số người tham gia:</span>
             <span>
-              {event.participants} / {event.maximumParticipants}
+              {participants} / {event.maximumParticipants}
             </span>
           </p>
           <p className="flex items-center gap-1 text-md">
@@ -97,25 +102,26 @@ export default function EventsListItem({
             <span>{event.minimumParticipants}</span>
           </p>
         </div>
-        {!isParticipated ? (
-          <Button
-            onClick={() => onClickParticipation()}
-            disabled={isDisabled}
-            placeholder={undefined}
-            size="md"
-            className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
-            Tham gia
-          </Button>
-        ) : (
-          <Button
-            onClick={() => onClickParticipationCancel()}
-            disabled={isDisabled}
-            placeholder={undefined}
-            size="md"
-            className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
-            Huỷ tham gia
-          </Button>
-        )}
+        {checkPermission('Event.Participant.Create') &&
+          (!isParticipated ? (
+            <Button
+              onClick={() => onClickParticipation()}
+              disabled={isDisabled}
+              placeholder={undefined}
+              size="md"
+              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
+              Tham gia
+            </Button>
+          ) : (
+            <Button
+              onClick={() => onClickParticipationCancel()}
+              disabled={isDisabled}
+              placeholder={undefined}
+              size="md"
+              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
+              Huỷ tham gia
+            </Button>
+          ))}
       </div>
     </div>
   )

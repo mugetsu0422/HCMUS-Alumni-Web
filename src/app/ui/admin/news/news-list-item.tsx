@@ -24,7 +24,6 @@ import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
-import CustomToaster from '../../common/custom-toaster'
 import Tag from '../../common/tag'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
@@ -186,7 +185,7 @@ export default function NewsListItem({
         {faculty ? faculty.name : 'Tất cả'}
       </p>
       <p className="w-[8rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
-        {moment(publishedAt).local().format('DD/MM/YYYY HH:mm:ss')}
+        {moment(publishedAt).local().format('DD/MM/YYYY HH:mm')}
       </p>
       <p className="w-[7.5rem] h-20 text-center text-black p-2 font-[600] flex items-center justify-center">
         {views}

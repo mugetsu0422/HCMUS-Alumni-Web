@@ -10,7 +10,7 @@ import Cookies from 'js-cookie'
 import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'
 import { useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
-import CustomToaster from '@/app/ui/common/custom-toaster'
+
 
 export default function Page() {
   const status = 'pending'
@@ -85,7 +85,7 @@ export default function Page() {
       {totalCount === 0 ? null : (
         <Filter setMyParams={setMyParams} status={status} />
       )}
-      <div className="flex flex-wrap gap-5 justify-between mt-5">
+      <div className="flex flex-col gap-5 justify-between mt-5">
         <CardInformation offset={offset} items={items} setItems={setItems} />
       </div>
       {offset.current + ADMIN_VERIFY_ALUMNI_PAGE_LIMIT >= itemNumber.current ||

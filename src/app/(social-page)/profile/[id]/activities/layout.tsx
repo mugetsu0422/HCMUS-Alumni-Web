@@ -1,0 +1,89 @@
+'use client'
+import React, { use, useEffect, useState } from 'react'
+import { Tabs, TabsHeader, Tab } from '@material-tailwind/react'
+import { PROFILE_ACTIVITIES_TABS } from '../../../../constant'
+import { usePathname, useRouter } from 'next/navigation'
+import clsx from 'clsx'
+import Cookies from 'js-cookie'
+
+function ProfileAboutTags({ params }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const parts = pathname.split('/')
+  const [activeTab, setActiveTab] = useState(() => {
+    if (parts[4] === undefined || parts[4] === 'posts') return ''
+    return parts[4]
+  })
+
+  const userIdParams = parts[2]
+  const userId = Cookies.get('userId')
+  const isProfileLoginUser = userId === userIdParams
+  const [isMounted, setIsMounted] = useState(false)
+
+  const tabsToRender = isProfileLoginUser
+    ? PROFILE_ACTIVITIES_TABS
+    : [PROFILE_ACTIVITIES_TABS[0]]
+
+  const handleClickTab = (url) => {
+    setActiveTab(url)
+    router.push(`/profile/${params.id}/activities/${url}`)
+  }
+
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
+
+  if (!isMounted) return null
+  return (
+    <div className="w-fit h-fit">
+      <p className="text-[20px] lg:text-2xl font-bold mb-4">Hoạt động</p>
+
+      <Tabs
+        value={activeTab || ''}
+        orientation="vertical"
+        className="flex w-[100%]">
+        <TabsHeader
+          placeholder={undefined}
+          className="w-full bg-white"
+          indicatorProps={{
+            className: 'bg-[#e6f0fb] shadow-none rounded-none z-0',
+          }}>
+          {tabsToRender.map(({ label, url }) => (
+            <Tab
+              placeholder={undefined}
+              key={label}
+              value={label}
+              onClick={() => handleClickTab(url)}
+              className={clsx({
+                'sm:text-wrap xl:text-nowrap sm:w-[190px] lg:w-fit font-bold px-4 py-2 xl:px-6 xl:py-4 flex justify-start text-[14px] lg:text-base z-0':
+                  true,
+                'sm:text-wrap xl:text-nowrap text-[--blue-05] sm:w-[190px] lg:w-full  border-b-2 border-[--blue-05] flex justify-start bg-[#e6f0fb] text-[14px] lg:text-base z-0':
+                  activeTab === url,
+              })}
+              activeClassName="text-[--blue-05] bg-[#e6f0fb]">
+              {label}
+            </Tab>
+          ))}
+        </TabsHeader>
+      </Tabs>
+    </div>
+  )
+}
+
+export default function GroupLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: { id: string }
+}) {
+  return (
+    <div className="mt-4">
+      <div className="flex items-start justify-between">
+        <ProfileAboutTags params={params} />
+        <div className="w-[75%]"> {children}</div>
+      </div>
+    </div>
+  )
+}

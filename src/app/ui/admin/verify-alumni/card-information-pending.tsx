@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { inter, nunito } from '../../fonts'
-import { Input, Button } from '@material-tailwind/react'
+import { Input, Button, Avatar } from '@material-tailwind/react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '../../../constant'
@@ -44,7 +44,9 @@ export default function CardInformation({ offset, items, setItems }) {
         }
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -66,57 +68,59 @@ export default function CardInformation({ offset, items, setItems }) {
         ) => (
           <div
             key={id}
-            className="w-[100%] lg:w-[49%] p-5 border border-gray-200 rounded-md break-words">
+            className=" w-[100%] p-5 border border-gray-200 rounded-md break-words bg-white">
             {/* First line include FullName MSSV and Year*/}
-            <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
-              <div className="flex-col col-span-2 ">
-                <p className="font-bold text-[var(--secondary)]">Họ và tên</p>
-                <p>{fullName}</p>
-              </div>
-              <div className="flex-col">
-                <p className="font-bold text-[var(--secondary)]">MSSV</p>
-                <p>{studentId}</p>
-              </div>
-              <div className="flex-col">
-                <p className="font-bold text-[var(--secondary)]">
-                  Năm nhập học
-                </p>
-                <p>{beginningYear}</p>
-              </div>
-            </div>
-            {/* Second line include Email and link  */}
-            <div className={`grid grid-cols-4  gap-5 ${inter.className} mb-2`}>
-              <div className="flex-col col-span-2">
-                <p className=" font-bold text-[var(--secondary)]">Email</p>
-                <p>{email}</p>
-              </div>
-              <div className="col-span-1">
-                <p className=" font-bold text-[var(--secondary)]">Khoa</p>
-                <p>{facultyName}</p>
-              </div>
-              <div className="col-span-1">
-                <div className="w-fit">
-                  <Link
-                    className=""
-                    href={`${socialMediaLink}`}
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    <LinkIcon link={socialMediaLink} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-            {/* Final line for the profile image */}
-            <div className="grid grid-cols-3 gap-3">
-              <Image
-                priority={true}
+            <div className={`flex gap-4 ${inter.className} mb-2 items-center`}>
+              <Avatar
+                placeholder={undefined}
                 src={avatarUrl || ''}
                 alt="profile image"
-                width={200}
-                height={200}
-                className="col-span-1 rounded-full"
+                className="w-[20%] h-[20%] 2xl:w-[10%] 2xl:h-[10%] aspect-square"
               />
-              <form className="col-span-2 py-8 my-auto">
+              <div className="flex flex-col gap-2 w-[600px]">
+                <div className="flex gap-2 items-start">  
+                  <div className="flex-col col-span-2 w-[280px]">
+                    <p className="font-bold text-[var(--secondary)]">
+                      Họ và tên
+                    </p>
+                    <p>{fullName}</p>
+                  </div>
+
+                  <div className="flex-col w-[120px]">
+                    <p className="font-bold text-[var(--secondary)]">MSSV</p>
+                    <p>{studentId}</p>
+                  </div>
+                  <div className="flex-col w-[120px]">
+                    <p className="font-bold text-[var(--secondary)]">
+                      Năm nhập học
+                    </p>
+                    <p>{beginningYear}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 items-start">
+                  <div className="flex-col col-span-2 w-[280px]">
+                    <p className=" font-bold text-[var(--secondary)]">Email</p>
+                    <p>{email}</p>
+                  </div>
+
+                  <div className="col-span-1 w-[250px]">
+                    <p className=" font-bold text-[var(--secondary)]">Khoa</p>
+                    <p>{facultyName}</p>
+                  </div>
+
+                    <Link
+                      className="w-fit h-full mt-1"
+                      href={`${socialMediaLink}`}
+                      target="_blank"
+                      rel="noopener noreferrer">
+                      <LinkIcon link={socialMediaLink} />
+                    </Link>
+                </div>
+                
+              </div>
+
+              <form className="flex flex-col gap-2">
                 <Input
                   crossOrigin={undefined}
                   className="w-full "
@@ -144,7 +148,7 @@ export default function CardInformation({ offset, items, setItems }) {
                 </div>
               </form>
             </div>
-          </div>
+            </div>
         )
       )}
     </>

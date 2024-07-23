@@ -20,6 +20,10 @@ export const FACULTIES = [
   { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
   { id: '9', name: 'Môi trường' },
 ]
+export const GENDER = [
+  { id: '1', name: 'Nam' },
+  { id: '2', name: 'Nữ' },
+]
 export const POST_STATUS = {
   Chờ: 1,
   'Bình thường': 2,
@@ -53,10 +57,38 @@ export const NOTIFICATION_TYPE = ['CREATE', 'UPDATE', 'DELETE'] as const
 export const REACTION_TYPE = {
   Like: 1,
 }
+
 export const GROUP_PRIVACY = {
   PUBLIC: 'Công khai',
   PRIVATE: 'Riêng tư',
 }
+
+export const PROFILE_TABS = [
+  {
+    label: 'Giới thiệu',
+    url: 'about',
+  },
+  {
+    label: 'Hoạt động',
+    url: 'activities',
+  },
+]
+
+export const PROFILE_ABOUT_TABS = [
+  {
+    label: 'Thông tin cơ bản và liên hệ',
+    url: '',
+  },
+  {
+    label: 'Công việc và học vấn',
+    url: 'work-and-education',
+  },
+  {
+    label: 'Thành tựu nổi bật',
+    url: 'achievements',
+  },
+]
+
 export const GROUP_TABS = [
   {
     label: 'Thảo luận',
@@ -96,3 +128,25 @@ export const MESSAGE_TYPE = {
   VIDEO: 'VIDEO',
   SOUND: 'SOUND',
 }
+
+export const PROFILE_ACTIVITIES_TABS = [
+  {
+    label: 'Hoạt động đã tham gia',
+    url: '',
+  },
+  {
+    label: 'Tư vấn',
+    url: 'counsel-posts',
+  },
+]
+
+export const PROFILE_COUNSEL_TABS = [
+  {
+    label: 'Bài viết',
+    url: '',
+  },
+  {
+    label: 'Bình luận',
+    url: 'counsel-comments',
+  },
+]

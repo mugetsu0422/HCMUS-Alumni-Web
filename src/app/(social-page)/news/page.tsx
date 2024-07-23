@@ -9,7 +9,6 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import Pagination from '../../ui/common/pagination'
 import { roboto } from '../../ui/fonts'
-import Thumbnail from '../../ui/social-page/thumbnail-image'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import NewsListItem from '../../ui/social-page/news/news-litst-item'
 
@@ -133,7 +132,6 @@ export default function Page() {
 
   return (
     <>
-      <Thumbnail />
       <div className="max-w-[1200px] flex flex-row justify-center gap-x-8 m-auto mb-8 px-10">
         <div className="w-full flex flex-col gap-y-6 mt-10">
           <p

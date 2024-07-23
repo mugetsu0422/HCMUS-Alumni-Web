@@ -10,9 +10,9 @@ export default function NewEvents({ events }) {
   return (
     <Carousel
       placeholder={undefined}
-      className="relative  rounded-xl w-full h-[500px] z-10"
+      className="relative rounded-xl w-full h-[500px]"
       navigation={({ setActiveIndex, activeIndex, length }) => (
-        <div className="absolute bottom-4 left-2/4 z-50 flex -translate-x-2/4 gap-2">
+        <div className="absolute bottom-4 left-2/4 flex -translate-x-2/4 gap-2">
           {new Array(length).fill('').map((_, i) => (
             <span
               key={i}
@@ -52,17 +52,20 @@ export default function NewEvents({ events }) {
       loop={true}>
       {events.slice(0, 10).map(({ id, thumbnail, faculty, title }) => (
         <Link key={id} href={`/events/${id}`}>
-          <figure className="relative w-full h-full z-10">
+          <figure className="relative w-full h-full">
             <img
               src={thumbnail}
               alt="thumbnail"
               className="w-full h-full object-cover object-center rounded-xl"
             />
             {faculty && (
-              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
+              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--secondary] saturate-200">
                 {faculty?.name}
               </figcaption>
             )}
+            <figcaption className="absolute p-2 bottom-6 left-6 font-bold text-black justify-between rounded-lg bg-white/75 saturate-200 text-lg">
+              {title}
+            </figcaption>
           </figure>
         </Link>
       ))}

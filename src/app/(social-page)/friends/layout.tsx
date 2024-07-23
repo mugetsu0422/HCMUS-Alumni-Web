@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Tab, Tabs, TabsHeader } from '@material-tailwind/react'
 import { roboto } from '@/app/ui/fonts'
-import Thumbnail from '@/app/ui/social-page/thumbnail-image'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { JWT_COOKIE, POST_STATUS, FRIEND_TABS } from '../../constant'
 import Cookies from 'js-cookie'
@@ -30,7 +29,6 @@ export default function GroupLayout({
 
   return (
     <>
-      <Thumbnail />
       <div className="max-w-[1000px] flex flex-row justify-center gap-x-8 m-auto mb-8 px-10">
         <div className="w-full flex flex-col gap-y-6 mt-10">
           <p

@@ -10,13 +10,14 @@ import {
   Radio,
   Spinner,
 } from '@material-tailwind/react'
-import React, { createContext, useContext, useRef, useState } from 'react'
+import React, { createContext, useContext, useRef, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { nunito } from '../fonts'
+import checkPermission from './checking-permission'
 
 const PollContext = createContext(null)
 
@@ -57,8 +58,8 @@ function UserVotesDialog({
         placeholder={undefined}
         className={`${nunito.className} flex flex-col gap-4 h-[50dvh] overflow-y-auto scrollbar-webkit-main`}>
         <div className="text-black font-medium text-xl">
-          {totalVoteCount ? Math.trunc((voteCount / totalVoteCount) * 100) : 0}% · {voteCount} lượt
-          bình chọn
+          {totalVoteCount ? Math.trunc((voteCount / totalVoteCount) * 100) : 0}%
+          · {voteCount} lượt bình chọn
         </div>
         <InfiniteScroll
           className="flex flex-col gap-2"
@@ -117,11 +118,12 @@ function VoteOption({ voteId, name }) {
       <label
         className="flex w-full gap-2 px-6 py-4 cursor-pointer"
         htmlFor={`${postId}-${voteId}`}>
-        {allowMultipleVotes ? (
-          <Checkbox color="blue" crossOrigin={undefined} {...commonProps} />
-        ) : (
-          <Radio color="blue" crossOrigin={undefined} {...commonProps} />
-        )}
+        {checkPermission('Counsel.Vote') &&
+          (allowMultipleVotes ? (
+            <Checkbox color="blue" crossOrigin={undefined} {...commonProps} />
+          ) : (
+            <Radio color="blue" crossOrigin={undefined} {...commonProps} />
+          ))}
         <span className="text-black">{name}</span>
       </label>
       <div
@@ -162,6 +164,7 @@ function AddNewVoteOptionInput() {
         crossOrigin={undefined}
         label="Thêm lựa chọn..."
         type="text"
+        disabled={!checkPermission('Counsel.Vote')}
         containerProps={{ className: 'h-[56px]' }}
         labelProps={{
           className:
@@ -264,7 +267,9 @@ export default function Poll({
             <VoteOption voteId={voteId} name={name} />
           </div>
         ))}
-        {allowAddOptions && votes.length < 10 && <AddNewVoteOptionInput />}
+        {checkPermission('Counsel.Vote') && (
+          allowAddOptions && votes.length < 10 && <AddNewVoteOptionInput />
+        )}
       </List>
       <UserVotesDialog
         users={userVotes}
