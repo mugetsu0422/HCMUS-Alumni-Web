@@ -143,35 +143,40 @@ export default function Page({
     e: React.FormEvent<HTMLFormElement>,
     parentId: string | null = null,
     content: string
-  ): void => {
+  ): Promise<any> => {
     e.preventDefault()
     const comment = {
       parentId: parentId,
       content: content,
     }
 
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/comments`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onHandleUploadComment = async (e, parentId, content) => {
     const postCommentToast = toast.loading('Đang đăng')
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/comments`,
-        comment,
+    try {
+      const {
+        data: { comment },
+      } = await onUploadComment(e, parentId, content)
+      toast.success('Đăng thành công', { id: postCommentToast })
+      setComments((prev) => [comment].concat(prev))
+      setUploadComment('')
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          id: postCommentToast,
         }
       )
-      .then(() => {
-        toast.success('Đăng thành công', { id: postCommentToast })
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định',
-          {
-            id: postCommentToast,
-          }
-        )
-      })
+    }
   }
   const onShowMoreComments = () => {
     setCommentPage((commentPage) => commentPage + 1)
@@ -668,7 +673,7 @@ export default function Page({
           <div className="h-fit py-3 bg-white">
             <form
               className="flex flex-start items-start w-full gap-2"
-              onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+              onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
               <AvatarUser />
               <ReactTextareaAutosize
                 spellCheck="false"
