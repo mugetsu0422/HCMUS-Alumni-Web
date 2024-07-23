@@ -44,6 +44,7 @@ import DeletePostDialog from '@/app/ui/social-page/counsel/delete-post-dialog'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 import ReactTextareaAutosize from 'react-textarea-autosize'
+import AvatarUser from '@/app/ui/common/avatar-user'
 
 export default function Page({
   params,
@@ -668,11 +669,7 @@ export default function Page({
             <form
               className="flex flex-start items-start w-full gap-2"
               onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
-              <Avatar
-                placeholder={undefined}
-                src={'/demo.jpg'}
-                alt="avatar user"
-              />
+              <AvatarUser />
               <ReactTextareaAutosize
                 spellCheck="false"
                 minRows={1}

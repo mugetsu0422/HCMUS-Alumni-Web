@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react'
 import { Avatar, Button } from '@material-tailwind/react'
 
 import Link from 'next/link'
+import AvatarUser from '../common/avatar-user'
 
-export default function CreatePost({ userAvatar }) {
+export default function CreatePost() {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -17,12 +18,7 @@ export default function CreatePost({ userAvatar }) {
   return (
     isMounted && (
       <div className="flex gap-4 items-center">
-        <Avatar
-          src={userAvatar}
-          alt="user avatar"
-          size="lg"
-          placeholder={undefined}
-        />
+        <AvatarUser size="lg" />
         <Link
           href="/counsel/create"
           className=" w-full bg-blue-gray-50 rounded-full">

@@ -31,7 +31,6 @@ export default function Page() {
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
   const userId = Cookies.get('userId')
-  const [userAvatar, setUserAvatar] = useState('')
   
   const resetCurPage = () => {
     params.delete('page')
@@ -114,24 +113,15 @@ export default function Page() {
         },
       }
     )
-
-    const userPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    Promise.all([postsPrmoise, userPromise])
-      .then(([postsPromise, userPromise]) => {
+    Promise.all([postsPrmoise])
+      .then(([postsPromise]) => {
         setTotalPages(postsPromise.data.totalPages)
         setPosts(postsPromise.data.posts)
         setHasMore(totalPages > 1)
-        setUserAvatar(userPromise.data?.user?.avatarUrl)
         setIsLoading(false)
       })
       .catch((err) => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myParams, userId])
 
   return (
@@ -148,7 +138,7 @@ export default function Page() {
           }}
         />
         {checkPermission('Counsel.Create') && (
-          <CreatePost userAvatar={userAvatar} />
+          <CreatePost />
         )}
         {!isLoading && (
           <InfiniteScroll
