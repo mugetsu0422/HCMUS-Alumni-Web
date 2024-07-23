@@ -191,35 +191,39 @@ export default function PostListItem({ post }: { post: PostProps }) {
     e: React.FormEvent<HTMLFormElement>,
     parentId: string | null = null,
     content: string
-  ): void => {
+  ): Promise<any> => {
     e.preventDefault()
     const comment = {
       parentId: parentId,
       content: content,
     }
 
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/comments`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onHandleUploadComment = async (e, parentId, content) => {
     const postCommentToast = toast.loading('Đang đăng')
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/comments`,
-        comment,
+    try {
+      const {
+        data: { comment },
+      } = await onUploadComment(e, parentId, content)
+      toast.success('Đăng thành công', { id: postCommentToast })
+      setComments((prev) => [comment].concat(prev))
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          id: postCommentToast,
         }
       )
-      .then(() => {
-        toast.success('Đăng thành công', { id: postCommentToast })
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định',
-          {
-            id: postCommentToast,
-          }
-        )
-      })
+    }
   }
   const onFetchChildrenComments = async (
     parentId: string,
@@ -659,6 +663,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
             openCommentsDialog={openCommentsDialog}
             handleOpenCommentDialog={handleOpenCommentDialog}
             onUploadComment={onUploadComment}
+            onHandleUploadComment={onHandleUploadComment}
             onEditComment={onEditComment}
             onDeleteComment={onDeleteComment}
             onFetchChildrenComments={onFetchChildrenComments}

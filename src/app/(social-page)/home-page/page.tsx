@@ -35,7 +35,7 @@ export default function Page() {
     )
 
     const hofPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof?statusId=${POST_STATUS['Bình thường']}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/rand`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,

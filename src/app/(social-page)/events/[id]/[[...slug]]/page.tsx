@@ -202,82 +202,41 @@ export default function Page({
     e: React.FormEvent<HTMLFormElement>,
     parentId: string | null = null,
     content: string
-  ) => {
+  ): Promise<any> => {
     e.preventDefault()
-
     const comment = {
-      parentId,
-      content,
+      parentId: parentId,
+      content: content,
     }
 
-    const renderComment = {
-      id: '1', // You should generate a unique ID here
-      creator: {
-        id: user.id,
-        fullName: user.fullName,
-        avatarUrl: user.avatarUrl,
-      },
-      parentId,
-      content,
-      childrenCommentNumber: 0,
-      createAt: Date.now(),
-      updateAt: Date.now(),
-      permissions: {
-        edit: true,
-        delete: true,
-      },
-    }
-
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onHandleUploadComment = async (e, parentId, content) => {
     const postCommentToast = toast.loading('Đang đăng')
-
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments`,
-        comment,
+    try {
+      const {
+        data: { comment },
+      } = await onUploadComment(e, parentId, content)
+      toast.success('Đăng thành công', { id: postCommentToast })
+      setComments((prev) => [comment].concat(prev))
+      setNumberComments((e) => e + 1)
+      setUploadComment('')
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          id: postCommentToast,
         }
       )
-      .then(() => {
-        toast.success('Đăng thành công', { id: postCommentToast })
-        setNumberComments((e) => e + 1)
-
-        const updateComments = (comments: any[]) => {
-          if (parentId) {
-            // Find the parent comment and add the reply
-            const parentCommentIndex = comments.findIndex(
-              (c) => c.id === parentId
-            )
-            if (parentCommentIndex !== -1) {
-              const parentComment = comments[parentCommentIndex]
-              parentComment.replies = [
-                ...(parentComment.replies || []),
-                renderComment,
-              ]
-              comments[parentCommentIndex] = parentComment
-            } else {
-              // If the parent comment is not found, add the reply to the end of the comments array
-              setComments((prev) => [renderComment, ...prev])
-            }
-          } else {
-            // New comment
-            setComments((prev) => [renderComment, ...prev])
-          }
-          setComments(comments)
-        }
-
-        updateComments(comments)
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định',
-          {
-            id: postCommentToast,
-          }
-        )
-      })
+    }
   }
   const onFetchChildrenComments = async (
     parentId: string,
@@ -438,7 +397,7 @@ export default function Page({
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments?page=${commentPage}&pageSize=50`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments?page=${commentPage}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -571,7 +530,8 @@ export default function Page({
 
         <div className="flex flex-col gap-y-2 w-[75%] max-w-[1366px] m-auto mb-10">
           {checkPermission('Event.Comment.Create') && (
-            <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+            <form
+              onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
               <Textarea
                 onChange={handleUploadCommentChange}
                 placeholder={undefined}

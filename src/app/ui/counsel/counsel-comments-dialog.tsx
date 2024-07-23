@@ -23,6 +23,7 @@ import 'moment/locale/vi'
 import { COMMENT_PAGE_SIZE } from '../../constant'
 import TextareaAutosize from 'react-textarea-autosize'
 import checkPermission from '@/app/ui/common/checking-permission'
+import AvatarUser from '../common/avatar-user'
 
 export default function CommentsDialog({
   post,
@@ -30,6 +31,7 @@ export default function CommentsDialog({
   openCommentsDialog,
   handleOpenCommentDialog,
   onUploadComment,
+  onHandleUploadComment,
   onEditComment,
   onDeleteComment,
   onFetchChildrenComments,
@@ -184,14 +186,10 @@ export default function CommentsDialog({
           <form
             className="h-full flex flex-start items-start w-full gap-2"
             onSubmit={(e) => {
-              onUploadComment(e, null, uploadComment)
+              onHandleUploadComment(e, null, uploadComment)
               setUploadComment('')
             }}>
-            <Avatar
-              placeholder={undefined}
-              src={'/demo.jpg'}
-              alt="avatar user"
-            />
+            <AvatarUser />
             <TextareaAutosize
               spellCheck="false"
               minRows={1}
@@ -202,6 +200,7 @@ export default function CommentsDialog({
               onChange={handleUploadCommentChange}
             />
             <Button
+              disabled={!uploadComment.trim()}
               type="submit"
               placeholder={undefined}
               variant="text"
