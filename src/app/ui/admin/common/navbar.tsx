@@ -139,7 +139,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         </MenuList>
       </Menu>
     ) : (
-      <Link onClick={toggleIsNavOpen} href={link} key={title}>
+      <Link href={link} key={title}>
         <MenuItem
           placeholder={undefined}
           className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -270,7 +270,7 @@ function NavList() {
   )
 }
 
-export default function MyNavbar() {
+function AdminNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
   const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
   const userId = Cookies.get('userId')
@@ -372,4 +372,33 @@ export default function MyNavbar() {
       </Navbar>
     </NavbarContext.Provider>
   )
+}
+
+export default function MyNavbar() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    setIsLoading(false)
+  }, [])
+
+  if (isLoading)
+    return (
+      <Navbar
+        placeholder={undefined}
+        fullWidth={true}
+        className={`sticky top-0 z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
+        <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
+          <Link href="/home-page">
+            <Image
+              className="hidden lg:block"
+              src="/logo-square.png"
+              alt="log"
+              width={80}
+              height={80}
+            />
+          </Link>
+        </div>
+      </Navbar>
+    )
+  else return <AdminNavbar />
 }

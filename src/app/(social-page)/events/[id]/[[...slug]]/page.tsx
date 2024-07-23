@@ -123,7 +123,6 @@ export default function Page({
   const singleCommentRef = useRef(null)
   const [participant, setParticipant] = useState(0)
   const [numberComments, setNumberComments] = useState(0)
-  const [user, setUser] = useState(null)
 
   // Event's participants
   const onParticipate = async (eventId) => {
@@ -169,9 +168,11 @@ export default function Page({
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/participants?limit=${PARTICIPANT_FETCH_LIMIT}&page=0`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data }) => {
@@ -184,9 +185,11 @@ export default function Page({
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/participants?limit=${PARTICIPANT_FETCH_LIMIT}&page=${page}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const { data } = res
@@ -325,49 +328,39 @@ export default function Page({
     const detailsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const isParticipatedPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/is-participated?eventIds=${params.id}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const commentsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments${commentId}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
-    const userInfor = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${Cookies.get(
-        'userId'
-      )}/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    Promise.all([
-      detailsPromise,
-      isParticipatedPromise,
-      commentsPromise,
-      userInfor,
-    ])
-      .then(([detailsRes, isParticipatedRes, commentsRes, userRes]) => {
+    Promise.all([detailsPromise, isParticipatedPromise, commentsPromise])
+      .then(([detailsRes, isParticipatedRes, commentsRes]) => {
         const { data: event } = detailsRes
         const isParticipated = isParticipatedRes.data[0].isParticipated
         const { comments, comment } = commentsRes.data
 
-        setUser(userRes.data.user)
         setNumberComments(event?.childrenCommentNumber)
         setIsParticipated(isParticipated)
         setEvent(event)
@@ -399,9 +392,11 @@ export default function Page({
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments?page=${commentPage}`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data: { comments: fetchedComments } }) => {

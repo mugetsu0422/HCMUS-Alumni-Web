@@ -169,6 +169,12 @@ export default function Page({
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
       setUploadComment('')
+      // setPost((prev) => {
+      //   return {
+      //     ...prev,
+      //     childrenCommentNumber: prev.childrenCommentNumber + 1,
+      //   }
+      // })
     } catch (error) {
       toast.error(
         error.response?.data?.error?.message || 'Lỗi không xác định',

@@ -18,9 +18,11 @@ export default function Page({ params }: { params: { id: string } }) {
     const detailsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${params.id}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     Promise.all([detailsPromise])
