@@ -140,6 +140,24 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
     setIsLoading(false)
     setChildrenComments(childrenComments.concat(fetchedChildrenComments))
   }
+  const onHandleUploadComment = async (e, parentId, content) => {
+    const postCommentToast = toast.loading('Đang đăng')
+    try {
+      const {
+        data: { comment },
+      } = await onUploadComment(e, parentId, content)
+      toast.success('Đăng thành công', { id: postCommentToast })
+      setChildrenComments((prev) => [comment].concat(prev))
+      setUploadComment('')
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
+        {
+          id: postCommentToast,
+        }
+      )
+    }
+  }
 
   return (
     !isDeleted && (
@@ -299,7 +317,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
               {isOpenInputComments && (
                 <form
                   onSubmit={(e) => {
-                    onUploadComment(e, comment.id, uploadComment)
+                    onHandleUploadComment(e, comment.id, uploadComment)
                   }}>
                   <Textarea
                     placeholder="Bình luận"

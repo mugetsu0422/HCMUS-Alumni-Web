@@ -41,54 +41,41 @@ export default function Page({
     e: React.FormEvent<HTMLFormElement>,
     parentId: string | null = null,
     content: string
-  ): void => {
+  ): Promise<any> => {
     e.preventDefault()
     const comment = {
       parentId: parentId,
       content: content,
     }
-    const renderComment = {
-      id: '1',
-      creator: {
-        id: user.id,
-        fullName: user.fullName,
-        avatarUrl: user.avatarUrl,
-      },
-      parentId: parentId,
-      content: content,
-      childrenCommentNumber: 0,
-      createAt: Date.now(),
-      updateAt: Date.now(),
-      permissions: {
-        edit: true,
-        delete: true,
-      },
-    }
 
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments`,
+      comment,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onHandleUploadComment = async (e, parentId, content) => {
     const postCommentToast = toast.loading('Đang đăng')
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments`,
-        comment,
+    try {
+      const {
+        data: { comment },
+      } = await onUploadComment(e, parentId, content)
+      toast.success('Đăng thành công', { id: postCommentToast })
+      setComments((prev) => [comment].concat(prev))
+      setNumberComments((e) => e + 1)
+      setUploadComment('')
+    } catch (error) {
+      toast.error(
+        error.response?.data?.error?.message || 'Lỗi không xác định',
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          id: postCommentToast,
         }
       )
-      .then(() => {
-        toast.success('Đăng thành công', { id: postCommentToast })
-        setComments((prev) => [renderComment, ...prev])
-        setNumberComments((e) => e + 1)
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định',
-          {
-            id: postCommentToast,
-          }
-        )
-      })
+    }
   }
   const onEditComment = (
     e: React.FormEvent<HTMLFormElement>,
@@ -247,7 +234,7 @@ export default function Page({
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments?page=${commentPage}&pageSize=50`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments?page=${commentPage}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -323,8 +310,9 @@ export default function Page({
             </div>
           </div>
           <div className="flex flex-col gap-y-2  mb-8">
-            <form onSubmit={(e) => onUploadComment(e, null, uploadComment)}>
+            <form onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
               <Textarea
+                value={uploadComment}
                 onChange={handleUploadCommentChange}
                 placeholder={undefined}
                 label="Chia sẻ ý kiến của bạn"
