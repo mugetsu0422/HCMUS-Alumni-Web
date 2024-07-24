@@ -175,7 +175,7 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }, 500)
   const onFilter = (facultyId: string) => {
@@ -185,7 +185,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }
   const onFilterBeginningYear = useDebouncedCallback((beginningYear) => {
@@ -195,14 +195,14 @@ export default function Page() {
       params.delete('beginningYear')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }, 500)
   const onResetFilter = () => {
     params.delete('facultyId')
     params.delete('beginningYear')
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }
   const onNextPage = () => {

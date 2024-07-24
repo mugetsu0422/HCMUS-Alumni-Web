@@ -183,7 +183,7 @@ export default function Page() {
       setSelectedTags(newTags)
       params.set('tagNames', newTags.map(({ value }) => value).join(','))
       resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      replace(`${pathname}?${params.toString()}`, { scroll: true })
       setMyParams(`?${params.toString()}`)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,7 +199,7 @@ export default function Page() {
         params.set('tagNames', newTags.map(({ value }) => value).join(','))
       }
       resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      replace(`${pathname}?${params.toString()}`, { scroll: true })
       setMyParams(`?${params.toString()}`)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -22,19 +22,21 @@ export default function Home() {
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/rand?number=3`
     )
 
-    Promise.all([newsPromise, hofPromise]).then(
-      ([
-        {
-          data: { news },
-        },
-        {
-          data: { hof },
-        },
-      ]) => {
-        setNews(news)
-        setHof(hof)
-      }
-    )
+    Promise.all([newsPromise, hofPromise])
+      .then(
+        ([
+          {
+            data: { news },
+          },
+          {
+            data: { hof },
+          },
+        ]) => {
+          setNews(news)
+          setHof(hof)
+        }
+      )
+      .catch((error) => {})
   }, [])
 
   return (

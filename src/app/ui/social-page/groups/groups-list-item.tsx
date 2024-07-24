@@ -38,8 +38,9 @@ export default function GroupsListItem({ group, onJoinGroup }) {
   }
 
   return (
-    <div className="flex justify-between items-center gap-4 w-full">
-      <div className="flex gap-4">
+    <div
+      className={`${nunito.className} flex justify-between items-center gap-4 w-full`}>
+      <Link className="flex gap-4" href={`/groups/${group.id}`}>
         <Avatar
           src={group.coverUrl}
           alt="group avatar"
@@ -48,12 +49,12 @@ export default function GroupsListItem({ group, onJoinGroup }) {
           variant="rounded"
         />
         <div className="max-w-[600px] min-w-[350px] w-[80%]">
-          <p className="text-[18px] font-[500] text-justify -mb-[2px]">
+          <p className="text-xl font-[500] text-justify -mb-[2px]">
             {group.name}
           </p>
           {!group.isJoined && (
             <>
-              <p className="flex items-center text-[#65676b]">
+              <p className="flex items-center text-[--secondary]">
                 {group.privacy === 'PUBLIC' ? 'Công khai' : 'Riêng tư'}
                 {group.numberMember > 0 && (
                   <>
@@ -65,18 +66,18 @@ export default function GroupsListItem({ group, onJoinGroup }) {
             </>
           )}
           {group.tags.length > 0 && (
-            <div className="flex text-[13px] items-center gap-1 text-[#65676b]">
+            <div className="flex items-center gap-1 text-[--secondary]">
               <TagsFill className="text-[--blue-05] " />
               {group.tags.map(({ id, name }) => (
                 <span key={id}>{name}</span>
               ))}
             </div>
           )}
-          <p className="text-[#65676b] text-[13px] line-clamp-2 w-[90%] xl:w-[100%]">
+          <p className="text-[--secondary] line-clamp-2 w-[90%] xl:w-[100%]">
             {group.description}
           </p>
         </div>
-      </div>
+      </Link>
 
       {checkPermission('Group.Join') &&
         (isRequestPending ? (

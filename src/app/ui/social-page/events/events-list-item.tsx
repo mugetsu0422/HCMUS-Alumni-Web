@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useState } from 'react'
-import { Clock, GeoAltFill, BarChartFill } from 'react-bootstrap-icons'
+import { Clock, GeoAltFill, BarChartFill, TagFill } from 'react-bootstrap-icons'
 import { Button } from '@material-tailwind/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -27,8 +27,9 @@ export default function EventsListItem({
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
       setParticipants((e) => e + 1)
+      toast.success('Tham gia sự kiện thành công')
     } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra!')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
   const onClickParticipationCancel = async () => {
@@ -38,8 +39,9 @@ export default function EventsListItem({
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
       setParticipants((e) => e - 1)
+      toast.success('Hủy tham gia sự kiện thành công')
     } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra!')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
 
@@ -94,13 +96,16 @@ export default function EventsListItem({
               {participants} / {event.maximumParticipants}
             </span>
           </p>
-          <p className="flex items-center gap-1 text-md">
-            <span>
-              <BarChartFill className="text-[--blue-02]" />
-            </span>
-            <span>Số người tối thiểu: </span>
-            <span>{event.minimumParticipants}</span>
-          </p>
+          <div className="flex gap-x-2 items-center flex-wrap">
+            <TagFill className="text-[--blue-02]" />
+            {event.tags.map(({ name }) => (
+              <p
+                key={name}
+                className="text-md hover:duration-300">
+                {name}
+              </p>
+            ))}
+          </div>
         </div>
         {checkPermission('Event.Participant.Create') &&
           (!isParticipated ? (

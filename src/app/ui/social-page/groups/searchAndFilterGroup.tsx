@@ -45,12 +45,16 @@ export default function SearchAndFilterGroups({
   const [isJoined, setIsJoined] = useState(params.isJoined || '0')
 
   return (
-    <div className="flex items-end gap-4 w-full flex-wrap xl:flex-nowrap">
-      <div className="flex flex-col gap-2 lg:basis-1/2">
+    <div className="h-[50px] flex items-end gap-4 w-full flex-wrap xl:flex-nowrap">
+      <div className="flex flex-col gap-2 lg:basis-1/2 h-full">
         <Input
           crossOrigin={undefined}
           placeholder={undefined}
-          //containerProps={{ className: 'max-w-[80%]' }}
+          containerProps={{ className: 'h-full' }}
+          labelProps={{
+            className:
+              'top-0 focus-after:top-0 before:!mt-[0px] after:!mt-[0px] peer-focus:!leading-[0px]',
+          }}
           label="Tìm kiếm nhóm"
           {...register('name', {
             onChange: (e) => onSearch(e.target.value),
@@ -58,7 +62,7 @@ export default function SearchAndFilterGroups({
         />
       </div>
 
-      <div className="flex flex-col gap-2 w-[130px] xl:w-[150px]">
+      <div className="flex flex-col gap-2 w-[130px] xl:w-[150px] h-full">
         <Select
           placeholder={undefined}
           label="Quyền riêng tư"
@@ -66,6 +70,7 @@ export default function SearchAndFilterGroups({
           labelProps={{
             className: 'w-[130px] xl:w-[150px]',
           }}
+          containerProps={{ className: 'h-full' }}
           value={privacy}
           onChange={(value) => {
             setPrivacy(value)
@@ -79,7 +84,7 @@ export default function SearchAndFilterGroups({
         </Select>
       </div>
 
-      <div className="flex flex-col gap-2 w-[130px] xl:w-[150px]">
+      <div className="flex flex-col gap-2 w-[130px] xl:w-[150px] h-full">
         <Select
           placeholder={undefined}
           label="Trạng thái"
@@ -87,6 +92,7 @@ export default function SearchAndFilterGroups({
           labelProps={{
             className: 'w-[130px] xl:w-[150px]',
           }}
+          containerProps={{ className: 'h-full' }}
           value={isJoined}
           onChange={(value) => {
             setIsJoined(value)

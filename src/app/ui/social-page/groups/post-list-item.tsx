@@ -38,6 +38,8 @@ import ImageGrid from '../../counsel/image-grid'
 import { nunito } from '../../fonts'
 import ReactionDialog from '../../common/reaction-dialog'
 import Poll from '../../common/poll'
+import DeletePostDialog from '../counsel/delete-post-dialog'
+import useHasAnyPostPermission from '@/hooks/user-has-any-post-permission'
 
 interface PostProps {
   id: string
@@ -100,6 +102,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
   })
   const [votes, setVotes] = useState(post.votes)
   const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
+  const hasAnyPostPermission = useHasAnyPostPermission(post.permissions)
 
   const handleOpenDeletePostDialog = () => {
     setOpenDeletePostDialog((e) => !e)
@@ -454,49 +457,51 @@ export default function PostListItem({ post }: { post: PostProps }) {
             </div>
           </div>
 
-          <Menu placement="bottom-end">
-            <MenuHandler>
-              <Button
-                placeholder={undefined}
-                variant="text"
-                className="rounded-full px-2 py-1">
-                <ThreeDots className="text-xl text-black" />
-              </Button>
-            </MenuHandler>
-            <MenuList placeholder={undefined}>
-              {post.permissions.edit && (
-                <MenuItem
-                  disabled={post.votes.length ? true : false}
+          {hasAnyPostPermission && (
+            <Menu placement="bottom-end">
+              <MenuHandler>
+                <Button
                   placeholder={undefined}
-                  className={'text-black text-base'}>
-                  <Link
-                    href={`/groups/${post.groupId}/posts/${post.id}/edit`}
-                    className=" flex items-center gap-2">
-                    <div>
-                      <Pencil />
-                    </div>
-                    <div>
-                      <p>Chỉnh sửa bài viết</p>
-                      {post.votes.length ? (
-                        <p className="text-sm text-wrap">
-                          Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
-                        </p>
-                      ) : null}
-                    </div>
-                  </Link>
-                </MenuItem>
-              )}
-              {post.permissions.delete && (
-                <MenuItem
-                  onClick={onDeletePost}
-                  placeholder={undefined}
-                  className={`${nunito.className} text-black text-base flex items-center gap-2`}>
-                  <Trash />
-                  <p>Xóa bài viết</p>
-                </MenuItem>
-              )}
-            </MenuList>
-          </Menu>
+                  variant="text"
+                  className="rounded-full px-2 py-1">
+                  <ThreeDots className="text-xl text-black" />
+                </Button>
+              </MenuHandler>
+              <MenuList placeholder={undefined}>
+                {post.permissions.edit && (
+                  <MenuItem
+                    disabled={post.votes.length ? true : false}
+                    placeholder={undefined}
+                    className={'text-black text-base'}>
+                    <Link
+                      href={`/groups/${post.groupId}/posts/${post.id}/edit`}
+                      className=" flex items-center gap-2">
+                      <div>
+                        <Pencil />
+                      </div>
+                      <div>
+                        <p>Chỉnh sửa bài viết</p>
+                        {post.votes.length ? (
+                          <p className="text-sm text-wrap">
+                            Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                          </p>
+                        ) : null}
+                      </div>
+                    </Link>
+                  </MenuItem>
+                )}
+                {post.permissions.delete && (
+                  <MenuItem
+                    onClick={handleOpenDeletePostDialog}
+                    placeholder={undefined}
+                    className={`${nunito.className} text-black text-base flex items-center gap-2`}>
+                    <Trash />
+                    <p>Xóa bài viết</p>
+                  </MenuItem>
+                )}
+              </MenuList>
+            </Menu>
+          )}
         </div>
 
         {/* this is the body of a post */}
@@ -654,6 +659,12 @@ export default function PostListItem({ post }: { post: PostProps }) {
             onFetchComments={onFetchComments}
           />
         </div>
+        <DeletePostDialog
+          postId={post.id}
+          openDeletePostDialog={openDeletePostDialog}
+          handleOpenDeletePostDialog={handleOpenDeletePostDialog}
+          onDelete={onDeletePost}
+        />
       </div>
     )
   )

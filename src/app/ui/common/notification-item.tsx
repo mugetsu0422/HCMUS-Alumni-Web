@@ -15,9 +15,11 @@ import Cookies from 'js-cookie'
 export default function NotificationItem({
   notification,
   lineClamp = 2,
+  onHandleOpenNotification,
 }: {
   notification: NotificationProps
   lineClamp?: number
+  onHandleOpenNotification: () => void
 }) {
   const [isRead, setIsRead] = useState(
     NOTIFICATION_STATUS[notification.status.name] ==
@@ -47,7 +49,10 @@ export default function NotificationItem({
   return (
     <Link
       onAuxClick={() => onReadNotification()}
-      onClick={() => onReadNotification()}
+      onClick={() => {
+        onReadNotification()
+        onHandleOpenNotification()
+      }}
       href={url}
       className={`flex gap-2 px-2 py-3 hover:rounded-lg hover:bg-[--highlight-bg]`}>
       <div>

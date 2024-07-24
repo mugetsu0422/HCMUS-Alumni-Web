@@ -35,6 +35,7 @@ import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import checkPermission from './../common/checking-permission'
 import LandingPageNavbar from '@/app/ui/landing-page/navbar'
+import NavbarSkeleton from '../common/navbar-skeleton'
 
 // nav list component
 const navListItems = [
@@ -362,6 +363,8 @@ function SocialPageNavbar() {
                 </Badge>
               </Button>
             </Link>
+
+            {/* Avatar dropdown */}
             <Menu>
               <MenuHandler>
                 <Button
@@ -372,12 +375,12 @@ function SocialPageNavbar() {
                   <AvatarUser />
                 </Button>
               </MenuHandler>
-              <MenuList placeholder={undefined}>
+              <MenuList placeholder={undefined} className="text-base">
                 <MenuItem placeholder={undefined} className="group">
                   <Link
                     href={`/profile/${userId}/about`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
+                    <FontAwesomeIcon icon={faCircleUser} className="" />
                     Trang cá nhân
                   </Link>
                 </MenuItem>
@@ -387,7 +390,7 @@ function SocialPageNavbar() {
                     <Link
                       href={`/admin`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserPen} className="text-xl" />
+                      <FontAwesomeIcon icon={faUserPen} className="" />
                       Admin
                     </Link>
                   </MenuItem>
@@ -395,12 +398,9 @@ function SocialPageNavbar() {
 
                 <MenuItem
                   placeholder={undefined}
-                  className="group"
+                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]"
                   onClick={handleLogout}>
-                  <FontAwesomeIcon
-                    icon={faRightFromBracket}
-                    className="text-xl text-[--text-navbar] group-hover:text-[--blue-05]"
-                  />
+                  <FontAwesomeIcon icon={faRightFromBracket} className="" />
                   Đăng xuất
                 </MenuItem>
               </MenuList>
@@ -427,25 +427,7 @@ export default function MyNavbar() {
     setIsLoading(false)
   }, [])
 
-  if (isLoading)
-    return (
-      <Navbar
-        placeholder={undefined}
-        fullWidth={true}
-        className={`sticky top-0 z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
-        <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
-          <Link href="/home-page">
-            <Image
-              className="hidden lg:block"
-              src="/logo-square.png"
-              alt="log"
-              width={80}
-              height={80}
-            />
-          </Link>
-        </div>
-      </Navbar>
-    )
+  if (isLoading) return <NavbarSkeleton />
   if (!isLoggedIn) return <LandingPageNavbar />
   else return <SocialPageNavbar />
 }

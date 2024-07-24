@@ -89,9 +89,12 @@ export default function SearchAndFilter({
             onResetFilter()
           }}
           placeholder={undefined}
-          className="flex bg-[--blue-02] w-fit h-[50px] normal-case text-sm items-center gap-1">
-          Xóa bộ lọc
-          <FontAwesomeIcon icon={faFilterCircleXmark} className="text-lg" />
+          className="flex bg-[--blue-02] text-nowrap w-fit h-[50px] normal-case text-sm items-center gap-1">
+          <p className="text-white">Xóa bộ lọc</p>
+          <FontAwesomeIcon
+            icon={faFilterCircleXmark}
+            className="text-lg text-white"
+          />
         </Button>
       </div>
     </div>

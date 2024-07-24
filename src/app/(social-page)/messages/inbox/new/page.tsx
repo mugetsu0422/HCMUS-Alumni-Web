@@ -14,7 +14,7 @@ import axios from 'axios'
 import { useDebouncedCallback } from 'use-debounce'
 import Autosuggest from 'react-autosuggest'
 import { JWT_COOKIE, MESSAGE_TYPE } from '@/app/constant'
-import { useAppDispatch } from '@/lib/hooks'
+import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import { setActiveInboxId } from '@/lib/features/message/inbox-manager'
 import clsx from 'clsx'
 import SocketManager from '@/config/socket/socket-manager'
@@ -34,6 +34,7 @@ export default function Page() {
 
   const [messages, setMessages] = useState([])
   const [messageContent, setMessageContent] = useState('')
+  const { userFromProfile } = useAppSelector((state) => state.newMessage)
 
   const dispatch = useAppDispatch()
   const mapStateToProps = (state) => ({
@@ -41,7 +42,7 @@ export default function Page() {
   })
   useEffect(() => {
     dispatch(setActiveInboxId(null))
-    setSelectedUser(mapStateToProps)
+    setSelectedUser(userFromProfile)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const onSearch = useDebouncedCallback((query) => {

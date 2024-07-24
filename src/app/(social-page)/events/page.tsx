@@ -39,7 +39,7 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }, 500)
 
@@ -49,7 +49,7 @@ export default function Page() {
       setSelectedTags(newTags)
       params.set('tagNames', newTags.map(({ value }) => value).join(','))
       resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      replace(`${pathname}?${params.toString()}`, { scroll: true })
       setMyParams(`?${params.toString()}`)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -65,7 +65,7 @@ export default function Page() {
         params.set('tagNames', newTags.map(({ value }) => value).join(','))
       }
       resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      replace(`${pathname}?${params.toString()}`, { scroll: true })
       setMyParams(`?${params.toString()}`)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,7 +79,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
 
@@ -87,22 +87,23 @@ export default function Page() {
     params.delete('facultyId')
     params.delete('tagNames')
     setSelectedTags([])
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
 
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage + 1
     })
   }
   const onPrevPage = () => {
-    if (curPage == 1) params.set('page', (curPage - 2).toString())
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    if (curPage == 1) return
+    params.set('page', (curPage - 2).toString())
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage - 1
@@ -145,30 +146,8 @@ export default function Page() {
         }
       )
       .then(({ data: { totalPages, events } }) => {
-        const eventIds = events.map(({ id }) => id)
-
-        // Get list of events that users whether have participated in
-        axios
-          .get(
-            `${
-              process.env.NEXT_PUBLIC_SERVER_HOST
-            }/events/is-participated?eventIds=${eventIds.join(',')}`,
-            {
-              headers: Cookies.get(JWT_COOKIE)
-                ? {
-                    Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-                  }
-                : null,
-            }
-          )
-          .then(({ data }) => {
-            for (let i = 0; i < events.length; i++) {
-              events[i].isParticipated = data[i].isParticipated
-            }
-
-            setTotalPages(totalPages)
-            setEvents(events)
-          })
+        setTotalPages(totalPages)
+        setEvents(events)
       })
       .catch((error) => {})
   }, [myParams])
