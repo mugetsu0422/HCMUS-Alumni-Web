@@ -78,6 +78,7 @@ export default function Page() {
           {notifications.map((notification) => (
             <NotificationItem
               notification={notification}
+              onHandleOpenNotification={() => {}}
               key={notification.id}
             />
           ))}
