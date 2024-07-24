@@ -137,9 +137,11 @@ export default function Page() {
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&statusId=${POST_STATUS['Bình thường']}`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data: { totalPages, events } }) => {
@@ -152,9 +154,11 @@ export default function Page() {
               process.env.NEXT_PUBLIC_SERVER_HOST
             }/events/is-participated?eventIds=${eventIds.join(',')}`,
             {
-              headers: {
-                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-              },
+              headers: Cookies.get(JWT_COOKIE)
+                ? {
+                    Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+                  }
+                : null,
             }
           )
           .then(({ data }) => {

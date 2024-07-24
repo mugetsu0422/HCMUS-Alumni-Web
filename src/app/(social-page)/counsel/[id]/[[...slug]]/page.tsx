@@ -167,6 +167,12 @@ export default function Page({
       } = await onUploadComment(e, parentId, content)
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
+      // setPost((prev) => {
+      //   return {
+      //     ...prev,
+      //     childrenCommentNumber: prev.childrenCommentNumber + 1,
+      //   }
+      // })
       setUploadComment('')
     } catch (error) {
       toast.error(
