@@ -12,6 +12,7 @@ import { Spinner } from '@material-tailwind/react'
 import { Toaster } from 'react-hot-toast'
 import PostListItem from '../../ui/social-page/counsel/post-list-item'
 import checkPermission from '@/app/ui/common/checking-permission'
+import { roboto } from '@/app/ui/fonts'
 
 export default function Page() {
   const pathname = usePathname()
@@ -31,7 +32,7 @@ export default function Page() {
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
   const userId = Cookies.get('userId')
-  
+
   const resetCurPage = () => {
     params.delete('page')
     curPage.current = 0
@@ -121,12 +122,16 @@ export default function Page() {
         setIsLoading(false)
       })
       .catch((err) => {})
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myParams, userId])
 
   return (
     <>
       <div className="mt-4 mb-8 max-w-[850px] w-[80%] m-auto flex flex-col gap-6">
+        <p
+          className={`${roboto.className} ml-8 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
+          TƯ VẤN
+        </p>
         <SearchAndFilter
           selectedTags={selectedTags}
           onAddTags={onAddTags}
@@ -137,9 +142,7 @@ export default function Page() {
             title: params.get('title'),
           }}
         />
-        {checkPermission('Counsel.Create') && (
-          <CreatePost />
-        )}
+        {checkPermission('Counsel.Create') && <CreatePost />}
         {!isLoading && (
           <InfiniteScroll
             dataLength={posts.length}

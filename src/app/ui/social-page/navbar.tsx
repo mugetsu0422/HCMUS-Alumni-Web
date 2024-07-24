@@ -35,6 +35,7 @@ import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import checkPermission from './../common/checking-permission'
 import LandingPageNavbar from '@/app/ui/landing-page/navbar'
+import NavbarSkeleton from '../common/navbar-skeleton'
 
 // nav list component
 const navListItems = [
@@ -427,25 +428,7 @@ export default function MyNavbar() {
     setIsLoading(false)
   }, [])
 
-  if (isLoading)
-    return (
-      <Navbar
-        placeholder={undefined}
-        fullWidth={true}
-        className={`sticky top-0 z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
-        <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
-          <Link href="/home-page">
-            <Image
-              className="hidden lg:block"
-              src="/logo-square.png"
-              alt="log"
-              width={80}
-              height={80}
-            />
-          </Link>
-        </div>
-      </Navbar>
-    )
+  if (isLoading) return <NavbarSkeleton />
   if (!isLoggedIn) return <LandingPageNavbar />
   else return <SocialPageNavbar />
 }

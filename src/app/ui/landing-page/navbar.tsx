@@ -27,6 +27,7 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import { JWT_COOKIE } from '@/app/constant'
 import { useRouter } from 'next/navigation'
+import NavbarSkeleton from '../common/navbar-skeleton'
 
 const NavbarContext = createContext(null)
 
@@ -254,7 +255,7 @@ function NavList() {
   )
 }
 
-export default function LandingPageNavbar() {
+function LandingPageNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
@@ -321,4 +322,15 @@ export default function LandingPageNavbar() {
       </Navbar>
     </NavbarContext.Provider>
   )
+}
+
+export default function MyNavbar() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    setIsLoading(false)
+  }, [])
+
+  if (isLoading) return <NavbarSkeleton />
+  else return <LandingPageNavbar />
 }
