@@ -29,7 +29,7 @@ export default function SearchAndFilterFriends({
   return (
     <div className="flex gap-4 flex-wrap w-full">
       <div className="h-fit w-full flex flex-col gap-2">
-        <p className="font-semibold text-md">Tìm kiếm bạn bè</p>
+        <p className="font-semibold text-md">Tìm kiếm</p>
         <Input
           size="lg"
           crossOrigin={undefined}
