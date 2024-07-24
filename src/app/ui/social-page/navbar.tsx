@@ -363,6 +363,8 @@ function SocialPageNavbar() {
                 </Badge>
               </Button>
             </Link>
+
+            {/* Avatar dropdown */}
             <Menu>
               <MenuHandler>
                 <Button
@@ -373,12 +375,12 @@ function SocialPageNavbar() {
                   <AvatarUser />
                 </Button>
               </MenuHandler>
-              <MenuList placeholder={undefined}>
+              <MenuList placeholder={undefined} className="text-base">
                 <MenuItem placeholder={undefined} className="group">
                   <Link
                     href={`/profile/${userId}/about`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
+                    <FontAwesomeIcon icon={faCircleUser} className="" />
                     Trang cá nhân
                   </Link>
                 </MenuItem>
@@ -388,7 +390,7 @@ function SocialPageNavbar() {
                     <Link
                       href={`/admin`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserPen} className="text-xl" />
+                      <FontAwesomeIcon icon={faUserPen} className="" />
                       Admin
                     </Link>
                   </MenuItem>
@@ -396,12 +398,9 @@ function SocialPageNavbar() {
 
                 <MenuItem
                   placeholder={undefined}
-                  className="group"
+                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]"
                   onClick={handleLogout}>
-                  <FontAwesomeIcon
-                    icon={faRightFromBracket}
-                    className="text-xl text-[--text-navbar] group-hover:text-[--blue-05]"
-                  />
+                  <FontAwesomeIcon icon={faRightFromBracket} className="" />
                   Đăng xuất
                 </MenuItem>
               </MenuList>
