@@ -123,8 +123,8 @@ export default function Page({
   const singleCommentRef = useRef(null)
   const [participant, setParticipant] = useState(0)
   const [numberComments, setNumberComments] = useState(0)
-  const [user, setUser] = useState(null)
-
+  const [firstLoadComment, setFirstLoadComment] = useState(false)
+  const [numberCommnets, setNumberCommnets] = useState(5)
   // Event's participants
   const onParticipate = async (eventId) => {
     setIsDisabled(true)
@@ -346,28 +346,17 @@ export default function Page({
         },
       }
     )
-    const userInfor = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${Cookies.get(
-        'userId'
-      )}/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
+
     Promise.all([
       detailsPromise,
       isParticipatedPromise,
       commentsPromise,
-      userInfor,
     ])
-      .then(([detailsRes, isParticipatedRes, commentsRes, userRes]) => {
+      .then(([detailsRes, isParticipatedRes, commentsRes]) => {
         const { data: event } = detailsRes
         const isParticipated = isParticipatedRes.data[0].isParticipated
         const { comments, comment } = commentsRes.data
 
-        setUser(userRes.data.user)
         setNumberComments(event?.childrenCommentNumber)
         setIsParticipated(isParticipated)
         setEvent(event)
@@ -410,6 +399,11 @@ export default function Page({
       .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
+
+  const FirstLoadMoreComments = () => {
+    setFirstLoadComment(true)
+    setNumberCommnets(event?.childrenCommentNumber)
+  }
 
   if (notFound) {
     return <NotFound404 />
@@ -567,13 +561,16 @@ export default function Page({
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
+              numberCommnets={numberCommnets}
             />
           }
 
-          {!isSingleComment &&
-            comments.length < event?.childrenCommentNumber && (
+          {((!isSingleComment &&
+            comments.length < event?.childrenCommentNumber) || (!firstLoadComment && 5 < event?.childrenCommentNumber)) && (
               <Button
-                onClick={onFetchComments}
+              onClick={() => {onFetchComments()
+                FirstLoadMoreComments()
+              }}
                 className="bg-[--blue-02] normal-case text-sm gap-1"
                 placeholder={undefined}>
                 Tải thêm

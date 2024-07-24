@@ -15,6 +15,7 @@ import RelatedNews from '@/app/ui/social-page/news/related-news'
 import { useRouter } from 'next/navigation'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 export default function Page({
   params,
@@ -33,6 +34,8 @@ export default function Page({
   const [user, setUser] = useState(null)
   const singleCommentRef = useRef(null)
   const [numberComments, setNumberComments] = useState(0)
+  const [firstLoadComment, setFirstLoadComment] = useState(false)
+  const [numberCommnets, setNumberCommnets] = useState(5)
   // Function to handle changes in the textarea
   const handleUploadCommentChange = (event) => {
     setUploadComment(event.target.value)
@@ -248,6 +251,11 @@ export default function Page({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
+  const FirstLoadMoreComments = () => {
+    setFirstLoadComment(true)
+    setNumberCommnets(news?.childrenCommentNumber)
+  }
+
   if (notFound) {
     return <NotFound404 />
   }
@@ -310,24 +318,27 @@ export default function Page({
             </div>
           </div>
           <div className="flex flex-col gap-y-2  mb-8">
-            <form onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
-              <Textarea
-                value={uploadComment}
-                onChange={handleUploadCommentChange}
-                placeholder={undefined}
-                label="Chia sẻ ý kiến của bạn"
-              />
-              <div className="flex justify-end gap-x-4 pt-2 mr-2">
-                <Button
+            {checkPermission('News.Comment.Create') && (
+              <form
+                onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
+                <Textarea
+                  value={uploadComment}
+                  onChange={handleUploadCommentChange}
                   placeholder={undefined}
-                  size="md"
-                  disabled={!uploadComment.trim()}
-                  type="submit"
-                  className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-                  Đăng
-                </Button>
-              </div>
-            </form>
+                  label="Chia sẻ ý kiến của bạn"
+                />
+                <div className="flex justify-end gap-x-4 pt-2 mr-2">
+                  <Button
+                    placeholder={undefined}
+                    size="md"
+                    disabled={!uploadComment.trim()}
+                    type="submit"
+                    className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
+                    Đăng
+                  </Button>
+                </div>
+              </form>
+            )}
 
             <p className="text-xl font-semibold">
               Bình luận <span className="font-normal">({numberComments})</span>
@@ -345,15 +356,18 @@ export default function Page({
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
+              numberCommnets={numberCommnets}
             />
 
-            {!isSingleComment &&
-              comments.length < news?.childrenCommentNumber && (
+            {((!isSingleComment &&
+              comments.length < news?.childrenCommentNumber) || (!firstLoadComment && 5 < news?.childrenCommentNumber)) && (
                 <Button
-                  onClick={onFetchComments}
+                  onClick={() => {onFetchComments()
+                    FirstLoadMoreComments()
+                  }}
                   className="bg-[--blue-02] normal-case text-sm gap-1"
                   placeholder={undefined}>
-                  Tải thêm
+                  Tải thêm 
                 </Button>
               )}
 

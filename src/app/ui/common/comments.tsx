@@ -88,6 +88,7 @@ interface CommentsProps {
   onEditComment: EditCommentHandler
   onDeleteComment: DeleteCommentHandler
   onFetchChildrenComments: FetchChildrenCommentsHandler
+  numberCommnets: number
 }
 
 function CommentsListItem({ comment, depth }: CommentListItemProps) {
@@ -396,6 +397,7 @@ export default function Comments({
   onEditComment,
   onDeleteComment,
   onFetchChildrenComments,
+  numberCommnets
 }: CommentsProps) {
   return (
     <div className="flex flex-col lg:py-8 gap-4 h-fit overflow-y-auto scrollbar-webkit-main">
@@ -406,7 +408,7 @@ export default function Comments({
           onDeleteComment,
           onFetchChildrenComments,
         }}>
-        {comments.map((comment) => (
+        {comments.slice(0,numberCommnets).map((comment) => (
           <CommentsListItem key={comment.id} comment={comment} depth={0} />
         ))}
       </CommentsConxtext.Provider>

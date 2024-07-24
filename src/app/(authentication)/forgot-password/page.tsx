@@ -14,7 +14,6 @@ import {
 } from '../../constant'
 import Countdown from 'react-countdown'
 import toast, { Toaster } from 'react-hot-toast'
-import Cookies from 'js-cookie'
 
 const FormContext = createContext(null)
 
@@ -120,6 +119,7 @@ function Step2() {
       )
       .then(() => {
         // Back to signin page
+        toast.success('Đổi mật khẩu thành công')
         router.push('/signin')
       })
       .catch((error) => {
@@ -285,7 +285,7 @@ function Step2() {
   )
 }
 
-function SignupForm() {
+function ForgotPasswordForm() {
   const { currentStep } = useContext(FormContext)
 
   return (
@@ -333,7 +333,7 @@ export default function Page() {
           handleBack: handleBack,
           handleNext: handleNext,
         }}>
-        <SignupForm />
+        <ForgotPasswordForm />
       </FormContext.Provider>
       <Link href="/signin" className="w-full">
         <Button

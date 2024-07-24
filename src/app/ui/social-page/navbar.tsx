@@ -25,6 +25,7 @@ import {
   faCircleUser,
   faUserGroup,
   faUserPen,
+  faUserGear,
 } from '@fortawesome/free-solid-svg-icons'
 import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import NotificationPopover from '../common/notification-popover'
@@ -199,16 +200,6 @@ function NavListMenu({ label, icon, navListMenuItems }) {
     <React.Fragment>
       <Menu allowHover open={isMenuOpen} handler={setIsMenuOpen}>
         <MenuHandler>
-          {/* <Link
-            href={link}
-            className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
-            <MenuItem
-              placeholder={undefined}
-              className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
-              <FontAwesomeIcon icon={icon} className="text-2xl" />
-              {label}
-            </MenuItem>
-          </Link> */}
           <div className="font-normal">
             <MenuItem
               placeholder={undefined}
@@ -357,7 +348,7 @@ export default function MyNavbar() {
               />
             </svg>
           </Button>
-          
+
           <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
             <NotificationPopover />
             <Link href={`/messages/inbox`} className="group">
@@ -376,7 +367,7 @@ export default function MyNavbar() {
                 </Badge>
               </Button>
             </Link>
-            <Menu>
+            <Menu placement="bottom-end">
               <MenuHandler>
                 <Button
                   placeholder={undefined}
@@ -391,8 +382,8 @@ export default function MyNavbar() {
                   <Link
                     href={`/profile/${userId}/about`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
-                    Trang cá nhân
+                    <FontAwesomeIcon icon={faCircleUser} className="text-2xl" />
+                    <p className="text-md "> Trang cá nhân</p>
                   </Link>
                 </MenuItem>
 
@@ -401,21 +392,33 @@ export default function MyNavbar() {
                     <Link
                       href={`/admin`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserPen} className="text-xl" />
-                      Admin
+                      <FontAwesomeIcon icon={faUserPen} className="text-2xl" />
+
+                      <p className="text-base">Admin</p>
                     </Link>
                   </MenuItem>
                 )}
 
                 <MenuItem
                   placeholder={undefined}
-                  className="group"
+                  >
+                    <Link
+                      href={`/change-password`}                   
+                      className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                  <FontAwesomeIcon icon={faUserGear} className="text-2xl" />
+                  <p className="text-base">Đổi mật khẩu</p>
+                  </Link>
+
+                </MenuItem>
+                <MenuItem
+                  placeholder={undefined}
+                  className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]"
                   onClick={handleLogout}>
                   <FontAwesomeIcon
                     icon={faRightFromBracket}
-                    className="text-xl text-[--text-navbar] group-hover:text-[--blue-05]"
+                    className="text-2xl"
                   />
-                  Đăng xuất
+                  <p className="text-base">Đăng xuất</p>
                 </MenuItem>
               </MenuList>
             </Menu>
