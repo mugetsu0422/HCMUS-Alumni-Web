@@ -88,9 +88,9 @@ function ParticipantsDialog({
             scrollableTarget="scrollableParticipants">
             {participants.map(({ id, fullName, avatarUrl }) => (
               <Link
-                href={`#`}
+                href={`/profile/${id}`}
                 key={id}
-                className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
+                className="flex items-center gap-3 hover:bg-gray-100 rounded-lg p-3">
                 <Avatar placeholder={undefined} src={avatarUrl} alt="avatar" />
                 <p>{fullName}</p>
               </Link>
@@ -141,7 +141,7 @@ export default function Page({
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra!')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
   const onCancelParticipation = async (eventId) => {
@@ -335,16 +335,6 @@ export default function Page({
           : null,
       }
     )
-    const isParticipatedPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/is-participated?eventIds=${params.id}`,
-      {
-        headers: Cookies.get(JWT_COOKIE)
-          ? {
-              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-            }
-          : null,
-      }
-    )
     const commentsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments${commentId}`,
       {
@@ -355,14 +345,13 @@ export default function Page({
           : null,
       }
     )
-    Promise.all([detailsPromise, isParticipatedPromise, commentsPromise])
-      .then(([detailsRes, isParticipatedRes, commentsRes]) => {
+    Promise.all([detailsPromise, commentsPromise])
+      .then(([detailsRes, commentsRes]) => {
         const { data: event } = detailsRes
-        const isParticipated = isParticipatedRes.data[0].isParticipated
         const { comments, comment } = commentsRes.data
 
-        setNumberComments(event?.childrenCommentNumber)
-        setIsParticipated(isParticipated)
+        setNumberComments(event.childrenCommentNumber)
+        setIsParticipated(event.isParticipated)
         setEvent(event)
         setParticipant(event.participants)
         if (comment) setComments([comment])

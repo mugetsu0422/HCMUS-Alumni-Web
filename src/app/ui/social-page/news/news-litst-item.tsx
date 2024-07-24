@@ -26,7 +26,7 @@ export default function NewsListItem({
       <div className="w-full md:w-fit px-8 md:px-0 flex flex-col gap-y-2 text-black">
         <Link
           href={`/news/${id}`}
-          className="font-extrabold w-full sm:w-[400px] md:w-[600px] text-[--blue-05] text-2xl cursor-pointer hover:text-[--secondary] hover:duration-300">
+          className="font-semibold w-full sm:w-[400px] md:w-[600px] text-2xl cursor-pointer hover:duration-300">
           {title}
         </Link>
         <p className="w-full sm:w-[400px] md:w-[600px]">{summary}</p>
@@ -40,7 +40,7 @@ export default function NewsListItem({
           {tags.map(({ name }) => (
             <p
               key={name}
-              className="font-extrabold text-[--blue-05] text-md hover:text-[--secondary] hover:duration-300">
+              className="text-md hover:duration-300">
               {name}
             </p>
           ))}

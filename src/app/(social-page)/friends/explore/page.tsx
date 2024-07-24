@@ -110,7 +110,7 @@ export default function Page() {
       params.delete('fullName')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }, 500)
 

@@ -41,13 +41,13 @@ export default function Page() {
     } else {
       params.delete('name')
     }
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }, 500)
   const onResetFilter = () => {
     params.delete('privacy')
     params.delete('isJoined')
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
   const onFilterPrivacy = (privacy: string) => {
@@ -56,7 +56,7 @@ export default function Page() {
     } else {
       params.delete('privacy')
     }
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
   const onFilterMyGroup = (isJoined: string) => {
@@ -65,7 +65,7 @@ export default function Page() {
     } else {
       params.delete('isJoined')
     }
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
 
