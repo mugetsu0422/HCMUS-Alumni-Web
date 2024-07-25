@@ -26,6 +26,10 @@ export default function NotificationPopover() {
   const [totalPages, setTotalPages] = useState(0)
   const page = useRef(0)
 
+  const onHandleOpenNotification = () => {
+    setOpenNotification((prev) => !prev)
+  }
+
   const notificationCount = useAppSelector(
     (state) => state.notificationCounter.value
   )
@@ -127,7 +131,7 @@ export default function NotificationPopover() {
 
           <Link href="/notifications">
             <Button
-              onClick={() => setOpenNotification(false)}
+              onClick={onHandleOpenNotification}
               placeholder={undefined}
               variant="text"
               className="normal-case text-[14px] py-2 px-4">
@@ -151,6 +155,7 @@ export default function NotificationPopover() {
             <NotificationItem
               notification={notification}
               lineClamp={3}
+              onHandleOpenNotification={onHandleOpenNotification}
               key={notification.id}
             />
           ))}

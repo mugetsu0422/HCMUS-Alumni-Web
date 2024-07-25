@@ -14,59 +14,7 @@ import { XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import { nunito } from '../fonts'
 import 'moment/locale/vi'
 import InfiniteScroll from 'react-infinite-scroll-component'
-
-// const user = [
-//   {
-//     id: '1',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '2',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '3',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '4',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '5',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '6',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '17',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '8',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '9',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-//   {
-//     id: '10',
-//     fullName: 'Trương Samuel',
-//     avatarUrl: '/demo.jpg',
-//   },
-// ]
+import Link from 'next/link'
 
 export default function ReactionDialog({
   users,
@@ -122,17 +70,20 @@ export default function ReactionDialog({
           }
           scrollableTarget="scrollableReaction">
           {users.map(({ creator: { id, fullName, avatarUrl } }) => (
-            <div key={id} className="flex items-center justify-between">
+            <Link
+              href={`profile/${id}/about`}
+              key={id}
+              className="flex items-center justify-between hover:bg-gray-400/[.25] p-2 rounded-lg">
               <div className="flex gap-3 items-center">
                 <Avatar
                   placeholder={undefined}
-                  src={avatarUrl}
+                  src={avatarUrl} 
                   alt="user-avatar"
                 />
                 <p className="text-base text-black font-semibold">{fullName}</p>
               </div>
               <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-            </div>
+            </Link>
           ))}
         </InfiniteScroll>
       </DialogBody>

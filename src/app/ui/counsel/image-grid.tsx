@@ -58,13 +58,17 @@ function DialogViewImage({
           navigation={() => <div></div>}
           placeholder={undefined}>
           <div className="flex justify-between z-10 items-center w-full h-full bg-black">
-            <Button
-              placeholder={undefined}
-              onClick={handlePrevImage}
-              className="ml-6 p-4 rounded-full hover:bg-gray-400 bg-gray-100"
-              variant="text">
-              <CaretLeftFill className="text-xl text-black" />
-            </Button>
+            {pictures.length > 1 ? (
+              <Button
+                placeholder={undefined}
+                onClick={handlePrevImage}
+                className="ml-6 p-4 rounded-full hover:bg-gray-400 bg-gray-100"
+                variant="text">
+                <CaretLeftFill className="text-xl text-black" />
+              </Button>
+            ) : (
+              <div className="w-[50px]"></div>
+            )}
             <div className="flex justify-center items-center h-[35vw] min-h-[350px] w-full">
               <img
                 src={pictures[currentImageIndex].pictureUrl}
@@ -73,13 +77,17 @@ function DialogViewImage({
               />
             </div>
 
-            <Button
-              placeholder={undefined}
-              onClick={handleNextImage}
-              className="mr-6 p-4 rounded-full hover:bg-gray-400 bg-gray-100"
-              variant="text">
-              <CaretRightFill className="text-xl text-black" />
-            </Button>
+            {pictures.length > 1 ? (
+              <Button
+                placeholder={undefined}
+                onClick={handleNextImage}
+                className="mr-6 p-4 rounded-full hover:bg-gray-400 bg-gray-100"
+                variant="text">
+                <CaretRightFill className="text-xl text-black" />
+              </Button>
+            ) : (
+              <div className="w-[50px]"></div>
+            )}
           </div>
         </Carousel>
       </DialogBody>

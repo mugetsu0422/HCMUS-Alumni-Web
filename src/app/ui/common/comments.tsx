@@ -27,6 +27,7 @@ import { AxiosResponse } from 'axios'
 import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import checkPermission from '@/app/ui/common/checking-permission'
+import Link from 'next/link'
 
 const CommentsConxtext = createContext<CommentsContextProps>(null)
 
@@ -172,11 +173,13 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
             nunito.className
           )}>
           <div className="flex gap-4">
-            <Avatar
-              src={comment.creator.avatarUrl}
-              alt="avatar user"
-              placeholder={undefined}
-            />
+            <Link href={`profile/${comment.creator.id}/about`}>
+              <Avatar
+                src={comment.creator.avatarUrl}
+                alt="avatar user"
+                placeholder={undefined}
+              />
+            </Link>
             <div className="w-full ">
               <div className="flex items-center gap-1 w-full">
                 <div
@@ -397,7 +400,7 @@ export default function Comments({
   onEditComment,
   onDeleteComment,
   onFetchChildrenComments,
-  numberCommnets
+  numberCommnets,
 }: CommentsProps) {
   return (
     <div className="flex flex-col lg:py-8 gap-4 h-fit overflow-y-auto scrollbar-webkit-main">
@@ -408,7 +411,7 @@ export default function Comments({
           onDeleteComment,
           onFetchChildrenComments,
         }}>
-        {comments.slice(0,numberCommnets).map((comment) => (
+        {comments.slice(0, numberCommnets).map((comment) => (
           <CommentsListItem key={comment.id} comment={comment} depth={0} />
         ))}
       </CommentsConxtext.Provider>

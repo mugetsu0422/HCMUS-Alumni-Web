@@ -1,28 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface NewMessageState {
-  fullName: string
-  id: string
-  avatarUrl: string
+  userFromProfile: {
+    fullName: string
+    id: string
+    avatarUrl: string
+  } | null
 }
 
 const initialState: NewMessageState = {
-  id: '',
-  fullName: '',
-  avatarUrl: '',
+  userFromProfile: null,
 }
 
 const newMessageSlice = createSlice({
-  name: 'newMessageSlice',
+  name: 'newMessage',
   initialState,
   reducers: {
-    getDataUser: (state, action: PayloadAction<NewMessageState>) => {
-      state.id = action.payload.id
-      state.fullName = action.payload.fullName
-      state.avatarUrl = action.payload.avatarUrl
+    setUserFromProfile: (state, action: PayloadAction<NewMessageState>) => {
+      state.userFromProfile = action.payload.userFromProfile
     },
   },
 })
 
-export const { getDataUser } = newMessageSlice.actions
+export const { setUserFromProfile } = newMessageSlice.actions
 export default newMessageSlice.reducer

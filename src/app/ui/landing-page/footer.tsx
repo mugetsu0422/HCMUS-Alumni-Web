@@ -45,14 +45,14 @@ function Footer() {
           <div className="flex gap-4 text-[var(--secondary)] text-2xl">
             <Link
               className="hover:text-[#0866ff]"
-              href={'https://www.facebook.com/'}
+              href={'https://www.facebook.com/VNUHCM.US'}
               rel="noopener noreferrer"
               target="_blank">
               <Facebook />
             </Link>
             <Link
               className="hover:text-[#ff0000]"
-              href={'https://www.youtube.com/'}
+              href={'https://www.youtube.com/channel/UCYtIjCGvl-VNizt_XWk9Uzg?'}
               rel="noopener noreferrer"
               target="_blank">
               <Youtube />

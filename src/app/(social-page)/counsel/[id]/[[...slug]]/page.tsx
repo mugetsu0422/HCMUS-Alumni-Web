@@ -167,6 +167,12 @@ export default function Page({
       } = await onUploadComment(e, parentId, content)
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
+      // setPost((prev) => {
+      //   return {
+      //     ...prev,
+      //     childrenCommentNumber: prev.childrenCommentNumber + 1,
+      //   }
+      // })
       setUploadComment('')
     } catch (error) {
       toast.error(
@@ -503,7 +509,7 @@ export default function Page({
         className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto`}>
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Link href="#">
+            <Link href={`profile/${post.creator.id}/about`}>
               <Avatar
                 placeholder={undefined}
                 src={post.creator.avatarUrl}

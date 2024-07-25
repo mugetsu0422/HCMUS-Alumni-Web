@@ -18,9 +18,11 @@ export default function Page({ params }: { params: { id: string } }) {
     const detailsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof/${params.id}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     Promise.all([detailsPromise])
@@ -80,6 +82,7 @@ export default function Page({ params }: { params: { id: string } }) {
               className="flex flex-col gap-4 ql-editor sm:text:md lg:text-base text-justify"
               dangerouslySetInnerHTML={{ __html: hof.content }}></div>
           </div>
+          <div className="w-full text-right">{hof.creator.fullName}</div>
         </div>
       </>
     )

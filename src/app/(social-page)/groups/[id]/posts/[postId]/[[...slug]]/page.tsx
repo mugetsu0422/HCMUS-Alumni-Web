@@ -45,6 +45,7 @@ import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 import AvatarUser from '@/app/ui/common/avatar-user'
+import useHasAnyPostPermission from '@/hooks/user-has-any-post-permission'
 
 export default function Page({
   params,
@@ -71,6 +72,7 @@ export default function Page({
 
   const singleCommentRef = useRef(null)
   const postRef = useRef(null)
+  const hasAnyPostPermission = useHasAnyPostPermission(post?.permissions || {})
 
   const handleOpenDeletePostDialog = () => {
     setOpenDeletePostDialog((e) => !e)
@@ -169,6 +171,12 @@ export default function Page({
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
       setUploadComment('')
+      // setPost((prev) => {
+      //   return {
+      //     ...prev,
+      //     childrenCommentNumber: prev.childrenCommentNumber + 1,
+      //   }
+      // })
     } catch (error) {
       toast.error(
         error.response?.data?.error?.message || 'Lỗi không xác định',
@@ -528,51 +536,53 @@ export default function Page({
             </div>
           </div>
 
-          <Menu placement="bottom-end">
-            <MenuHandler>
-              <Button
+          {hasAnyPostPermission && (
+            <Menu placement="bottom-end">
+              <MenuHandler>
+                <Button
+                  placeholder={undefined}
+                  variant="text"
+                  className="rounded-full px-2 py-1">
+                  <ThreeDots className="text-xl text-black" />
+                </Button>
+              </MenuHandler>
+              <MenuList
                 placeholder={undefined}
-                variant="text"
-                className="rounded-full px-2 py-1">
-                <ThreeDots className="text-xl text-black" />
-              </Button>
-            </MenuHandler>
-            <MenuList
-              placeholder={undefined}
-              className={`${nunito.className} max-w-[250px]`}>
-              {post.permissions.edit && (
-                <MenuItem
-                  disabled={post.votes.length ? true : false}
-                  placeholder={undefined}
-                  className={'text-black text-base'}>
-                  <Link
-                    href={`/groups/${params.id}/posts/${params.postId}/edit`}
-                    className="flex items-center gap-2">
-                    <div>
-                      <Pencil />
-                    </div>
-                    <div>
-                      <p>Chỉnh sửa bài viết</p>
-                      {post.votes.length ? (
-                        <p className="text-sm text-wrap">
-                          Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
-                        </p>
-                      ) : null}
-                    </div>
-                  </Link>
-                </MenuItem>
-              )}
-              {post.permissions.delete && (
-                <MenuItem
-                  onClick={handleOpenDeletePostDialog}
-                  placeholder={undefined}
-                  className={`text-black text-base flex items-center gap-2`}>
-                  <Trash />
-                  <p>Xóa bài viết</p>
-                </MenuItem>
-              )}
-            </MenuList>
-          </Menu>
+                className={`${nunito.className} max-w-[250px]`}>
+                {post.permissions.edit && (
+                  <MenuItem
+                    disabled={post.votes.length ? true : false}
+                    placeholder={undefined}
+                    className={'text-black text-base'}>
+                    <Link
+                      href={`/groups/${params.id}/posts/${params.postId}/edit`}
+                      className="flex items-center gap-2">
+                      <div>
+                        <Pencil />
+                      </div>
+                      <div>
+                        <p>Chỉnh sửa bài viết</p>
+                        {post.votes.length ? (
+                          <p className="text-sm text-wrap">
+                            Không thể chỉnh sửa bài viết có cuộc thăm dò ý kiến
+                          </p>
+                        ) : null}
+                      </div>
+                    </Link>
+                  </MenuItem>
+                )}
+                {post.permissions.delete && (
+                  <MenuItem
+                    onClick={handleOpenDeletePostDialog}
+                    placeholder={undefined}
+                    className={`text-black text-base flex items-center gap-2`}>
+                    <Trash />
+                    <p>Xóa bài viết</p>
+                  </MenuItem>
+                )}
+              </MenuList>
+            </Menu>
+          )}
         </div>
 
         <div>

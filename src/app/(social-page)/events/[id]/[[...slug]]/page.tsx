@@ -88,9 +88,9 @@ function ParticipantsDialog({
             scrollableTarget="scrollableParticipants">
             {participants.map(({ id, fullName, avatarUrl }) => (
               <Link
-                href={`#`}
+                href={`/profile/${id}`}
                 key={id}
-                className="flex items-center gap-3 hover:bg-gray-100 rounded-sm">
+                className="flex items-center gap-3 hover:bg-gray-100 rounded-lg p-3">
                 <Avatar placeholder={undefined} src={avatarUrl} alt="avatar" />
                 <p>{fullName}</p>
               </Link>
@@ -142,7 +142,7 @@ export default function Page({
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
     } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra!')
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
   const onCancelParticipation = async (eventId) => {
@@ -169,9 +169,11 @@ export default function Page({
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/participants?limit=${PARTICIPANT_FETCH_LIMIT}&page=0`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data }) => {
@@ -184,9 +186,11 @@ export default function Page({
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/participants?limit=${PARTICIPANT_FETCH_LIMIT}&page=${page}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const { data } = res
@@ -325,40 +329,30 @@ export default function Page({
     const detailsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    const isParticipatedPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/is-participated?eventIds=${params.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const commentsPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments${commentId}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
-
-    Promise.all([
-      detailsPromise,
-      isParticipatedPromise,
-      commentsPromise,
-    ])
-      .then(([detailsRes, isParticipatedRes, commentsRes]) => {
+    Promise.all([detailsPromise, commentsPromise])
+      .then(([detailsRes, commentsRes]) => {
         const { data: event } = detailsRes
-        const isParticipated = isParticipatedRes.data[0].isParticipated
         const { comments, comment } = commentsRes.data
 
-        setNumberComments(event?.childrenCommentNumber)
-        setIsParticipated(isParticipated)
+        setNumberComments(event.childrenCommentNumber)
+        setIsParticipated(event.isParticipated)
         setEvent(event)
         setParticipant(event.participants)
         if (comment) setComments([comment])
@@ -388,9 +382,11 @@ export default function Page({
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/${params.id}/comments?page=${commentPage}`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data: { comments: fetchedComments } }) => {
@@ -520,6 +516,7 @@ export default function Page({
               {event?.content}
             </p>
           </div>
+          <div className="text-right w-full">{event?.creator?.fullName}</div>
         </div>
 
         <div className="flex flex-col gap-y-2 w-[75%] max-w-[1366px] m-auto mb-10">
@@ -566,16 +563,18 @@ export default function Page({
           }
 
           {((!isSingleComment &&
-            comments.length < event?.childrenCommentNumber) || (!firstLoadComment && 5 < event?.childrenCommentNumber)) && (
-              <Button
-              onClick={() => {onFetchComments()
+            comments.length < event?.childrenCommentNumber) ||
+            (!firstLoadComment && 5 < event?.childrenCommentNumber)) && (
+            <Button
+              onClick={() => {
+                onFetchComments()
                 FirstLoadMoreComments()
               }}
-                className="bg-[--blue-02] normal-case text-sm gap-1"
-                placeholder={undefined}>
-                Tải thêm
-              </Button>
-            )}
+              className="bg-[--blue-02] normal-case text-sm gap-1"
+              placeholder={undefined}>
+              Tải thêm
+            </Button>
+          )}
         </div>
       </>
     )

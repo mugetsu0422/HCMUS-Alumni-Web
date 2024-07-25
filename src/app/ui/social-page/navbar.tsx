@@ -5,7 +5,6 @@ import {
   Navbar,
   Collapse,
   Badge,
-  Avatar,
   Button,
   MenuItem,
   Menu,
@@ -34,10 +33,11 @@ import { useAppSelector } from '@/lib/hooks'
 import AvatarUser from '../common/avatar-user'
 const NavbarContext = createContext(null)
 import Cookies from 'js-cookie'
-import axios from 'axios'
-import { JWT_COOKIE } from '@/app/constant'
 import { useRouter } from 'next/navigation'
 import checkPermission from './../common/checking-permission'
+import LandingPageNavbar from '@/app/ui/landing-page/navbar'
+import NavbarSkeleton from '../common/navbar-skeleton'
+
 // nav list component
 const navListItems = [
   {
@@ -134,7 +134,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         </MenuList>
       </Menu>
     ) : (
-      <Link onClick={toggleIsNavOpen} href={link} key={title}>
+      <Link href={link} key={title}>
         <MenuItem
           placeholder={undefined}
           className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -265,10 +265,9 @@ function NavList() {
   )
 }
 
-export default function MyNavbar() {
+function SocialPageNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
   const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
-  const [userAvatar, setUserAvatar] = React.useState('')
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
   const userId = Cookies.get('userId')
@@ -293,20 +292,8 @@ export default function MyNavbar() {
     )
   }, [isNavOpen])
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/profile`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(({ data }) => {
-        setUserAvatar(data?.user?.avatarUrl)
-      })
-      .catch((error) => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+  // if (!userId) return <LandingPageNavbar />
+  // else
   return (
     <NavbarContext.Provider
       value={{
@@ -367,7 +354,9 @@ export default function MyNavbar() {
                 </Badge>
               </Button>
             </Link>
-            <Menu placement="bottom-end">
+
+            {/* Avatar dropdown */}
+            <Menu>
               <MenuHandler>
                 <Button
                   placeholder={undefined}
@@ -377,13 +366,13 @@ export default function MyNavbar() {
                   <AvatarUser />
                 </Button>
               </MenuHandler>
-              <MenuList placeholder={undefined}>
+              <MenuList placeholder={undefined} className="text-base">
                 <MenuItem placeholder={undefined} className="group">
                   <Link
                     href={`/profile/${userId}/about`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="text-2xl" />
-                    <p className="text-md "> Trang cá nhân</p>
+                    <FontAwesomeIcon icon={faCircleUser} className="" />
+                    Trang cá nhân
                   </Link>
                 </MenuItem>
 
@@ -392,23 +381,21 @@ export default function MyNavbar() {
                     <Link
                       href={`/admin`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserPen} className="text-2xl" />
-
-                      <p className="text-base">Admin</p>
+                      <FontAwesomeIcon icon={faUserPen} className="text-xl" />
+                      Admin
                     </Link>
                   </MenuItem>
                 )}
 
                 <MenuItem
                   placeholder={undefined}
-                  >
-                    <Link
-                      href={`/change-password`}                   
-                      className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                  <FontAwesomeIcon icon={faUserGear} className="text-2xl" />
-                  <p className="text-base">Đổi mật khẩu</p>
+                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]">
+                  <Link
+                    href={`/change-password`}
+                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                    <FontAwesomeIcon icon={faUserGear} className="text-xl" />
+                    <p className="text-base">Đổi mật khẩu</p>
                   </Link>
-
                 </MenuItem>
                 <MenuItem
                   placeholder={undefined}
@@ -416,9 +403,9 @@ export default function MyNavbar() {
                   onClick={handleLogout}>
                   <FontAwesomeIcon
                     icon={faRightFromBracket}
-                    className="text-2xl"
+                    className="text-xl"
                   />
-                  <p className="text-base">Đăng xuất</p>
+                  Đăng xuất
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -432,4 +419,19 @@ export default function MyNavbar() {
       </Navbar>
     </NavbarContext.Provider>
   )
+}
+
+export default function MyNavbar() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const userId = Cookies.get('userId')
+    if (userId) setIsLoggedIn(true)
+    setIsLoading(false)
+  }, [])
+
+  if (isLoading) return <NavbarSkeleton />
+  if (!isLoggedIn) return <LandingPageNavbar />
+  else return <SocialPageNavbar />
 }

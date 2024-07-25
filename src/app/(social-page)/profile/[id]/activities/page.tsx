@@ -2,7 +2,13 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import { Button, Spinner } from '@material-tailwind/react'
-import { Star, GeoAltFill, Clock, BarChartFill } from 'react-bootstrap-icons'
+import {
+  Star,
+  GeoAltFill,
+  Clock,
+  BarChartFill,
+  TagFill,
+} from 'react-bootstrap-icons'
 import Link from 'next/link'
 import axios from 'axios'
 import Cookies from 'js-cookie'
@@ -33,14 +39,14 @@ function EventListItem({ event }) {
         <div className="flex flex-col gap-1">
           <p className="text-[20px] lg:text-[24px] font-bold">{event.title}</p>
 
-          <p className="text-[12px] lg:text-base text-[--secondary] flex items-center gap-1">
+          <p className="text-[12px] lg:text-base flex items-center gap-1">
             <span className="">
               <GeoAltFill className="text-[--blue-02]" />
             </span>
             <span> Địa điểm: {event.organizationLocation}</span>
           </p>
 
-          <p className="text-[12px] lg:text-base text-[--secondary] flex items-center gap-1">
+          <p className="text-[12px] lg:text-base flex items-center gap-1">
             <span>
               <Clock className="text-[--blue-02]" />
             </span>
@@ -63,26 +69,22 @@ function EventListItem({ event }) {
             </span>
           </p>
 
-          <p className="flex items-center gap-1 text-md">
-            <span>
-              <BarChartFill className="text-[--blue-02]" />
-            </span>
-            <span>Số người tối thiểu: </span>
-            <span>{event.minimumParticipants}</span>
-          </p>
+          <div className="flex gap-x-2 items-center flex-wrap">
+            <TagFill className="text-[--blue-02]" />
+            {event.tags.map(({ name }) => (
+              <p key={name} className="text-md hover:duration-300">
+                {name}
+              </p>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default function Page() {
-  const pathname = usePathname()
-  const { replace } = useRouter()
-  const searchParams = useSearchParams()
-  const params = new URLSearchParams(searchParams)
+export default function Page({ params }: { params: { id: string } }) {
   const [joinedEvents, setJoinedEvent] = useState([])
-  const [myParams, setMyParams] = useState(`?${params.toString()}`)
   const curPage = useRef(0)
   const [totalPages, setTotalPages] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -96,7 +98,7 @@ export default function Page() {
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated${myParams}&statusId=${POST_STATUS['Bình thường']}&page=${curPage.current}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated?requestedUserId=${params.id}&statusId=${POST_STATUS['Bình thường']}&page=${curPage.current}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -112,7 +114,7 @@ export default function Page() {
   useEffect(() => {
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated${myParams}&statusId=${POST_STATUS['Bình thường']}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated?requestedUserId=${params.id}&statusId=${POST_STATUS['Bình thường']}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,

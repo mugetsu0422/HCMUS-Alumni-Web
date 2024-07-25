@@ -46,11 +46,30 @@ function FriendListItem({ friend }) {
   }
   return (
     !isDeleted && (
-      <div className="flex w-[80%] m-auto items-center mt-1">
-        <Link  href={`/profile/${friend.id}/about`} className="flex items-center gap-2 w-full hover:bg-gray-400/[.25] p-2 rounded-lg">
-            <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
+      <div className="flex justify-between w-[80%] m-auto items-center mt-4">
+        <Link
+          href={`/profile/${friend.id}/about`}
+          className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+          <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
           <p>{friend.fullName}</p>
         </Link>
+        <Menu placement="bottom-end">
+          <MenuHandler>
+            <Button
+              placeholder={undefined}
+              className="h-fit bg-[--blue-05] text-white normal-case">
+              Bạn bè
+            </Button>
+          </MenuHandler>
+          <MenuList placeholder={undefined}>
+            <MenuItem
+              placeholder={undefined}
+              className="flex items-center gap-1 text-black py-3 bg-white"
+              onClick={handleDeleteFriend}>
+              Hủy bạn bè
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </div>
     )
   )
@@ -88,7 +107,6 @@ export default function Page() {
 
   const onFetchMore = () => {
     curPage.current++
-    console.log(curPage.current >= totalPages)
     if (curPage.current >= totalPages) {
       setHasMore(false)
       return
@@ -96,15 +114,15 @@ export default function Page() {
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user${myParams}&page=${curPage.current}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/friends${myParams}&page=${curPage.current}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
           },
         }
       )
-      .then(({ data: { users } }) => {
-        setListFriend(listFriend.concat(users))
+      .then(({ data: { friends } }) => {
+        setListFriend(listFriend.concat(friends))
       })
       .catch((err) => {})
   }
@@ -113,24 +131,23 @@ export default function Page() {
     // Friends list
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user${myParams}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userId}/friends${myParams}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
           },
         }
       )
-      .then(({ data: { totalPages, users } }) => {
+      .then(({ data: { totalPages, friends } }) => {
         if (!totalPages) {
           setHasMore(false)
           return
         }
-        setListFriend(users)
+        setListFriend(friends)
         setTotalPages(totalPages)
         setIsLoading(false)
       })
-      .catch((error) => {
-      })
+      .catch((error) => {})
   }, [myParams])
 
   return (
@@ -152,7 +169,7 @@ export default function Page() {
             </div>
           }>
           <div className="flex flex-col gap-4 mt-6">
-            {listFriend.map(( friend ) => (
+            {listFriend.map(({ friend }) => (
               <FriendListItem key={friend.id} friend={friend} />
             ))}
           </div>

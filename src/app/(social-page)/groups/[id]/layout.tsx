@@ -14,6 +14,7 @@ import {
   Tab,
   Tabs,
   TabsHeader,
+  Spinner,
 } from '@material-tailwind/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -29,7 +30,7 @@ import {
   Trash,
   TagsFill,
 } from 'react-bootstrap-icons'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import clsx from 'clsx'
 import Link from 'next/link'
@@ -37,6 +38,7 @@ import Link from 'next/link'
 import { JWT_COOKIE, GROUP_PRIVACY, GROUP_TABS } from '@/app/constant'
 import { nunito } from '@/app/ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 const GroupContext = createContext(null)
 export const useGroupContext = () => {
@@ -63,6 +65,9 @@ export default function GroupLayout({
   const [group, setGroup] = useState(null)
   const [openDialogDeleteGroup, setOpenDialogDeleteGroup] = useState(false)
   const [openDialogLeaveGroup, setOpenDialogLeaveGroup] = useState(false)
+  const [isJoining, setIsJoining] = useState(false)
+  const [isJoined, setIsJoined] = useState(false)
+  const [isRequestPending, setIsRequestPending] = useState(false)
 
   function hanldeOpenDeleteGroupDialog() {
     setOpenDialogDeleteGroup((e) => !e)
@@ -101,8 +106,55 @@ export default function GroupLayout({
       )
       .then(() => {})
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message.error?.message ||
+            'Lỗi không xác định'
+        )
       })
+  }
+  const onJoinGroup = (groupId: string): Promise<AxiosResponse<any, any>> => {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${groupId}/requests`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+  const onClickJoinButton = () => {
+    setIsJoining(true)
+    onJoinGroup(group.id)
+      .then((data) => {})
+      .catch((error) => {
+        toast.error(
+          error.response?.data?.error?.message.error?.message ||
+            'Lỗi không xác định'
+        )
+      })
+      .finally(() => {
+        setIsJoining(false)
+        if (group.privacy === 'PUBLIC') {
+          setIsJoined(true)
+        } else if (group.privacy === 'PRIVATE') {
+          setIsRequestPending(true)
+        }
+      })
+  }
+  const hasAtLeastOnePermission = (userRole) => {
+    if (!userRole) return false
+    const permissionsMap = {
+      edit: ['CREATOR', 'ADMIN'],
+      delete: ['CREATOR'],
+    }
+    // Iterate over the permissionsMap to check if the userRole has any of the permissions
+    for (const permission in permissionsMap) {
+      if (permissionsMap[permission].includes(userRole)) {
+        return true // User has at least one permission
+      }
+    }
+    return false // User doesn't have any of the required permissions
   }
 
   useEffect(() => {
@@ -113,10 +165,8 @@ export default function GroupLayout({
         },
       })
       .then(({ data }) => {
-        if (!data.userRole && data.privacy === 'PRIVATE') {
-          router.push('/groups')
-          return
-        }
+        setIsJoined(data.userRole ? true : false)
+        setIsRequestPending(data.isRequestPending)
         setGroup(data)
         setIsLoading(false)
       })
@@ -133,7 +183,6 @@ export default function GroupLayout({
       <div
         className={`${nunito.className} max-w-[1350px] min-w-[480px] w-[80%] m-auto mb-10`}>
         <div className="relative">
-          
           <img
             src={group.coverUrl}
             alt="group cover"
@@ -141,7 +190,7 @@ export default function GroupLayout({
           />
           <div className="flex items-center justify-between mt-4">
             <div>
-              <p className="flex items-center text-[22px] xl:text-[26px] font-bold ">
+              <p className="flex items-center text-[22px] xl:text-[28px] font-bold ">
                 {group.name}
               </p>
 
@@ -156,7 +205,7 @@ export default function GroupLayout({
               </p>
 
               {group.tags.length > 0 && (
-                <div className="flex items-center gap-1 text-[#65676b]">
+                <div className="flex items-center gap-1 text-[--secondary]">
                   <TagsFill className="text-[--blue-05] mr-2" />
                   {group.tags.map(({ id, name }) => (
                     <span key={id}>{name}</span>
@@ -165,19 +214,47 @@ export default function GroupLayout({
               )}
             </div>
 
-            {group.userRole ? (
-              <Button
-                placeholder={undefined}
-                className="normal-case px-4 py-2 text-[14px] h-fit bg-[#e4e6eb] text-black ">
-                Đã tham gia
-              </Button>
-            ) : (
-              <Button
-                placeholder={undefined}
-                className="normal-case px-4 py-2 text-[14px] bg-[--blue-04] text-[--blue-05]">
-                Tham gia
-              </Button>
-            )}
+            {checkPermission('Group.Join') &&
+              (isRequestPending ? (
+                <Button
+                  disabled={true}
+                  onClick={onClickJoinButton}
+                  size="sm"
+                  placeholder={undefined}
+                  className="h-fit text-white bg-[--blue-02] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+                  {isJoining && <Spinner className="h-[14px] w-[14px]" />}
+                  Đang chờ duyệt
+                </Button>
+              ) : isJoined ? (
+                <Menu placement="bottom-end">
+                  <MenuHandler>
+                    <Button
+                      placeholder={undefined}
+                      className="normal-case px-4 py-2 text-[14px] h-fit bg-[--blue-04] text-[--blue-05] ">
+                      Đã tham gia
+                    </Button>
+                  </MenuHandler>
+                  <MenuList placeholder={undefined}>
+                    <MenuItem
+                      placeholder={undefined}
+                      onClick={handleOpenLeaveGroupDialog}
+                      className="flex items-center gap-1 text-black py-3">
+                      <BoxArrowInRight className="text-lg" />
+                      Rời khỏi nhóm
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              ) : (
+                <Button
+                  disabled={isJoining}
+                  onClick={onClickJoinButton}
+                  size="sm"
+                  placeholder={undefined}
+                  className="h-fit text-white bg-[--blue-02] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
+                  {isJoining && <Spinner className="h-[14px] w-[14px]" />}
+                  Tham gia
+                </Button>
+              ))}
           </div>
           {/*  */}
 
@@ -216,47 +293,41 @@ export default function GroupLayout({
                 </Tabs>
               </div>
 
-              <Menu placement="bottom-end">
-                <MenuHandler>
-                  <Button
-                    placeholder={undefined}
-                    variant="text"
-                    className="py-2 px-4 flex gap-1 items-center text-black">
-                    <Gear className="text-xl" />
-                  </Button>
-                </MenuHandler>
-                <MenuList placeholder={undefined}>
-                  {(group.userRole === 'CREATOR' ||
-                    group.userRole === 'ADMIN') && (
-                    <Link href={`/groups/${group.id}/edit`}>
+              {hasAtLeastOnePermission(group?.userRole) && (
+                <Menu placement="bottom-end">
+                  <MenuHandler>
+                    <Button
+                      placeholder={undefined}
+                      variant="text"
+                      className="py-2 px-4 flex gap-1 items-center text-black">
+                      <Gear className="text-xl" />
+                    </Button>
+                  </MenuHandler>
+                  <MenuList placeholder={undefined}>
+                    {(group.userRole === 'CREATOR' ||
+                      group.userRole === 'ADMIN') && (
+                      <Link href={`/groups/${group.id}/edit`}>
+                        <MenuItem
+                          placeholder={undefined}
+                          className="flex items-center gap-1 text-black py-3">
+                          <PencilSquare className="text-lg" />
+                          Chỉnh sửa thông tin nhóm
+                        </MenuItem>
+                      </Link>
+                    )}
+
+                    {group.userRole === 'CREATOR' && (
                       <MenuItem
                         placeholder={undefined}
+                        onClick={hanldeOpenDeleteGroupDialog}
                         className="flex items-center gap-1 text-black py-3">
-                        <PencilSquare className="text-lg" />
-                        Chỉnh sửa thông tin nhóm
+                        <Trash className="text-lg" />
+                        Xóa nhóm
                       </MenuItem>
-                    </Link>
-                  )}
-
-                  {group.userRole === 'CREATOR' && (
-                    <MenuItem
-                      placeholder={undefined}
-                      onClick={hanldeOpenDeleteGroupDialog}
-                      className="flex items-center gap-1 text-black py-3">
-                      <Trash className="text-lg" />
-                      Xóa nhóm
-                    </MenuItem>
-                  )}
-
-                  <MenuItem
-                    placeholder={undefined}
-                    onClick={handleOpenLeaveGroupDialog}
-                    className="flex items-center gap-1 text-black py-3">
-                    <BoxArrowInRight className="text-lg" />
-                    Rời khỏi nhóm
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+                    )}
+                  </MenuList>
+                </Menu>
+              )}
             </div>
           </div>
         </div>

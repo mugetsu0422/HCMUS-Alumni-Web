@@ -40,7 +40,7 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }, 500)
 
@@ -50,7 +50,7 @@ export default function Page() {
       setSelectedTags(newTags)
       params.set('tagNames', newTags.map(({ value }) => value).join(','))
       resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      replace(`${pathname}?${params.toString()}`, { scroll: true })
       setMyParams(`?${params.toString()}`)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,7 +66,7 @@ export default function Page() {
         params.set('tagNames', newTags.map(({ value }) => value).join(','))
       }
       resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: false })
+      replace(`${pathname}?${params.toString()}`, { scroll: true })
       setMyParams(`?${params.toString()}`)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,7 +80,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
 
@@ -89,14 +89,14 @@ export default function Page() {
     params.delete('tagNames')
     setSelectedTags([])
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }
 
   const onNextPage = () => {
     if (curPage == totalPages) return
     params.set('page', curPage.toString())
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage + 1
@@ -105,7 +105,7 @@ export default function Page() {
   const onPrevPage = () => {
     if (curPage == 1) return
     params.set('page', (curPage - 2).toString())
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
     setCurPage((curPage) => {
       return curPage - 1
@@ -118,9 +118,11 @@ export default function Page() {
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&statusId=${POST_STATUS['Bình thường']}`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data: { totalPages, news } }) => {

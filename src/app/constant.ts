@@ -108,9 +108,10 @@ export const GROUP_TABS = [
 ]
 
 export const FRIEND_TABS = [
+  { label: 'Tất cả', url: '' },
   {
     label: 'Bạn bè',
-    url: '',
+    url: 'all-friends',
   },
   {
     label: 'Khám phá',

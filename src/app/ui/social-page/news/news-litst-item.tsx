@@ -19,11 +19,18 @@ export default function NewsListItem({
       <Link
         href={`/news/${id}`}
         className="w-[20rem] xl:w-[20rem] h-52 shrink-0">
-        <img
-          src={thumbnail}
-          alt="thumbnail"
-          className="w-full h-full object-cover object-center rounded-xl"
-        />
+        <figure className="relative">
+          <img
+            src={thumbnail}
+            alt="thumbnail"
+            className="w-full h-full object-cover object-center rounded-xl"
+          />
+          {faculty && (
+            <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
+              {faculty?.name}
+            </figcaption>
+          )}
+        </figure>
       </Link>
       <div className="w-full md:w-fit px-8 md:px-0 flex flex-col gap-y-1 text-black">
         <Link
@@ -36,13 +43,10 @@ export default function NewsListItem({
           <Calendar className="text-[--blue-02]" />
           <p>{moment(publishedAt).local().format('DD/MM/YYYY')}</p>
         </div>
-        {faculty ? <p>Khoa {faculty.name}</p> : null}
         <div className="flex gap-x-2 items-center flex-wrap">
           <TagFill className="text-[--blue-02]" />
           {tags.map(({ name }) => (
-            <p
-              key={name}
-              className="font-extrabold text-[--blue-05] text-md hover:text-[--secondary] hover:duration-300">
+            <p key={name} className="text-md hover:duration-300">
               {name}
             </p>
           ))}

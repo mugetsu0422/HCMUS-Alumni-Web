@@ -31,7 +31,6 @@ export default function Page({
   const [comments, setComments] = useState([])
   const [commentPage, setCommentPage] = useState(0)
   const [isSingleComment, setIsSingleComment] = useState(false)
-  const [user, setUser] = useState(null)
   const singleCommentRef = useRef(null)
   const [numberComments, setNumberComments] = useState(0)
   const [firstLoadComment, setFirstLoadComment] = useState(false)
@@ -123,9 +122,11 @@ export default function Page({
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/comments/${parentId}/children?page=${page}&pageSize=${pageSize}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const {
@@ -164,41 +165,36 @@ export default function Page({
     const news = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const comments = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments${commentId}`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
     const relatedNews = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/related`,
       {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
+        headers: Cookies.get(JWT_COOKIE)
+          ? {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            }
+          : null,
       }
     )
 
-    const userInfor = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${Cookies.get(
-        'userId'
-      )}/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-
-    Promise.all([news, comments, relatedNews, userInfor])
-      .then(([newsRes, commentRes, relatedNewsRes, userRes]) => {
+    Promise.all([news, comments, relatedNews])
+      .then(([newsRes, commentRes, relatedNewsRes]) => {
         const { data: news } = newsRes
         const {
           data: { comments, comment },
@@ -206,8 +202,6 @@ export default function Page({
         const {
           data: { news: relatedNews },
         } = relatedNewsRes
-
-        setUser(userRes.data.user)
 
         setNews(news)
         setNumberComments(news?.childrenCommentNumber)
@@ -239,9 +233,11 @@ export default function Page({
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/${params.id}/comments?page=${commentPage}`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data: { comments: fetchedComments } }) => {

@@ -43,12 +43,10 @@ function FriendListItem({ users }) {
   return (
     !isDelete && (
       <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-        <div className="flex items-center gap-2">
-          <Link href={`/profile/${users.id}/about`}>
-            <Avatar size="lg" src={users.avatarUrl} placeholder={undefined} />
-          </Link>
+        <Link href={`/profile/${users.id}/about`} className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+          <Avatar size="lg" src={users.avatarUrl} placeholder={undefined} />
           <p>{users.fullName}</p>
-        </div>
+        </Link>
 
         <Button
           onClick={onRequest}
@@ -110,12 +108,11 @@ export default function Page() {
       params.delete('fullName')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     setMyParams(`?${params.toString()}`)
   }, 500)
 
   useEffect(() => {
-    // Friends list
     axios
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/suggestion${myParams}`,

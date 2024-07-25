@@ -16,7 +16,6 @@ import { Button, Input } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
 
-
 const PAGE_SIZE = 9
 
 interface SearchAndFilterProps {
@@ -142,7 +141,7 @@ function HofListItem({ hof }) {
         {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
         {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
       </p>
-      <p className="w-full text-center text-black font-semibold">
+      <p className="w-full text-left text-pretty text-black font-semibold">
         {hof.position}
       </p>
       <p className="text-sm">{hof.summary}</p>
@@ -176,7 +175,7 @@ export default function Page() {
       params.delete('title')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }, 500)
   const onFilter = (facultyId: string) => {
@@ -186,7 +185,7 @@ export default function Page() {
       params.delete('facultyId')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }
   const onFilterBeginningYear = useDebouncedCallback((beginningYear) => {
@@ -196,14 +195,14 @@ export default function Page() {
       params.delete('beginningYear')
     }
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }, 500)
   const onResetFilter = () => {
     params.delete('facultyId')
     params.delete('beginningYear')
     resetCurPage()
-    replace(`${pathname}?${params.toString()}`, { scroll: false })
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
     onChangeMyParams()
   }
   const onNextPage = () => {
@@ -231,9 +230,11 @@ export default function Page() {
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&statusId=${POST_STATUS['Bình thường']}`,
         {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
+          headers: Cookies.get(JWT_COOKIE)
+            ? {
+                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+              }
+            : null,
         }
       )
       .then(({ data: { totalPages, hof } }) => {
@@ -244,37 +245,37 @@ export default function Page() {
   }, [myParams])
 
   return (
-         <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
-        <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
-          <p
-            className={`${roboto.className} text-3xl font-bold text-[var(--blue-02)]`}>
-            GƯƠNG THÀNH CÔNG
-          </p>
-          <SearchAndFilter
-            onSearch={onSearch}
-            onFilter={onFilter}
-            onFilterBeginningYear={onFilterBeginningYear}
-            onResetFilter={onResetFilter}
-            params={{
-              title: params.get('title'),
-              facultyId: params.get('facultyId'),
-              beginningYear: params.get('beginningYear'),
-            }}
-          />
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-10 gap-y-6">
-            {hof.map((hof) => (
-              <HofListItem key={hof.id} hof={hof} />
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <Pagination
-              totalPages={totalPages}
-              curPage={curPage}
-              onNextPage={onNextPage}
-              onPrevPage={onPrevPage}
-            />
-          )}
+    <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+      <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
+        <p
+          className={`${roboto.className} text-3xl font-bold text-[var(--blue-02)]`}>
+          GƯƠNG THÀNH CÔNG
+        </p>
+        <SearchAndFilter
+          onSearch={onSearch}
+          onFilter={onFilter}
+          onFilterBeginningYear={onFilterBeginningYear}
+          onResetFilter={onResetFilter}
+          params={{
+            title: params.get('title'),
+            facultyId: params.get('facultyId'),
+            beginningYear: params.get('beginningYear'),
+          }}
+        />
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-10 gap-y-6">
+          {hof.map((hof) => (
+            <HofListItem key={hof.id} hof={hof} />
+          ))}
         </div>
+        {totalPages > 1 && (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        )}
       </div>
+    </div>
   )
 }

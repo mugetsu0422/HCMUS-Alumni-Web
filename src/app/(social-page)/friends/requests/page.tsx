@@ -66,12 +66,10 @@ function FriendListItem({ friend }) {
 
   return (
     <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-      <div className="flex items-center gap-2">
-        <Link href={`/profile/${friend.id}/about`}>
-          <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
-        </Link>
+      <Link href={`/profile/${friend.id}/about`} className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+        <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
         <p>{friend.fullName}</p>
-      </div>
+      </Link>
       <div className="flex items-center gap-2">
         <Button
           onClick={onDeny}

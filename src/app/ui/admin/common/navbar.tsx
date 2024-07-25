@@ -5,7 +5,6 @@ import {
   Navbar,
   Collapse,
   Badge,
-  Avatar,
   Button,
   Menu,
   MenuHandler,
@@ -28,11 +27,11 @@ import NotificationPopover from '@/app/ui/common/notification-popover'
 import { inter } from '@/app/ui/fonts'
 import { useAppSelector } from '@/lib/hooks'
 import AvatarUser from '../../common/avatar-user'
-const NavbarContext = createContext(null)
 import Cookies from 'js-cookie'
-import axios from 'axios'
-import { JWT_COOKIE } from '@/app/constant'
 import { useRouter } from 'next/navigation'
+import NavbarSkeleton from '../../common/navbar-skeleton'
+
+const NavbarContext = createContext(null)
 
 // nav list component
 const navListItems = [
@@ -76,12 +75,6 @@ const navListItems = [
     icon: faCertificate,
     link: '/admin/hof',
   },
-  // {
-  //   label: 'Tư vấn',
-  //   subMenu: null,
-  //   icon: faComments,
-  //   link: '#',
-  // },
 ]
 
 function NavListMenu({ label, icon, navListMenuItems }) {
@@ -139,7 +132,7 @@ function NavListMenu({ label, icon, navListMenuItems }) {
         </MenuList>
       </Menu>
     ) : (
-      <Link onClick={toggleIsNavOpen} href={link} key={title}>
+      <Link href={link} key={title}>
         <MenuItem
           placeholder={undefined}
           className={`${inter.className} text-base hover:text-[var(--blue-05)]`}>
@@ -270,7 +263,7 @@ function NavList() {
   )
 }
 
-export default function MyNavbar() {
+function AdminNavbar() {
   const [isNavOpen, setIsNavOpen] = React.useState(false)
   const { unreadInboxSet } = useAppSelector((state) => state.inboxManager)
   const userId = Cookies.get('userId')
@@ -338,11 +331,6 @@ export default function MyNavbar() {
               />
             </svg>
           </Button>
-          {/* <FontAwesomeIcon
-            onClick={toggleIsNavOpen}
-            className="mr-auto lg:hidden text-[var(--blue-02)] text-2xl"
-            icon={faBars}
-          /> */}
           <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
             <NotificationPopover />
             <Link href={`/messages/inbox`} className="group">
@@ -361,7 +349,46 @@ export default function MyNavbar() {
                 </Badge>
               </Button>
             </Link>
-            <AvatarUser />
+
+            {/* Avatar dropdown */}
+            <Menu>
+              <MenuHandler>
+                <Button
+                  placeholder={undefined}
+                  variant="text"
+                  size="sm"
+                  className="p-0 rounded-full">
+                  <AvatarUser />
+                </Button>
+              </MenuHandler>
+              <MenuList placeholder={undefined} className="text-base">
+                <MenuItem placeholder={undefined} className="group">
+                  <Link
+                    href={`/profile/${userId}/about`}
+                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                    <FontAwesomeIcon icon={faCircleUser} className="" />
+                    Trang cá nhân
+                  </Link>
+                </MenuItem>
+
+                <MenuItem placeholder={undefined} className="group">
+                  <Link
+                    href={`/home-page`}
+                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                    <FontAwesomeIcon icon={faUser} className="" />
+                    Người dùng
+                  </Link>
+                </MenuItem>
+
+                <MenuItem
+                  placeholder={undefined}
+                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]"
+                  onClick={handleLogout}>
+                  <FontAwesomeIcon icon={faRightFromBracket} className="" />
+                  Đăng xuất
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </div>
         </div>
         <Collapse
@@ -372,4 +399,15 @@ export default function MyNavbar() {
       </Navbar>
     </NavbarContext.Provider>
   )
+}
+
+export default function MyNavbar() {
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    setIsLoading(false)
+  }, [])
+
+  if (isLoading) return <NavbarSkeleton />
+  else return <AdminNavbar />
 }

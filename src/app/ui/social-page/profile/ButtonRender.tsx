@@ -14,7 +14,9 @@ import {
   MenuItem,
 } from '@material-tailwind/react'
 import { usePathname, useRouter } from 'next/navigation'
-import { getDataUser } from '@/lib/features/new-message/new-message'
+import {
+  setUserFromProfile,
+} from '@/lib/features/new-message/new-message'
 import { useDispatch } from 'react-redux'
 import { JWT_COOKIE, MESSAGE_TYPE } from '@/app/constant'
 import axios from 'axios'
@@ -110,11 +112,15 @@ export default function ButtonRedering({
       .catch((error) => {
         // Handle the error if the request fails
         router.push(`/messages/inbox/new`)
-        dispatch(getDataUser({
-          id: user.user.id,
-          fullName: user.user.fullName,
-          avatarUrl: user.user.avatarUrl,
-        }))
+        dispatch(
+          setUserFromProfile({
+            userFromProfile: {
+              id: user.user.id,
+              fullName: user.user.fullName,
+              avatarUrl: user.user.avatarUrl,
+            },
+          })
+        )
       })
   }
 
