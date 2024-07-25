@@ -139,10 +139,7 @@ export default function Page() {
         }
       )
       .then(({ data: { totalPages, friends } }) => {
-        if (!totalPages) {
-          setHasMore(false)
-          return
-        }
+        setHasMore(totalPages > 1)
         setListFriend(friends)
         setTotalPages(totalPages)
         setIsLoading(false)

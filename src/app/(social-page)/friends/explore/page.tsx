@@ -43,7 +43,9 @@ function FriendListItem({ users }) {
   return (
     !isDelete && (
       <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-        <Link href={`/profile/${users.id}/about`} className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+        <Link
+          href={`/profile/${users.id}/about`}
+          className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
           <Avatar size="lg" src={users.avatarUrl} placeholder={undefined} />
           <p>{users.fullName}</p>
         </Link>
@@ -123,10 +125,7 @@ export default function Page() {
         }
       )
       .then(({ data: { totalPages, users } }) => {
-        if (!totalPages) {
-          setHasMore(false)
-          return
-        }
+        setHasMore(totalPages > 1)
         setListFriend(users)
         setTotalPages(totalPages)
         setIsLoading(false)

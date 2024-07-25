@@ -173,7 +173,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
             nunito.className
           )}>
           <div className="flex gap-4">
-            <Link href={`profile/${comment.creator.id}/about`}>
+            <Link href={`/profile/${comment.creator.id}/about`}>
               <Avatar
                 src={comment.creator.avatarUrl}
                 alt="avatar user"

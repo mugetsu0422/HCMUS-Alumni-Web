@@ -47,8 +47,10 @@ function FriendListItem({ friend }) {
   return (
     !isDeleted && (
       <div className="flex w-[80%] m-auto items-center mt-1">
-        <Link  href={`/profile/${friend.id}/about`} className="flex items-center gap-2 w-full hover:bg-gray-400/[.25] p-2 rounded-lg">
-            <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
+        <Link
+          href={`/profile/${friend.id}/about`}
+          className="flex items-center gap-2 w-full hover:bg-gray-400/[.25] p-2 rounded-lg">
+          <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
           <p>{friend.fullName}</p>
         </Link>
       </div>
@@ -112,25 +114,18 @@ export default function Page() {
   useEffect(() => {
     // Friends list
     axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user${myParams}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user${myParams}`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      })
       .then(({ data: { totalPages, users } }) => {
-        if (!totalPages) {
-          setHasMore(false)
-          return
-        }
+        setHasMore(totalPages > 1)
         setListFriend(users)
         setTotalPages(totalPages)
         setIsLoading(false)
       })
-      .catch((error) => {
-      })
+      .catch((error) => {})
   }, [myParams])
 
   return (
@@ -152,7 +147,7 @@ export default function Page() {
             </div>
           }>
           <div className="flex flex-col gap-4 mt-6">
-            {listFriend.map(( friend ) => (
+            {listFriend.map((friend) => (
               <FriendListItem key={friend.id} friend={friend} />
             ))}
           </div>

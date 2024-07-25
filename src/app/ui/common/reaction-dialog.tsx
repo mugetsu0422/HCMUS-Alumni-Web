@@ -71,7 +71,7 @@ export default function ReactionDialog({
           scrollableTarget="scrollableReaction">
           {users.map(({ creator: { id, fullName, avatarUrl } }) => (
             <Link
-              href={`profile/${id}/about`}
+              href={`/profile/${id}/about`}
               key={id}
               className="flex items-center justify-between hover:bg-gray-400/[.25] p-2 rounded-lg">
               <div className="flex gap-3 items-center">

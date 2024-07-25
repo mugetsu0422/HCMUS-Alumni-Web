@@ -19,23 +19,21 @@ export default function NewsListItem({
       <Link
         href={`/news/${id}`}
         className="w-[20rem] xl:w-[20rem] h-52 shrink-0">
-        <figure className="relative">
+        <figure className="relative h-full w-full">
           <img
             src={thumbnail}
             alt="thumbnail"
-            className="w-full h-full object-cover object-center rounded-xl"
+            className="w-full h-full object-cover rounded-xl"
           />
-          {faculty && (
-            <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
-              {faculty?.name}
-            </figcaption>
-          )}
+          <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
+            {faculty ? faculty.name : 'Tất ca3F'}
+          </figcaption>
         </figure>
       </Link>
       <div className="w-full md:w-fit px-8 md:px-0 flex flex-col gap-y-1 text-black">
         <Link
           href={`/news/${id}`}
-          className="font-extrabold w-full sm:w-[400px] md:w-full text-[--blue-05] text-[22px] cursor-pointer hover:text-[--secondary] hover:duration-300">
+          className="font-semibold w-full sm:w-[400px] md:w-full text-[22px] cursor-pointer hover:duration-300">
           {title}
         </Link>
         <p className="w-full sm:w-[400px] md:w-full">{summary}</p>

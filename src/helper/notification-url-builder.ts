@@ -78,12 +78,13 @@ export class NotificationUrlBuilder {
     entityTable: NotificationEntityTable,
     type: NotificationType
   ): string {
+    console.log(this.notification)
     if (type === 'CREATE') {
       switch (entityTable) {
         case 'request_friend':
           return `/friends/requests`
         case 'friend':
-          return `/profile/${this.notification.entityId}/about`
+          return `/profile/${this.notification.actor.id}/about`
         default:
           return '#'
       }
@@ -92,7 +93,7 @@ export class NotificationUrlBuilder {
     } else if (type === 'DELETE') {
       switch (entityTable) {
         case 'request_friend':
-          return `/profile/${this.notification.entityId}/about`
+          return `/profile/${this.notification.actor.id}/about`
             default:
           return '#'
       }

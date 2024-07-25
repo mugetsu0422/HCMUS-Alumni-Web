@@ -66,7 +66,9 @@ function FriendListItem({ friend }) {
 
   return (
     <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-      <Link href={`/profile/${friend.id}/about`} className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+      <Link
+        href={`/profile/${friend.id}/about`}
+        className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
         <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
         <p>{friend.fullName}</p>
       </Link>
@@ -134,10 +136,7 @@ export default function Page() {
         },
       })
       .then(({ data: { totalPages, friendRequests } }) => {
-        if (!totalPages) {
-          setHasMore(false)
-          return
-        }
+        setHasMore(totalPages > 1)
         setListFriend(friendRequests)
         setTotalPages(totalPages)
         setIsLoading(false)
@@ -148,7 +147,7 @@ export default function Page() {
   return (
     <div>
       <div className="flex flex-col gap-4 mt-6">
-      {!isLoading && (
+        {!isLoading && (
           <InfiniteScroll
             dataLength={listFriend.length}
             next={onFetchMore}
@@ -158,12 +157,11 @@ export default function Page() {
                 <Spinner className="h-8 w-8"></Spinner>
               </div>
             }>
-          {listFriend.map(({ user }) => (
-          <FriendListItem key={user.id} friend={user} />
-        ))}
+            {listFriend.map(({ user }) => (
+              <FriendListItem key={user.id} friend={user} />
+            ))}
           </InfiniteScroll>
         )}
-        
       </div>
     </div>
   )
