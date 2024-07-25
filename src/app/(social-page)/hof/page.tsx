@@ -141,7 +141,7 @@ function HofListItem({ hof }) {
         {hof.beginningYear && <span>Khóa {hof.beginningYear} </span>}
         {hof.faculty && <span>- Khoa {hof.faculty.name}</span>}
       </p>
-      <p className="w-full text-center text-black font-semibold">
+      <p className="w-full text-left text-pretty text-black font-semibold">
         {hof.position}
       </p>
       <p className="text-sm">{hof.summary}</p>

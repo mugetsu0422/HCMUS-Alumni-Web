@@ -50,7 +50,7 @@ class NotificationUrlBuilder {
         case 'request_friend':
           return `/friends/requests`
         case 'friend':
-          return `/profile/${this.notification.entityId}/about`
+          return `/profile/${this.notification.actor.id}/about`
         default:
           return '#'
       }
@@ -59,7 +59,7 @@ class NotificationUrlBuilder {
     } else if (type === 'DELETE') {
       switch (entityTable) {
         case 'request_friend':
-          return `/profile/${this.notification.entityId}/about`
+          return `/profile/${this.notification.actor.id}/about`
         default:
           return '#'
       }

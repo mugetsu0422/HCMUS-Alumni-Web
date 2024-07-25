@@ -82,6 +82,7 @@ export default function Page({ params }: { params: { id: string } }) {
               className="flex flex-col gap-4 ql-editor sm:text:md lg:text-base text-justify"
               dangerouslySetInnerHTML={{ __html: hof.content }}></div>
           </div>
+          <div className="w-full text-right">{hof.creator.fullName}</div>
         </div>
       </>
     )

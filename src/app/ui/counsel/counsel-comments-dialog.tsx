@@ -162,6 +162,7 @@ export default function CommentsDialog({
             onEditComment={onEditComment}
             onDeleteComment={onDeleteComment}
             onFetchChildrenComments={onFetchChildrenComments}
+            numberCommnets={comments.length}
           />
           {comments.length < post.childrenCommentNumber && (
             <div

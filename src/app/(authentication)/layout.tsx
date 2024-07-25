@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function RootLayout({ children }) {
   return (
-    <div className="flex justify-between flex-col sm:flex-row">
+    <div className="flex justify-between flex-col sm:flex-row h-screen">
       <Link href={'/'}>
         <Image
           className="sm:absolute sm:left-10 sm:top-4 "

@@ -10,7 +10,13 @@ import {
   Radio,
   Spinner,
 } from '@material-tailwind/react'
-import React, { createContext, useContext, useRef, useState, useEffect } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+} from 'react'
 import { useForm } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
@@ -120,9 +126,19 @@ function VoteOption({ voteId, name }) {
         htmlFor={`${postId}-${voteId}`}>
         {checkPermission('Counsel.Vote') &&
           (allowMultipleVotes ? (
-            <Checkbox color="blue" crossOrigin={undefined} {...commonProps} />
+            <Checkbox
+              color="blue"
+              crossOrigin={undefined}
+              {...commonProps}
+              className="border-2"
+            />
           ) : (
-            <Radio color="blue" crossOrigin={undefined} {...commonProps} />
+            <Radio
+              color="blue"
+              crossOrigin={undefined}
+              {...commonProps}
+              className="border-2"
+            />
           ))}
         <span className="text-black">{name}</span>
       </label>
@@ -267,9 +283,9 @@ export default function Poll({
             <VoteOption voteId={voteId} name={name} />
           </div>
         ))}
-        {checkPermission('Counsel.Vote') && (
-          allowAddOptions && votes.length < 10 && <AddNewVoteOptionInput />
-        )}
+        {checkPermission('Counsel.Vote') &&
+          allowAddOptions &&
+          votes.length < 10 && <AddNewVoteOptionInput />}
       </List>
       <UserVotesDialog
         users={userVotes}

@@ -33,6 +33,8 @@ export default function Page({
   const [isSingleComment, setIsSingleComment] = useState(false)
   const singleCommentRef = useRef(null)
   const [numberComments, setNumberComments] = useState(0)
+  const [firstLoadComment, setFirstLoadComment] = useState(false)
+  const [numberCommnets, setNumberCommnets] = useState(5)
   // Function to handle changes in the textarea
   const handleUploadCommentChange = (event) => {
     setUploadComment(event.target.value)
@@ -245,6 +247,11 @@ export default function Page({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
+  const FirstLoadMoreComments = () => {
+    setFirstLoadComment(true)
+    setNumberCommnets(news?.childrenCommentNumber)
+  }
+
   if (notFound) {
     return <NotFound404 />
   }
@@ -345,15 +352,18 @@ export default function Page({
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
+              numberCommnets={numberCommnets}
             />
 
-            {!isSingleComment &&
-              comments.length < news?.childrenCommentNumber && (
+            {((!isSingleComment &&
+              comments.length < news?.childrenCommentNumber) || (!firstLoadComment && 5 < news?.childrenCommentNumber)) && (
                 <Button
-                  onClick={onFetchComments}
+                  onClick={() => {onFetchComments()
+                    FirstLoadMoreComments()
+                  }}
                   className="bg-[--blue-02] normal-case text-sm gap-1"
                   placeholder={undefined}>
-                  Tải thêm
+                  Tải thêm 
                 </Button>
               )}
 

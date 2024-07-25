@@ -99,9 +99,7 @@ export default function EventsListItem({
           <div className="flex gap-x-2 items-center flex-wrap">
             <TagFill className="text-[--blue-02]" />
             {event.tags.map(({ name }) => (
-              <p
-                key={name}
-                className="text-md hover:duration-300">
+              <p key={name} className="text-md hover:duration-300">
                 {name}
               </p>
             ))}
@@ -123,7 +121,7 @@ export default function EventsListItem({
               disabled={isDisabled}
               placeholder={undefined}
               size="md"
-              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
+              className="w-full lg:w-[400px] bg-[#e4e6eb] text-[#4b4f56] font-medium text-[16px]">
               Huỷ tham gia
             </Button>
           ))}

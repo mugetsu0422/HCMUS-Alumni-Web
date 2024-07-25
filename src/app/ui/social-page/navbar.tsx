@@ -24,6 +24,7 @@ import {
   faCircleUser,
   faUserGroup,
   faUserPen,
+  faUserGear,
 } from '@fortawesome/free-solid-svg-icons'
 import { ChatDotsFill, ChevronDown, ChevronUp } from 'react-bootstrap-icons'
 import NotificationPopover from '../common/notification-popover'
@@ -199,16 +200,6 @@ function NavListMenu({ label, icon, navListMenuItems }) {
     <React.Fragment>
       <Menu allowHover open={isMenuOpen} handler={setIsMenuOpen}>
         <MenuHandler>
-          {/* <Link
-            href={link}
-            className="text-[--text-navbar] font-bold group-hover:text-[var(--blue-05)] flex items-center gap-2">
-            <MenuItem
-              placeholder={undefined}
-              className="flex items-center gap-2 text-[--text-navbar] hover:text-[--blue-05] font-bold text-base lg:rounded-full">
-              <FontAwesomeIcon icon={icon} className="text-2xl" />
-              {label}
-            </MenuItem>
-          </Link> */}
           <div className="font-normal">
             <MenuItem
               placeholder={undefined}
@@ -380,7 +371,7 @@ function SocialPageNavbar() {
                   <Link
                     href={`/profile/${userId}/about`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="" />
+                    <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
                     Trang cá nhân
                   </Link>
                 </MenuItem>
@@ -390,7 +381,7 @@ function SocialPageNavbar() {
                     <Link
                       href={`/admin`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserPen} className="" />
+                      <FontAwesomeIcon icon={faUserPen} className="text-xl" />
                       Admin
                     </Link>
                   </MenuItem>
@@ -398,9 +389,22 @@ function SocialPageNavbar() {
 
                 <MenuItem
                   placeholder={undefined}
-                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]"
+                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]">
+                  <Link
+                    href={`/change-password`}
+                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                    <FontAwesomeIcon icon={faUserGear} className="text-xl" />
+                    <p className="text-base">Đổi mật khẩu</p>
+                  </Link>
+                </MenuItem>
+                <MenuItem
+                  placeholder={undefined}
+                  className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]"
                   onClick={handleLogout}>
-                  <FontAwesomeIcon icon={faRightFromBracket} className="" />
+                  <FontAwesomeIcon
+                    icon={faRightFromBracket}
+                    className="text-xl"
+                  />
                   Đăng xuất
                 </MenuItem>
               </MenuList>

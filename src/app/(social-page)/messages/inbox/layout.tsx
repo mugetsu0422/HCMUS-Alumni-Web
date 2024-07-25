@@ -91,11 +91,7 @@ export default function GroupLayout({
         dispatch(setInboxes({ type: 'set', newInboxes: inboxes }))
         setHasMore(totalPages > 1)
       })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+      .catch((error) => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
 

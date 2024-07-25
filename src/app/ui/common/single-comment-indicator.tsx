@@ -20,11 +20,11 @@ const SingleCommentIndicator = forwardRef<
           <a
             href={`${parentCommentUrl}`}
             className="no-underline hover:no-underline visited:no-underline text-[var(--blue-05)]">
-            Chuỗi bình luận đơn lẻ
+            Xem bình luận cha
           </a>
         ) : (
           <span className="no-underline hover:no-underline visited:no-underline text-black">
-            Chuỗi bình luận đơn lẻ
+            Xem bình luận cha
           </span>
         )}
 

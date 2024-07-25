@@ -8,6 +8,7 @@ import { nunito } from '../../ui/fonts'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '@/app/constant'
 import Cookies from 'js-cookie'
+import Footer from '@/app/ui/landing-page/footer'
 
 export default function Page() {
   const [events, setEvents] = useState([])
@@ -26,7 +27,7 @@ export default function Page() {
     )
 
     const newsPromise = axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news?statusId=${POST_STATUS['Bình thường']}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/news/hot?statusId=${POST_STATUS['Bình thường']}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -52,11 +53,14 @@ export default function Page() {
       .catch((error) => {})
   }, [])
   return (
-    <div
-      className={`${nunito.className} mt-8 flex flex-col place-items-center justify-center max-w-[1200px] w-full relative gap-y-10 m-auto`}>
-      <NewEvents events={events} />
-      <TrendingNews news={news} />
-      <HallOfFame hof={hof} />
-    </div>
+    <>
+      <div
+        className={`${nunito.className} mt-8 flex flex-col place-items-center justify-center max-w-[1200px] w-full relative gap-y-10 m-auto`}>
+        <NewEvents events={events} />
+        <TrendingNews news={news} />
+        <HallOfFame hof={hof} />
+      </div>
+      <Footer />
+    </>
   )
 }

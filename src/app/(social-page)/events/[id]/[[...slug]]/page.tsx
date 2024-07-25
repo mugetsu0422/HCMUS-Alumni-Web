@@ -123,7 +123,8 @@ export default function Page({
   const singleCommentRef = useRef(null)
   const [participant, setParticipant] = useState(0)
   const [numberComments, setNumberComments] = useState(0)
-
+  const [firstLoadComment, setFirstLoadComment] = useState(false)
+  const [numberCommnets, setNumberCommnets] = useState(5)
   // Event's participants
   const onParticipate = async (eventId) => {
     setIsDisabled(true)
@@ -395,6 +396,11 @@ export default function Page({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentPage])
 
+  const FirstLoadMoreComments = () => {
+    setFirstLoadComment(true)
+    setNumberCommnets(event?.childrenCommentNumber)
+  }
+
   if (notFound) {
     return <NotFound404 />
   }
@@ -510,6 +516,7 @@ export default function Page({
               {event?.content}
             </p>
           </div>
+          <div className="text-right w-full">{event?.creator?.fullName}</div>
         </div>
 
         <div className="flex flex-col gap-y-2 w-[75%] max-w-[1366px] m-auto mb-10">
@@ -551,18 +558,23 @@ export default function Page({
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
+              numberCommnets={numberCommnets}
             />
           }
 
-          {!isSingleComment &&
-            comments.length < event?.childrenCommentNumber && (
-              <Button
-                onClick={onFetchComments}
-                className="bg-[--blue-02] normal-case text-sm gap-1"
-                placeholder={undefined}>
-                Tải thêm
-              </Button>
-            )}
+          {((!isSingleComment &&
+            comments.length < event?.childrenCommentNumber) ||
+            (!firstLoadComment && 5 < event?.childrenCommentNumber)) && (
+            <Button
+              onClick={() => {
+                onFetchComments()
+                FirstLoadMoreComments()
+              }}
+              className="bg-[--blue-02] normal-case text-sm gap-1"
+              placeholder={undefined}>
+              Tải thêm
+            </Button>
+          )}
         </div>
       </>
     )

@@ -442,7 +442,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
         {/* this is the header of a post */}
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Link href="#">
+            <Link href={`/profile/${post.creator.id}/about`}>
               <Avatar
                 placeholder={undefined}
                 src={post.creator.avatarUrl}
@@ -564,49 +564,41 @@ export default function PostListItem({ post }: { post: PostProps }) {
             />
           )}
 
-          {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
-            <div className="flex flex-col">
-              <div className="flex justify-between my-3 mx-1">
-                {reactionCount > 0 ? (
-                  <div
-                    className="flex items-center gap-1 group hover:cursor-pointer"
-                    onClick={() => {
-                      if (!reaction.length) {
-                        onFetchReaction()
-                      }
-                      hanldeOpenReactDialog()
-                    }}>
-                    <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-                    <p className="text-[16px] group-hover:underline">
-                      {reactionCount}
-                    </p>
-                  </div>
-                ) : (
-                  <div> </div>
-                )}
-
-                {post.childrenCommentNumber > 0 && (
-                  <div
-                    onClick={() => {
-                      if (
-                        comments.length === 0 &&
-                        post.childrenCommentNumber != 0
-                      ) {
-                        onFetchComments(0, COMMENT_PAGE_SIZE)
-                      }
-
-                      handleOpenCommentDialog()
-                    }}
-                    className="hover:underline hover:cursor-pointer">
-                    {post.childrenCommentNumber} Bình luận
-                  </div>
-                )}
+          <div className="flex flex-col">
+            <div className="flex justify-between my-3 mx-1">
+              <div
+                className="flex items-center gap-1 group hover:cursor-pointer"
+                onClick={() => {
+                  if (!reaction.length) {
+                    onFetchReaction()
+                  }
+                  if(reactionCount > 0) {                  hanldeOpenReactDialog()
+                  }
+                }}>
+                <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
+                <p className="text-[16px] group-hover:underline">
+                  {reactionCount}
+                </p>
               </div>
-              <span className="border-t-[1px] border-[--secondary]"></span>
+
+              <div
+                onClick={() => {
+                  if (
+                    comments.length === 0 &&
+                    post.childrenCommentNumber != 0
+                  ) {
+                    onFetchComments(0, COMMENT_PAGE_SIZE)
+                  }
+                  if (post.childrenCommentNumber > 0) {
+                    handleOpenCommentDialog()
+                  }
+                }}
+                className="hover:underline hover:cursor-pointer">
+                {post.childrenCommentNumber} Bình luận
+              </div>
             </div>
-          ) : (
-            ''
-          )}
+            <span className="border-t-[1px] border-[--secondary]"></span>
+          </div>
 
           <ReactionDialog
             users={reaction}

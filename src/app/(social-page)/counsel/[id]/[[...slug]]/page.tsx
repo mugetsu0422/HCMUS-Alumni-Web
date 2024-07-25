@@ -509,7 +509,7 @@ export default function Page({
         className={`${nunito.className} mt-4 max-w-[850px] min-w-[500px] w-[80%] flex flex-col h-fit mb-20 mx-auto`}>
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Link href="#">
+            <Link href={`/profile/${post.creator.id}/about`}>
               <Avatar
                 placeholder={undefined}
                 src={post.creator.avatarUrl}
@@ -706,6 +706,7 @@ export default function Page({
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
+              numberCommnets={comments.length}
             />
             {!isSingleComment &&
               comments.length < post.childrenCommentNumber && (

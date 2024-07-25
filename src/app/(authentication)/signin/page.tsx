@@ -17,7 +17,6 @@ import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
 
-
 function ForceChangePasswordForm({
   forceChangePasswordForm,
   onForceChangePasswordSubmit,
@@ -209,28 +208,6 @@ function SigninForm({ signinForm, onSigninFormSubmit }) {
           </div>
         </div>
 
-        <div className="flex justify-between pt-2">
-          <Checkbox
-            label={
-              <Typography
-                variant="small"
-                className={` ${roboto.className} flex items-center font-normal`}
-                placeholder={undefined}>
-                Ghi nhớ đăng nhập
-              </Typography>
-            }
-            color="blue"
-            containerProps={{ className: '-ml-2.5' }}
-            crossOrigin={undefined}
-          />
-          <Typography
-            variant="small"
-            className={` ${roboto.className} flex items-center font-normal`}
-            placeholder={undefined}>
-            <Link href={'#'}>Quên mật khẩu ?</Link>
-          </Typography>
-        </div>
-
         <Button
           type="submit"
           placeholder={undefined}
@@ -238,6 +215,15 @@ function SigninForm({ signinForm, onSigninFormSubmit }) {
           className={` ${roboto.className} mt-6 w-full bg-blue-800 text-white rounded-md py-4`}>
           Đăng nhập
         </Button>
+
+        <div className="flex justify-center pt-2 mt-2">
+          <Typography
+            variant="h6"
+            className={` ${roboto.className} flex items-center font-normal hover:underline`}
+            placeholder={undefined}>
+            <Link href={'/forgot-password'}>Quên mật khẩu ?</Link>
+          </Typography>
+        </div>
 
         <div className=" mt-[2rem] flex items-center justify-between ">
           <Typography
@@ -293,7 +279,9 @@ export default function Page() {
         }
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -331,7 +319,6 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      
       {isForceChangePassword ? (
         <ForceChangePasswordForm
           forceChangePasswordForm={forceChangePasswordForm}
