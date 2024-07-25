@@ -718,6 +718,7 @@ export default function Page({
               onEditComment={onEditComment}
               onDeleteComment={onDeleteComment}
               onFetchChildrenComments={onFetchChildrenComments}
+              numberCommnets={comments.length}
             />
             {!isSingleComment &&
               comments.length < post.childrenCommentNumber && (
