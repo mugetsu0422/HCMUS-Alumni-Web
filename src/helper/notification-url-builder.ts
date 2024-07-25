@@ -78,7 +78,6 @@ export class NotificationUrlBuilder {
     entityTable: NotificationEntityTable,
     type: NotificationType
   ): string {
-    console.log(this.notification)
     if (type === 'CREATE') {
       switch (entityTable) {
         case 'request_friend':

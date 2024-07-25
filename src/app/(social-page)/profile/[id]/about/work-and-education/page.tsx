@@ -20,13 +20,12 @@ export default function Page() {
   const [openDialogAddEducation, setOpenDialogAddEducation] = useState(false)
   const [works, setWorks] = useState([])
   const [educations, setEducations] = useState([])
-  const userId = Cookies.get('userId')
 
   const [coverImage, setCoverImage] = useState('')
   const pathname = usePathname()
   const parts = pathname.split('/')
   const userIdParams = parts[2]
-  const isProfileLoginUser = userId === userIdParams
+  const [isProfileLoginUser, setIsProfileLoginUser] = useState(false)
 
   function handleOpenDialogAddWorks() {
     setOpenDialogAddWorks((e) => !e)
@@ -79,6 +78,8 @@ export default function Page() {
   }
 
   useEffect(() => {
+    setIsProfileLoginUser(userIdParams === Cookies.get('userId'))
+
     const worksPromise = axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userIdParams}/profile/job`,
       {

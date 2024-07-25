@@ -17,8 +17,7 @@ export default function Page() {
   const pathname = usePathname()
   const parts = pathname.split('/')
   const userIdParams = parts[2]
-  const userId = Cookies.get('userId')
-  const isProfileLoginUser = userId === userIdParams
+  const [isProfileLoginUser, setIsProfileLoginUser] = useState(false)
 
   function handleOpenDialogAdd() {
     setOpenDialogAdd((e) => !e)
@@ -48,6 +47,8 @@ export default function Page() {
   }
 
   useEffect(() => {
+    setIsProfileLoginUser(userIdParams === Cookies.get('userId'))
+
     axios
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userIdParams}/profile/achievement`,
