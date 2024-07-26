@@ -33,7 +33,6 @@ export default function Page() {
   const today = new Date()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const tomorrowString = tomorrow.toISOString().split('T')[0]
   const [user, setUser] = useState(null)
   const pathname = usePathname()
   const userId = Cookies.get('userId')
@@ -79,11 +78,11 @@ export default function Page() {
   }, [part[2]])
 
   function convertToInputDate(timestamp) {
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const date = new Date(timestamp)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
   const onSubmit = async (data) => {
@@ -153,37 +152,7 @@ export default function Page() {
           },
           aboutMe: data.aboutMe,
           coverUrl: user?.user?.coverUrl,
-          dob: convertToInputDate(data.dob),
-          faculty: {
-            name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
-            id: data.facultyId,
-          },
-        },
-      })
-      console.log({
-        alumni: {
-          graduationYear: data.graduationYear,
-          alumClass: data.alumClass,
-        },
-        alumniVerification: {
-          status: user?.alumniVerification?.status,
-          studentId: user?.alumniVerification?.studentId,
-          beginningYear: user?.alumniVerification?.beginningYear,
-        },
-        user: {
-          id: user?.user?.id,
-          fullName: data.fullName,
-          socialMediaLink: data.socialMediaLink,
-          email: user?.user?.email,
-          avatarUrl: user?.user?.avatarUrl,
-          phone: data.phone,
-          sex: {  
-            name: GENDER.find((gender) => gender.id === data.sex)?.name,
-            id: data.sex,
-          },
-          aboutMe: data.aboutMe,
-          coverUrl: user?.user?.coverUrl,
-          dob: convertToInputDate(data.dob),
+          dob: data.dob ? convertToInputDate(data.dob) : "",
           faculty: {
             name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
             id: data.facultyId,
@@ -199,10 +168,11 @@ export default function Page() {
     const verification = {
       avatar: user?.user?.avatarUrl,
       fullName: user?.user?.fullName,
-      studentId: user?.alumniVerification?.studentId,
+      studentId: user?.alumni?.studentId,
       beginningYear: user?.alumniVerification?.beginningYear,
       socialMediaLink: user?.user?.socialMediaLink,
     }
+    console.log(verification)
     axios
       .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
@@ -411,7 +381,7 @@ export default function Page() {
         {/* Khóa */}
         <div className="flex items-start gap-4">
           <Mortarboard className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit && user?.alumniVerification?.status !== 'APPROVED' ? (
+          {onpenEdit && user?.alumniVerification?.status !== 'APPROVED' ? (
             <div className="flex flex-col lg:flex-row gap-4 w-[40%]">
               <div className="flex flex-col gap-2 w-full">
                 <label className="text-lg font-bold text-black">Khóa</label>
@@ -487,7 +457,7 @@ export default function Page() {
 
         <div className="flex items-start gap-4">
           <PersonVcard className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit && user?.alumniVerification?.status !== 'APPROVED' ? (
+          {onpenEdit && user?.alumniVerification?.status !== 'APPROVED' ? (
             <div className="flex flex-col gap-2 w-[40%]">
               <label className="text-lg font-bold text-black">
                 Mã số sinh viên
@@ -532,9 +502,10 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {moment(user?.user?.dob)
-                  .local()
-                  .format('DD/MM/YYYY')}
+                {user?.user?.dob &&
+                  moment(user?.user?.dob)
+                    .local()
+                    .format('DD/MM/YYYY')}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Ngày sinh
@@ -547,7 +518,9 @@ export default function Page() {
                 className="w-full my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
                 id="dob"
                 type="date"
-                defaultValue={convertToInputDate(user?.user?.dob)}
+                defaultValue={
+                  user?.user?.dob && convertToInputDate(user?.user?.dob)
+                }
                 onFocus={(e) => e.target.showPicker()}
                 {...register('dob', {})}
               />
@@ -606,7 +579,7 @@ export default function Page() {
           {!onpenEdit ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.phone}
+                {user?.user?.phone !== "null" && user?.user?.phone}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Di động
@@ -635,9 +608,9 @@ export default function Page() {
           <Link45deg className="text-[20px] lg:text-[24px]" />
           {!onpenEdit ? (
             <div>
-              <p className="text-base lg:text-[20px] font-semibold">
+              <Link href={`${user?.user?.socialMediaLink}`} target="blank" className="text-base lg:text-[20px] font-semibold">
                 {user?.user?.socialMediaLink}
-              </p>
+              </Link>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Trang cá nhân
               </p>
