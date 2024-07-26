@@ -1,4 +1,3 @@
-
 import Navbar from '../ui/social-page/navbar'
 import { Provider } from 'react-redux'
 
