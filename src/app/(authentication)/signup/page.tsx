@@ -15,6 +15,7 @@ import {
 import Countdown from 'react-countdown'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
+import { jwtDecode } from 'jwt-decode'
 
 const FormContext = createContext(null)
 
@@ -45,7 +46,9 @@ function Step1() {
         handleNext()
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
         return
       })
   }
@@ -188,10 +191,12 @@ function Step2() {
                 email: inputs.email,
                 pass: inputs.pass,
               })
-              .then((res) => {
-                Cookies.set(JWT_COOKIE, res.data.jwt, {
-                  expires: JWT_EXPIRED_TIME,
-                })
+              .then(({ data: { jwt, permissions } }) => {
+                const decoded: { sub: string } = jwtDecode(jwt)
+
+                Cookies.set('userId', decoded.sub, { expires: 3 })
+                Cookies.set('jwt', jwt, { expires: 3 })
+                Cookies.set('permissions', permissions, { expires: 3 })
                 // Move to next page
                 setTimeout(() => router.push('/verify-alumni'), 2500)
               })
@@ -199,7 +204,9 @@ function Step2() {
       })
       .catch((error) => {
         // failed
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
   const countdownRenderer = ({ seconds }) => {
@@ -219,7 +226,9 @@ function Step2() {
       )
       .then((res) => {})
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
     setIsCodeExpired(false)
     timer.current = Date.now()
@@ -335,7 +344,6 @@ export default function Page() {
   return (
     <div
       className={`${roboto.className} w-auto h-auto m-auto xl:m-0 xl:ml-[5rem] sm:pt-[10rem] 2xl:pt-0`}>
-      
       <Typography
         variant="h2"
         color="blue-gray"
