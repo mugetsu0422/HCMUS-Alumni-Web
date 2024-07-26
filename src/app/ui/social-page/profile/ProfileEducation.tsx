@@ -19,29 +19,37 @@ import moment from 'moment'
 import { useForm } from 'react-hook-form'
 import ErrorInput from '@/app/ui/error-input'
 import toast from 'react-hot-toast'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 
 export function DialogAddEducation({
   openDialogAddEducation,
   handleOpenDialogAddEducation,
-  onAddEducation,
+  onHandleAddEducation,
 }) {
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm()
 
-  const onSubmit = (data) => {
+  const onSubmit = (data, e) => {
+    const convertToDDMMYYYY = (mmYYYY: string): string | null => {
+      const [year, month] = mmYYYY.split('-')
+      if (!month || !year || month.length !== 2 || year.length !== 4) {
+        return null
+      }
+      return `${year}-${month}-01`
+    }
     const eudcation = {
       schoolName: data.schoolName,
       degree: data.degree,
-      startTime: data.startTime,
-      endTime: data.endTime,
+      startTime: convertToDDMMYYYY(data.startTime),
+      endTime: convertToDDMMYYYY(data.endTime),
       privacy: 'PUBLIC',
       isLearning: false,
     }
-    onAddEducation(eudcation)
+    onHandleAddEducation(eudcation, e)
+    reset()
   }
 
   return (
@@ -97,7 +105,7 @@ export function DialogAddEducation({
             <input
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="startTime"
-              type="date"
+              type="month"
               //min={todayString}
               //defaultValue={tomorrowString}
               onFocus={(e) => e.target.showPicker()}
@@ -115,7 +123,7 @@ export function DialogAddEducation({
             <input
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="endTime"
-              type="date"
+              type="month"
               //min={todayString}
               //defaultValue={tomorrowString}
               onFocus={(e) => e.target.showPicker()}
@@ -146,50 +154,36 @@ export function DialogAddEducation({
 function DialogEditEducation({
   openDialogEdit,
   handleOpenDialogEdit,
-  educationId,
+  educationData,
+  setEducationData,
 }) {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm()
 
-  const pathname = usePathname()
-  const parts = pathname.split('/')
-  const userIdParams = parts[2]
-
-  useEffect(() => {
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userIdParams}/profile/job/${educationId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { edu } }) => {
-        setValue('schoolName', edu.schoolName)
-        setValue('startTime', edu.startTime)
-        setValue('endTime', edu.endTime)
-        setValue('degree', edu.degree)
-      })
-      .catch((error) => {})
-  }, [])
-
   const onSubmit = (data) => {
+    const convertToDDMMYYYY = (mmYYYY: string): string | null => {
+      const [year, month] = mmYYYY.split('-')
+      if (!month || !year || month.length !== 2 || year.length !== 4) {
+        return null
+      }
+      return `${year}-${month}-01`
+    }
     const education = {
+      educationId: educationData.educationId,
       schoolName: data.schoolName,
       degree: data.degree,
-      startTime: data.startTime,
-      endTime: data.endTime,
+      startTime: convertToDDMMYYYY(data.startTime),
+      endTime: convertToDDMMYYYY(data.endTime),
       privacy: 'PUBLIC',
       isLearning: data.isLearning,
+      isDelete: false,
     }
     axios
       .put(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/education/${educationId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/education/${educationData.educationId}`,
         education,
         {
           headers: {
@@ -197,12 +191,23 @@ function DialogEditEducation({
           },
         }
       )
-      .then(() => toast.success('Cập nhật học vấn thành công'))
+      .then(() => {
+        toast.success('Cập nhật học vấn thành công')
+        handleOpenDialogEdit()
+        setEducationData(education)
+      })
       .catch((error) => {
         toast.error(
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )
       })
+  }
+
+  const convertToMonthInputValue = (dateTimeString) => {
+    const date = new Date(dateTimeString)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0') // Add 1 because getMonth() returns 0-11
+    return `${year}-${month}`
   }
 
   return (
@@ -220,6 +225,7 @@ function DialogEditEducation({
               size="md"
               crossOrigin={undefined}
               variant="outlined"
+              defaultValue={educationData.schoolName}
               type="text"
               {...register('schoolName', {
                 required: 'Vui lòng nhập thành tựu',
@@ -238,6 +244,7 @@ function DialogEditEducation({
               size="md"
               crossOrigin={undefined}
               variant="outlined"
+              defaultValue={educationData.degree}
               type="text"
               {...register('degree', {
                 required: 'Vui lòng nhập thành tựu',
@@ -259,11 +266,9 @@ function DialogEditEducation({
             <input
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="startTime"
-              type="date"
-              //min={todayString}
-              //defaultValue={tomorrowString}
+              type="month"
+              defaultValue={convertToMonthInputValue(educationData.startTime)}
               onFocus={(e) => e.target.showPicker()}
-              //onChange={(e) => onChange({ date: e.target.value })}
               {...register('startTime', {})}
             />
           </div>
@@ -277,11 +282,9 @@ function DialogEditEducation({
             <input
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="endTime"
-              type="date"
-              //min={todayString}
-              //defaultValue={tomorrowString}
+              type="month"
+              defaultValue={convertToMonthInputValue(educationData.endTime)}
               onFocus={(e) => e.target.showPicker()}
-              //onChange={(e) => onChange({ date: e.target.value })}
               {...register('endTime', {})}
             />
           </div>
@@ -307,7 +310,8 @@ function DialogEditEducation({
 
 export default function EducationListItem({ education, isProfileLoginUser }) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
-
+  const [educationData, setEducationData] = useState(education)
+  console.log(education)
   function handleOpenEditDialog() {
     setOpenEditDialog((e) => !e)
   }
@@ -318,16 +322,16 @@ export default function EducationListItem({ education, isProfileLoginUser }) {
         <Award className="text-[20px] lg:text-[24px]" />
         <div>
           <p className="text-base lg:text-[20px] font-semibold">
-            {education.schoolName}
+            {educationData.schoolName}
           </p>
           <p className="text-[12px] lg:text-base text-black font-semibold">
-            {education.degree}
+            {educationData.degree}
           </p>
           <p className="text-[12px] lg:text-base text-[--secondary] font-semibold">
-            {moment(education.startTime).local().format('MM/YYYY')} -{' '}
-            {education.endTime === null
+            {moment(educationData.startTime).local().format('MM/YYYY')} -{' '}
+            {educationData.endTime === null
               ? 'Hiện tại'
-              : moment(education.endTime).local().format('MM/YYYY')}
+              : moment(educationData.endTime).local().format('MM/YYYY')}
           </p>
         </div>
       </div>
@@ -344,7 +348,8 @@ export default function EducationListItem({ education, isProfileLoginUser }) {
       <DialogEditEducation
         openDialogEdit={openEditDialog}
         handleOpenDialogEdit={handleOpenEditDialog}
-        educationId={education.educationId}
+        educationData={educationData}
+        setEducationData={setEducationData}
       />
     </div>
   )
