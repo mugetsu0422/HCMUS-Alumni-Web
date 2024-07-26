@@ -44,7 +44,6 @@
     "react-tag-autocomplete": "^7.2.0",
     "react-textarea-autosize": "^8.5.3",
     "react-tooltip": "^5.27.1",
-    "sharp": "^0.33.1",
     "sockjs-client": "^1.6.1",
     "use-debounce": "^10.0.0"
   },
