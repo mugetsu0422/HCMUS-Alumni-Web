@@ -11,13 +11,14 @@ function Footer() {
         <div className="flex flex-col items-center gap-4">
           <div className="flex gap-10">
             <Image
-              src={'/hcmus-logo.svg'}
+              className='w-auto h-[100px]'
+              src={'/hcmus-logo.png'}
               width={100}
               height={100}
               alt="hcmus-logo"
             />
             <Image
-              src={'/logo-square.svg'}
+              src={'/logo-square.png'}
               width={100}
               height={100}
               alt="hcmus-logo"
@@ -44,14 +45,14 @@ function Footer() {
           <div className="flex gap-4 text-[var(--secondary)] text-2xl">
             <Link
               className="hover:text-[#0866ff]"
-              href={'https://www.facebook.com/'}
+              href={'https://www.facebook.com/VNUHCM.US'}
               rel="noopener noreferrer"
               target="_blank">
               <Facebook />
             </Link>
             <Link
               className="hover:text-[#ff0000]"
-              href={'https://www.youtube.com/'}
+              href={'https://www.youtube.com/channel/UCYtIjCGvl-VNizt_XWk9Uzg?'}
               rel="noopener noreferrer"
               target="_blank">
               <Youtube />
