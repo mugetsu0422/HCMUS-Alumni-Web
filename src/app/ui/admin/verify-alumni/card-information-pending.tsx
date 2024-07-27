@@ -57,6 +57,7 @@ export default function CardInformation({ offset, items, setItems }) {
           {
             id,
             studentId,
+            userId,
             beginningYear,
             socialMediaLink,
             fullName,
@@ -70,17 +71,20 @@ export default function CardInformation({ offset, items, setItems }) {
             key={id}
             className=" w-[100%] p-5 border border-gray-200 rounded-md break-words bg-white">
             {/* First line include FullName MSSV and Year*/}
-            <div className={`flex gap-4 ${inter.className} mb-2 items-center`} >
-              <Link href={`/profile/${id}/about`} target="blank" className="w-[20%] h-[20%] 2xl:w-[10%] 2xl:h-[10%]">
-              <Avatar
-                placeholder={undefined}
-                src={avatarUrl || ''}
-                alt="profile image"
-                className="w-full h-full aspect-square"
-              />
+            <div className={`flex gap-4 ${inter.className} mb-2 items-center`}>
+              <Link
+                href={`/profile/${userId}/about`}
+                target="blank"
+                className="w-[20%] h-[20%] 2xl:w-[10%] 2xl:h-[10%]">
+                <Avatar
+                  placeholder={undefined}
+                  src={avatarUrl || ''}
+                  alt="profile image"
+                  className="w-full h-full aspect-square"
+                />
               </Link>
               <div className="flex flex-col gap-2 w-[600px]">
-                <div className="flex gap-2 items-start">  
+                <div className="flex gap-2 items-start">
                   <div className="flex-col col-span-2 w-[280px]">
                     <p className="font-bold text-[var(--secondary)]">
                       Họ và tên
@@ -111,15 +115,14 @@ export default function CardInformation({ offset, items, setItems }) {
                     <p>{facultyName}</p>
                   </div>
 
-                    <Link
-                      className="w-fit h-full mt-1"
-                      href={`${socialMediaLink}`}
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      <LinkIcon link={socialMediaLink} />
-                    </Link>
+                  <Link
+                    className="w-fit h-full mt-1"
+                    href={`${socialMediaLink}`}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <LinkIcon link={socialMediaLink} />
+                  </Link>
                 </div>
-                
               </div>
 
               <form className="flex flex-col gap-2">
@@ -150,7 +153,7 @@ export default function CardInformation({ offset, items, setItems }) {
                 </div>
               </form>
             </div>
-            </div>
+          </div>
         )
       )}
     </>
