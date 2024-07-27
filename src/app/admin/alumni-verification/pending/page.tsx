@@ -11,7 +11,6 @@ import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'
 import { useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
 
-
 export default function Page() {
   const status = 'pending'
   const searchParams = useSearchParams()
@@ -77,7 +76,6 @@ export default function Page() {
 
   return (
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 py-4 px-10">
-      
       <p
         className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
         Yêu cầu xét duyệt cựu sinh viên - #{totalCount}
