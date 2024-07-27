@@ -50,7 +50,7 @@ export default function Page({ params }: { params: { id: string } }) {
           <div className={`mt-10 flex flex-col gap-y-6 mx-0 md:mx-auto w-full`}>
             {hof.linkedUser ? (
               <Link
-                href={`/profile/${hof.linkedUser}/about`}
+                href={`/profile/${hof.linkedUser.id}/about`}
                 target="blank"
                 className="w-full flex justify-center">
                 <img
