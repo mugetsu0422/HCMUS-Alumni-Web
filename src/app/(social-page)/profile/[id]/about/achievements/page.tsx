@@ -23,27 +23,33 @@ export default function Page() {
     setOpenDialogAdd((e) => !e)
   }
 
-  const onAddAchievements = (achivement) => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/achievement`,
-        achivement,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(() => {
-        toast.success('Thêm thành tựu thành công')
-        handleOpenDialogAdd()
-        setAchievements((prev) => prev.concat(achivement))
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+  const onAddAchievements = (
+    e: React.FormEvent<HTMLFormElement>,
+    achivement: object
+  ): Promise<any> => {
+    e.preventDefault()
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/achievement`,
+      achivement,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+
+  const onHandleAddAchievements = async (e, achievement) => {
+    try {
+      const {
+        data: { achievement: newAchievement },
+      } = await onAddAchievements(e, achievement)
+      toast.success('Thêm thành tựu thành công')
+      setAchievements((prev) => [newAchievement, ...prev]) // Ensure correct con catenation
+      handleOpenDialogAdd()
+    } catch (error) {
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+    }
   }
 
   useEffect(() => {
@@ -100,7 +106,7 @@ export default function Page() {
         <DialogAddAchievements
           openDialogAdd={openDialogAdd}
           handleOpenDialogAdd={handleOpenDialogAdd}
-          onAddAchievements={onAddAchievements}
+          onAddAchievements={onHandleAddAchievements}
         />
       </div>
     </div>

@@ -25,20 +25,30 @@ export function DialogAddAchievements({
   onAddAchievements,
 }) {
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm()
 
-  const onSubmit = (data) => {
+  const onSubmit = (data, e) => {
+    const convertToDDMMYYYY = (mmYYYY: string): string | null => {
+      const [year, month] = mmYYYY.split('-')
+      if (!month || !year || month.length !== 2 || year.length !== 4) {
+        return null
+      }
+      return `${year}-${month}-01`
+    }
+
     const achivement = {
       achievementName: data.achievementName,
       achievementType: data.achievementType,
-      achievementTime: data.achievementTime,
+      achievementTime: convertToDDMMYYYY(data.achievementTime),
       privacy: 'PUBLIC',
     }
 
-    onAddAchievements(achivement)
+    onAddAchievements(e, achivement)
+    reset()
   }
 
   return (
@@ -99,7 +109,7 @@ export function DialogAddAchievements({
             <input
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="achievementTime"
-              type="date"
+              type="month"
               //defaultValue={tomorrowString}
               onFocus={(e) => e.target.showPicker()}
               //onChange={(e) => onChange({ date: e.target.value })}
@@ -129,48 +139,36 @@ export function DialogAddAchievements({
 function DialogEditAchievements({
   openEditDialog,
   handleOpenDialogEdit,
-  achievementId,
+  achivementData,
+  setAchivementData,
 }) {
   const {
     register,
+    reset,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm()
 
-  const pathname = usePathname()
-  const parts = pathname.split('/')
-  const userIdParams = parts[2]
-
-  useEffect(() => {
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/${userIdParams}/profile/achievement/${achievementId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { achievement } }) => {
-        setValue('achievementName', achievement.achievementName)
-        setValue('achievementType', achievement.achievementType)
-        setValue('achievementTime', achievement.achievementTime)
-      })
-      .catch((error) => {})
-  }, [])
-
   const onSubmit = (data) => {
+    const convertToDDMMYYYY = (mmYYYY: string): string | null => {
+      const [year, month] = mmYYYY.split('-')
+      if (!month || !year || month.length !== 2 || year.length !== 4) {
+        return null
+      }
+      return `${year}-${month}-01`
+    }
+
     const achivement = {
+      achievementId: achivementData.achievementId,
       achievementName: data.achievementName,
       achievementType: data.achievementType,
-      achievementTime: data.achievementTime,
+      achievementTime: convertToDDMMYYYY(data.achievementTime),
       privacy: 'PUBLIC',
     }
 
     axios
       .put(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/achievement/${achievementId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/achievement/${achivementData.achievementId}`,
         achivement,
         {
           headers: {
@@ -178,13 +176,26 @@ function DialogEditAchievements({
           },
         }
       )
-      .then(() => toast.success('Cập nhật thành tựu thành công'))
+      .then(() => {
+        toast.success('Cập nhật thành tựu thành công')
+        setAchivementData(achivement)
+        handleOpenDialogEdit()
+        reset()
+      })
       .catch((error) => {
         toast.error(
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )
       })
   }
+
+  const convertToMonthInputValue = (dateTimeString) => {
+    const date = new Date(dateTimeString)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0') // Add 1 because getMonth() returns 0-11
+    return `${year}-${month}`
+  }
+
   return (
     <Dialog
       placeholder={undefined}
@@ -204,6 +215,7 @@ function DialogEditAchievements({
               size="md"
               crossOrigin={undefined}
               variant="outlined"
+              defaultValue={achivementData?.achievementName}
               type="text"
               {...register('achievementName', {
                 required: 'Vui lòng nhập thành tựu',
@@ -223,8 +235,9 @@ function DialogEditAchievements({
               crossOrigin={undefined}
               variant="outlined"
               type="text"
+              defaultValue={achivementData?.achievementType}
               {...register('achievementType', {
-                required: 'Vui lòng nhập thành tựu',
+                required: 'Vui lòng nhập loại thành tựu',
               })}
               labelProps={{
                 className: 'before:content-none after:content-none',
@@ -242,8 +255,10 @@ function DialogEditAchievements({
             <input
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="achievementTime"
-              type="date"
-              //defaultValue={tomorrowString}
+              type="month"
+              defaultValue={convertToMonthInputValue(
+                achivementData?.achievementTime
+              )}
               onFocus={(e) => e.target.showPicker()}
               //onChange={(e) => onChange({ date: e.target.value })}
               {...register('achievementTime', {})}
@@ -274,25 +289,23 @@ export default function AchievementListItem({
   isProfileLoginUser,
 }) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [achivementData, setAchivementData] = useState(achivement)
   function handleOpenDialogEdit() {
     setOpenEditDialog((e) => !e)
   }
-
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-start gap-4">
         <Star className="text-[20px] lg:text-[24px]" />
         <div>
           <p className="text-base lg:text-[20px] font-semibold">
-            {achivement?.achievementName}
+            {achivementData.achievementName}
           </p>
           <p className="text-[12px] lg:text-base text-black font-semibold">
-            {achivement?.achievementType}
+            {achivementData.achievementType}
           </p>
           <p className="text-[12px] lg:text-base text-[--secondary] font-semibold">
-            {moment(achivement?.achievementTime)
-              .local()
-              .format('MM/YYYY')}
+            {moment(achivementData.achievementTime).local().format('MM/YYYY')}
           </p>
         </div>
       </div>
@@ -309,7 +322,8 @@ export default function AchievementListItem({
       <DialogEditAchievements
         openEditDialog={openEditDialog}
         handleOpenDialogEdit={handleOpenDialogEdit}
-        achievementId={achivement.achievementId}
+        achivementData={achivementData}
+        setAchivementData={setAchivementData}
       />
     </div>
   )

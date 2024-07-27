@@ -26,19 +26,21 @@ import ErrorInput from '@/app/ui/error-input'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { usePathname } from 'next/navigation'
+import moment from 'moment'
 
 export default function Page() {
-  const [onpenEdit, setOpenEdit] = useState(false)
+  const [openEditBasicInfor, setOpenEditBasicInfor] = useState(false)
+  const [openEditVerifyInfor, setOpenEditVerifyInfor] = useState(false)
   const today = new Date()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const tomorrowString = tomorrow.toISOString().split('T')[0]
-  const [user, setUser] = useState(null)
+  const [userBasicInfor, setUserBasicInfor] = useState(null)
+  const [alumniData, setAlumniData] = useState(null)
+  const [verifyAlumni, setVerifyAlumni] = useState(null)
   const pathname = usePathname()
   const userId = Cookies.get('userId')
   const part = pathname.split('/')
   const isProfileLoginUser = userId === part[2]
-  const [dob, setDob] = useState(null)
   const [isMounted, setIsMounted] = useState(false)
 
   const {
@@ -49,8 +51,12 @@ export default function Page() {
     formState: { errors },
   } = useForm()
 
-  function handleOpenEdit() {
-    setOpenEdit((e) => !e)
+  function handleOpenEditBasicInfor() {
+    setOpenEditBasicInfor((e) => !e)
+  }
+
+  function handleOpenEditVerifyInfor() {
+    setOpenEditVerifyInfor((e) => !e)
   }
 
   useEffect(() => {
@@ -61,7 +67,10 @@ export default function Page() {
         },
       })
       .then(({ data }) => {
-        setUser(data)
+        setUserBasicInfor(data.user)
+        setAlumniData(data.alumni)
+        setVerifyAlumni(data.alumniVerification)
+        console.log(data)
         setValue('fullName', data.user.fullName)
         setValue('socialMediaLink', data.user.socialMediaLink)
         setValue('phone', data.user.phone)
@@ -71,44 +80,61 @@ export default function Page() {
         setValue('faculty', data.user.faculty.Id)
         setValue('graduationYear', data.alumni.graduationYear)
         setValue('alumClass', data.alumni.alumClass)
-        setValue('studentId', data.alumniVerification.studentId)
-        setValue('beginningYear', data.alumniVerification.beginningYear)
+        setValue('studentId', data.alumni.studentId)
+        setValue('beginningYear', data.alumni.beginningYear)
       })
       .catch((error) => {})
   }, [part[2]])
 
-  const onSubmit = async (data) => {
+  function convertToInputDate(timestamp) {
+    const date = new Date(timestamp)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const onSubmitVerifyInfor = async (data) => {
+    const facultyData = {
+      name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
+      id: data.facultyId,
+    }
+
+    const alumni = {
+      alumClass: alumniData?.alumClass,
+      graduationYear: alumniData?.graduationYear,
+    }
+
     const userData = {
-      aboutMe: data.aboutMe,
-      fullName: data.fullName,
-      facultyId: data.facultyId,
-      sexId: data.sex,
-      phone: data.phone,
-      dob: new Date(`${dob}`).getTime(),
-      socialMediaLink: data.socialMediaLink,
+      aboutMe: userBasicInfor?.aboutMe,
+      fullName: userBasicInfor?.fullName,
+      sexId: Number(userBasicInfor?.sex) || null,
+      phone: String(userBasicInfor?.phone),
+      dob: String(userBasicInfor?.dob),
+      socialMediaLink: userBasicInfor?.socialMediaLink,
+      facultyId: Number(data.facultyId) || null,
     }
-
-    const alumniData = {
-      alumClass: data.alumClass,
-      graduationYear: data.graduationYear,
-    }
-
+    
     const userVerification = {
       studentId: data.studentId,
       beginningYear: data.beginningYear,
+      faculty: facultyData,
+      socialMediaLink: userBasicInfor?.socialMediaLink,
     }
+    
+try {
+    await axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
+      { user: userData, alumni },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
 
-    try {
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
-        { profileRequestDto: { user: userData, alumni: alumniData } },
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      await axios.put(
+    await axios
+      .put(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
         userVerification,
         {
@@ -117,7 +143,92 @@ export default function Page() {
           },
         }
       )
+      .then(() => {
+        toast.success('Cập nhật thành công')
+        handleOpenEditVerifyInfor()
+        setUserBasicInfor({
+          id: userBasicInfor?.id,
+          fullName: userBasicInfor?.fullName,
+          socialMediaLink: userBasicInfor?.socialMediaLink,
+          email: userBasicInfor?.email,
+          avatarUrl: userBasicInfor?.avatarUrl,
+          phone: userBasicInfor?.phone,
+          sex: {
+            name: GENDER.find((gender) => gender.id === userBasicInfor?.sex)?.name,
+            id: userBasicInfor?.sex,
+          },
+          aboutMe: userBasicInfor?.aboutMe,
+          coverUrl: userBasicInfor?.coverUrl,
+          dob: userBasicInfor?.dob ? convertToInputDate(userBasicInfor?.dob) : '',
+          faculty: {
+            name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
+            id: data.facultyId,
+          },
+        })
+        setVerifyAlumni((prevState) => ({
+          ...prevState,
+          ...userVerification,
+        }))
+      })
+      .catch((error) => {
+        toast.error(
+          error?.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      }) } catch {(error) =>toast.error(
+        error?.response?.data?.error?.message || 'Lỗi không xác định'
+      ) }
+  }
+
+  const onSubmitBasicInfor = async (data) => {
+    const alumni = {
+      alumClass: data.alumClass,
+      graduationYear: data.graduationYear,
+    }
+    const userData = {
+      aboutMe: data.aboutMe,
+      fullName: data.fullName,
+      sexId: Number(data.sex) || null,
+      phone: String(data.phone),
+      dob: String(data.dob),
+      socialMediaLink: data.socialMediaLink,
+    }
+
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
+        { user: userData, alumni },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       toast.success('Cập nhật thành công')
+      handleOpenEditBasicInfor()
+      setAlumniData({
+        graduationYear: data.graduationYear,
+        alumClass: data.alumClass,
+        studentId: alumniData?.studentId,
+      })
+      setUserBasicInfor({
+        id: userBasicInfor?.id,
+        fullName: data.fullName,
+        socialMediaLink: data.socialMediaLink,
+        email: userBasicInfor?.email,
+        avatarUrl: userBasicInfor?.avatarUrl,
+        phone: data.phone,
+        sex: {
+          name: GENDER.find((gender) => gender.id === data.sex)?.name,
+          id: data.sex,
+        },
+        aboutMe: data.aboutMe,
+        coverUrl: userBasicInfor?.coverUrl,
+        dob: data.dob ? convertToInputDate(data.dob) : '',
+        faculty: {
+          name: FACULTIES.find((f) => f.id === userBasicInfor?.facultyId)?.name,
+          id: userBasicInfor?.facultyId,
+        },
+      })
     } catch (error) {
       toast.error(error?.response?.data?.error?.message || 'Lỗi không xác định')
     }
@@ -125,12 +236,13 @@ export default function Page() {
 
   const onSendRequest = () => {
     const verification = {
-      avatar: user?.user?.avatarUrl,
-      fullName: user?.user?.fullName,
-      studentId: user?.alumniVerification?.studentId,
-      beginningYear: user?.alumniVerification?.beginningYear,
-      socialMediaLink: user?.user?.socialMediaLink,
+      avatar: userBasicInfor?.avatarUrl,
+      fullName: userBasicInfor?.fullName,
+      studentId: verifyAlumni?.studentId,
+      beginningYear: verifyAlumni?.beginningYear,
+      socialMediaLink: userBasicInfor?.socialMediaLink,
     }
+    console.log(verification)
     axios
       .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
@@ -161,7 +273,7 @@ export default function Page() {
     <div className="overflow-x-auto scrollbar-webkit-main">
       {/* Thông tin cá nhân */}
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmitBasicInfor)}
         className="w-full flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <p className="text-[18px] lg:text-[22px] font-bold">
@@ -169,33 +281,21 @@ export default function Page() {
           </p>
 
           {isProfileLoginUser &&
-            (!onpenEdit ? (
+            (!openEditBasicInfor ? (
               <div className="flex gap-2">
                 <Button
                   className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
                   placeholder={undefined}
-                  onClick={handleOpenEdit}>
+                  onClick={handleOpenEditBasicInfor}>
                   <PencilFill /> Chỉnh sửa thông tin
                 </Button>
-
-                {user?.alumniVerification?.status === 'APPROVED' ? (
-                  ' '
-                ) : (
-                  <Button
-                    onClick={onSendRequest}
-                    placeholder={undefined}
-                    className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
-                    <PersonCheckFill className="text-base" />
-                    Yêu cầu xét duyệt
-                  </Button>
-                )}
               </div>
             ) : (
               <div className="flex gap-3">
                 <Button
                   className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-4"
                   placeholder={undefined}
-                  onClick={handleOpenEdit}>
+                  onClick={handleOpenEditBasicInfor}>
                   Hủy
                 </Button>
 
@@ -213,33 +313,31 @@ export default function Page() {
 
         <div className="flex items-start gap-4">
           <InfoCircle className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
+          {!openEditBasicInfor ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.aboutMe}
+                {userBasicInfor?.aboutMe}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Mô tả bản thân
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[40%]">
               <label className="text-lg font-bold text-black">
                 Mô tả bản thân
               </label>
               <Input
                 crossOrigin={undefined}
-                variant="outlined"
                 type="text"
-                {...register('aboutMe', {
-                  required: 'Vui lòng nhập thành tựu',
-                })}
+                variant="outlined"
+                defaultValue={userBasicInfor?.aboutMe}
+                {...register('aboutMe')}
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
-                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
               />
-              <ErrorInput errors={errors?.aboutMe?.message} />
             </div>
           )}
         </div>
@@ -248,27 +346,28 @@ export default function Page() {
 
         <div className="flex items-start gap-4">
           <PersonFill className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
+          {!openEditBasicInfor ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.fullName}
+                {userBasicInfor?.fullName}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">Tên</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[40%]">
               <label className="text-lg font-bold text-black">Tên</label>
               <Input
                 crossOrigin={undefined}
                 variant="outlined"
                 type="text"
+                defaultValue={userBasicInfor?.fullName}
                 {...register('fullName', {
                   required: 'Vui lòng nhập thành tựu',
                 })}
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
-                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
               />
               <ErrorInput errors={errors?.fullName?.message} />
             </div>
@@ -279,36 +378,22 @@ export default function Page() {
 
         <div className="flex items-start gap-4">
           <BookHalf className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
-            <div>
-              <p className="text-base lg:text-[20px] font-semibold">
-                {user?.alumni?.alumClass}
-                {user?.alumni?.alumClass &&
-                  user?.alumni?.graduationYear &&
-                  ' - '}
-                {user?.alumni?.graduationYear}
-              </p>
-              <p className="text-[12px] lg:text-base text-[--secondary]">
-                Lớp - Năm tốt nghiệp
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex flex-col gap-2">
+          {openEditBasicInfor && alumniData !== null ? (
+            <div className="flex flex-col lg:flex-row gap-4 w-[40%]">
+              <div className="flex flex-col gap-2 w-full">
                 <label className="text-lg font-bold text-black">Lớp</label>
                 <Input
                   crossOrigin={undefined}
                   variant="outlined"
+                  defaultValue={alumniData?.alumClass}
                   type="text"
-                  {...register('alumClass', {
-                    required: 'Vui lòng nhập lớp',
-                  })}
+                  {...register('alumClass')}
                   labelProps={{
                     className: 'before:content-none after:content-none',
                   }}
-                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
                 />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 w-full">
                   <label className="text-lg font-bold text-black">
                     Năm tốt nghiệp
                   </label>
@@ -316,6 +401,7 @@ export default function Page() {
                     crossOrigin={undefined}
                     variant="outlined"
                     type="number"
+                    defaultValue={alumniData?.graduationYear}
                     {...register('graduationYear', {
                       pattern: {
                         value: /^\d{4}$/,
@@ -329,117 +415,21 @@ export default function Page() {
                     labelProps={{
                       className: 'before:content-none after:content-none',
                     }}
-                    className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
                   />
                 </div>
-
-                {/* <ErrorInput errors={errors?.title?.message} /> */}
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Khóa - Khoa */}
-        <div className="flex items-start gap-4">
-          <Mortarboard className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
+          ) : (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.alumniVerification?.beginningYear}{' '}
-                {user?.alumniVerification?.beginningYear &&
-                  user?.faculty?.name &&
-                  ' - '}
-                {user?.faculty?.name}
+                {alumniData?.alumClass}
+                {alumniData?.alumClass && alumniData?.graduationYear && ' - '}
+                {alumniData?.graduationYear}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
-                Khóa - Khoa
+                Lớp - Năm tốt nghiệp
               </p>
-            </div>
-          ) : (
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-lg font-bold text-black">Khóa</label>
-                <Input
-                  crossOrigin={undefined}
-                  variant="outlined"
-                  type="number"
-                  {...register('beginningYear', {
-                    pattern: {
-                      value: /^\d{4}$/,
-                      message: 'Vui lòng nhập đúng 4 chữ số',
-                    },
-                    required: 'Vui lòng nhập khóa',
-                  })}
-                  onInput={(e) => {
-                    const input = e.target as HTMLInputElement
-                    input.value = input.value.trim().slice(0, 4)
-                  }} //
-                  labelProps={{
-                    className: 'before:content-none after:content-none',
-                  }}
-                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-                />
-                <div className="flex flex-col gap-2">
-                  <label className="text-lg font-bold text-black">Khoa</label>
-                  <select
-                    className="h-10 text-[14px] hover:cursor-pointer pl-3 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-                    {...register('facultyId')}>
-                    <option value={0}>Không</option>
-                    {FACULTIES.map(({ id, name }) => {
-                      return (
-                        <option key={id} value={id}>
-                          {name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                </div>
-
-                {/* <ErrorInput errors={errors?.title?.message} /> */}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Mã số sinh viên */}
-
-        <div className="flex items-start gap-4">
-          <PersonVcard className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
-            <div>
-              <p className="text-base lg:text-[20px] font-semibold">
-                {user?.alumni?.studentId}
-              </p>
-              <p className="text-[12px] lg:text-base text-[--secondary]">
-                Mã số sinh viên
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <label className="text-lg font-bold text-black">
-                Mã số sinh viên
-              </label>
-              <Input
-                crossOrigin={undefined}
-                variant="outlined"
-                type="number"
-                {...register('studentId', {
-                  pattern: {
-                    value: /^\d{8}$/,
-                    message: 'Vui lòng nhập đúng 8 chữ số',
-                  },
-                  required: 'Vui lòng nhập mã số sinh viên',
-                })}
-                onInput={(e) => {
-                  const input = e.target as HTMLInputElement
-                  input.value = input.value.trim().slice(0, 8)
-                }} //
-                labelProps={{
-                  className: 'before:content-none after:content-none',
-                }}
-                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
-              />
-              {/* <ErrorInput errors={errors?.name?.message} /> */}
             </div>
           )}
         </div>
@@ -448,25 +438,29 @@ export default function Page() {
 
         <div className="flex items-start gap-4">
           <Calendar className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
+          {!openEditBasicInfor ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.dob}
+                {userBasicInfor?.dob &&
+                  moment(userBasicInfor?.dob)
+                    .local()
+                    .format('DD/MM/YYYY')}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Ngày sinh
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[40%]">
               <label className="text-lg font-bold text-black">Ngày sinh</label>
               <input
-                className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
+                className="w-full my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
                 id="dob"
                 type="date"
-                defaultValue={tomorrowString}
+                defaultValue={
+                  userBasicInfor?.dob && convertToInputDate(userBasicInfor?.dob)
+                }
                 onFocus={(e) => e.target.showPicker()}
-                onChange={(e) => setDob(e.target.value)}
                 {...register('dob', {})}
               />
               <ErrorInput errors={errors?.dob?.message} />
@@ -477,16 +471,16 @@ export default function Page() {
         {/* Giới tính */}
 
         <div className="flex items-start gap-4">
-          {user?.user?.sex?.name === 'Nam' ? (
+          {userBasicInfor?.sex?.name === 'Nam' ? (
             <GenderMale className="text-[20px] lg:text-[24px]" />
           ) : (
             <GenderFemale className="text-[20px] lg:text-[24px]" />
           )}
 
-          {!onpenEdit ? (
+          {!openEditBasicInfor ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.sex?.name}
+                {userBasicInfor?.sex?.name}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Giới tính
@@ -497,7 +491,8 @@ export default function Page() {
               <label className="text-lg font-bold text-black">Giới tính</label>
               <select
                 className="h-10 text-[14px] hover:cursor-pointer pl-3 pr-2 w-fit text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-                {...register('sex')}>
+                {...register('sex')}
+                defaultValue={userBasicInfor?.sex?.id}>
                 <option value={0}>Không</option>
                 {GENDER.map(({ id, name }) => {
                   return (
@@ -520,17 +515,17 @@ export default function Page() {
 
         <div className="flex items-start gap-4">
           <TelephoneFill className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
+          {!openEditBasicInfor ? (
             <div>
               <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.phone}
+                {userBasicInfor?.phone !== 'null' && userBasicInfor?.phone}
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Di động
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[40%]">
               <label className="text-lg font-bold text-black">
                 Số điện thoại
               </label>
@@ -542,31 +537,33 @@ export default function Page() {
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
-                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
               />
-              {/* <ErrorInput errors={errors?.name?.message} /> */}
             </div>
           )}
         </div>
         {/* href={user && user.socialMediaLink} */}
         <div className="flex items-start gap-4">
           <Link45deg className="text-[20px] lg:text-[24px]" />
-          {!onpenEdit ? (
+          {!openEditBasicInfor ? (
             <div>
-              <p className="text-base lg:text-[20px] font-semibold">
-                {user?.user?.socialMediaLink}
-              </p>
+              <Link
+                href={`${userBasicInfor?.socialMediaLink}`}
+                target="blank"
+                className="text-base lg:text-[20px] font-semibold">
+                {userBasicInfor?.socialMediaLink}
+              </Link>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Trang cá nhân
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[40%]">
               <label className="text-lg font-bold text-black">
                 Trang cá nhân
               </label>
               <Input
-                className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
                 {...register('socialMediaLink', {
                   pattern: {
                     value:
@@ -588,12 +585,178 @@ export default function Page() {
           <Envelope className="text-[20px] lg:text-[24px]" />
           <div>
             <p className="text-base lg:text-[20px] font-semibold">
-              {user?.user?.email}
+              {userBasicInfor?.email}
             </p>
             <p className="text-[12px] lg:text-base text-[--secondary]">Email</p>
           </div>
         </div>
       </div>
+
+      <form
+        onSubmit={handleSubmit(onSubmitVerifyInfor)}
+        className="w-full flex flex-col gap-4 mt-4">
+        <div className="flex items-center justify-between">
+          <p className="text-[18px] lg:text-[22px] font-bold">
+            Thông tin xét duyệt
+          </p>
+          {isProfileLoginUser &&
+            (!openEditVerifyInfor ? (
+              <div className="flex gap-2">
+                {verifyAlumni?.status === 'APPROVED' ? (
+                  ' '
+                ) : (
+                  <>
+                    <Button
+                      className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
+                      placeholder={undefined}
+                      onClick={handleOpenEditVerifyInfor}>
+                      <PencilFill /> Chỉnh sửa thông tin
+                    </Button>
+
+                    <Button
+                      onClick={onSendRequest}
+                      placeholder={undefined}
+                      className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
+                      <PersonCheckFill className="text-base" />
+                      Yêu cầu xét duyệt
+                    </Button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <Button
+                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-4"
+                  placeholder={undefined}
+                  onClick={handleOpenEditVerifyInfor}>
+                  Hủy
+                </Button>
+
+                <Button
+                  type="submit"
+                  className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-4"
+                  placeholder={undefined}>
+                  Cập nhật
+                </Button>
+              </div>
+            ))}
+        </div>
+        {/* Khóa */}
+        <div className="flex items-start gap-4">
+          <Mortarboard className="text-[20px] lg:text-[24px]" />
+          {openEditVerifyInfor && verifyAlumni?.status !== 'APPROVED' ? (
+            <div className="flex flex-col lg:flex-row gap-4 w-[40%]">
+              <div className="flex flex-col gap-2 w-full">
+                <label className="text-lg font-bold text-black">Khóa</label>
+                <Input
+                  crossOrigin={undefined}
+                  variant="outlined"
+                  type="number"
+                  defaultValue={verifyAlumni?.beginningYear}
+                  {...register('beginningYear', {
+                    pattern: {
+                      value: /^\d{4}$/,
+                      message: 'Vui lòng nhập đúng 4 chữ số',
+                    },
+                  })}
+                  onInput={(e) => {
+                    const input = e.target as HTMLInputElement
+                    input.value = input.value.trim().slice(0, 4)
+                  }} //
+                  labelProps={{
+                    className: 'before:content-none after:content-none',
+                  }}
+                  className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {verifyAlumni?.beginningYear}{' '}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Khóa
+              </p>
+            </div>
+          )}
+        </div>
+        {/* Mã số sinh viên */}
+
+        <div className="flex items-start gap-4">
+          <Mortarboard className="text-[20px] lg:text-[24px]" />
+          {openEditVerifyInfor && verifyAlumni?.status !== 'APPROVED' ? (
+            <div className="flex flex-col gap-2 w-[40%]">
+              <label className="text-lg font-bold text-black">
+                Mã số sinh viên
+              </label>
+              <Input
+                crossOrigin={undefined}
+                variant="outlined"
+                type="number"
+                defaultValue={verifyAlumni?.studentId}
+                {...register('studentId', {
+                  pattern: {
+                    value: /^\d{8}$/,
+                    message: 'Vui lòng nhập đúng 8 chữ số',
+                  },
+                })}
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement
+                  input.value = input.value.trim().slice(0, 8)
+                }} //
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                className="bg-white !border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
+              />
+            </div>
+          ) : (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {verifyAlumni?.studentId}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Mã số sinh viên
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Khoa */}
+        <div className="flex items-start gap-4">
+          <PersonVcard className="text-[20px] lg:text-[24px]" />
+          {openEditVerifyInfor && verifyAlumni?.status !== 'APPROVED' ? (
+            <div className="flex flex-col lg:flex-row gap-2 w-[40%]">
+              <div className="flex flex-col gap-2 w-[40%]">
+                <label className="text-lg font-bold text-black">Khoa</label>
+                <select
+                  className="w-fit h-10 text-[14px] hover:cursor-pointer pl-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+                  {...register('facultyId')}
+                  defaultValue={userBasicInfor?.faculty?.id}>
+                  <option value={0}>Không</option>
+                  {FACULTIES.map(({ id, name }) => {
+                    return (
+                      <option key={id} value={id}>
+                        {name}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {userBasicInfor?.faculty?.name}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Khoa
+              </p>
+            </div>
+          )}
+        </div>
+      </form>
     </div>
   )
 }

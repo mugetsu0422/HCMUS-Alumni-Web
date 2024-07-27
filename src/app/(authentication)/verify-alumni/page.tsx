@@ -412,7 +412,7 @@ function Step2() {
         onClick={onBack}
         placeholder={undefined}
         ripple={true}
-        className={`mt-[2rem] w-full bg-blue-800 text-white rounded-md py-4`}>
+        className={`mt-[2rem] w-full bg-[#e4e6eb] text-[#4b4f56] rounded-md py-4`}>
         Trở lại
       </Button>
       <Button

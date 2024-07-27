@@ -271,7 +271,7 @@ function SocialPageNavbar() {
   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
 
   const userId = Cookies.get('userId')
-  const permissions = Cookies.get('permissions')
+  const token = Cookies.get('jwt')
 
   const router = useRouter()
 
@@ -356,59 +356,77 @@ function SocialPageNavbar() {
             </Link>
 
             {/* Avatar dropdown */}
-            <Menu>
-              <MenuHandler>
-                <Button
-                  placeholder={undefined}
-                  variant="text"
-                  size="sm"
-                  className="p-0 rounded-full">
-                  <AvatarUser />
-                </Button>
-              </MenuHandler>
-              <MenuList placeholder={undefined} className="text-base">
-                <MenuItem placeholder={undefined} className="group">
-                  <Link
-                    href={`/profile/${userId}/about`}
-                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
-                    Trang cá nhân
-                  </Link>
-                </MenuItem>
-
-                {checkPermission('AlumniVerify.Read') && (
+            {token === null ? (
+              <div className="lg:ml-auto flex sm:gap-4 lg:pr-6">
+                <Link
+                  href={'/signup'}
+                  className="text-[var(--blue-02)] text-center text-sm sm:text-base sm:w-[7.25rem] py-2 px-3 sm:px-0 border-2 border-[var(--blue-02)] rounded-xl font-bold hover:bg-[var(--blue-05-10)]">
+                  Đăng ký
+                </Link>
+                <Link
+                  href={'/signin'}
+                  className="bg-[var(--blue-02)] text-white text-center text-sm sm:text-base sm:w-[7.25rem] py-2 px-3 sm:px-0 rounded-xl font-bold hover:opacity-90">
+                  Đăng nhập
+                </Link>
+              </div>
+            ) : (
+              <Menu>
+                <MenuHandler>
+                  <Button
+                    placeholder={undefined}
+                    variant="text"
+                    size="sm"
+                    className="p-0 rounded-full">
+                    <AvatarUser />
+                  </Button>
+                </MenuHandler>
+                <MenuList placeholder={undefined} className="text-base">
                   <MenuItem placeholder={undefined} className="group">
                     <Link
-                      href={`/admin`}
+                      href={`/profile/${userId}/about`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserPen} className="text-xl" />
-                      Admin
+                      <FontAwesomeIcon
+                        icon={faCircleUser}
+                        className="text-xl"
+                      />
+                      Trang cá nhân
                     </Link>
                   </MenuItem>
-                )}
 
-                <MenuItem
-                  placeholder={undefined}
-                  className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]">
-                  <Link
-                    href={`/change-password`}
-                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faUserGear} className="text-xl" />
-                    <p className="text-base">Đổi mật khẩu</p>
-                  </Link>
-                </MenuItem>
-                <MenuItem
-                  placeholder={undefined}
-                  className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]"
-                  onClick={handleLogout}>
-                  <FontAwesomeIcon
-                    icon={faRightFromBracket}
-                    className="text-xl"
-                  />
-                  Đăng xuất
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                  {checkPermission('AlumniVerify.Read') && (
+                    <MenuItem placeholder={undefined} className="group">
+                      <Link
+                        href={`/admin/alumni-verification/pending`}
+                        className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                        <FontAwesomeIcon icon={faUserPen} className="text-xl" />
+                        Admin
+                      </Link>
+                    </MenuItem>
+                  )}
+
+                  <MenuItem
+                    placeholder={undefined}
+                    className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]">
+                    <Link
+                      href={`/change-password`}
+                      className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
+                      <FontAwesomeIcon icon={faUserGear} className="text-xl" />
+                      <p className="text-base">Đổi mật khẩu</p>
+                    </Link>
+                  </MenuItem>
+                  <MenuItem
+                    placeholder={undefined}
+                    className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]"
+                    onClick={handleLogout}>
+                    <FontAwesomeIcon
+                      icon={faRightFromBracket}
+                      className="text-xl"
+                    />
+                    Đăng xuất
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            )}
           </div>
         </div>
         <Collapse

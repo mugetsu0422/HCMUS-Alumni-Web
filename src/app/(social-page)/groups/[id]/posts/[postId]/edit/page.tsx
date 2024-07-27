@@ -1,33 +1,22 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
 
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  Fragment,
-} from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { Button, Input, Textarea } from '@material-tailwind/react'
 import { XLg, ArrowLeft, FileEarmarkImage } from 'react-bootstrap-icons'
 import { useForm, Controller } from 'react-hook-form'
 import { ReactTags } from 'react-tag-autocomplete'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
 import axios from 'axios'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import Cookies from 'js-cookie'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { JWT_COOKIE, TAGS_LIMIT } from '../../../../../../constant'
 import ErrorInput from '../../../../../../ui/error-input'
 import { nunito } from '../../../../../../ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'
 
-
-export default function Page({
-  params,
-}: {
-  params: { id: string; postId: string }
-}) {
+export default function Page({ params }) {
   const {
     control,
     register,
@@ -48,37 +37,26 @@ export default function Page({
   const onDragOver = (event) => {
     event.preventDefault()
   }
-  const onDrop = (event) => {
+
+  const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
 
-    const files = event.dataTransfer.files
+    const files = Array.from(event.dataTransfer.files) as File[] // Type cast to File[]
 
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].size > 1024 * 1024 * 5) {
-        toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
-        return
-      }
+    if (files.some((file) => file.size > 1024 * 1024 * 5)) {
+      toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
+      return
     }
+
     if (currentImages.length + previewImages.length + files.length > 5) {
       toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
       return
     }
 
-    if (files.length > 0) {
-      const newImages = [...previewImages]
-      for (const file of files) {
-        setAddedImageFiles((prev) => prev.concat(file))
-
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          newImages.push({ pictureUrl: event.target.result })
-          setPreviewImages(newImages)
-        }
-        reader.readAsDataURL(file)
-      }
-    }
+    handleFiles(files)
   }
+
   const onClickDropzone = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -87,54 +65,60 @@ export default function Page({
     input.click()
 
     input.addEventListener('change', (event) => {
-      const files = (event.target as HTMLInputElement).files // Type cast here
-      if (files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-          if (files[i].size > 1024 * 1024 * 5) {
-            toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
-            return
-          }
-        }
-        if (currentImages.length + previewImages.length + files.length > 5) {
-          toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
-          return
-        }
+      const target = event.target as HTMLInputElement // Type cast to HTMLInputElement
+      const files = Array.from(target.files || [])
 
-        const newImages = [...previewImages]
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i]
-
-          setAddedImageFiles((prev) => prev.concat(file))
-
-          const reader = new FileReader()
-          reader.onload = (event) => {
-            newImages.push({ pictureUrl: event.target.result })
-            setPreviewImages(newImages)
-          }
-          reader.readAsDataURL(file)
-        }
+      if (files.some((file) => file.size > 1024 * 1024 * 5)) {
+        toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
+        return
       }
+
+      if (currentImages.length + previewImages.length + files.length > 5) {
+        toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
+        return
+      }
+
+      handleFiles(files)
+    })
+  }
+
+  const handleFiles = (files) => {
+    const newImages = [...previewImages]
+
+    files.forEach((file) => {
+      setAddedImageFiles((prev) => [...prev, file])
+
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        newImages.push({ pictureUrl: event.target.result })
+        setPreviewImages(newImages)
+      }
+      reader.readAsDataURL(file)
     })
   }
 
   const removeCurrentImage = (index, id, event) => {
     event.stopPropagation()
     const newImages = previewImages.filter(
-      (image, imageIndex) => imageIndex !== index
+      (_, imageIndex) => imageIndex !== index
     )
-    setCurrentImages(newImages)
     setPreviewImages(newImages)
     setAddedImageFiles((prev) => prev.filter((_, i) => i !== index))
 
-    setDeleteImageIds((prev) => prev.concat(id))
+    if (id) {
+      setDeleteImageIds((prev) => [...prev, id])
+    }
   }
 
   const onAddTags = useCallback(
     (newTag) => {
-      setSelectedTags([...selectedTags, newTag])
+      if (selectedTags.length < TAGS_LIMIT) {
+        setSelectedTags([...selectedTags, newTag])
+      }
     },
     [selectedTags]
   )
+
   const onDeleteTags = useCallback(
     (tagIndex) => {
       setSelectedTags(selectedTags.filter((_, i) => i !== tagIndex))
@@ -142,85 +126,60 @@ export default function Page({
     [selectedTags]
   )
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { tagsDummy, ...rest } = data
     const post = {
       ...rest,
-      tags: selectedTags.map((tag) => {
-        return { name: tag.value }
-      }),
+      tags: selectedTags.map((tag) => ({ name: tag.value })),
     }
 
     const imagesForm = new FormData()
-    for (const image of addedImageFiles) {
-      imagesForm.append('addedImages', image)
-    }
-    for (const id of deleteImageIds) {
-      imagesForm.append('deletedImageIds', id)
-    }
+    addedImageFiles.forEach((image) => imagesForm.append('addedImages', image))
+    deleteImageIds.forEach((id) => imagesForm.append('deletedImageIds', id))
 
     const postToast = toast.loading('Đang cập nhật bài viết...')
 
-    const updatePromise = axios.put(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}`,
-      post,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
-    const updateImages = axios.put(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}/images`,
-      imagesForm,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
+    try {
+      await Promise.all([
+        axios.put(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}`,
+          post,
+          { headers: { Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}` } }
+        ),
+        axios.put(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}/images`,
+          imagesForm,
+          { headers: { Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}` } }
+        ),
+      ])
 
-    Promise.all([updatePromise, updateImages])
-      .then(() => {
-        toast.success('Cập nhật bài viết thành công', {
-          id: postToast,
-        })
-      })
-      .catch((err) => {
-        console.error(err)
-        toast.error('Có lỗi xảy ra khi cập nhật bài viết', {
-          id: postToast,
-        })
-      })
+      toast.success('Cập nhật bài viết thành công', { id: postToast })
+    } catch (err) {
+      console.error(err)
+      toast.error('Có lỗi xảy ra khi cập nhật bài viết', { id: postToast })
+    }
   }
+
   useEffect(() => {
     axios
       .get(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/posts/${params.postId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}` } }
       )
       .then(({ data: { title, content, tags, pictures } }) => {
         setValue('title', title)
         setValue('content', content)
         setSelectedTags(
-          tags.map((tag) => ({
-            value: tag.name,
-            label: tag.name,
-          }))
+          tags.map((tag) => ({ value: tag.name, label: tag.name }))
         )
         setPreviewImages(pictures)
         setCurrentImages(pictures)
       })
       .catch((err) => {
         console.error(err)
-        return setNotFound(true)
+        setNotFound(true)
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [params.postId, setValue])
 
   if (notFound) {
     return <NotFound404 />
@@ -229,11 +188,10 @@ export default function Page({
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[80%] m-auto`}>
-      
       <div className="w-full flex">
         <Button
-          onClick={() => router.push(`/groups/${params.id}`)}
           placeholder={undefined}
+          onClick={() => router.push(`/groups/${params.id}`)}
           variant="text"
           className="p-2 rounded-full">
           <ArrowLeft className="text-xl" />
@@ -242,33 +200,23 @@ export default function Page({
           Chỉnh sửa bài viết
         </p>
       </div>
-      {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <Input
-          size="lg"
           crossOrigin={undefined}
+          size="lg"
           label="Tiêu đề"
           type="text"
-          {...register('title', {
-            required: 'Vui lòng nhập tiêu đề',
-          })}
+          {...register('title', { required: 'Vui lòng nhập tiêu đề' })}
         />
-        <ErrorInput
-          // This is the error message
-          errors={errors?.title?.message}
-        />
+        <ErrorInput errors={errors?.title?.message} />
         <Textarea
           rows={8}
           label="Nội dung"
-          {...register('content', {
-            required: 'Vui lòng nhập nội dung',
-          })}
+          {...register('content', { required: 'Vui lòng nhập nội dung' })}
         />
-        <ErrorInput
-          // This is the error message
-          errors={errors?.content?.message}
-        />
+        <ErrorInput errors={errors?.content?.message} />
+
         <ReactTags
           ref={tagsInputRef}
           id="tags-input-validity-description"
@@ -309,7 +257,7 @@ export default function Page({
           rules={{
             validate: {
               validateTagsInput: () => {
-                if (selectedTags.length > 5) {
+                if (selectedTags.length > TAGS_LIMIT) {
                   tagsInputRef.current.input.focus()
                   return false
                 }
@@ -351,14 +299,14 @@ function AddImagePost({
 }) {
   return (
     <div>
-      <div className="flex text-gray-700 text-xl font-bold mb-2 ">Thêm ảnh</div>
+      <div className="flex text-gray-700 text-xl font-bold mb-2">Thêm ảnh</div>
       <div className="container flex flex-col items-end relative mx-auto my-2">
         <div
           className="border-dashed border-2 w-full border-gray-400 p-4 flex flex-col items-center justify-center hover:cursor-pointer"
           onDragOver={onDragOver}
           onDrop={onDrop}
           onClick={onClickDropzone}>
-          {previewImages.length == 0 ? (
+          {previewImages.length === 0 ? (
             <>
               <FileEarmarkImage className="text-[50px] text-[--secondary]" />
               <p className="text-[--secondary]">
@@ -369,16 +317,13 @@ function AddImagePost({
           ) : (
             <div className="mt-4 flex flex-wrap gap-3 justify-center">
               {previewImages.map((image, index) => (
-                <div
-                  key={image.index}
-                  className="relative flex flex-col items-end">
+                <div key={index} className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
                     className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
                     onClick={(event) =>
                       removeCurrentImage(index, image.id, event)
-                    } // Pass event object
-                  >
+                    }>
                     <XLg />
                   </Button>
                   <img

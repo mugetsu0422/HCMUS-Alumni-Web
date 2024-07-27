@@ -8,6 +8,7 @@ import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '../../../constant'
 import { ClockFill, EyeFill } from 'react-bootstrap-icons'
 import moment from 'moment'
+import Link from 'next/link'
 
 export default function Page({ params }: { params: { id: string } }) {
   const [hof, setHof] = useState(null)
@@ -47,13 +48,26 @@ export default function Page({ params }: { params: { id: string } }) {
       <>
         <div className="flex flex-col justify-center items-center m-auto mb-10 max-w-[1000px] w-[80%] gap-6">
           <div className={`mt-10 flex flex-col gap-y-6 mx-0 md:mx-auto w-full`}>
-            <div className="w-full flex justify-center">
-              <img
-                src={hof.thumbnail}
-                alt="Hall of fame image"
-                className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
-              />
-            </div>
+            {hof.linkedUser ? (
+              <Link
+                href={`/profile/${hof.linkedUser.id}/about`}
+                target="blank"
+                className="w-full flex justify-center">
+                <img
+                  src={hof.thumbnail}
+                  alt="Hall of fame image"
+                  className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
+                />
+              </Link>
+            ) : (
+              <div className="w-full flex justify-center">
+                <img
+                  src={hof.thumbnail}
+                  alt="Hall of fame image"
+                  className=" w-[650px] lg:h-[450px] sm:h-[350px] object-cover object-center rounded-xl"
+                />
+              </div>
+            )}
 
             <div className="w-full flex justify-center items-center">
               <div className="font-medium text-lg flex items-center gap-x-1 text-[--secondary] italic">

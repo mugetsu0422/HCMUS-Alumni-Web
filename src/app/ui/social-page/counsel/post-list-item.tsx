@@ -567,16 +567,21 @@ export default function PostListItem({ post }: { post: PostProps }) {
           <div className="flex flex-col">
             <div className="flex justify-between my-3 mx-1">
               <div
-                className="flex items-center gap-1 group hover:cursor-pointer"
+                className={`flex items-center gap-1 group ${
+                  reactionCount > 0 && 'hover:cursor-pointer'
+                } `}
                 onClick={() => {
                   if (!reaction.length) {
                     onFetchReaction()
                   }
-                  if(reactionCount > 0) {                  hanldeOpenReactDialog()
+                  if (reactionCount > 0) {
+                    hanldeOpenReactDialog()
                   }
                 }}>
                 <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-                <p className="text-[16px] group-hover:underline">
+                <p  className={`text-[16px] ${
+                    reactionCount > 0 && 'group-hover:underline'
+                  }`}>
                   {reactionCount}
                 </p>
               </div>
@@ -593,7 +598,9 @@ export default function PostListItem({ post }: { post: PostProps }) {
                     handleOpenCommentDialog()
                   }
                 }}
-                className="hover:underline hover:cursor-pointer">
+                className={`${
+                  reactionCount > 0 && 'hover:underline hover:cursor-pointer'
+                } `}>
                 {post.childrenCommentNumber} Bình luận
               </div>
             </div>
