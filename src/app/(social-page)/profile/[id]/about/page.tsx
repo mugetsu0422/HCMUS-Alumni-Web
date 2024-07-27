@@ -94,37 +94,89 @@ export default function Page() {
     return `${year}-${month}-${day}`
   }
 
-  const onSubmitVerifyInfor = (data) => {
+  const onSubmitVerifyInfor = async (data) => {
+    const facultyData = {
+      name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
+      id: data.facultyId,
+    }
+
+    const alumni = {
+      alumClass: alumniData?.alumClass,
+      graduationYear: alumniData?.graduationYear,
+    }
+
+    const userData = {
+      aboutMe: userBasicInfor?.aboutMe,
+      fullName: userBasicInfor?.fullName,
+      sexId: Number(userBasicInfor?.sex) || null,
+      phone: String(userBasicInfor?.phone),
+      dob: String(userBasicInfor?.dob),
+      socialMediaLink: userBasicInfor?.socialMediaLink,
+      facultyId: Number(data.facultyId) || null,
+    }
+    
     const userVerification = {
       studentId: data.studentId,
       beginningYear: data.beginningYear,
+      faculty: facultyData,
+      socialMediaLink: userBasicInfor?.socialMediaLink,
     }
+    
+try {
+    await axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
+      { user: userData, alumni },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
 
-    if (verifyAlumni?.status !== 'APPROVED') {
-      axios
-        .put(
-          `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-          userVerification,
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-            },
-          }
+    await axios
+      .put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+        userVerification,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success('Cập nhật thành công')
+        handleOpenEditVerifyInfor()
+        setUserBasicInfor({
+          id: userBasicInfor?.id,
+          fullName: userBasicInfor?.fullName,
+          socialMediaLink: userBasicInfor?.socialMediaLink,
+          email: userBasicInfor?.email,
+          avatarUrl: userBasicInfor?.avatarUrl,
+          phone: userBasicInfor?.phone,
+          sex: {
+            name: GENDER.find((gender) => gender.id === userBasicInfor?.sex)?.name,
+            id: userBasicInfor?.sex,
+          },
+          aboutMe: userBasicInfor?.aboutMe,
+          coverUrl: userBasicInfor?.coverUrl,
+          dob: userBasicInfor?.dob ? convertToInputDate(userBasicInfor?.dob) : '',
+          faculty: {
+            name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
+            id: data.facultyId,
+          },
+        })
+        setVerifyAlumni((prevState) => ({
+          ...prevState,
+          ...userVerification,
+        }))
+      })
+      .catch((error) => {
+        toast.error(
+          error?.response?.data?.error?.message || 'Lỗi không xác định'
         )
-        .then(() => {
-          toast.success('Cập nhật thành công')
-          handleOpenEditVerifyInfor()
-          setVerifyAlumni((prevState) => ({
-            ...prevState,
-            ...userVerification,
-          }))
-        })
-        .catch((error) => {
-          toast.error(
-            error?.response?.data?.error?.message || 'Lỗi không xác định'
-          )
-        })
-    }
+      }) } catch {(error) =>toast.error(
+        error?.response?.data?.error?.message || 'Lỗi không xác định'
+      ) }
   }
 
   const onSubmitBasicInfor = async (data) => {
@@ -135,7 +187,6 @@ export default function Page() {
     const userData = {
       aboutMe: data.aboutMe,
       fullName: data.fullName,
-      facultyId: +data.facultyId || null,
       sexId: Number(data.sex) || null,
       phone: String(data.phone),
       dob: String(data.dob),
@@ -155,31 +206,27 @@ export default function Page() {
       toast.success('Cập nhật thành công')
       handleOpenEditBasicInfor()
       setAlumniData({
-      
-          graduationYear: data.graduationYear,
-          alumClass: data.alumClass,
-          studentId: alumniData?.studentId,
-        
+        graduationYear: data.graduationYear,
+        alumClass: data.alumClass,
+        studentId: alumniData?.studentId,
       })
       setUserBasicInfor({
-     
-          id: userBasicInfor?.id,
-          fullName: data.fullName,
-          socialMediaLink: data.socialMediaLink,
-          email: userBasicInfor?.email,
-          avatarUrl: userBasicInfor?.avatarUrl,
-          phone: data.phone,
-          sex: {
-            name: GENDER.find((gender) => gender.id === data.sex)?.name,
-            id: data.sex,
-          },
-          aboutMe: data.aboutMe,
-          coverUrl: userBasicInfor?.coverUrl,
-          dob: data.dob ? convertToInputDate(data.dob) : '',
-          faculty: {
-            name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
-            id: data.facultyId,
-          
+        id: userBasicInfor?.id,
+        fullName: data.fullName,
+        socialMediaLink: data.socialMediaLink,
+        email: userBasicInfor?.email,
+        avatarUrl: userBasicInfor?.avatarUrl,
+        phone: data.phone,
+        sex: {
+          name: GENDER.find((gender) => gender.id === data.sex)?.name,
+          id: data.sex,
+        },
+        aboutMe: data.aboutMe,
+        coverUrl: userBasicInfor?.coverUrl,
+        dob: data.dob ? convertToInputDate(data.dob) : '',
+        faculty: {
+          name: FACULTIES.find((f) => f.id === userBasicInfor?.facultyId)?.name,
+          id: userBasicInfor?.facultyId,
         },
       })
     } catch (error) {
@@ -383,40 +430,6 @@ export default function Page() {
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Lớp - Năm tốt nghiệp
               </p>
-            </div>
-          )}
-        </div>
-
-        {/* Khoa */}
-        <div className="flex items-start gap-4">
-          <PersonVcard className="text-[20px] lg:text-[24px]" />
-          {!openEditBasicInfor ? (
-            <div>
-              <p className="text-base lg:text-[20px] font-semibold">
-                {userBasicInfor?.faculty?.name}
-              </p>
-              <p className="text-[12px] lg:text-base text-[--secondary]">
-                Khoa
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col lg:flex-row gap-2 w-[40%]">
-              <div className="flex flex-col gap-2 w-[40%]">
-                <label className="text-lg font-bold text-black">Khoa</label>
-                <select
-                  className="w-fit h-10 text-[14px] hover:cursor-pointer pl-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
-                  {...register('facultyId')}
-                  defaultValue={userBasicInfor?.faculty?.id}>
-                  <option value={0}>Không</option>
-                  {FACULTIES.map(({ id, name }) => {
-                    return (
-                      <option key={id} value={id}>
-                        {name}
-                      </option>
-                    )
-                  })}
-                </select>
-              </div>
             </div>
           )}
         </div>
@@ -705,6 +718,40 @@ export default function Page() {
               </p>
               <p className="text-[12px] lg:text-base text-[--secondary]">
                 Mã số sinh viên
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Khoa */}
+        <div className="flex items-start gap-4">
+          <PersonVcard className="text-[20px] lg:text-[24px]" />
+          {openEditVerifyInfor && verifyAlumni?.status !== 'APPROVED' ? (
+            <div className="flex flex-col lg:flex-row gap-2 w-[40%]">
+              <div className="flex flex-col gap-2 w-[40%]">
+                <label className="text-lg font-bold text-black">Khoa</label>
+                <select
+                  className="w-fit h-10 text-[14px] hover:cursor-pointer pl-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 rounded-md border-blue-gray-200 focus:border-gray-900"
+                  {...register('facultyId')}
+                  defaultValue={userBasicInfor?.faculty?.id}>
+                  <option value={0}>Không</option>
+                  {FACULTIES.map(({ id, name }) => {
+                    return (
+                      <option key={id} value={id}>
+                        {name}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-base lg:text-[20px] font-semibold">
+                {userBasicInfor?.faculty?.name}
+              </p>
+              <p className="text-[12px] lg:text-base text-[--secondary]">
+                Khoa
               </p>
             </div>
           )}
