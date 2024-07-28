@@ -30,7 +30,7 @@ function EventListItem({ event }) {
               className="w-full h-full object-cover object-center rounded-xl"
             />
             {event?.faculty && (
-              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200 z-20">
+              <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--secondary] saturate-200 z-20">
                 {event?.faculty?.name}
               </figcaption>
             )}
@@ -98,7 +98,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated?requestedUserId=${params.id}&statusId=${POST_STATUS['Bình thường']}&page=${curPage.current}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated?requestedUserId=${params.id}&mode=1&page=${curPage.current}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
@@ -114,7 +114,7 @@ export default function Page({ params }: { params: { id: string } }) {
   useEffect(() => {
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated?requestedUserId=${params.id}&statusId=${POST_STATUS['Bình thường']}`,
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events/participated?requestedUserId=${params.id}&mode=1`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,

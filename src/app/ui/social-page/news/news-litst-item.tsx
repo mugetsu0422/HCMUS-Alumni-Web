@@ -25,7 +25,7 @@ export default function NewsListItem({
             alt="thumbnail"
             className="w-full h-full object-cover rounded-xl"
           />
-          <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
+          <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--secondary] saturate-200">
             {faculty ? faculty.name : 'Tất cả'}
           </figcaption>
         </figure>

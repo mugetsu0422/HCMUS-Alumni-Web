@@ -29,7 +29,7 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
     <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
       <DialogHeader placeholder={undefined}>Xoá</DialogHeader>
       <DialogBody placeholder={undefined}>
-        Bạn có muốn xoá tin tức này?
+        Bạn có muốn xoá bài viết này?
       </DialogBody>
       <DialogFooter placeholder={undefined}>
         <Button
@@ -62,7 +62,7 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
     statusId = POST_STATUS['Bình thường']
   } else {
     header = 'Ẩn'
-    body = 'Bạn có muốn ẩn bài viết này'
+    body = 'Bạn có muốn ẩn bài viết này?'
     statusId = POST_STATUS['Ẩn']
   }
 

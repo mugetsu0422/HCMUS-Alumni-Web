@@ -11,6 +11,7 @@ interface StatusProps {
 }
 
 export interface NotificationProps {
+  actorId: string | null // Assuming actorId can be null
   id: number
   notifier: UserProps
   actor: UserProps
@@ -82,8 +83,10 @@ export class NotificationUrlBuilder {
       switch (entityTable) {
         case 'request_friend':
           return `/friends/requests`
-        case 'friend':
-          return `/profile/${this.notification.actor.id}/about`
+        case 'friend': {
+          const id = this.notification.actorId || this.notification.actor.id
+          return `/profile/${id}/about`
+        }
         default:
           return '#'
       }
@@ -91,9 +94,11 @@ export class NotificationUrlBuilder {
       return `#`
     } else if (type === 'DELETE') {
       switch (entityTable) {
-        case 'request_friend':
-          return `/profile/${this.notification.actor.id}/about`
-            default:
+        case 'request_friend': {
+          const id = this.notification.actorId || this.notification.actor.id
+          return `/profile/${id}/about`
+        }
+        default:
           return '#'
       }
     }

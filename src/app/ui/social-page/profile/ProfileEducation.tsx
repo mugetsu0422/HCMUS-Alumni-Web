@@ -311,7 +311,6 @@ function DialogEditEducation({
 export default function EducationListItem({ education, isProfileLoginUser }) {
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [educationData, setEducationData] = useState(education)
-  console.log(education)
   function handleOpenEditDialog() {
     setOpenEditDialog((e) => !e)
   }

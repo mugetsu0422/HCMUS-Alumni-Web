@@ -62,7 +62,6 @@ export default function Page() {
         if (!totalPages) setHasMore(false)
         setTotalPages(totalPages)
         setPosts(posts)
-        console.log(posts)
 
         setIsLoading(false)
       })

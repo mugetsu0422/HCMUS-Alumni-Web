@@ -577,7 +577,7 @@ export default function Page({
             <p className="text-xl uppercase font-bold text-black">
               {post.title}
             </p>
-            <div className="flex items-center gap-2 text-[--secondary]">
+            <div className="flex items-center gap-2 text-[--blue-05]">
               {post.tags.length != 0 && (
                 <>
                   <TagFill className="text-[--blue-02]" />

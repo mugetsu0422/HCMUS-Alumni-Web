@@ -1,3 +1,4 @@
+import { INBOX_PAGE_SIZE } from '@/app/constant'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface InboxManagerState {
@@ -65,7 +66,7 @@ const inboxManagerSlicers = createSlice({
         state.inboxes.unshift(processedInbox)
       } else {
         // Inbox does not exist, add it to the beginning and remove the last one if necessary
-        if (state.inboxes.length > 0) {
+        if (state.inboxes.length % INBOX_PAGE_SIZE === 0) {
           state.inboxes.pop()
         }
         state.inboxes.unshift(processedInbox)

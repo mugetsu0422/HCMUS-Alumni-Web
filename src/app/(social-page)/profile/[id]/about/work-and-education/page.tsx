@@ -86,7 +86,6 @@ export default function Page() {
         data: { education: neweducation },
       } = await onAddEducation(e, education)
       toast.success('Thêm học vấn thành công')
-      console.log(education)
       setEducations((prev) => [neweducation, ...prev]) // Ensure correct con catenation
       handleOpenDialogAddEducation()
     } catch (error) {

@@ -128,7 +128,6 @@ function AvatarAndCoverUser({
     const data = {
       friendId: user?.user?.id,
     }
-    console.log(data)
     axios
       .post(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/friends/requests`,

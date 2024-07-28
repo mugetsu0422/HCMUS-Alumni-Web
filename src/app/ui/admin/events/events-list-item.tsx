@@ -57,7 +57,7 @@ function HideOrShowDialog({ id, open, handleOpen, isHidden, onHideOrShow }) {
     statusId = POST_STATUS['Bình thường']
   } else {
     header = 'Ẩn'
-    body = 'Bạn có muốn ẩn sự kiện này'
+    body = 'Bạn có muốn ẩn sự kiện này?'
     statusId = POST_STATUS['Ẩn']
   }
 
