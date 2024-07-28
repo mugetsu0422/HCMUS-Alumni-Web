@@ -1,4 +1,3 @@
-import '../globals.css'
 import Navbar from '../ui/landing-page/navbar'
 import Footer from '../ui/landing-page/footer'
 
