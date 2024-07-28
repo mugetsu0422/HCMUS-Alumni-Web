@@ -76,6 +76,9 @@ export default function PostListItem({
   post: PostProps
   isJoined: boolean
 }) {
+  const [numberComments, setNumberComments] = useState(
+    post.childrenCommentNumber
+  )
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [openReactDialog, setOpenReactDialog] = useState(false)
   const [isReacted, setIsReacted] = useState(post.isReacted)
@@ -223,6 +226,7 @@ export default function PostListItem({
       } = await onUploadComment(e, parentId, content)
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
+      setNumberComments((e) => e + 1)
     } catch (error) {
       toast.error(
         error.response?.data?.error?.message || 'Lỗi không xác định',
@@ -365,7 +369,13 @@ export default function PostListItem({
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       }
-    )
+    ).then((response) => {
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment.id !== commentId)
+      )
+      setNumberComments((count) => count - 1)
+      return response
+    })
   }
   const onVote = (voteId: number) => {
     return axios.post(
@@ -660,6 +670,7 @@ export default function PostListItem({
           )}
           <CommentsDialog
             post={post}
+            numberComments={numberComments}
             comments={comments}
             openCommentsDialog={openCommentsDialog}
             handleOpenCommentDialog={handleOpenCommentDialog}
