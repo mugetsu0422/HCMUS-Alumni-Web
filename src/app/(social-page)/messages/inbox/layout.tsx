@@ -6,7 +6,7 @@ import { XLg, PlusCircle, Search, PencilSquare } from 'react-bootstrap-icons'
 import { useDebouncedCallback } from 'use-debounce'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { JWT_COOKIE } from '@/app/constant'
+import { INBOX_PAGE_SIZE, JWT_COOKIE } from '@/app/constant'
 import 'moment/locale/vi'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
@@ -81,11 +81,14 @@ export default function GroupLayout({
     }
     // Fetch list of inboxes
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox${params}`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox${params}?pageSize=${INBOX_PAGE_SIZE}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(({ data: { totalPages, inboxes } }) => {
         setTotalPages(totalPages)
         dispatch(setInboxes({ type: 'set', newInboxes: inboxes }))
