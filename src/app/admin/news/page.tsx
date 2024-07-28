@@ -177,34 +177,26 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`)
     setMyParams(`?${params.toString()}`)
   }
-  const onAddTags = useCallback(
-    (newTag) => {
-      const newTags = [...selectedTags, newTag]
-      setSelectedTags(newTags)
+  const onAddTags = (newTag) => {
+    const newTags = [...selectedTags, newTag]
+    setSelectedTags(newTags)
+    params.set('tagNames', newTags.map(({ value }) => value).join(','))
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
+    setMyParams(`?${params.toString()}`)
+  }
+  const onDeleteTags = (tagIndex) => {
+    const newTags = selectedTags.filter((_, i) => i !== tagIndex)
+    setSelectedTags(newTags)
+    if (newTags.length == 0) {
+      params.delete('tagNames')
+    } else {
       params.set('tagNames', newTags.map(({ value }) => value).join(','))
-      resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: true })
-      setMyParams(`?${params.toString()}`)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedTags]
-  )
-  const onDeleteTags = useCallback(
-    (tagIndex) => {
-      const newTags = selectedTags.filter((_, i) => i !== tagIndex)
-      setSelectedTags(newTags)
-      if (newTags.length == 0) {
-        params.delete('tagNames')
-      } else {
-        params.set('tagNames', newTags.map(({ value }) => value).join(','))
-      }
-      resetCurPage()
-      replace(`${pathname}?${params.toString()}`, { scroll: true })
-      setMyParams(`?${params.toString()}`)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedTags]
-  )
+    }
+    resetCurPage()
+    replace(`${pathname}?${params.toString()}`, { scroll: true })
+    setMyParams(`?${params.toString()}`)
+  }
 
   useEffect(() => {
     axios
@@ -222,7 +214,6 @@ export default function Page() {
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
-      
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1220px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý tin tức

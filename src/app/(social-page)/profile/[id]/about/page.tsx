@@ -70,7 +70,6 @@ export default function Page() {
         setUserBasicInfor(data.user)
         setAlumniData(data.alumni)
         setVerifyAlumni(data.alumniVerification)
-        console.log(data)
         setValue('fullName', data.user.fullName)
         setValue('socialMediaLink', data.user.socialMediaLink)
         setValue('phone', data.user.phone)
@@ -242,7 +241,6 @@ try {
       beginningYear: verifyAlumni?.beginningYear,
       socialMediaLink: userBasicInfor?.socialMediaLink,
     }
-    console.log(verification)
     axios
       .postForm(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
