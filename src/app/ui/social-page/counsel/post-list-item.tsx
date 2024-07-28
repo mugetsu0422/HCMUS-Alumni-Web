@@ -70,6 +70,9 @@ interface PostProps {
 }
 
 export default function PostListItem({ post }: { post: PostProps }) {
+  const [numberComments, setNumberComments] = useState(
+    post.childrenCommentNumber
+  )
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [openReactDialog, setOpenReactDialog] = useState(false)
   const [isReacted, setIsReacted] = useState(post.isReacted)
@@ -216,6 +219,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       } = await onUploadComment(e, parentId, content)
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
+      setNumberComments((e) => e + 1)
     } catch (error) {
       toast.error(
         error.response?.data?.error?.message || 'Lỗi không xác định',
@@ -348,15 +352,24 @@ export default function PostListItem({ post }: { post: PostProps }) {
   ): Promise<AxiosResponse<any, any>> => {
     e.preventDefault()
 
-    return axios.delete(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${commentId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
+    return axios
+      .delete(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/comments/${commentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
+      .then((response) => {
+        setComments((prevComments) =>
+          prevComments.filter((comment) => comment.id !== commentId)
+        )
+        setNumberComments((count) => count - 1)
+        return response
+      })
   }
+
   const onVote = (voteId: number) => {
     return axios.post(
       `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes/${voteId}`,
@@ -579,7 +592,8 @@ export default function PostListItem({ post }: { post: PostProps }) {
                   }
                 }}>
                 <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-                <p  className={`text-[16px] ${
+                <p
+                  className={`text-[16px] ${
                     reactionCount > 0 && 'group-hover:underline'
                   }`}>
                   {reactionCount}
@@ -588,20 +602,17 @@ export default function PostListItem({ post }: { post: PostProps }) {
 
               <div
                 onClick={() => {
-                  if (
-                    comments.length === 0 &&
-                    post.childrenCommentNumber != 0
-                  ) {
+                  if (comments.length === 0 && numberComments != 0) {
                     onFetchComments(0, COMMENT_PAGE_SIZE)
                   }
-                  if (post.childrenCommentNumber > 0) {
+                  if (numberComments > 0) {
                     handleOpenCommentDialog()
                   }
                 }}
                 className={`${
                   reactionCount > 0 && 'hover:underline hover:cursor-pointer'
                 } `}>
-                {post.childrenCommentNumber} Bình luận
+                {numberComments} Bình luận
               </div>
             </div>
             <span className="border-t-[1px] border-[--secondary]"></span>
@@ -658,6 +669,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
 
           <CommentsDialog
             post={post}
+            numberComments={numberComments}
             comments={comments}
             openCommentsDialog={openCommentsDialog}
             handleOpenCommentDialog={handleOpenCommentDialog}
