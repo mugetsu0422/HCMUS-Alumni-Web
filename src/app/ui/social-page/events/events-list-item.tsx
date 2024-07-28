@@ -55,7 +55,7 @@ export default function EventsListItem({
             className="w-full h-full object-cover object-center rounded-xl"
           />
           {event.faculty && (
-            <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--blue-05] saturate-200">
+            <figcaption className="absolute p-2 top-4 left-6 font-medium text-white justify-between rounded-lg bg-[--secondary] saturate-200">
               {event.faculty?.name}
             </figcaption>
           )}

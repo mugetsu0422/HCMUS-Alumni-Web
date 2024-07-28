@@ -516,7 +516,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
           {/* this is the header of the body */}
           <div className="mt-3">
             <p className="text-xl uppercase font-bold">{post.title}</p>
-            <div className="flex items-center gap-2 text-[--secondary]">
+            <div className="flex items-center gap-2 text-[--blue-05]">
               {post.tags.length != 0 && (
                 <>
                   <TagFill className="text-[--blue-02]" />
