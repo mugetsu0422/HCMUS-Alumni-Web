@@ -83,7 +83,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   const onSubmit = (data) => {
-    const putToast = toast.loading('Đang cập nhật quyền...')
+    const putToast = toast.loading('Đang cập nhật vai trò...')
 
     const updatedRole = {
       ...data,
@@ -105,7 +105,7 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       )
       .then((res) => {
-        toast.success('Cập nhật quyền thành công', {
+        toast.success('Cập nhật vai trò thành công', {
           id: putToast,
         })
       })

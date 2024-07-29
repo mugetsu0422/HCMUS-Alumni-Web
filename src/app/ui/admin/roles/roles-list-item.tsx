@@ -31,7 +31,7 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
     <Dialog placeholder={undefined} size="xs" open={open} handler={handleOpen}>
       <DialogHeader placeholder={undefined}>Xoá</DialogHeader>
       <DialogBody placeholder={undefined}>
-        Bạn có muốn xoá tin tức này?
+        Bạn có muốn xoá vai trò này?
       </DialogBody>
       <DialogFooter placeholder={undefined}>
         <Button

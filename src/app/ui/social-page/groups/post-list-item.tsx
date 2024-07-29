@@ -69,7 +69,16 @@ interface PostProps {
   }
 }
 
-export default function PostListItem({ post }: { post: PostProps }) {
+export default function PostListItem({
+  post,
+  isJoined,
+}: {
+  post: PostProps
+  isJoined: boolean
+}) {
+  const [numberComments, setNumberComments] = useState(
+    post.childrenCommentNumber
+  )
   const [openCommentsDialog, setOpenCommentsDialog] = useState(false)
   const [openReactDialog, setOpenReactDialog] = useState(false)
   const [isReacted, setIsReacted] = useState(post.isReacted)
@@ -217,6 +226,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
       } = await onUploadComment(e, parentId, content)
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
+      setNumberComments((e) => e + 1)
     } catch (error) {
       toast.error(
         error.response?.data?.error?.message || 'Lỗi không xác định',
@@ -359,7 +369,13 @@ export default function PostListItem({ post }: { post: PostProps }) {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
       }
-    )
+    ).then((response) => {
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment.id !== commentId)
+      )
+      setNumberComments((count) => count - 1)
+      return response
+    })
   }
   const onVote = (voteId: number) => {
     return axios.post(
@@ -509,7 +525,7 @@ export default function PostListItem({ post }: { post: PostProps }) {
           {/* this is the header of the body */}
           <div className="mt-3">
             <p className="text-xl uppercase font-bold">{post.title}</p>
-            <div className="flex items-center gap-2 text-[--secondary]">
+            <div className="flex items-center gap-2 text-[--blue-05]">
               {post.tags.length != 0 && (
                 <>
                   <TagFill className="text-[--blue-02]" />
@@ -559,49 +575,51 @@ export default function PostListItem({ post }: { post: PostProps }) {
             />
           )}
 
-          {reactionCount > 0 || post.childrenCommentNumber > 0 ? (
-            <div className="flex flex-col">
-              <div className="flex justify-between my-3 mx-1">
-                {reactionCount > 0 ? (
-                  <div
-                    className="flex items-center gap-1 group hover:cursor-pointer"
-                    onClick={() => {
-                      if (!reaction.length) {
-                        onFetchReaction()
-                      }
-                      hanldeOpenReactDialog()
-                    }}>
-                    <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
-                    <p className="text-[16px] group-hover:underline">
-                      {reactionCount}
-                    </p>
-                  </div>
-                ) : (
-                  <div> </div>
-                )}
-
-                {post.childrenCommentNumber > 0 && (
-                  <div
-                    onClick={() => {
-                      if (
-                        comments.length === 0 &&
-                        post.childrenCommentNumber != 0
-                      ) {
-                        onFetchComments(0, COMMENT_PAGE_SIZE)
-                      }
-
-                      handleOpenCommentDialog()
-                    }}
-                    className="hover:underline hover:cursor-pointer">
-                    {post.childrenCommentNumber} Bình luận
-                  </div>
-                )}
+          <div className="flex flex-col">
+            <div className="flex justify-between my-3 mx-1">
+              <div
+                className={`flex items-center gap-1 group ${
+                  reactionCount > 0 && 'hover:cursor-pointer'
+                } `}
+                onClick={() => {
+                  if (!reaction.length) {
+                    onFetchReaction()
+                  }
+                  {
+                    reactionCount > 0 && hanldeOpenReactDialog()
+                  }
+                }}>
+                <HandThumbsUpFill className="rounded-full p-[6px] bg-[--blue-02] text-[24px] text-white" />
+                <p
+                  className={`text-[16px] ${
+                    reactionCount > 0 && 'group-hover:underline'
+                  }`}>
+                  {reactionCount}
+                </p>
               </div>
-              <span className="border-t-[1px] border-[--secondary]"></span>
+
+              <div
+                onClick={() => {
+                  if (
+                    comments.length === 0 &&
+                    post.childrenCommentNumber != 0
+                  ) {
+                    onFetchComments(0, COMMENT_PAGE_SIZE)
+                  }
+                  {
+                    post.childrenCommentNumber > 0 && handleOpenCommentDialog()
+                  }
+                }}
+                className={`${
+                  reactionCount > 0 && 'hover:underline hover:cursor-pointer'
+                } `}>
+                {post.childrenCommentNumber} Bình luận
+              </div>
             </div>
-          ) : (
-            ''
-          )}
+            {isJoined && (
+              <span className="border-t-[1px] border-[--secondary]"></span>
+            )}
+          </div>
 
           <ReactionDialog
             users={reaction}
@@ -611,43 +629,48 @@ export default function PostListItem({ post }: { post: PostProps }) {
             hanldeOpenReactDialog={hanldeOpenReactDialog}
           />
 
-          <div className="flex gap-2">
-            <Button
-              onClick={handleReactionClick}
-              placeholder={undefined}
-              variant="text"
-              className="flex gap-1 py-2 px-1 normal-case w-fit">
-              {isReacted ? (
-                <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
-              ) : (
-                <HandThumbsUp className="text-[16px]" />
-              )}
-              <span
-                className={
-                  isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
-                }>
-                Thích
-              </span>
-            </Button>
+          {isJoined && (
+            <div className="flex gap-2 mt-2">
+              <Button
+                onClick={handleReactionClick}
+                placeholder={undefined}
+                variant="text"
+                className="flex gap-1 py-2 px-1 normal-case w-fit">
+                {isReacted ? (
+                  <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
+                ) : (
+                  <HandThumbsUp className="text-[16px]" />
+                )}
+                <span
+                  className={
+                    isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
+                  }>
+                  Thích
+                </span>
+              </Button>
 
-            <Button
-              onClick={() => {
-                if (comments.length === 0 && post.childrenCommentNumber != 0) {
-                  onFetchComments(0, COMMENT_PAGE_SIZE)
-                }
+              <Button
+                onClick={() => {
+                  if (
+                    comments.length === 0 &&
+                    post.childrenCommentNumber != 0
+                  ) {
+                    onFetchComments(0, COMMENT_PAGE_SIZE)
+                  }
 
-                handleOpenCommentDialog()
-              }}
-              placeholder={undefined}
-              variant="text"
-              className="flex gap-1 py-2 px-4 normal-case w-fit">
-              <Chat className="text-[16px]" />
-              <span className="text-[14px]">Bình luận</span>
-            </Button>
-          </div>
-
+                  handleOpenCommentDialog()
+                }}
+                placeholder={undefined}
+                variant="text"
+                className="flex gap-1 py-2 px-4 normal-case w-fit">
+                <Chat className="text-[16px]" />
+                <span className="text-[14px]">Bình luận</span>
+              </Button>
+            </div>
+          )}
           <CommentsDialog
             post={post}
+            numberComments={numberComments}
             comments={comments}
             openCommentsDialog={openCommentsDialog}
             handleOpenCommentDialog={handleOpenCommentDialog}

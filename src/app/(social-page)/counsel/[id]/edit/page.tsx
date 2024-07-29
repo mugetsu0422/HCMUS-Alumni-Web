@@ -16,7 +16,6 @@ import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import NotFound404 from '@/app/ui/common/not-found-404'
 
-
 export default function Page({ params }: { params: { id: string } }) {
   const {
     control,
@@ -38,37 +37,58 @@ export default function Page({ params }: { params: { id: string } }) {
   const onDragOver = (event) => {
     event.preventDefault()
   }
+
+  const removeImage = (index, id, event) => {
+    event.stopPropagation()
+
+    if (index < currentImages.length) {
+      // Removing from currentImages
+      if (id) {
+        setDeleteImageIds((prev) => prev.concat(id))
+      }
+      const newCurrentImages = currentImages.filter((_, i) => i !== index)
+      setCurrentImages(newCurrentImages)
+    } else {
+      // Removing from previewImages
+      const previewIndex = index - currentImages.length
+      const newPreviewImages = previewImages.filter(
+        (_, i) => i !== previewIndex
+      )
+      setPreviewImages(newPreviewImages)
+    }
+  }
+
   const onDrop = (event) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
 
     const files = event.dataTransfer.files
+    const newPreviewImages = [...previewImages]
+    const newAddedImageFiles = [...addedImageFiles]
 
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > 1024 * 1024 * 5) {
         toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
         return
       }
-    }
-    if (currentImages.length + previewImages.length + files.length > 5) {
-      toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
-      return
-    }
-
-    if (files.length > 0) {
-      const newImages = [...previewImages]
-      for (const file of files) {
-        setAddedImageFiles((prev) => prev.concat(file))
-
-        const reader = new FileReader()
-        reader.onload = (event) => {
-          newImages.push({ pictureUrl: event.target.result })
-          setPreviewImages(newImages)
-        }
-        reader.readAsDataURL(file)
+      if (currentImages.length + previewImages.length + files.length > 5) {
+        toast.error('Bạn chỉ được chọn tối đa 5 ảnh!')
+        return
       }
+      const file = files[i]
+      newAddedImageFiles.push(file) // Add new file to the array
+
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        newPreviewImages.push({ pictureUrl: event.target.result })
+        setPreviewImages([...newPreviewImages]) // Update preview images state
+      }
+      reader.readAsDataURL(file)
     }
+
+    setAddedImageFiles(newAddedImageFiles) // Update added image files state
   }
+
   const onClickDropzone = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -79,6 +99,9 @@ export default function Page({ params }: { params: { id: string } }) {
     input.addEventListener('change', (event) => {
       const files = (event.target as HTMLInputElement).files // Type cast here
       if (files.length > 0) {
+        const newPreviewImages = [...previewImages]
+        const newAddedImageFiles = [...addedImageFiles]
+
         for (let i = 0; i < files.length; i++) {
           if (files[i].size > 1024 * 1024 * 5) {
             toast.error('Bạn chỉ được chọn ảnh dưới 5MB')
@@ -90,33 +113,23 @@ export default function Page({ params }: { params: { id: string } }) {
           return
         }
 
-        const newImages = [...previewImages]
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
-
-          setAddedImageFiles((prev) => prev.concat(file))
+          newAddedImageFiles.push(file) // Add new file to the array
 
           const reader = new FileReader()
           reader.onload = (event) => {
-            newImages.push({ pictureUrl: event.target.result })
-            setPreviewImages(newImages)
+            newPreviewImages.push({ pictureUrl: event.target.result })
+            setPreviewImages([...newPreviewImages]) // Update preview images state
           }
           reader.readAsDataURL(file)
         }
+
+        setAddedImageFiles(newAddedImageFiles) // Update added image files state
       }
     })
   }
-  const removeImage = (index, id, event) => {
-    event.stopPropagation()
-    const newImages = previewImages.filter(
-      (image, imageIndex) => imageIndex !== index
-    )
-    setCurrentImages(newImages)
-    setPreviewImages(newImages)
-    setAddedImageFiles((prev) => prev.filter((_, i) => i !== index))
 
-    setDeleteImageIds((prev) => prev.concat(id))
-  }
   const onAddTags = useCallback(
     (newTag) => {
       setSelectedTags([...selectedTags, newTag])
@@ -147,6 +160,11 @@ export default function Page({ params }: { params: { id: string } }) {
       imagesForm.append('deletedImageIds', id)
     }
 
+    // If there are no images left to be updated, ensure we handle this case
+    if (currentImages.length === 0 && previewImages.length === 0) {
+      imagesForm.append('noImages', 'true') // Use a flag to indicate no images are left
+    }
+
     const putToast = toast.loading('Đang cập nhật bài viết...')
 
     const updatePromise = axios.put(
@@ -175,11 +193,15 @@ export default function Page({ params }: { params: { id: string } }) {
         })
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-          id: putToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: putToast,
+          }
+        )
       })
   }
+
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${params.id}`, {
@@ -196,10 +218,11 @@ export default function Page({ params }: { params: { id: string } }) {
             label: tag.name,
           }))
         )
+        //console.log("Pictures:", pictures); // Log the pictures data
         setCurrentImages(pictures)
       })
       .catch((error) => {
-        return setNotFound(true)
+        setNotFound(true)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -211,7 +234,6 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} flex flex-col gap-8 mt-8 max-w-[1200px] w-[81.25%] m-auto`}>
-      
       <div className="w-full flex">
         <Button
           onClick={() => router.push('/counsel')}
@@ -224,7 +246,6 @@ export default function Page({ params }: { params: { id: string } }) {
           Chỉnh sửa bài viết
         </p>
       </div>
-      {/* className={`${nunito.className} h-[480px] overflow-y-auto scrollbar-webkit-main flex flex-col gap-4`} */}
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <Input
@@ -236,10 +257,7 @@ export default function Page({ params }: { params: { id: string } }) {
             required: 'Vui lòng nhập tiêu đề',
           })}
         />
-        <ErrorInput
-          // This is the error message
-          errors={errors?.title?.message}
-        />
+        <ErrorInput errors={errors?.title?.message} />
         <Textarea
           rows={8}
           label="Nội dung"
@@ -247,10 +265,7 @@ export default function Page({ params }: { params: { id: string } }) {
             required: 'Vui lòng nhập nội dung',
           })}
         />
-        <ErrorInput
-          // This is the error message
-          errors={errors?.content?.message}
-        />
+        <ErrorInput errors={errors?.content?.message} />
 
         <ReactTags
           ref={tagsInputRef}
@@ -310,6 +325,7 @@ export default function Page({ params }: { params: { id: string } }) {
           onDrop={onDrop}
           onClickDropzone={onClickDropzone}
           removeImage={removeImage}
+          currentImages={currentImages}
           previewImages={previewImages}
         />
 
@@ -330,6 +346,7 @@ function AddImagePost({
   onDrop,
   onClickDropzone,
   removeImage,
+  currentImages,
   previewImages,
 }) {
   return (
@@ -341,7 +358,7 @@ function AddImagePost({
           onDragOver={onDragOver}
           onDrop={onDrop}
           onClick={onClickDropzone}>
-          {previewImages.length == 0 ? (
+          {currentImages.length == 0 && previewImages.length == 0 ? (
             <>
               <FileEarmarkImage className="text-[50px] text-[--secondary]" />
               <p className="text-[--secondary]">
@@ -351,20 +368,38 @@ function AddImagePost({
             </>
           ) : (
             <div className="mt-4 flex flex-wrap gap-3 justify-center">
-              {previewImages.map((image, index) => (
+              {currentImages.map((image, index) => (
                 <div
-                  key={image.pictureUrl}
+                  key={image.pictureUrl || index} // Added fallback for key
                   className="relative flex flex-col items-end">
                   <Button
                     placeholder={undefined}
                     className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
-                    onClick={(event) => removeImage(index, image.id, event)} // Pass event object
-                  >
+                    onClick={(event) => removeImage(index, image.id, event)}>
                     <XLg />
                   </Button>
                   <img
                     src={image.pictureUrl}
-                    alt="Ảnh được kéo thả"
+                    alt="Ảnh hiện tại"
+                    className="w-48 h-48 object-cover rounded-md"
+                  />
+                </div>
+              ))}
+              {previewImages.map((image, index) => (
+                <div
+                  key={image.pictureUrl || index} // Added fallback for key
+                  className="relative flex flex-col items-end">
+                  <Button
+                    placeholder={undefined}
+                    className="-mb-8 mr-1 p-2 cursor-pointer bg-black hover:bg-black opacity-75"
+                    onClick={(event) =>
+                      removeImage(index + currentImages.length, null, event)
+                    }>
+                    <XLg />
+                  </Button>
+                  <img
+                    src={image.pictureUrl}
+                    alt="Ảnh được thêm"
                     className="w-48 h-48 object-cover rounded-md"
                   />
                 </div>

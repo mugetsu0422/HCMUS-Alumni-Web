@@ -35,46 +35,62 @@ export default function Page() {
     setOpenDialogAddEducation((e) => !e)
   }
 
-  const onAddJob = (job) => {
-    axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/job`, job, {
+  const onAddJob = (
+    e: React.FormEvent<HTMLFormElement>,
+    job: object
+  ): Promise<any> => {
+    e.preventDefault()
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/job`,
+      job,
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then(() => {
-        toast.success('Thêm công việc thành công')
-        handleOpenDialogAddWorks()
-        setWorks((prev) => prev.concat(job))
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+      }
+    )
   }
 
-  const onAddEducation = (eudcation) => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/education`,
-        eudcation,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(() => {
-        toast.success('Thêm học vấn thành công')
-        handleOpenDialogAddEducation()
-        setEducations((prev) => prev.concat(eudcation))
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+  const onHandleAddJob = async (job, e) => {
+    try {
+      const {
+        data: { job: newJob },
+      } = await onAddJob(e, job)
+      toast.success('Thêm thành công việc')
+      setWorks((prev) => [newJob, ...prev]) // Ensure correct con catenation
+      handleOpenDialogAddWorks()
+    } catch (error) {
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+    }
+  }
+
+  const onAddEducation = (
+    e: React.FormEvent<HTMLFormElement>,
+    education: object
+  ): Promise<any> => {
+    e.preventDefault()
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile/education`,
+      education,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+  }
+
+  const onHandleAddEducation = async (education, e) => {
+    try {
+      const {
+        data: { education: neweducation },
+      } = await onAddEducation(e, education)
+      toast.success('Thêm học vấn thành công')
+      setEducations((prev) => [neweducation, ...prev]) // Ensure correct con catenation
+      handleOpenDialogAddEducation()
+    } catch (error) {
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+    }
   }
 
   useEffect(() => {
@@ -123,27 +139,13 @@ export default function Page() {
         )}
 
         {works?.length > 0 ? (
-          works.map(
-            ({
-              jobId,
-              companyName,
-              position,
-              startTime,
-              endTime,
-              isWorking,
-            }) => (
-              <WorksListItem
-                key={jobId}
-                id={jobId}
-                name={companyName}
-                position={position}
-                startTime={startTime}
-                endTime={endTime}
-                isWorking={isWorking}
-                isProfileLoginUser={isProfileLoginUser}
-              />
-            )
-          )
+          works.map((job) => (
+            <WorksListItem
+              key={job.jobId}
+              job={job}
+              isProfileLoginUser={isProfileLoginUser}
+            />
+          ))
         ) : (
           <div className="flex items-center gap-2">
             <Briefcase className="text-[20px] lg:text-[24px]" /> Không có công
@@ -154,7 +156,7 @@ export default function Page() {
       <DialogAddWorks
         openDialogAddWorks={openDialogAddWorks}
         handleOpenDialogAddWorks={handleOpenDialogAddWorks}
-        onAddJob={onAddJob}
+        onHandleAddJob={onHandleAddJob}
       />
 
       <div className="w-full flex flex-col gap-4 mt-4">
@@ -172,11 +174,11 @@ export default function Page() {
         <DialogAddEducation
           handleOpenDialogAddEducation={handleOpenDialogAddEducation}
           openDialogAddEducation={openDialogAddEducation}
-          onAddEducation={onAddEducation}
+          onHandleAddEducation={onHandleAddEducation}
         />
         {educations?.map((education) => (
           <EducationListItem
-            key={education.educationId}
+            key={education?.educationId}
             education={education}
             isProfileLoginUser={isProfileLoginUser}
           />

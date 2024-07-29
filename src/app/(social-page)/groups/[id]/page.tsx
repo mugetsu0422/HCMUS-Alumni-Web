@@ -44,6 +44,7 @@ export default function Page({ params }) {
   const [posts, setPosts] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [isPrivatedView, setIsPrivatedView] = useState(false)
+  const [isJoined, setIsJoined] = useState(false)
 
   const onFetchMore = () => {
     curPage.current++
@@ -77,19 +78,32 @@ export default function Page({ params }) {
       return
     }
 
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`, {
+    const postsPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}/posts`,
+      {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
-      })
-      .then(({ data: { totalPages, posts } }) => {
-        if (!totalPages) {
+      }
+    )
+
+    const groupPromise = axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${params.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
+    Promise.all([postsPromise, groupPromise])
+      .then(([postRes, groupsRes]) => {
+        if (!postRes.data.totalPages) {
           setHasMore(false)
         }
-        setPostTotalPage(totalPages)
-        setPosts(posts)
+        setPostTotalPage(postRes.data.totalPages)
+        setPosts(postRes.data.posts)
         setIsLoading(false)
+        setIsJoined(groupsRes.data.userRole ? true : false)
       })
       .catch((error) => {})
   }, [group, params.id])
@@ -111,7 +125,7 @@ export default function Page({ params }) {
               </div>
             }>
             {posts.map((post) => (
-              <PostListItem key={post.id} post={post} />
+              <PostListItem key={post.id} post={post} isJoined={isJoined} />
             ))}
           </InfiniteScroll>
         </div>

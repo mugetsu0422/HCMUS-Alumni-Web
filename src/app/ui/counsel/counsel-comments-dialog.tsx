@@ -27,6 +27,7 @@ import AvatarUser from '../common/avatar-user'
 
 export default function CommentsDialog({
   post,
+  numberComments,
   comments,
   openCommentsDialog,
   handleOpenCommentDialog,
@@ -101,7 +102,7 @@ export default function CommentsDialog({
             <p className="text-xl uppercase font-bold text-black">
               {post.title}
             </p>
-            <div className="flex items-center gap-2 text-[--secondary]">
+            <div className="flex items-center gap-2 text-[--blue-05]">
               {post.tags.length != 0 && (
                 <>
                   <TagFill className="text-[--blue-02]" />
@@ -144,9 +145,7 @@ export default function CommentsDialog({
                 <div> </div>
               )}
 
-              {post.childrenCommentNumber > 0 && (
-                <div>{post.childrenCommentNumber} Bình luận</div>
-              )}
+              <div>{numberComments} Bình luận</div>
             </div>
             <span className="border-t-[1px] border-[--secondary]"></span>
           </div>
@@ -164,21 +163,22 @@ export default function CommentsDialog({
             onFetchChildrenComments={onFetchChildrenComments}
             numberCommnets={comments.length}
           />
-          {comments.length < post.childrenCommentNumber && (
-            <div
-              onClick={() => {
-                onShowMoreComments(++commentPage.current, COMMENT_PAGE_SIZE)
-              }}
-              className="group w-full flex gap-2 text-[--secondary] justify-between">
-              <span className="group-hover:underline group-hover:cursor-pointer flex gap-3">
-                Xem thêm bình luận
-                {isLoading && <Spinner className="w-4" />}
-              </span>
-              <span>
-                {comments.length}/{post.childrenCommentNumber}
-              </span>
-            </div>
-          )}
+          {comments.length < post.childrenCommentNumber &&
+            numberComments > 0 && (
+              <div
+                onClick={() => {
+                  onShowMoreComments(++commentPage.current, COMMENT_PAGE_SIZE)
+                }}
+                className="group w-full flex gap-2 text-[--secondary] justify-between">
+                <span className="group-hover:underline group-hover:cursor-pointer flex gap-3">
+                  Xem thêm bình luận
+                  {isLoading && <Spinner className="w-4" />}
+                </span>
+                <span>
+                  {comments.length}/{post.childrenCommentNumber}
+                </span>
+              </div>
+            )}
         </div>
       </DialogBody>
 

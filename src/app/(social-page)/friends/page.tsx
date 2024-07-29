@@ -90,7 +90,6 @@ export default function Page() {
 
   const onFetchMore = () => {
     curPage.current++
-    console.log(curPage.current >= totalPages)
     if (curPage.current >= totalPages) {
       setHasMore(false)
       return

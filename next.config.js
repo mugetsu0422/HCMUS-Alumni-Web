@@ -30,6 +30,10 @@ const nextConfig = {
         source: '/profile/:id',
         destination: '/profile/:id/about',
       },
+      {
+        source: '/admin',
+        destination: '/admin/alumni-verification/pending',
+      },
     ]
   },
 }

@@ -99,7 +99,7 @@ export default function Page() {
         },
       })
       .then((res) => {
-        toast.success('Tạo quyền thành công', {
+        toast.success('Tạo vai trò thành công', {
           id: postToast,
         })
       })
