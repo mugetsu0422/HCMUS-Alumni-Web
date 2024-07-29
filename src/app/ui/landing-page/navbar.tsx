@@ -270,7 +270,7 @@ function LandingPageNavbar() {
         fullWidth={true}
         className={`sticky top-0 z-[999] px-3 lg:pl-6 py-5 lg:py-0 shadow`}>
         <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
-          <Link href="/home-page">
+          <Link href="/">
             <Image
               className="hidden lg:block"
               src="/logo-square.png"
