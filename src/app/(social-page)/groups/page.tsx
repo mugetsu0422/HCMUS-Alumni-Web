@@ -102,8 +102,6 @@ export default function Page() {
     )
   }
 
-  // console.log(hasMore, curPage.current)
-
   useEffect(() => {
     curPage.current = 0
     setHasMore(true)
