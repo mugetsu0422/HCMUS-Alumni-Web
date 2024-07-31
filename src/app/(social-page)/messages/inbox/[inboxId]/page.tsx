@@ -79,32 +79,29 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     setMessageContent('')
   }
 
-  const sendMediaMessage = () => {
+  const sendMediaMessage = async () => {
     const copy = [...imageFiles]
     setImageFiles([])
     setPreviewImages([])
 
-    copy.forEach((file) => {
-      axios
-        .postForm(
-          `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/${params.inboxId}/media`,
-          {
-            media: file,
-            messageType: MESSAGE_TYPE.IMAGE,
-            parentMessageId: parentMessage?.id || null,
+    const uploadPromises = copy.map((file) => {
+      axios.postForm(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/${params.inboxId}/media`,
+        {
+          media: file,
+          messageType: MESSAGE_TYPE.IMAGE,
+          parentMessageId: parentMessage?.id || null,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-            },
-          }
-        )
-        .catch((error) => {
-          toast.error(
-            error.response?.data?.error?.message || 'Lỗi không xác định'
-          )
-        })
+        }
+      )
     })
+
+    // Use Promise.all to handle all requests
+    return await Promise.all(uploadPromises)
   }
 
   const handleReply = (message) => {
@@ -114,12 +111,18 @@ export default function Page({ params }: { params: { inboxId: string } }) {
     }
   }
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (messageContent.trim()) {
       sendTextMessage()
     }
     if (imageFiles.length > 0) {
-      sendMediaMessage()
+      try {
+        sendMediaMessage()
+      } catch (error) {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      }
     }
     setParentMessage(null)
   }
@@ -198,10 +201,11 @@ export default function Page({ params }: { params: { inboxId: string } }) {
         setInboxInformation(inbox.members)
       })
       .catch((error) => {
-        if (error.response.status === 403) {
+        if (error.response.status === 404) {
           setNotFound(true)
           return
         }
+        setHasMore(false)
         toast.error(
           error.response?.data?.error?.message || 'Lỗi không xác định'
         )

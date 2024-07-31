@@ -164,12 +164,12 @@ export default function Page() {
     setMessageContent('')
   }
 
-  const sendMediaMessage = (inboxId: number) => {
+  const sendMediaMessage = async(inboxId: number) => {
     const copy = [...imageFiles]
     setImageFiles([])
     setPreviewImages([])
 
-    copy.forEach((file) => {
+    const uploadPromises = copy.map((file) => {
       axios
         .postForm(
           `${process.env.NEXT_PUBLIC_SERVER_HOST}/messages/inbox/${inboxId}/media`,
@@ -190,13 +190,22 @@ export default function Page() {
           )
         })
     })
+
+    // Use Promise.all to handle all requests
+    return await Promise.all(uploadPromises)
   }
-  const sendMessage = (inboxId: number) => {
+  const sendMessage = async (inboxId: number) => {
     if (messageContent.trim()) {
       sendTextMessage(inboxId)
     }
     if (imageFiles.length > 0) {
-      sendMediaMessage(inboxId)
+      try {
+        sendMediaMessage(inboxId)
+      } catch (error) {
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
+      }
     }
   }
 
