@@ -18,6 +18,8 @@ import Cookies from 'js-cookie'
 import NotificationItem from '@/app/ui/common/notification-item'
 import { reset } from '@/lib/features/notification/notification-counter'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
+import { usePathname } from 'next/navigation'
+import clsx from 'clsx'
 
 export default function NotificationPopover() {
   const [openNotification, setOpenNotification] = useState(false)
@@ -25,6 +27,8 @@ export default function NotificationPopover() {
   const [hasMore, setHasMore] = useState(true)
   const [totalPages, setTotalPages] = useState(0)
   const page = useRef(0)
+  const pathname = usePathname()
+  const isNotificationsPage = pathname.startsWith('/notifications')
 
   const onHandleOpenNotification = () => {
     setOpenNotification((prev) => !prev)
@@ -99,6 +103,7 @@ export default function NotificationPopover() {
       handler={popoverHandler}>
       <PopoverHandler>
         <Button
+          disabled={isNotificationsPage}
           placeholder={undefined}
           variant="text"
           size="sm"
@@ -110,7 +115,10 @@ export default function NotificationPopover() {
             <div className="h-[24px] w-[24px]">
               <FontAwesomeIcon
                 icon={faBell}
-                className="text-[24px] text-[--text-navbar] group-hover:text-[--blue-05]"
+                className={clsx('text-[24px] group-hover:text-[--blue-05]', {
+                  'text-[--text-navbar]': !isNotificationsPage,
+                  'text-[--blue-05]': isNotificationsPage,
+                })}
               />
             </div>
           </Badge>

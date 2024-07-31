@@ -151,24 +151,26 @@ export default function Page() {
           isJoined: params.get('isJoined'),
         }}
       />
-      <InfiniteScroll
-        className="flex flex-col gap-6"
-        dataLength={groups.length}
-        next={onFetchMore}
-        hasMore={hasMore}
-        loader={
-          <div className="h-10 my-5 flex justify-center">
-            <Spinner className="h-8 w-8"></Spinner>
-          </div>
-        }>
-        {groups.map((group) => (
-          <GroupsListItem
-            key={group.id}
-            group={group}
-            onJoinGroup={onJoinGroup}
-          />
-        ))}
-      </InfiniteScroll>
+      {groups.length > 0 && (
+        <InfiniteScroll
+          className="flex flex-col gap-6"
+          dataLength={groups.length}
+          next={onFetchMore}
+          hasMore={hasMore}
+          loader={
+            <div className="h-10 my-5 flex justify-center">
+              <Spinner className="h-8 w-8"></Spinner>
+            </div>
+          }>
+          {groups.map((group) => (
+            <GroupsListItem
+              key={group.id}
+              group={group}
+              onJoinGroup={onJoinGroup}
+            />
+          ))}
+        </InfiniteScroll>
+      )}
     </div>
   )
 }
