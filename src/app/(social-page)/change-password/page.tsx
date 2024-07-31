@@ -9,6 +9,8 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
+import { JWT_COOKIE } from '@/app/constant'
 
 export default function Page() {
   const {
@@ -24,11 +26,18 @@ export default function Page() {
   const onSubmit = (data) => {
     // Verify email activation code
     axios
-      .post(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/reset-password`, {
-        email: data.email,
-        oldPassword: data.oldPassword,
-        newPassword: data.newPassword,
-      })
+      .post(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/change-password`,
+        {
+          oldPassword: data.oldPassword,
+          newPassword: data.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(() => {
         // Back to signin page
         toast.success('Đổi mật khẩu thành công')
@@ -55,40 +64,6 @@ export default function Page() {
             //summit form
             onSubmit={handleSubmit(onSubmit)}
             className="mb-2 w-80 max-w-screen-lg sm:w-96 m-auto">
-            <div className="mb-1 flex flex-col gap-6 mx-auto">
-              <Typography
-                placeholder={undefined}
-                variant="h6"
-                color="blue-gray"
-                className={` -mb-3`}>
-                Email <span className="text-red-700 font-bold text-lg">*</span>
-              </Typography>
-
-              <div className="flex relative w-full max-w-[24rem]">
-                <Input
-                  size="lg"
-                  className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
-                  labelProps={{
-                    className: 'before:content-none after:content-none',
-                  }}
-                  {...register('email', {
-                    required: 'Vui lòng nhập email',
-                    pattern: {
-                      value:
-                        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                      message:
-                        'Hãy nhập đúng định dạng email. Ví dụ: test@gmail.com',
-                    },
-                  })}
-                  containerProps={{
-                    className: 'min-w-0',
-                  }}
-                  crossOrigin={undefined}
-                />
-              </div>
-              <ErrorInput errors={errors?.email?.message} />
-            </div>
-
             <div className="mb-1 flex flex-col gap-6">
               <Typography
                 placeholder={undefined}
@@ -148,7 +123,32 @@ export default function Page() {
               </div>
               <ErrorInput errors={errors?.newPassword?.message} />
             </div>
-
+            <div className="mb-4 flex flex-col gap-3">
+              <Typography
+                placeholder={undefined}
+                variant="h6"
+                color="blue-gray"
+                className={` ${roboto.className}`}>
+                Nhập lại mật khẩu mới{' '}
+                <span className="text-red-700 font-bold text-lg">*</span>
+              </Typography>
+              <Input
+                type="password"
+                size="lg"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                crossOrigin={undefined}
+                {...register('confirmNewPassword', {
+                  required: 'Vui lòng xác nhận lại mật khẩu',
+                  validate: (value) =>
+                    value === getValues('newPassword') ||
+                    'Xác nhận mật khẩu mới không khớp',
+                })}
+              />
+              <ErrorInput errors={errors?.confirmNewPassword?.message} />
+            </div>
             <Button
               type="submit"
               placeholder={undefined}
