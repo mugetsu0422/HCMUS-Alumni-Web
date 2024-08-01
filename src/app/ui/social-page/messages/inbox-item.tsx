@@ -49,9 +49,9 @@ export default function InboxItem({
                   ? latestMessage.sender.id === userID
                     ? 'Bạn: ' + latestMessage.content
                     : latestMessage.content
-                  : `${latestMessage.sender.fullName.substring(
-                      latestMessage.sender.fullName.lastIndexOf(' ') + 1
-                    )} đã gửi 1 phương tiện`}
+                  : latestMessage.sender.id === userID
+                    ? 'Bạn đã gửi 1 phương tiện'
+                    : 'Đã gửi 1 phương tiện'}
               </span>
               <span className="grow-0 shrink-0">·</span>
               <span className="grow-0 shrink-0 text-[--text-navbar] font-normal">
