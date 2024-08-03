@@ -72,7 +72,9 @@ export default function RolesListItem({ role }: { role: Role }) {
         setIsDeleted(true)
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định'
+        )
       })
   }
 
@@ -80,9 +82,8 @@ export default function RolesListItem({ role }: { role: Role }) {
   return (
     <div
       className={`${nunito.className} border border-t-0 gap-2 border-[#CDCDCD] w-[1220px] m-auto items-center justify-between h-fit flex pl-2 py-2 last:rounded-b-lg`}>
-      
       <div className="flex">
-        <p className="h-full w-[250px] p-2 font-[600] text-black align-middle flex items-center justify-center">
+        <p className="h-full w-[250px] p-2 font-[600] text-black align-middle flex items-center justify-start pl-[50px]">
           {role.name}
         </p>
         <p className="h-full w-[500px] text-left text-black p-2 font-[600] flex items-center justify-center">

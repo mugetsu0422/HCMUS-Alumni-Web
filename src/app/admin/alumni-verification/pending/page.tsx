@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import Filter from '../../../ui/admin/verify-alumni/filter'
+import Filter from '../../../ui/admin/verify-alumni/filter-for-pending'
 import CardInformation from '../../../ui/admin/verify-alumni/card-information-pending'
 import { nunito } from '../../../ui/fonts'
 import { Button } from '@material-tailwind/react'
@@ -83,8 +83,13 @@ export default function Page() {
       {totalCount === 0 ? null : (
         <Filter setMyParams={setMyParams} status={status} />
       )}
-      <div className="flex flex-col gap-5 justify-between mt-5">
-        <CardInformation offset={offset} items={items} setItems={setItems} />
+      <div className="flex flex-col gap-5 justify-between mt-5 overflow-x-auto">
+        <CardInformation
+          offset={offset}
+          items={items}
+          setItems={setItems}
+          setTotalCount={setTotalCount}
+        />
       </div>
       {offset.current + ADMIN_VERIFY_ALUMNI_PAGE_LIMIT >= itemNumber.current ||
       itemNumber.current == 0 ? null : (

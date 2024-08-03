@@ -97,7 +97,7 @@ export default function UserListItem({ user, onLockUser, onUnlockUser }) {
         {user.email}
       </p>
 
-      <div className="w-[250px] flex flex-col h-20 text-left text-black p-2 font-[600] overflow-x-auto scrollbar-webkit-main">
+      <div className="w-[250px] flex flex-col justify-center h-20 text-left text-black p-2 font-[600] overflow-x-auto scrollbar-webkit-main">
         {user.roles.map(({ id, name }) => (
           <p key={id}>{name}</p>
         ))}

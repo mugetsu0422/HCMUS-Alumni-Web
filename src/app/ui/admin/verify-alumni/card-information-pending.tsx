@@ -10,7 +10,12 @@ import { FieldValues, useForm } from 'react-hook-form'
 import LinkIcon from './link-icon'
 import toast from 'react-hot-toast'
 
-export default function CardInformation({ offset, items, setItems }) {
+export default function CardInformation({
+  offset,
+  items,
+  setItems,
+  setTotalCount,
+}) {
   const { register, handleSubmit } = useForm()
 
   const onSubmit = (
@@ -70,12 +75,11 @@ export default function CardInformation({ offset, items, setItems }) {
           <div
             key={id}
             className=" w-[100%] p-5 border border-gray-200 rounded-md break-words bg-white">
-            {/* First line include FullName MSSV and Year*/}
             <div className={`flex gap-4 ${inter.className} mb-2 items-center`}>
               <Link
                 href={`/profile/${userId}/about`}
                 target="blank"
-                className="w-[20%] h-[20%] 2xl:w-[10%] 2xl:h-[10%]">
+                className="w-[20%] h-[20%] min-w-[104px] min-h-[104px] max-w-[116px] max-h-[116px] 2xl:w-[10%] 2xl:h-[10%]">
                 <Avatar
                   placeholder={undefined}
                   src={avatarUrl || ''}
@@ -89,7 +93,16 @@ export default function CardInformation({ offset, items, setItems }) {
                     <p className="font-bold text-[var(--secondary)]">
                       Họ và tên
                     </p>
-                    <p>{fullName}</p>
+                    <div className="flex gap-1 justify-between items-center pr-12">
+                      <p>{fullName} </p>
+                      <Link
+                        className="w-fit"
+                        href={`${socialMediaLink}`}
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        <LinkIcon link={socialMediaLink} />
+                      </Link>
+                    </div>
                   </div>
 
                   <div className="flex-col w-[120px]">
@@ -114,14 +127,6 @@ export default function CardInformation({ offset, items, setItems }) {
                     <p className=" font-bold text-[var(--secondary)]">Khoa</p>
                     <p>{facultyName}</p>
                   </div>
-
-                  <Link
-                    className="w-fit h-full mt-1"
-                    href={`${socialMediaLink}`}
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    <LinkIcon link={socialMediaLink} />
-                  </Link>
                 </div>
               </div>
 
@@ -135,17 +140,19 @@ export default function CardInformation({ offset, items, setItems }) {
                 />
                 <div className="flex justify-between gap-5 mt-3">
                   <Button
-                    onClick={handleSubmit((data) =>
+                    onClick={handleSubmit((data) => {
                       onSubmit(data, id, 'APPROVED', idx, fullName)
-                    )}
+                      setTotalCount((e) => e - 1)
+                    })}
                     placeholder={undefined}
                     className={`${nunito.className} w-52 bg-[var(--blue-02)] font-bold`}>
                     Phê duyệt
                   </Button>
                   <Button
-                    onClick={handleSubmit((data) =>
+                    onClick={handleSubmit((data) => {
                       onSubmit(data, id, 'DENIED', idx, fullName)
-                    )}
+                      setTotalCount((e) => e - 1)
+                    })}
                     placeholder={undefined}
                     className={`${nunito.className} w-52 bg-[var(--blue-04)] text-black font-bold`}>
                     Từ chối

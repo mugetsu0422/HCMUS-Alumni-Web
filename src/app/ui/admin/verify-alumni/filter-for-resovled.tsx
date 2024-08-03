@@ -2,13 +2,16 @@
 
 import React from 'react'
 import { Input, Button, Radio, Select, Option } from '@material-tailwind/react'
-import { CaretDownFill } from 'react-bootstrap-icons'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { classNames } from 'react-easy-crop/helpers'
+import {
+  CaretDownFill,
+  SortAlphaUp,
+  SortAlphaDown,
+} from 'react-bootstrap-icons'
+import { useForm } from 'react-hook-form'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { FACULTIES } from '../../../constant'
-import { SortAlphaUp, SortAlphaDown } from 'react-bootstrap-icons'
+
 const filerBtn = [
   {
     type: 'createAtOrder',
@@ -44,16 +47,13 @@ const filerBtn = [
   },
 ]
 
-export default function Filter({ setMyParams, status }) {
+export default function Filter({ setMyParams, status, setStatus }) {
+  const [currentStatus, setCurrentStatus] = React.useState(status)
+  const [currentParam, setCurrentParam] = React.useState('')
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
-  const {
-    register,
-    getValues,
-    reset,
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = useForm({
+  const { register, getValues, reset } = useForm({
     values: {
       keyword: searchParams.get('keyword')?.toString() || '',
       criteria: searchParams.get('criteria')?.toString() || 'email',
@@ -85,12 +85,14 @@ export default function Filter({ setMyParams, status }) {
     }
 
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?status=${status}&${params.toString()}`)
+    setCurrentParam(params.toString())
   }, 500)
 
   const handleResetForm = () => {
     reset()
     replace(pathname)
+    setCurrentParam('')
+    setCurrentStatus(status)
     setMyParams(`?status=${status}`)
   }
 
@@ -98,27 +100,19 @@ export default function Filter({ setMyParams, status }) {
     const params = new URLSearchParams(searchParams)
     params.set(e.target.name, e.target.value)
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?status=${status}&${params.toString()}`)
+    setMyParams(`?status=${currentStatus}&${params.toString()}`)
+  }
+
+  const handleStatusChange = (e) => {
+    setCurrentStatus(e)
+    const params = new URLSearchParams(searchParams)
+    setMyParams(`?status=${e}&${params.toString()}`)
   }
 
   return (
     <form>
       <div className="flex flex-wrap lg:flex-nowrap gap-5 max-w-[65rem]">
-        <Input
-          placeholder=""
-          crossOrigin={undefined}
-          size="md"
-          containerProps={{ className: 'col-span-6' }}
-          labelProps={{
-            className: 'before:content-none after:content-none',
-          }}
-          className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
-          {...register('keyword')}
-          onChange={(e) => handleSearch(e.target.value)}
-          type="text"
-        />
-
-        <div className="h-10 flex ">
+        <div className="h-10 flex w-full gap-4">
           <label htmlFor="criteria" className="font-semibold self-center pr-3">
             Theo
           </label>
@@ -135,27 +129,51 @@ export default function Filter({ setMyParams, status }) {
               Năm nhập học
             </option>
           </select>
-        </div>
+          <Input
+            placeholder=""
+            crossOrigin={undefined}
+            size="md"
+            containerProps={{ className: 'col-span-6' }}
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 bg-white"
+            {...register('keyword')}
+            onChange={(e) => handleSearch(e.target.value)}
+            type="text"
+          />
 
-        <div className="h-10 flex ">
-          <label htmlFor="facultyId" className="font-semibold self-center pr-3">
-            Khoa
-          </label>
-          <select
-            className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
-            {...register('facultyId')}
-            onChange={(e) => handleInputs(e)}>
-            <option key={0} value={0}>
-              Toàn bộ
-            </option>
-            {FACULTIES.map(({ id, name }) => {
-              return (
-                <option key={id} value={id}>
-                  {name}
-                </option>
-              )
-            })}
-          </select>
+          <div className="h-10 flex ">
+            <label
+              htmlFor="facultyId"
+              className="font-semibold self-center pr-3">
+              Khoa
+            </label>
+            <select
+              className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
+              {...register('facultyId')}
+              onChange={(e) => handleInputs(e)}>
+              <option key={0} value={0}>
+                Toàn bộ
+              </option>
+              {FACULTIES.map(({ id, name }) => {
+                return (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+          <Button
+            onClick={() =>
+              setMyParams(`?status=${currentStatus}&${currentParam}`)
+            }
+            placeholder={undefined}
+            size="md"
+            className="h-fit bg-[--blue-02] flex-1 normal-case">
+            <p className="text-nowrap text-white">Tìm kiếm</p>
+          </Button>
         </div>
       </div>
 
@@ -164,8 +182,8 @@ export default function Filter({ setMyParams, status }) {
           onClick={handleResetForm}
           variant="outlined"
           placeholder={undefined}
-          size="sm"
-          className="h-fit">
+          size="md"
+          className="h-fit bg-white">
           Đặt lại
         </Button>
         {filerBtn.map(({ type, title, filter }) => (
@@ -173,8 +191,8 @@ export default function Filter({ setMyParams, status }) {
             <Button
               variant="outlined"
               placeholder={undefined}
-              size="sm"
-              className="flex gap-2 -mb-1">
+              size="md"
+              className="flex gap-2 -mb-1 bg-white">
               {title}
               <CaretDownFill className="group-hover:rotate-180 " />
             </Button>
@@ -190,7 +208,7 @@ export default function Filter({ setMyParams, status }) {
                     key={idx}
                     label={sub}
                     containerProps={{
-                      className: 'p-0 m-3 ml-0',
+                      className: 'p-1 m-3 ml-0',
                     }}
                     id={type + idx}
                   />
@@ -204,6 +222,23 @@ export default function Filter({ setMyParams, status }) {
             </div>
           </div>
         ))}
+        <div className="w-[150px]">
+          <Select
+            placeholder={undefined}
+            size="lg"
+            className=" !border-blue-gray-900 focus:border-2 focus:!border-gray-900 bg-white"
+            containerProps={{ className: '' }}
+            labelProps={{ className: 'before:content-none after:content-none' }}
+            onChange={(val) => {
+              setStatus(val)
+              handleStatusChange(val)
+            }}
+            value={status}>
+            <Option value="resolved">Tất cả</Option>
+            <Option value="approved">Chấp thuận</Option>
+            <Option value="denied">Từ chối</Option>
+          </Select>
+        </div>
       </div>
     </form>
   )
