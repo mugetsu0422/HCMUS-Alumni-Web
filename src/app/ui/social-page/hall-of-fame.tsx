@@ -54,8 +54,8 @@ export default function HallOfFame({ hof }) {
                         {title}
                       </p>
                       <div className="pt-0 text-[var(--text)] ">
-                        <p>Khóa {beginningYear}</p>
-                        <p>Khoa {faculty.name}</p>
+                        {beginningYear ? <p>Khóa {beginningYear}</p> : null}
+                        {faculty ? <p>Khoa {faculty.name}</p> : null}
                       </div>
                     </CardBody>
                   </Link>
