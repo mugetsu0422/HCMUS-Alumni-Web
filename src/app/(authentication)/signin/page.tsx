@@ -16,6 +16,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons'
 
 function ForceChangePasswordForm({
   forceChangePasswordForm,
@@ -27,6 +28,23 @@ function ForceChangePasswordForm({
     getValues,
     formState: { errors },
   } = useForm()
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+
+  const toggleCurrentPasswordVisibility = () => {
+    setShowCurrentPassword((e) => !e)
+  }
+
+  const togglePasswordConfirmVisibility = () => {
+    setShowPasswordConfirm((e) => !e)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
+
   return (
     <>
       <Typography
@@ -39,7 +57,6 @@ function ForceChangePasswordForm({
       <form
         onSubmit={handleSubmit(onForceChangePasswordSubmit)}
         className="mb-2 w-80 max-w-screen-lg sm:w-96">
-        <div>
           <div className="mb-4 flex flex-col gap-3">
             <Typography
               placeholder={undefined}
@@ -49,19 +66,34 @@ function ForceChangePasswordForm({
               Mật khẩu hiện tại{' '}
               <span className="text-red-700 font-bold text-lg">*</span>
             </Typography>
-            <Input
-              type="password"
-              size="lg"
-              className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
-              labelProps={{
-                className: 'before:content-none after:content-none',
-              }}
-              crossOrigin={undefined}
-              {...register('currentPassword', {
-                required: 'Vui lòng nhập mật khẩu hiện tại',
-              })}
-            />
-            <ErrorInput errors={errors?.currentPassword?.message} />
+            <div className="flex relative w-full max-w-[24rem]">
+              <Input
+                type={showCurrentPassword ? 'text' : 'password'}
+                size="lg"
+                className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                crossOrigin={undefined}
+                {...register('currentPassword', {
+                  required: 'Vui lòng nhập mật khẩu hiện tại',
+                })}
+              />
+              <ErrorInput errors={errors?.currentPassword?.message} />
+              <Button
+                placeholder={undefined}
+                size="sm"
+                color="blue"
+                variant="text"
+                className="!absolute right-1 top-1.5 rounded"
+                onClick={toggleCurrentPasswordVisibility}>
+                {showCurrentPassword ? (
+                  <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                ) : (
+                  <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                )}
+              </Button>
+            </div>
           </div>
 
           <div className="mb-4 flex flex-col gap-3">
@@ -73,18 +105,46 @@ function ForceChangePasswordForm({
               Mật khẩu mới{' '}
               <span className="text-red-700 font-bold text-lg">*</span>
             </Typography>
-            <Input
-              type="password"
-              size="lg"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: 'before:content-none after:content-none',
-              }}
-              crossOrigin={undefined}
-              {...register('newPassword', {
-                required: 'Vui lòng nhập mật khẩu',
-              })}
-            />
+            <div className="mb-1 flex flex-col gap-6">
+              <Input
+                crossOrigin={undefined}
+                type={showPassword ? 'text' : 'password'}
+                {...register('newPassword', {
+                  required: 'Vui lòng nhập mật khẩu',
+                  minLength: {
+                    value: 8,
+                    message: 'Mật khẩu phải chứa ít nhất 8 ký tự',
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: 'Mật khẩu không được vượt quá 20 ký tự',
+                  },
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).*$/,
+                    message:
+                      'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa và một ký tự đặc biệt',
+                  },
+                })}
+                size="lg"
+                className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+              />
+              <Button
+                placeholder={undefined}
+                size="sm"
+                color="blue"
+                variant="text"
+                className="!absolute right-1 top-1.5 rounded"
+                onClick={togglePasswordVisibility}>
+                {showPassword ? (
+                  <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                ) : (
+                  <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                )}
+              </Button>
+            </div>
             <ErrorInput errors={errors?.newPassword?.message} />
           </div>
 
@@ -97,8 +157,10 @@ function ForceChangePasswordForm({
               Nhập lại mật khẩu mới{' '}
               <span className="text-red-700 font-bold text-lg">*</span>
             </Typography>
+            <div className="flex relative w-full max-w-[24rem]">
+
             <Input
-              type="password"
+              type={showPasswordConfirm ? 'text' : 'password'}
               size="lg"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -111,10 +173,25 @@ function ForceChangePasswordForm({
                   value === getValues('newPassword') ||
                   'Xác nhận mật khẩu mới không khớp',
               })}
+
             />
             <ErrorInput errors={errors?.confirmNewPassword?.message} />
-          </div>
+            <Button
+            placeholder={undefined}
+            size="sm"
+            color="blue"
+            variant="text"
+            className="!absolute right-1 top-1.5 rounded"
+            onClick={togglePasswordConfirmVisibility}>
+            {showPasswordConfirm ? (
+              <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+            ) : (
+              <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+            )}
+          </Button>
         </div>
+
+          </div>
 
         <Button
           type="submit"
@@ -134,6 +211,12 @@ function SigninForm({ signinForm, onSigninFormSubmit }) {
     handleSubmit,
     formState: { errors },
   } = signinForm
+
+  const [showPassword, setShowPassword] = useState(false)
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
+
   return (
     <>
       <Typography
@@ -189,18 +272,33 @@ function SigninForm({ signinForm, onSigninFormSubmit }) {
               Mật khẩu <span className="text-red-700 font-bold text-lg">*</span>
             </Typography>
             {/* Input password */}
-            <Input
-              type="password"
-              size="lg"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: 'before:content-none after:content-none',
-              }}
-              crossOrigin={undefined}
-              {...register('pass', {
-                required: 'Vui lòng nhập mật khẩu',
-              })}
-            />
+            <div className="flex relative w-full max-w-[24rem]">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                size="lg"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                crossOrigin={undefined}
+                {...register('pass', {
+                  required: 'Vui lòng nhập mật khẩu',
+                })}
+              />
+              <Button
+                placeholder={undefined}
+                size="sm"
+                color="blue"
+                variant="text"
+                className="!absolute right-1 top-1.5 rounded"
+                onClick={togglePasswordVisibility}>
+                {showPassword ? (
+                  <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                ) : (
+                  <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                )}
+              </Button>
+            </div>
             <ErrorInput
               // This is the error message
               errors={errors?.pass?.message}

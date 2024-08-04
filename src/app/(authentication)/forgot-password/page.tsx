@@ -14,6 +14,7 @@ import {
 } from '../../constant'
 import Countdown from 'react-countdown'
 import toast, { Toaster } from 'react-hot-toast'
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons'
 
 const FormContext = createContext(null)
 
@@ -97,7 +98,11 @@ function Step2() {
   const [isCodeExpired, setIsCodeExpired] = useState(false)
   const router = useRouter()
   const timer = useRef(Date.now())
+  const [showPassword, setShowPassword] = useState(false)
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
   const {
     register,
     handleSubmit,
@@ -245,20 +250,44 @@ function Step2() {
 
         <div className="flex relative w-full max-w-[24rem]">
           <Input
-            size="lg"
-            type="password"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            {...register('newPassword', {
-              required: 'Vui lòng nhập mật khẩu mới',
-            })}
-            containerProps={{
-              className: 'min-w-0',
-            }}
-            crossOrigin={undefined}
+              crossOrigin={undefined}
+              type={showPassword ? 'text' : 'password'}
+              {...register('newPassword', {
+                required: 'Vui lòng nhập mật khẩu',
+                minLength: {
+                  value: 8,
+                  message: 'Mật khẩu phải chứa ít nhất 8 ký tự',
+                },
+                maxLength: {
+                  value: 20,
+                  message: 'Mật khẩu không được vượt quá 20 ký tự',
+                },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).*$/,
+                  message:
+                    'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa và một ký tự đặc biệt',
+                },
+              })}
+              size="lg"
+              className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
           />
+
+          <Button
+            placeholder={undefined}
+            size="sm"
+            color="blue"
+            variant="text"
+            className="!absolute right-1 top-1.5 rounded"
+            onClick={togglePasswordVisibility}>
+            {showPassword ? (
+              <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+            ) : (
+              <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+            )}
+          </Button>
         </div>
         <ErrorInput
           // This is the error message
@@ -278,6 +307,7 @@ function Step2() {
         onClick={handleBack}
         placeholder={undefined}
         ripple={true}
+        size="lg"
         className={`mt-[1rem] font-bold w-full bg-[#e4e6eb] text-[#4b4f56] rounded-md py-4`}>
         Trở lại
       </Button>

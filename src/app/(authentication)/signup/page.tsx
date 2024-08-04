@@ -16,12 +16,22 @@ import Countdown from 'react-countdown'
 import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons'
 
 const FormContext = createContext(null)
 
 function Step1() {
   const { inputs, setInputs, handleNext } = useContext(FormContext)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
 
+  const togglePasswordConfirmVisibility = () => {
+    setShowPasswordConfirm((e) => !e)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
   const {
     register,
     handleSubmit,
@@ -86,33 +96,61 @@ function Step1() {
           />
         </div>
 
-        <div className="mb-4 flex flex-col gap-3">
+        <div className="mb-4 flex flex-col gap-3 w-full">
           <Typography
             placeholder={undefined}
             variant="h6"
             color="blue-gray"
-            className={``}>
+            className="">
             Mật khẩu <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
-          <Input
-            type="password"
-            {...register('password', {
-              required: 'Vui lòng nhập mật khẩu',
-            })}
-            size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            crossOrigin={undefined}
-          />
-          <ErrorInput
-            // This is the error message
-            errors={errors?.password?.message}
-          />
+          <div className="flex relative w-full">
+            <Input
+              crossOrigin={undefined}
+              type={showPassword ? 'text' : 'password'}
+              {...register('password', {
+                required: 'Vui lòng nhập mật khẩu',
+                minLength: {
+                  value: 8,
+                  message: 'Mật khẩu phải chứa ít nhất 8 ký tự',
+                },
+                maxLength: {
+                  value: 20,
+                  message: 'Mật khẩu không được vượt quá 20 ký tự',
+                },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).*$/,
+                  message:
+                    'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa và một ký tự đặc biệt',
+                },
+              })}
+              size="lg"
+              className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+            />
+            <Button
+              placeholder={undefined}
+              size="sm"
+              color="blue"
+              variant="text"
+              className="!absolute right-1 top-1.5 rounded"
+              onClick={togglePasswordVisibility}>
+              {showPassword ? (
+                <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              ) : (
+                <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              )}
+            </Button>
+          </div>
         </div>
+        <ErrorInput
+          // This is the error message
+          errors={errors?.password?.message}
+        />
 
-        <div className="mb-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <Typography
             placeholder={undefined}
             variant="h6"
@@ -121,26 +159,40 @@ function Step1() {
             Nhập lại mật khẩu{' '}
             <span className="text-red-700 font-bold text-lg">*</span>
           </Typography>
-
-          <Input
-            type="password"
-            size="lg"
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-            labelProps={{
-              className: 'before:content-none after:content-none',
-            }}
-            {...register('confirmPassword', {
-              required: 'Vui lòng xác nhận lại mật khẩu',
-              validate: (value) =>
-                value === getValues().password ||
-                'Xác nhận mật khẩu không khớp',
-            })}
-            crossOrigin={undefined}
-          />
-          <ErrorInput
-            // This is the error message
-            errors={errors?.confirmPassword?.message}
-          />
+          <div className="flex relative w-full">
+            <Input
+              type={showPasswordConfirm ? 'text' : 'password'}
+              size="lg"
+              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              labelProps={{
+                className: 'before:content-none after:content-none',
+              }}
+              {...register('confirmPassword', {
+                required: 'Vui lòng xác nhận lại mật khẩu',
+                validate: (value) =>
+                  value === getValues().password ||
+                  'Xác nhận mật khẩu không khớp',
+              })}
+              crossOrigin={undefined}
+            />
+            <ErrorInput
+              // This is the error message
+              errors={errors?.confirmPassword?.message}
+            />
+            <Button
+              placeholder={undefined}
+              size="sm"
+              color="blue"
+              variant="text"
+              className="!absolute right-1 top-1.5 rounded"
+              onClick={togglePasswordConfirmVisibility}>
+              {showPasswordConfirm ? (
+                <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              ) : (
+                <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
