@@ -117,7 +117,7 @@ export default function Page() {
   const onResetAll = () => {
     resetCurPage()
     replace(pathname)
-    setMyParams(``)
+    setMyParams(`?`)
   }
 
   const onNextPage = () => {
@@ -169,7 +169,7 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&fetchMode=MANAGEMENT`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },

@@ -137,7 +137,7 @@ export default function Page() {
     resetCurPage()
     replace(pathname)
     setSelectedTags([])
-    setMyParams(``)
+    setMyParams(`?`)
   }
 
   const onNextPage = () => {
@@ -200,7 +200,7 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&fetchMode=MANAGEMENT`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
