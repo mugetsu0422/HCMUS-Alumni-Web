@@ -93,7 +93,7 @@ export default function UserListItem({ user, onLockUser, onUnlockUser }) {
         {user.fullName}
       </p>
 
-      <p className="w-[250px] h-fit text-left text-black p-2 font-[600] flex items-center">
+      <p className="w-[250px] h-fit text-left text-black p-2 font-[600] flex items-center break-all">
         {user.email}
       </p>
 
