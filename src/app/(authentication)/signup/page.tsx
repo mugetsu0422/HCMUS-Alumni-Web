@@ -119,7 +119,7 @@ function Step1() {
                   message: 'Mật khẩu không được vượt quá 20 ký tự',
                 },
                 pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).*$/,
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*!]).{8,}$/,
                   message:
                     'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa và một ký tự đặc biệt',
                 },

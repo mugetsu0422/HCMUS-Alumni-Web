@@ -104,9 +104,11 @@ export default function Page({ params }: { params: { id: string } }) {
       organizationTime: moment(data.organizationTime).format(
         'YYYY-MM-DD HH:mm:ss'
       ),
-      tagNames: selectedTags.map((tag) => {
-        return tag.value
-      }).join(','),
+      tagNames: selectedTags
+        .map((tag) => {
+          return tag.value
+        })
+        .join(','),
     }
 
     const putToast = toast.loading('Đang cập nhật')
@@ -126,9 +128,12 @@ export default function Page({ params }: { params: { id: string } }) {
         })
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định', {
-          id: putToast,
-        })
+        toast.error(
+          error.response?.data?.error?.message || 'Lỗi không xác định',
+          {
+            id: putToast,
+          }
+        )
       })
   }
 
@@ -171,7 +176,6 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <div
       className={`${nunito.className} max-w-[1200px] w-[81.25%] h-fit m-auto bg-[#f7fafd] mt-8 rounded-lg`}>
-      
       <header className="font-extrabold text-2xl h-16 py-3 px-8 bg-[var(--blue-02)] flex items-center text-white rounded-tl-lg rounded-tr-lg">
         Thông tin chi tiết
       </header>
@@ -411,7 +415,7 @@ export default function Page({ params }: { params: { id: string } }) {
             <Textarea
               size="lg"
               variant="outlined"
-              className="bg-white h-44 !border-t-blue-gray-200 focus:!border-t-gray-900"
+              className="bg-white h-96 !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
                 className: 'w-full h-fit',
               }}

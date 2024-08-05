@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { FACULTIES } from '../../../constant'
+import isAdminLogin from './../../common/Is-admin-login'
 
 const filerBtn = [
   {
@@ -100,7 +101,7 @@ export default function Filter({ setMyParams, status }) {
     const params = new URLSearchParams(searchParams)
     params.set(e.target.name, e.target.value)
     replace(`${pathname}?${params.toString()}`)
-    setMyParams(`?status=${currentStatus}&${params.toString()}`)
+    setCurrentParam(params.toString())
   }
 
   const handleStatusChange = (e) => {
@@ -109,8 +110,15 @@ export default function Filter({ setMyParams, status }) {
     setMyParams(`?status=${e.target.value}&${params.toString()}`)
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent the default form submission
+      setMyParams(`?status=${currentStatus}&${currentParam}`);
+    }
+  };
+
   return (
-    <form>
+    <form onKeyDown={handleKeyDown}>
       <div className="flex flex-wrap lg:flex-nowrap gap-5 max-w-[65rem]">
         <div className="h-10 flex w-full gap-4">
           <label htmlFor="criteria" className="font-semibold self-center pr-3">
@@ -143,7 +151,7 @@ export default function Filter({ setMyParams, status }) {
             type="text"
           />
 
-          <div className="h-10 flex ">
+         {isAdminLogin() && <div className="h-10 flex ">
             <label
               htmlFor="facultyId"
               className="font-semibold self-center pr-3">
@@ -164,14 +172,14 @@ export default function Filter({ setMyParams, status }) {
                 )
               })}
             </select>
-          </div>
+          </div>}
           <Button
             onClick={() =>
               setMyParams(`?status=${currentStatus}&${currentParam}`)
             }
             placeholder={undefined}
             size="md"
-            className="h-fit bg-[--blue-02] flex-1 normal-case">
+            className="h-fit bg-[--blue-02] flex-1 normal-case min-w-[100px]">
             <p className="text-nowrap text-white">Tìm kiếm</p>
           </Button>
         </div>
