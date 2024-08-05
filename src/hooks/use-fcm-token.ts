@@ -14,7 +14,11 @@ const useFcmToken = () => {
   useEffect(() => {
     const retrieveToken = async () => {
       try {
-        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        if (
+          typeof window !== 'undefined' &&
+          'serviceWorker' in navigator &&
+          Cookies.get(JWT_COOKIE)
+        ) {
           const messaging = getMessaging(firebaseApp)
           const permission = await Notification.requestPermission()
           setNotificationPermissionStatus(permission)

@@ -206,7 +206,7 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}`, {
+      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&fetchMode=MANAGEMENT`, {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
         },
