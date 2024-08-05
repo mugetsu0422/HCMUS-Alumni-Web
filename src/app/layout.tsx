@@ -26,7 +26,6 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} scrollbar-webkit-main`}>
         <StoreProvider>
           <CustomToaster />
-          <FirebaseForeground />
           <Socket />
           {children}
         </StoreProvider>
