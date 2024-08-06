@@ -250,29 +250,21 @@ function Step2() {
 
         <div className="flex relative w-full max-w-[24rem]">
           <Input
-              crossOrigin={undefined}
-              type={showPassword ? 'text' : 'password'}
-              {...register('newPassword', {
-                required: 'Vui lòng nhập mật khẩu',
-                minLength: {
-                  value: 8,
-                  message: 'Mật khẩu phải chứa ít nhất 8 ký tự',
-                },
-                maxLength: {
-                  value: 20,
-                  message: 'Mật khẩu không được vượt quá 20 ký tự',
-                },
-                pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).*$/,
-                  message:
-                    'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa và một ký tự đặc biệt',
-                },
-              })}
-              size="lg"
-              className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
-              labelProps={{
-                className: 'before:content-none after:content-none',
-              }}
+            crossOrigin={undefined}
+            type={showPassword ? 'text' : 'password'}
+            {...register('newPassword', {
+              required: 'Vui lòng nhập mật khẩu',
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*!]).{8,20}$/,
+                message:
+                  'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa, một ký tự đặc biệt và có độ dài từ 8 đến 20 ký tự',
+              },
+            })}
+            size="lg"
+            className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
+            labelProps={{
+              className: 'before:content-none after:content-none',
+            }}
           />
 
           <Button

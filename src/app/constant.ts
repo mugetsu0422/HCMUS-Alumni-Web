@@ -12,14 +12,14 @@ export const INBOX_PAGE_SIZE = 10
 export const MESSAGE_PAGE_SIZE = 20
 export const FACULTIES = [
   { id: '1', name: 'Công nghệ Thông tin' },
-  { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
   { id: '3', name: 'Địa chất' },
-  { id: '4', name: 'Toán – Tin học' },
   { id: '5', name: 'Điện tử - Viễn thông' },
-  { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
   { id: '7', name: 'Hóa học' },
-  { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
+  { id: '6', name: 'Khoa học & Công nghệ Vật liệu' },
   { id: '9', name: 'Môi trường' },
+  { id: '8', name: 'Sinh học – Công nghệ Sinh học' },
+  { id: '4', name: 'Toán – Tin học' },
+  { id: '2', name: 'Vật lý – Vật lý kỹ thuật' },
 ]
 export const GENDER = [
   { id: '1', name: 'Nam' },
@@ -151,4 +151,21 @@ export const PROFILE_COUNSEL_TABS = [
     label: 'Bình luận',
     url: 'counsel-comments',
   },
+]
+
+export const ADMIN_PERMISSIONS = [
+  'User.Edit',
+  'User.Role.Create',
+  'User.Role.Edit',
+  'User.Role.Delete',
+  'AlumniVerify.Read',
+  'News.Create',
+  'News.Edit',
+  'News.Delete',
+  'Event.Create',
+  'Event.Edit',
+  'Event.Delete',
+  'Hof.Create',
+  'Hof.Edit',
+  'Hof.Delete',
 ]

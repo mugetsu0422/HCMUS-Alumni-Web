@@ -111,18 +111,11 @@ function ForceChangePasswordForm({
               type={showPassword ? 'text' : 'password'}
               {...register('newPassword', {
                 required: 'Vui lòng nhập mật khẩu',
-                minLength: {
-                  value: 8,
-                  message: 'Mật khẩu phải chứa ít nhất 8 ký tự',
-                },
-                maxLength: {
-                  value: 20,
-                  message: 'Mật khẩu không được vượt quá 20 ký tự',
-                },
+
                 pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*!]).{8,}$/,
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*!]).{8,20}$/,
                   message:
-                    'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa và một ký tự đặc biệt',
+                    'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa, một ký tự đặc biệt và có độ dài từ 8 đến 20 ký tự',
                 },
               })}
               size="lg"

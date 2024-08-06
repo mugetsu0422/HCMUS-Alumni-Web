@@ -85,7 +85,6 @@ export default function Filter({ setMyParams, status, setStatus }) {
       params.set('beginningYearOrder', getValues('beginningYearOrder'))
     }
 
-    replace(`${pathname}?${params.toString()}`)
     setCurrentParam(params.toString())
   }, 500)
 
@@ -104,6 +103,13 @@ export default function Filter({ setMyParams, status, setStatus }) {
     setCurrentParam(params.toString())
   }
 
+  const handleFilter = (e) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(e.target.name, e.target.value)
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?status=${currentStatus}&${params.toString()}`)
+  }
+
   const handleStatusChange = (e) => {
     setCurrentStatus(e)
     const params = new URLSearchParams(searchParams)
@@ -113,6 +119,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       event.preventDefault() // Prevent the default form submission
+      replace(`${pathname}?${currentParam}`)
       setMyParams(`?status=${currentStatus}&${currentParam}`)
     }
   }
@@ -125,7 +132,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
             Theo
           </label>
           <select
-            className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
+            className="h-full hover:cursor-pointer rounded-lg border pl-3 !border-gray-900 focus:border-2 focus:!border-gray-900"
             {...register('criteria')}
             onChange={(e) => handleInputs(e)}>
             <option value="email">Email</option>
@@ -145,7 +152,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 bg-white"
+            className=" !border-gray-900 focus:border-2 focus:!border-gray-900 pr-20 bg-white"
             {...register('keyword')}
             onChange={(e) => handleSearch(e.target.value)}
             type="text"
@@ -176,9 +183,10 @@ export default function Filter({ setMyParams, status, setStatus }) {
             </div>
           )}
           <Button
-            onClick={() =>
+            onClick={() => {
+              replace(`${pathname}?${currentParam}`)
               setMyParams(`?status=${currentStatus}&${currentParam}`)
-            }
+            }}
             placeholder={undefined}
             size="md"
             className="h-fit bg-[--blue-02] flex-1 normal-case min-w-[100px]">
@@ -197,7 +205,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
           Đặt lại
         </Button>
         {filerBtn.map(({ type, title, filter }) => (
-          <div key={title} className="flex-col group">
+          <div key={title} className="flex-col group ">
             <Button
               variant="outlined"
               placeholder={undefined}
@@ -212,7 +220,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
                   <Radio
                     {...register(`${type}` as any)}
                     value={order}
-                    onClick={(e) => handleInputs(e)}
+                    onClick={(e) => handleFilter(e)}
                     color="blue"
                     crossOrigin={undefined}
                     key={idx}
@@ -236,7 +244,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
           <Select
             placeholder={undefined}
             size="lg"
-            className=" !border-blue-gray-900 focus:border-2 focus:!border-gray-900 bg-white"
+            className=" !border-gray-900 focus:border-2 focus:!border-gray-900 bg-white font-bold text-gray-900 text-xs"
             containerProps={{ className: '' }}
             labelProps={{ className: 'before:content-none after:content-none' }}
             onChange={(val) => {
@@ -244,9 +252,9 @@ export default function Filter({ setMyParams, status, setStatus }) {
               handleStatusChange(val)
             }}
             value={currentStatus}>
-            <Option value="resolved">Tất cả</Option>
-            <Option value="approved">Chấp thuận</Option>
-            <Option value="denied">Từ chối</Option>
+            <Option value="resolved">TẤT CẢ</Option>
+            <Option value="approved">CHẤP THUẬN</Option>
+            <Option value="denied">TỪ CHỐI</Option>
           </Select>
         </div>
       </div>

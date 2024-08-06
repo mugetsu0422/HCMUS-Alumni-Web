@@ -15,6 +15,7 @@ import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3
@@ -44,6 +45,10 @@ function FuntionSection({
       title: params.get('title'),
     },
   })
+  const hasPermissionCreate = useHasAnyPermission(
+    ['Event.Create'],
+    Cookies.get('permissions').split(',')
+  )
 
   return (
     <div className="my-5 w-full max-w-[1650px] m-auto flex flex-wrap items-end justify-between gap-5">
@@ -80,13 +85,12 @@ function FuntionSection({
         />
       </div>
       <div className="flex gap-5">
-        <Link href={'/admin/events/create'}>
-          <Button
-            placeholder={undefined}
-            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-            Tạo mới
-          </Button>
-        </Link>
+        <Button
+          placeholder={undefined}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white "
+          disabled={!hasPermissionCreate}>
+          <Link href={'/admin/events/create'}>Tạo mới</Link>
+        </Button>
 
         <Button
           onClick={() => {
@@ -206,11 +210,14 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&fetchMode=MANAGEMENT`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&fetchMode=MANAGEMENT`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(({ data: { totalPages, events } }) => {
         setTotalPages(totalPages)
         setEvents(events)

@@ -9,6 +9,7 @@ import { JWT_COOKIE } from '../../../constant'
 import { FieldValues, useForm } from 'react-hook-form'
 import LinkIcon from './link-icon'
 import toast from 'react-hot-toast'
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 export default function CardInformation({
   offset,
@@ -17,7 +18,10 @@ export default function CardInformation({
   setTotalCount,
 }) {
   const { register, handleSubmit } = useForm()
-
+  const hasAnyPermission = useHasAnyPermission(
+    ['AlumniVerify.Edit'],
+    Cookies.get('permissions').split(',')
+  )
   const onSubmit = (
     data: FieldValues,
     id: any,
@@ -133,13 +137,14 @@ export default function CardInformation({
               <form className="flex flex-col gap-2">
                 <Input
                   crossOrigin={undefined}
-                  className="w-full "
+                  className="w-full focus:border-2 !border-gray-900 border-2"
                   size="lg"
                   label="Ghi chú"
                   {...register('comment')}
                 />
                 <div className="flex justify-between gap-5 mt-3">
                   <Button
+                    disabled={!hasAnyPermission}
                     onClick={handleSubmit((data) => {
                       onSubmit(data, id, 'APPROVED', idx, fullName)
                       setTotalCount((e) => e - 1)
@@ -149,6 +154,7 @@ export default function CardInformation({
                     Phê duyệt
                   </Button>
                   <Button
+                    disabled={!hasAnyPermission}
                     onClick={handleSubmit((data) => {
                       onSubmit(data, id, 'DENIED', idx, fullName)
                       setTotalCount((e) => e - 1)

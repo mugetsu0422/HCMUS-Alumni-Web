@@ -85,7 +85,6 @@ export default function Filter({ setMyParams, status }) {
       params.set('beginningYearOrder', getValues('beginningYearOrder'))
     }
 
-    replace(`${pathname}?${params.toString()}`)
     setCurrentParam(params.toString())
   }, 500)
 
@@ -104,6 +103,13 @@ export default function Filter({ setMyParams, status }) {
     setCurrentParam(params.toString())
   }
 
+  const handleFilter = (e) => {
+    const params = new URLSearchParams(searchParams)
+    params.set(e.target.name, e.target.value)
+    replace(`${pathname}?${params.toString()}`)
+    setMyParams(`?status=${currentStatus}&${params.toString()}`)
+  }
+
   const handleStatusChange = (e) => {
     setCurrentStatus(e.target.value)
     const params = new URLSearchParams(searchParams)
@@ -111,11 +117,12 @@ export default function Filter({ setMyParams, status }) {
   }
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault(); // Prevent the default form submission
-      setMyParams(`?status=${currentStatus}&${currentParam}`);
+    if (event.key === 'Enter') {
+      event.preventDefault() // Prevent the default form submission
+      replace(`${pathname}?${currentParam}`)
+      setMyParams(`?status=${currentStatus}&${currentParam}`)
     }
-  };
+  }
 
   return (
     <form onKeyDown={handleKeyDown}>
@@ -125,7 +132,7 @@ export default function Filter({ setMyParams, status }) {
             Theo
           </label>
           <select
-            className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3"
+            className="h-full hover:cursor-pointer rounded-lg border !border-gray-900 focus:border-2 focus:!border-gray-900 pl-3"
             {...register('criteria')}
             onChange={(e) => handleInputs(e)}>
             <option value="email">Email</option>
@@ -145,38 +152,41 @@ export default function Filter({ setMyParams, status }) {
             labelProps={{
               className: 'before:content-none after:content-none',
             }}
-            className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20 bg-white"
+            className=" !border-gray-900 focus:border-2 focus:!border-gray-900 pr-20 bg-white"
             {...register('keyword')}
             onChange={(e) => handleSearch(e.target.value)}
             type="text"
           />
 
-         {isAdminLogin() && <div className="h-10 flex ">
-            <label
-              htmlFor="facultyId"
-              className="font-semibold self-center pr-3">
-              Khoa
-            </label>
-            <select
-              className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
-              {...register('facultyId')}
-              onChange={(e) => handleInputs(e)}>
-              <option key={0} value={0}>
-                Toàn bộ
-              </option>
-              {FACULTIES.map(({ id, name }) => {
-                return (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                )
-              })}
-            </select>
-          </div>}
+          {isAdminLogin() && (
+            <div className="h-10 flex ">
+              <label
+                htmlFor="facultyId"
+                className="font-semibold self-center pr-3">
+                Khoa
+              </label>
+              <select
+                className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
+                {...register('facultyId')}
+                onChange={(e) => handleInputs(e)}>
+                <option key={0} value={0}>
+                  Toàn bộ
+                </option>
+                {FACULTIES.map(({ id, name }) => {
+                  return (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+          )}
           <Button
-            onClick={() =>
+            onClick={() => {
+              replace(`${pathname}?${currentParam}`)
               setMyParams(`?status=${currentStatus}&${currentParam}`)
-            }
+            }}
             placeholder={undefined}
             size="md"
             className="h-fit bg-[--blue-02] flex-1 normal-case min-w-[100px]">
@@ -210,7 +220,7 @@ export default function Filter({ setMyParams, status }) {
                   <Radio
                     {...register(`${type}` as any)}
                     value={order}
-                    onClick={(e) => handleInputs(e)}
+                    onClick={(e) => handleFilter(e)}
                     color="blue"
                     crossOrigin={undefined}
                     key={idx}

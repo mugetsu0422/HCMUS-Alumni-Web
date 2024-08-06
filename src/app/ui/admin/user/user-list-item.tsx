@@ -20,6 +20,7 @@ import Link from 'next/link'
 import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import toast from 'react-hot-toast'
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 function LockAccountDialog({
   openLockAccountDialog,
@@ -66,6 +67,11 @@ export default function UserListItem({ user, onLockUser, onUnlockUser }) {
   const [openLockAccountDialog, setOpenLockAccountDialog] =
     React.useState(false)
 
+  const hasPermissionEdit = useHasAnyPermission(
+    ['User.Edit'],
+    Cookies.get('permissions').split(',')
+  )
+
   const handleOpenLockAccountDialog = () => setOpenLockAccountDialog((e) => !e)
 
   const handleLockAndUnlock = async (isLock: boolean) => {
@@ -104,16 +110,18 @@ export default function UserListItem({ user, onLockUser, onUnlockUser }) {
       </div>
 
       <div className="flex justify-end px-2">
-        <Link href={`/admin/users/${user.id}`}>
-          <Button variant="text" placeholder={undefined} className="px-4">
-            <PencilSquare className="text-2xl text-[--blue-05]" />
+          <Button variant="text" placeholder={undefined} className="px-4" disabled={!hasPermissionEdit}>
+            <Link href={`/admin/users/${user.id}`}>
+              <PencilSquare className="text-2xl text-[--blue-05]" />
+            </Link>
           </Button>
-        </Link>
         <Button
           variant="text"
           placeholder={undefined}
           className="px-4 w-12 flex justify-center"
-          onClick={handleOpenLockAccountDialog}>
+          onClick={handleOpenLockAccountDialog}
+          disabled={!hasPermissionEdit}
+          >
           {isLock ? (
             <FontAwesomeIcon
               icon={faLock}
@@ -133,11 +141,11 @@ export default function UserListItem({ user, onLockUser, onUnlockUser }) {
           isLock={isLock}
           handleLockAndUnlock={handleLockAndUnlock}
         />
-        <Link href={`/profile/${user.id}/about`}>
-          <Button variant="text" className="px-4" placeholder={undefined}>
-            <Eye className="text-2xl  text-black" />
+          <Button variant="text" className="px-4" placeholder={undefined} disabled={!hasPermissionEdit}>
+            <Link href={`/profile/${user.id}/about`}>
+              <Eye className="text-2xl  text-black" />
+            </Link>
           </Button>
-        </Link>
       </div>
     </div>
   )

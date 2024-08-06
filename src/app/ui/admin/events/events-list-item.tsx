@@ -18,6 +18,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import Cookies from 'js-cookie'
 import Link from 'next/link'
 import Tag from '../../common/tag'
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -107,6 +108,14 @@ export default function EventsListItem({
   const [isHidden, setIsHidden] = React.useState(
     status.name === 'Ẩn' ? true : status.name === 'Bình thường' ? false : null
   )
+  const hasPermissionEdit = useHasAnyPermission(
+    ['Event.Edit'],
+    Cookies.get('permissions').split(',')
+  )
+  const hasPermissionDelete = useHasAnyPermission(
+    ['Event.Delete'],
+    Cookies.get('permissions').split(',')
+  )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
@@ -191,15 +200,20 @@ export default function EventsListItem({
       </p>
 
       <div className="flex justify-end px-2">
-        <Link href={`/admin/events/${id}`}>
-          <Button variant="text" placeholder={undefined} className="px-4">
+        <Button
+          variant="text"
+          placeholder={undefined}
+          className="px-4"
+          disabled={!hasPermissionEdit}>
+          <Link href={`/admin/events/${id}`}>
             <PencilSquare className="text-2xl text-[--blue-05]" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <Button
           variant="text"
           onClick={handleOpenDetele}
           placeholder={undefined}
+          disabled={!hasPermissionDelete}
           className="px-4">
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
@@ -214,7 +228,8 @@ export default function EventsListItem({
           variant="text"
           onClick={handleOpenShow}
           className="px-4"
-          placeholder={undefined}>
+          placeholder={undefined}
+          disabled={!hasPermissionEdit}>
           {!isHidden ? (
             <Eye className="text-2xl  text-black" />
           ) : (

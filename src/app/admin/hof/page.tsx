@@ -16,7 +16,7 @@ import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
-
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 function FuntionSection({
   onSearch,
@@ -31,7 +31,10 @@ function FuntionSection({
       title: params.get('title'),
     },
   })
-
+  const hasPermissionCreate = useHasAnyPermission(
+    ['Hof.Create'],
+    Cookies.get('permissions').split(',')
+  )
   return (
     <div className="my-5 w-full max-w-[1450px] m-auto justify-between flex items-end gap-5 flex-wrap">
       <div className=" flex gap-5 justify-start flex-wrap">
@@ -67,13 +70,12 @@ function FuntionSection({
       </div>
 
       <div className="flex gap-5">
-        <Link href={'/admin/hof/create'}>
-          <Button
-            placeholder={undefined}
-            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-            Tạo mới
-          </Button>
-        </Link>
+        <Button
+          placeholder={undefined}
+          disabled={!hasPermissionCreate}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
+          <Link href={'/admin/hof/create'}> Tạo mới</Link>
+        </Button>
         <Button
           onClick={() => {
             onResetSearchAndFilter()
@@ -169,11 +171,14 @@ export default function Page() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&fetchMode=MANAGEMENT`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
+      .get(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&fetchMode=MANAGEMENT`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
+      )
       .then(({ data: { totalPages, hof } }) => {
         setTotalPages(totalPages)
         setHof(hof)
@@ -183,7 +188,6 @@ export default function Page() {
 
   return (
     <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
-      
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1450px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công

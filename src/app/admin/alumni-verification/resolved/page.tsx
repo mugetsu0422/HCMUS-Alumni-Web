@@ -77,7 +77,7 @@ export default function Page() {
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 p-4 px-10">
       <p
         className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
-        Cựu sinh viên đã xét duyệt - #{items.length}
+        Cựu sinh viên đã xét duyệt
       </p>
       {totalCount === 0 ? null : (
         <Filter

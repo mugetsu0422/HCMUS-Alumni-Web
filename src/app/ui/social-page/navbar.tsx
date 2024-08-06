@@ -37,7 +37,8 @@ import { useRouter } from 'next/navigation'
 import checkPermission from './../common/checking-permission'
 import LandingPageNavbar from '@/app/ui/landing-page/navbar'
 import NavbarSkeleton from '../common/navbar-skeleton'
-
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import { ADMIN_PERMISSIONS } from '@/app/constant'
 // nav list component
 const navListItems = [
   {
@@ -294,6 +295,11 @@ function SocialPageNavbar() {
 
   // if (!userId) return <LandingPageNavbar />
   // else
+
+  const hasAnyPermission = useHasAnyPermission(
+    ADMIN_PERMISSIONS,
+    Cookies.get('permissions').split(',')
+  )
   return (
     <NavbarContext.Provider
       value={{
@@ -393,7 +399,7 @@ function SocialPageNavbar() {
                     </Link>
                   </MenuItem>
 
-                  {checkPermission('AlumniVerify.Read') && (
+                  {hasAnyPermission && (
                     <MenuItem placeholder={undefined} className="group">
                       <Link
                         href={`/admin/alumni-verification/pending`}

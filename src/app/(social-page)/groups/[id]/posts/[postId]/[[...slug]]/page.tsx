@@ -45,7 +45,7 @@ import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 import AvatarUser from '@/app/ui/common/avatar-user'
-import useHasAnyPostPermission from '@/hooks/user-has-any-post-permission'
+import useHasAnyPostPermission from '@/hooks/use-has-any-post-permission'
 
 export default function Page({
   params,

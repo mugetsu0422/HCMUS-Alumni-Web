@@ -39,7 +39,7 @@ import { nunito } from '../../fonts'
 import ReactionDialog from '../../common/reaction-dialog'
 import Poll from '../../common/poll'
 import DeletePostDialog from '../counsel/delete-post-dialog'
-import useHasAnyPostPermission from '@/hooks/user-has-any-post-permission'
+import useHasAnyPostPermission from '@/hooks/use-has-any-post-permission'
 
 interface PostProps {
   id: string
@@ -362,20 +362,22 @@ export default function PostListItem({
   ): Promise<AxiosResponse<any, any>> => {
     e.preventDefault()
 
-    return axios.delete(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/comments/${commentId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    ).then((response) => {
-      setComments((prevComments) =>
-        prevComments.filter((comment) => comment.id !== commentId)
+    return axios
+      .delete(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/comments/${commentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+          },
+        }
       )
-      setNumberComments((count) => count - 1)
-      return response
-    })
+      .then((response) => {
+        setComments((prevComments) =>
+          prevComments.filter((comment) => comment.id !== commentId)
+        )
+        setNumberComments((count) => count - 1)
+        return response
+      })
   }
   const onVote = (voteId: number) => {
     return axios.post(

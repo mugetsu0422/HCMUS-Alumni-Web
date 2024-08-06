@@ -17,6 +17,7 @@ import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 type Role = {
   id: number
@@ -57,6 +58,14 @@ function DeleteDialog({ id, open, handleOpen, onDelete }) {
 export default function RolesListItem({ role }: { role: Role }) {
   const [openDelete, setOpenDelete] = React.useState(false)
   const [isDeleted, setIsDeleted] = React.useState(false)
+  const hasPermissionEdit = useHasAnyPermission(
+    ['User.Role.Edit'],
+    Cookies.get('permissions').split(',')
+  )
+  const hasPermissionDelete = useHasAnyPermission(
+    ['User.Role.Delete'],
+    Cookies.get('permissions').split(',')
+  )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
 
@@ -94,16 +103,21 @@ export default function RolesListItem({ role }: { role: Role }) {
         </p>
       </div>
       <div className="flex justify-end px-2">
-        <Link href={`/admin/roles/${role.id}`}>
-          <Button variant="text" placeholder={undefined} className="px-4">
+        <Button
+          variant="text"
+          placeholder={undefined}
+          className="px-4"
+          disabled={!hasPermissionEdit}>
+          <Link href={`/admin/roles/${role.id}`}>
             <PencilSquare className="text-2xl text-[--blue-05]" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <Button
           variant="text"
           onClick={handleOpenDetele}
           placeholder={undefined}
-          className="px-4">
+          className="px-4"
+          disabled={!hasPermissionEdit}>
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
         <DeleteDialog

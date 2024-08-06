@@ -25,6 +25,7 @@ import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
 import Tag from '../../common/tag'
+import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -111,6 +112,14 @@ export default function NewsListItem({
   const [isHidden, setIsHidden] = React.useState(
     status.name === 'Ẩn' ? true : status.name === 'Bình thường' ? false : null
   )
+  const hasPermissionEdit = useHasAnyPermission(
+    ['News.Edit'],
+    Cookies.get('permissions').split(',')
+  )
+  const hasPermissionDelete = useHasAnyPermission(
+    ['News.Delete'],
+    Cookies.get('permissions').split(',')
+  )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
@@ -191,16 +200,21 @@ export default function NewsListItem({
         {views}
       </p>
       <div className="flex justify-end px-2">
-        <Link href={`/admin/news/${id}`}>
-          <Button variant="text" placeholder={undefined} className="px-4">
+        <Button
+          variant="text"
+          placeholder={undefined}
+          className="px-4"
+          disabled={!hasPermissionEdit}>
+          <Link href={`/admin/news/${id}`}>
             <PencilSquare className="text-2xl text-[--blue-05]" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <Button
           variant="text"
           onClick={handleOpenDetele}
           placeholder={undefined}
-          className="px-4">
+          className="px-4"
+          disabled={!hasPermissionDelete}>
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
         <DeleteDialog
@@ -219,7 +233,8 @@ export default function NewsListItem({
             variant="text"
             onClick={handleOpenShow}
             className="px-4"
-            placeholder={undefined}>
+            placeholder={undefined}
+            disabled={!hasPermissionEdit}>
             {!isHidden ? (
               <Eye className="text-2xl  text-black" />
             ) : (
