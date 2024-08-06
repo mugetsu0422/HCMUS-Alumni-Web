@@ -15,7 +15,7 @@ import Cookies from 'js-cookie'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3
@@ -47,7 +47,7 @@ function FuntionSection({
   })
   const hasPermissionCreate = useHasAnyPermission(
     ['Event.Create'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
 
   return (

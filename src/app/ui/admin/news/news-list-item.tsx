@@ -25,7 +25,7 @@ import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
 import Tag from '../../common/tag'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -114,11 +114,11 @@ export default function NewsListItem({
   )
   const hasPermissionEdit = useHasAnyPermission(
     ['News.Edit'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   const hasPermissionDelete = useHasAnyPermission(
     ['News.Delete'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)

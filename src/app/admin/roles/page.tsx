@@ -14,7 +14,7 @@ import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import RolesListItem from '../../ui/admin/roles/roles-list-item'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
@@ -26,7 +26,7 @@ function FuntionSection({ onSearch, onResetAll }: FunctionSectionProps) {
   const params = new URLSearchParams(searchParams)
   const hasAnyPermission = useHasAnyPermission(
     ['User.Role.Create'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   const { register, reset } = useForm({
     defaultValues: {

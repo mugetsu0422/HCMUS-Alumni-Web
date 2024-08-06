@@ -16,7 +16,7 @@ import SortHeader from '../../ui/admin/hof/sort-header'
 import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 function FuntionSection({
   onSearch,
@@ -33,7 +33,7 @@ function FuntionSection({
   })
   const hasPermissionCreate = useHasAnyPermission(
     ['Hof.Create'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   return (
     <div className="my-5 w-full max-w-[1450px] m-auto justify-between flex items-end gap-5 flex-wrap">

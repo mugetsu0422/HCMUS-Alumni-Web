@@ -166,7 +166,7 @@ export default function Filter({ setMyParams, status }) {
                 Khoa
               </label>
               <select
-                className="h-full hover:cursor-pointer rounded-lg border border-blue-gray-200 pl-3 max-w-fit"
+                className="h-full hover:cursor-pointer rounded-lg border !border-gray-900 focus:border-2 focus:!border-gray-900 pl-3 max-w-fit"
                 {...register('facultyId')}
                 onChange={(e) => handleInputs(e)}>
                 <option key={0} value={0}>

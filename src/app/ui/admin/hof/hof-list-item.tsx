@@ -23,7 +23,7 @@ import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -108,11 +108,11 @@ export default function HofListItem({ hof }) {
   )
   const hasPermissionEdit = useHasAnyPermission(
     ['Hof.Edit'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   const hasPermissionDelete = useHasAnyPermission(
     ['Hof.Delete'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)

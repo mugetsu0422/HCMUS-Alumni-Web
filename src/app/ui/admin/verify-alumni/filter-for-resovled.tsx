@@ -201,7 +201,7 @@ export default function Filter({ setMyParams, status, setStatus }) {
           variant="outlined"
           placeholder={undefined}
           size="md"
-          className="h-fit bg-white">
+          className="h-fit bg-white py-[11px]">
           Đặt lại
         </Button>
         {filerBtn.map(({ type, title, filter }) => (
@@ -210,9 +210,9 @@ export default function Filter({ setMyParams, status, setStatus }) {
               variant="outlined"
               placeholder={undefined}
               size="md"
-              className="flex gap-2 -mb-1 bg-white">
+              className="flex gap-2 -mb-1 bg-white py-[11px]">
               {title}
-              <CaretDownFill className="group-hover:rotate-180 " />
+              <CaretDownFill className="group-hover:rotate-180" />
             </Button>
             <div className="w-[fit] p-5 hidden group-hover:flex gap-2 flex-col bg-white rounded-xl font-medium translate-y-1 border-2 border-[var(--secondary)] absolute z-10">
               {filter.map(({ sub, order }, idx) => (
@@ -243,10 +243,11 @@ export default function Filter({ setMyParams, status, setStatus }) {
         <div className="w-[150px]">
           <Select
             placeholder={undefined}
-            size="lg"
+            size="md"
             className=" !border-gray-900 focus:border-2 focus:!border-gray-900 bg-white font-bold text-gray-900 text-xs"
             containerProps={{ className: '' }}
             labelProps={{ className: 'before:content-none after:content-none' }}
+            menuProps={{ className: 'border-2 border-[var(--secondary)] ' }}
             onChange={(val) => {
               setStatus(val)
               handleStatusChange(val)

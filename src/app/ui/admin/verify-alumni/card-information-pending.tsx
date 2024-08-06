@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -9,7 +11,7 @@ import { JWT_COOKIE } from '../../../constant'
 import { FieldValues, useForm } from 'react-hook-form'
 import LinkIcon from './link-icon'
 import toast from 'react-hot-toast'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 export default function CardInformation({
   offset,
@@ -20,7 +22,7 @@ export default function CardInformation({
   const { register, handleSubmit } = useForm()
   const hasAnyPermission = useHasAnyPermission(
     ['AlumniVerify.Edit'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   const onSubmit = (
     data: FieldValues,
@@ -137,7 +139,6 @@ export default function CardInformation({
               <form className="flex flex-col gap-2">
                 <Input
                   crossOrigin={undefined}
-                  className="w-full focus:border-2 !border-gray-900 border-2"
                   size="lg"
                   label="Ghi chú"
                   {...register('comment')}

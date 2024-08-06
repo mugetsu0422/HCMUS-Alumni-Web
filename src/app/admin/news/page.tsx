@@ -15,7 +15,7 @@ import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
 
 interface FunctionSectionProps {
@@ -45,7 +45,7 @@ function FuntionSection({
   })
   const hasPermissionCreate = useHasAnyPermission(
     ['News.Create'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   return (
     <div className="my-5 w-full max-w-[1220px] justify-between flex flex-wrap items-end gap-5 m-auto">

@@ -17,7 +17,7 @@ import { JWT_COOKIE } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 type Role = {
   id: number
@@ -60,11 +60,11 @@ export default function RolesListItem({ role }: { role: Role }) {
   const [isDeleted, setIsDeleted] = React.useState(false)
   const hasPermissionEdit = useHasAnyPermission(
     ['User.Role.Edit'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   const hasPermissionDelete = useHasAnyPermission(
     ['User.Role.Delete'],
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)

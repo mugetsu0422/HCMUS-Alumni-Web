@@ -37,7 +37,7 @@ import { useRouter } from 'next/navigation'
 import checkPermission from './../common/checking-permission'
 import LandingPageNavbar from '@/app/ui/landing-page/navbar'
 import NavbarSkeleton from '../common/navbar-skeleton'
-import useHasAnyPermission from '@/hooks/use-has-any-admin-permission'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 import { ADMIN_PERMISSIONS } from '@/app/constant'
 // nav list component
 const navListItems = [
@@ -298,7 +298,7 @@ function SocialPageNavbar() {
 
   const hasAnyPermission = useHasAnyPermission(
     ADMIN_PERMISSIONS,
-    Cookies.get('permissions').split(',')
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
   )
   return (
     <NavbarContext.Provider
@@ -391,10 +391,12 @@ function SocialPageNavbar() {
                     <Link
                       href={`/profile/${userId}/about`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon
-                        icon={faCircleUser}
-                        className="text-xl"
-                      />
+                      <span className="w-[25px]">
+                        <FontAwesomeIcon
+                          icon={faCircleUser}
+                          className="text-xl"
+                        />
+                      </span>
                       Trang cá nhân
                     </Link>
                   </MenuItem>
@@ -404,7 +406,12 @@ function SocialPageNavbar() {
                       <Link
                         href={`/admin/alumni-verification/pending`}
                         className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                        <FontAwesomeIcon icon={faUserPen} className="text-xl" />
+                        <span className="w-[25px]">
+                          <FontAwesomeIcon
+                            icon={faUserPen}
+                            className="text-xl"
+                          />
+                        </span>
                         Admin
                       </Link>
                     </MenuItem>
@@ -416,18 +423,25 @@ function SocialPageNavbar() {
                     <Link
                       href={`/change-password`}
                       className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                      <FontAwesomeIcon icon={faUserGear} className="text-xl" />
-                      <p className="text-base">Đổi mật khẩu</p>
+                      <span className="w-[25px]">
+                        <FontAwesomeIcon
+                          icon={faUserGear}
+                          className="text-xl"
+                        />
+                      </span>
+                      Đổi mật khẩu
                     </Link>
                   </MenuItem>
                   <MenuItem
                     placeholder={undefined}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]"
                     onClick={handleLogout}>
-                    <FontAwesomeIcon
-                      icon={faRightFromBracket}
-                      className="text-xl"
-                    />
+                    <span className="w-[25px]">
+                      <FontAwesomeIcon
+                        icon={faRightFromBracket}
+                        className="text-xl"
+                      />
+                    </span>
                     Đăng xuất
                   </MenuItem>
                 </MenuList>
