@@ -14,7 +14,6 @@ import {
   DialogHeader,
   Avatar,
   Spinner,
-  Textarea,
 } from '@material-tailwind/react'
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
@@ -28,7 +27,8 @@ import Comments from '@/app/ui/common/comments'
 import { nunito } from '@/app/ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
-import checkPermission from '@/app/ui/common/checking-permission'
+import CommentInput from '@/app/ui/social-page/common/comment-input'
+import ParticipateButton from '@/app/ui/social-page/events/participate-button'
 
 const PARTICIPANT_FETCH_LIMIT = 50
 
@@ -141,6 +141,7 @@ export default function Page({
       setParticipant((e) => e + 1)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
+      toast.success('Tham gia sự kiện thành công')
     } catch (error) {
       toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
@@ -159,6 +160,7 @@ export default function Page({
       setParticipant((e) => e - 1)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
+      toast.success('Hủy tham gia sự kiện thành công')
     } catch (error) {
       toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
@@ -483,28 +485,17 @@ export default function Page({
                   participantCount={event?.participants}
                   onLoadParticipants={onLoadMoreParticipants}
                 />
-                {checkPermission('Event.Participant.Create') &&
-                  (!isParticipated ? (
-                    <Button
-                      onClick={() => {
-                        onParticipate(params.id)
-                      }}
-                      disabled={isDisabled}
-                      placeholder={undefined}
-                      size="md"
-                      className="bg-[--blue-02] font-medium w-full text-[16px]">
-                      Tham gia
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => onCancelParticipation(params.id)}
-                      disabled={isDisabled}
-                      placeholder={undefined}
-                      size="md"
-                      className="bg-[--blue-02] font-medium w-full text-[16px]">
-                      Huỷ tham gia
-                    </Button>
-                  ))}
+                <ParticipateButton
+                  requiredPermission={'Event.Participant.Create'}
+                  isParticipated={isParticipated}
+                  isDisabled={isDisabled}
+                  onParticipate={onParticipate}
+                  onCancelParticipation={onCancelParticipation}
+                  eventId={params.id}
+                  participateBtnClassName={`flex justify-center items-center gap-2 bg-[--blue-02] font-bold w-full text-[16px]`}
+                  cancelPartcipateBtnClassName={`flex justify-center items-center gap-2 bg-[#e4e6eb] text-[#4b4f56] font-bold w-full text-[16px]`}
+                  requiredBtnClassName={`py-3 px-6 bg-[#e4e6eb] text-[#4b4f56] normal-case w-full text-[16px]`}
+                />
               </div>
             </div>
           </div>
@@ -520,26 +511,12 @@ export default function Page({
         </div>
 
         <div className="flex flex-col gap-y-2 w-[75%] max-w-[1366px] m-auto mb-10">
-          {checkPermission('Event.Comment.Create') && (
-            <form
-              onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
-              <Textarea
-                onChange={handleUploadCommentChange}
-                placeholder={undefined}
-                label="Chia sẻ ý kiến của bạn"
-              />
-              <div className="flex justify-end gap-x-4 pt-2 mr-2">
-                <Button
-                  placeholder={undefined}
-                  size="md"
-                  disabled={!uploadComment.trim()}
-                  type="submit"
-                  className={`${nunito.className} py-2 px-4 bg-[var(--blue-05)] normal-case text-md`}>
-                  Đăng
-                </Button>
-              </div>
-            </form>
-          )}
+          <CommentInput
+            requiredPermission={'News.Comment.Create'}
+            uploadComment={uploadComment}
+            handleUploadCommentChange={handleUploadCommentChange}
+            onHandleUploadComment={onHandleUploadComment}
+          />
 
           <p className="text-xl font-semibold">
             Bình luận <span className="font-normal">({numberComments})</span>
