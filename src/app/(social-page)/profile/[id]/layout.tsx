@@ -171,11 +171,15 @@ function AvatarAndCoverUser({
   return (
     <div className="relative">
       <figure className="relative h-40 xl:h-96 w-full">
-        <img
-          src={coverImage}
-          alt="user cover"
-          className="w-full h-40 xl:h-96 object-cover object-center"
-        />
+        {coverImage ? (
+          <img
+            src={coverImage}
+            alt="user cover"
+            className="w-full h-40 xl:h-96 object-cover object-center"
+          />
+        ) : (
+          <div className="w-full h-full bg-[--secondary] opacity-30"></div>
+        )}
         {isMounted && isProfileLoginUser && (
           <figcaption className="absolute bottom-0 left-2/4 flex justify-end w-full -translate-x-2/4 py-2 px-4">
             <Button
@@ -383,12 +387,12 @@ export default function GroupLayout({
         setUser(userRes.data)
         setCroppedAvatar(
           userRes.data?.user?.avatarUrl === null
-            ? '/placeholderImage.png'
+            ? '/none-avatar.png'
             : userRes.data?.user?.avatarUrl
         )
         setCoverImage(
           userRes.data?.user?.coverUrl === null
-            ? '/placeholderImage.png'
+            ? null
             : userRes.data?.user?.coverUrl
         )
         setNumberFriend(userFriendRes.data)

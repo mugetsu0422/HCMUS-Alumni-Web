@@ -1,13 +1,12 @@
+import FirebaseForeground from '@/config/notification/firebase-foreground'
 import Navbar from '../ui/social-page/navbar'
-import { Provider } from 'react-redux'
 
 export default function RootLayout({ children }) {
   return (
     <>
+      <FirebaseForeground />
       <Navbar />
-      <main className="">
-        {children}
-      </main>
+      <main className="">{children}</main>
     </>
   )
 }

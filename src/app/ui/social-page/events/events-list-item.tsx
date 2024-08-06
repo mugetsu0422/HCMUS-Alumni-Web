@@ -3,13 +3,10 @@
 
 import React, { useState } from 'react'
 import { Clock, GeoAltFill, BarChartFill, TagFill } from 'react-bootstrap-icons'
-import { Button } from '@material-tailwind/react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import moment from 'moment'
 import toast from 'react-hot-toast'
-import Cookies from 'js-cookie'
-import checkPermission from '../../common/checking-permission'
+import ParticipateButton from './participate-button'
 
 export default function EventsListItem({
   event,
@@ -20,10 +17,10 @@ export default function EventsListItem({
   const [isDisabled, setIsDisabled] = useState(false)
   const [participants, setParticipants] = useState(event.participants)
 
-  const onClickParticipation = async () => {
+  const onClickParticipation = async (eventId) => {
     setIsDisabled(true)
     try {
-      await onParticipate(event.id)
+      await onParticipate(eventId)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
       setParticipants((e) => e + 1)
@@ -32,10 +29,10 @@ export default function EventsListItem({
       toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
-  const onClickParticipationCancel = async () => {
+  const onClickParticipationCancel = async (eventId) => {
     setIsDisabled(true)
     try {
-      await onCancelParticipation(event.id)
+      await onCancelParticipation(eventId)
       setIsParticipated((isParticipated) => !isParticipated)
       setIsDisabled(false)
       setParticipants((e) => e - 1)
@@ -105,26 +102,17 @@ export default function EventsListItem({
             ))}
           </div>
         </div>
-        {checkPermission('Event.Participant.Create') &&
-          (!isParticipated ? (
-            <Button
-              onClick={() => onClickParticipation()}
-              disabled={isDisabled}
-              placeholder={undefined}
-              size="md"
-              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
-              Tham gia
-            </Button>
-          ) : (
-            <Button
-              onClick={() => onClickParticipationCancel()}
-              disabled={isDisabled}
-              placeholder={undefined}
-              size="md"
-              className="w-full lg:w-[400px] bg-[#e4e6eb] text-[#4b4f56] font-medium text-[16px]">
-              Huỷ tham gia
-            </Button>
-          ))}
+        <ParticipateButton
+          requiredPermission={'Event.Participant.Create'}
+          isParticipated={isParticipated}
+          isDisabled={isDisabled}
+          onParticipate={onClickParticipation}
+          onCancelParticipation={onClickParticipationCancel}
+          eventId={event.id}
+          participateBtnClassName={`flex justify-center items-center gap-2 bg-[--blue-02] font-bold w-full lg:w-[400px] bg-[--blue-02] text-[16px]`}
+          cancelPartcipateBtnClassName={`flex justify-center items-center gap-2 bg-[#e4e6eb] text-[#4b4f56] font-bold w-full lg:w-[400px] text-[16px]`}
+          requiredBtnClassName={`w-full lg:w-[400px] py-3 px-6 bg-[#e4e6eb] text-[#4b4f56] normal-case w-full text-[16px]`}
+        />
       </div>
     </div>
   )

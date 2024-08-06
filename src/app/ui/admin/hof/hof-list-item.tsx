@@ -23,6 +23,7 @@ import { JWT_COOKIE, POST_STATUS } from '../../../constant'
 import Cookies from 'js-cookie'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 
 function DeleteDialog({ id, open, handleOpen, onDelete }) {
   return (
@@ -105,6 +106,14 @@ export default function HofListItem({ hof }) {
         ? false
         : null
   )
+  const hasPermissionEdit = useHasAnyPermission(
+    ['Hof.Edit'],
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
+  )
+  const hasPermissionDelete = useHasAnyPermission(
+    ['Hof.Delete'],
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
+  )
 
   const handleOpenDetele = () => setOpenDelete((e) => !e)
   const handleOpenShow = () => setOpenShow((e) => !e)
@@ -165,13 +174,13 @@ export default function HofListItem({ hof }) {
         />
       </div>
 
-      <p className="text-lg h-20 w-[220px] font-[600] text-black justify-start flex items-center text-wrap">
+      <p className="text-lg h-[88px] w-[220px] font-[600] text-black justify-start flex items-center text-wrap">
         {hof.title}
       </p>
-      <p className="text-lg h-20 w-[325px] font-[600] text-black justify-center flex items-center overflow-y-auto scrollbar-webkit-main">
+      <p className="text-lg h-[88px] w-[325px] font-[600] text-black justify-center flex items-start overflow-y-auto scrollbar-webkit-main">
         {hof.position}
       </p>
-      <p className="w-[8rem] h-20 text-center text-black font-[600] flex items-center justify-center">
+      <p className="w-[8rem] h-[88px] text-center text-black font-[600] flex items-center justify-center">
         {moment(hof.publishedAt).local().format('DD/MM/YYYY HH:mm')}
       </p>
       <p className="text-lg w-[8rem] text-center text-black font-[600] flex items-center justify-center">
@@ -184,16 +193,21 @@ export default function HofListItem({ hof }) {
         {hof.views}
       </p>
       <div className="flex justify-end px-2">
-        <Link href={`/admin/hof/${hof.id}`}>
-          <Button variant="text" placeholder={undefined} className="px-4">
-            <PencilSquare className="text-2xl text-[--blue-05]" />
-          </Button>
-        </Link>
+        <Button
+          variant="text"
+          placeholder={undefined}
+          className="px-4"
+          disabled={!hasPermissionEdit}>
+          <Link href={`/admin/hof/${hof.id}`}>
+            <PencilSquare className="text-2xl text-[--blue-05]" />{' '}
+          </Link>
+        </Button>
         <Button
           variant="text"
           onClick={handleOpenDetele}
           placeholder={undefined}
-          className="px-4">
+          className="px-4"
+          disabled={!hasPermissionDelete}>
           <Trash3 className="text-2xl text-[--delete]" />
         </Button>
         <DeleteDialog
@@ -212,6 +226,7 @@ export default function HofListItem({ hof }) {
             variant="text"
             onClick={handleOpenShow}
             className="px-4"
+            disabled={!hasPermissionEdit}
             placeholder={undefined}>
             {!isHidden ? (
               <Eye className="text-2xl  text-black" />

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import { Input, Button, Typography } from '@material-tailwind/react'
@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { JWT_COOKIE } from '@/app/constant'
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons'
 
 export default function Page() {
   const {
@@ -20,7 +21,21 @@ export default function Page() {
     formState: { errors },
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
 
+  const toggleCurrentPasswordVisibility = () => {
+    setShowCurrentPassword((e) => !e)
+  }
+
+  const togglePasswordConfirmVisibility = () => {
+    setShowPasswordConfirm((e) => !e)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
   const router = useRouter()
 
   const onSubmit = (data) => {
@@ -78,7 +93,7 @@ export default function Page() {
                 <Input
                   size="lg"
                   className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
-                  type="password"
+                  type={showCurrentPassword ? 'text' : 'password'}
                   labelProps={{
                     className: 'before:content-none after:content-none',
                   }}
@@ -90,6 +105,19 @@ export default function Page() {
                   }}
                   crossOrigin={undefined}
                 />
+                <Button
+                  placeholder={undefined}
+                  size="sm"
+                  color="blue"
+                  variant="text"
+                  className="!absolute right-1 top-1.5 rounded"
+                  onClick={toggleCurrentPasswordVisibility}>
+                  {showCurrentPassword ? (
+                    <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                  ) : (
+                    <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                  )}
+                </Button>
               </div>
               <ErrorInput errors={errors?.oldPassword?.message} />
             </div>
@@ -106,20 +134,35 @@ export default function Page() {
 
               <div className="flex relative w-full max-w-[24rem]">
                 <Input
+                  crossOrigin={undefined}
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('newPassword', {
+                    required: 'Vui lòng nhập mật khẩu',
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*!]).{8,20}$/,
+                      message:
+                        'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa, một ký tự đặc biệt và có độ dài từ 8 đến 20 ký tự',
+                    },
+                  })}
                   size="lg"
-                  type="password"
-                  className=" !border-t-blue-gray-200 focus:!border-t-gray-900 pr-20"
+                  className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
                   labelProps={{
                     className: 'before:content-none after:content-none',
                   }}
-                  {...register('newPassword', {
-                    required: 'Vui lòng nhập mật khẩu mới',
-                  })}
-                  containerProps={{
-                    className: 'min-w-0',
-                  }}
-                  crossOrigin={undefined}
                 />
+                <Button
+                  placeholder={undefined}
+                  size="sm"
+                  color="blue"
+                  variant="text"
+                  className="!absolute right-1 top-1.5 rounded"
+                  onClick={togglePasswordVisibility}>
+                  {showPassword ? (
+                    <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                  ) : (
+                    <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                  )}
+                </Button>
               </div>
               <ErrorInput errors={errors?.newPassword?.message} />
             </div>
@@ -132,21 +175,36 @@ export default function Page() {
                 Nhập lại mật khẩu mới{' '}
                 <span className="text-red-700 font-bold text-lg">*</span>
               </Typography>
-              <Input
-                type="password"
-                size="lg"
-                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-                labelProps={{
-                  className: 'before:content-none after:content-none',
-                }}
-                crossOrigin={undefined}
-                {...register('confirmNewPassword', {
-                  required: 'Vui lòng xác nhận lại mật khẩu',
-                  validate: (value) =>
-                    value === getValues('newPassword') ||
-                    'Xác nhận mật khẩu mới không khớp',
-                })}
-              />
+              <div className="flex relative w-full max-w-[24rem]">
+                <Input
+                  type={showPasswordConfirm ? 'text' : 'password'}
+                  size="lg"
+                  className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                  labelProps={{
+                    className: 'before:content-none after:content-none',
+                  }}
+                  crossOrigin={undefined}
+                  {...register('confirmNewPassword', {
+                    required: 'Vui lòng xác nhận lại mật khẩu',
+                    validate: (value) =>
+                      value === getValues('newPassword') ||
+                      'Xác nhận mật khẩu mới không khớp',
+                  })}
+                />
+                <Button
+                  placeholder={undefined}
+                  size="sm"
+                  color="blue"
+                  variant="text"
+                  className="!absolute right-1 top-1.5 rounded"
+                  onClick={togglePasswordConfirmVisibility}>
+                  {showPasswordConfirm ? (
+                    <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                  ) : (
+                    <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                  )}
+                </Button>
+              </div>
               <ErrorInput errors={errors?.confirmNewPassword?.message} />
             </div>
             <Button

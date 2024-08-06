@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Avatar, Button, Spinner } from '@material-tailwind/react'
 import { useDebouncedCallback } from 'use-debounce'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
@@ -13,7 +13,9 @@ import toast from 'react-hot-toast'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-function FriendListItem({ friend }) {
+function FriendListItem({ friend, onRemove }) {
+  const [isRemoved, setIsRemoved] = useState(false)
+
   const onAccept = () => {
     const data = {
       friendId: friend.id,
@@ -30,6 +32,7 @@ function FriendListItem({ friend }) {
         }
       )
       .then(() => {
+        onRemove(friend.id)
         toast.success('Chấp nhận lời mời kết bạn thành công')
       })
       .catch((error) => {
@@ -55,6 +58,7 @@ function FriendListItem({ friend }) {
         }
       )
       .then(() => {
+        onRemove(friend.id)
         toast.success('Hủy lời mời kết bạn thành công')
       })
       .catch((error) => {
@@ -64,32 +68,33 @@ function FriendListItem({ friend }) {
       })
   }
 
-  return (
-    <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-      <Link
-        href={`/profile/${friend.id}/about`}
-        className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
-        <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
-        <p>{friend.fullName}</p>
-      </Link>
-      <div className="flex items-center gap-2">
-        <Button
-          onClick={onDeny}
-          placeholder={undefined}
-          size="md"
-          className="bg-[--delete-filter] text-black normal-case">
-          Từ chối
-        </Button>
-        <Button
-          onClick={onAccept}
-          placeholder={undefined}
-          size="md"
-          className="bg-[var(--blue-05)] normal-case">
-          Chấp nhận
-        </Button>
+  if (!isRemoved)
+    return (
+      <div className="flex justify-between w-[80%] m-auto items-center mt-4">
+        <Link
+          href={`/profile/${friend.id}/about`}
+          className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+          <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
+          <p>{friend.fullName}</p>
+        </Link>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={onDeny}
+            placeholder={undefined}
+            size="md"
+            className="bg-[--delete-filter] text-black normal-case">
+            Từ chối
+          </Button>
+          <Button
+            onClick={onAccept}
+            placeholder={undefined}
+            size="md"
+            className="bg-[var(--blue-05)] normal-case">
+            Chấp nhận
+          </Button>
+        </div>
       </div>
-    </div>
-  )
+    )
 }
 
 export default function Page() {
@@ -99,7 +104,7 @@ export default function Page() {
   const params = new URLSearchParams(searchParams)
   const curPage = useRef(0)
   const [myParams, setMyParams] = useState(`?${params.toString()}`)
-  const [listFriend, setListFriend] = useState([])
+  const [friendRequests, setFriendRequests] = useState([])
   const userId = Cookies.get('userId')
   const [totalPages, setTotalPages] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -122,7 +127,7 @@ export default function Page() {
         }
       )
       .then(({ data: { friendRequests } }) => {
-        setListFriend(listFriend.concat(friendRequests))
+        setFriendRequests(friendRequests.concat(friendRequests))
       })
       .catch((err) => {})
   }
@@ -137,19 +142,23 @@ export default function Page() {
       })
       .then(({ data: { totalPages, friendRequests } }) => {
         setHasMore(totalPages > 1)
-        setListFriend(friendRequests)
+        setFriendRequests(friendRequests)
         setTotalPages(totalPages)
         setIsLoading(false)
       })
       .catch((error) => {})
   }, [myParams])
 
+  const removeFriend = useCallback((userId) => {
+    setFriendRequests((prevList) => prevList.filter((req) => req.user.id !== userId))
+  }, [])
+
   return (
     <div>
       <div className="flex flex-col gap-4 mt-6">
         {!isLoading && (
           <InfiniteScroll
-            dataLength={listFriend.length}
+            dataLength={friendRequests.length}
             next={onFetchMore}
             hasMore={hasMore}
             loader={
@@ -157,8 +166,12 @@ export default function Page() {
                 <Spinner className="h-8 w-8"></Spinner>
               </div>
             }>
-            {listFriend.map(({ user }) => (
-              <FriendListItem key={user.id} friend={user} />
+            {friendRequests.map(({ user }) => (
+              <FriendListItem
+                key={user.id}
+                friend={user}
+                onRemove={removeFriend}
+              />
             ))}
           </InfiniteScroll>
         )}
