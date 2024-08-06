@@ -383,7 +383,7 @@ export default function Page() {
             <Textarea
               size="lg"
               variant="outlined"
-              className="bg-white h-44 !border-t-blue-gray-200 focus:!border-t-gray-900"
+              className="bg-white h-96 !border-t-blue-gray-200 focus:!border-t-gray-900"
               containerProps={{
                 className: 'h-fit',
               }}

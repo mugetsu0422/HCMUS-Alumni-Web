@@ -15,7 +15,7 @@ import Pagination from '../../ui/common/pagination'
 import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
-
+import useHasAnyPermission from '@/hooks/use-has-any-permission'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
 
 interface FunctionSectionProps {
@@ -43,7 +43,10 @@ function FuntionSection({
       title: params.get('title'),
     },
   })
-
+  const hasPermissionCreate = useHasAnyPermission(
+    ['News.Create'],
+    Cookies.get('permissions') ? Cookies.get('permissions').split(',') : []
+  )
   return (
     <div className="my-5 w-full max-w-[1220px] justify-between flex flex-wrap items-end gap-5 m-auto">
       <div className="w-[800px] flex gap-5 justify-start flex-wrap">
@@ -80,13 +83,17 @@ function FuntionSection({
         />
       </div>
       <div className="flex gap-5">
-        <Link href={'/admin/news/create'}>
+
           <Button
             placeholder={undefined}
-            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white ">
-            Tạo mới
+            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white"
+            disabled={!hasPermissionCreate}
+            >
+            <Link href={'/admin/news/create'}>
+              Tạo mới
+            </Link>
           </Button>
-        </Link>
+        
 
         <Button
           onClick={() => {

@@ -16,6 +16,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons'
 
 function ForceChangePasswordForm({
   forceChangePasswordForm,
@@ -27,6 +28,23 @@ function ForceChangePasswordForm({
     getValues,
     formState: { errors },
   } = useForm()
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+
+  const toggleCurrentPasswordVisibility = () => {
+    setShowCurrentPassword((e) => !e)
+  }
+
+  const togglePasswordConfirmVisibility = () => {
+    setShowPasswordConfirm((e) => !e)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
+
   return (
     <>
       <Typography
@@ -39,18 +57,18 @@ function ForceChangePasswordForm({
       <form
         onSubmit={handleSubmit(onForceChangePasswordSubmit)}
         className="mb-2 w-80 max-w-screen-lg sm:w-96">
-        <div>
-          <div className="mb-4 flex flex-col gap-3">
-            <Typography
-              placeholder={undefined}
-              variant="h6"
-              color="blue-gray"
-              className={`${roboto.className}`}>
-              Mật khẩu hiện tại{' '}
-              <span className="text-red-700 font-bold text-lg">*</span>
-            </Typography>
+        <div className="mb-4 flex flex-col gap-3">
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={`${roboto.className}`}>
+            Mật khẩu hiện tại{' '}
+            <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
+          <div className="flex relative w-full max-w-[24rem]">
             <Input
-              type="password"
+              type={showCurrentPassword ? 'text' : 'password'}
               size="lg"
               className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-96"
               labelProps={{
@@ -62,43 +80,79 @@ function ForceChangePasswordForm({
               })}
             />
             <ErrorInput errors={errors?.currentPassword?.message} />
-          </div>
-
-          <div className="mb-4 flex flex-col gap-3">
-            <Typography
+            <Button
               placeholder={undefined}
-              variant="h6"
-              color="blue-gray"
-              className={` ${roboto.className}`}>
-              Mật khẩu mới{' '}
-              <span className="text-red-700 font-bold text-lg">*</span>
-            </Typography>
+              size="sm"
+              color="blue"
+              variant="text"
+              className="!absolute right-1 top-1.5 rounded"
+              onClick={toggleCurrentPasswordVisibility}>
+              {showCurrentPassword ? (
+                <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              ) : (
+                <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <div className="mb-4 flex flex-col gap-3">
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={` ${roboto.className}`}>
+            Mật khẩu mới{' '}
+            <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
+          <div className="mb-1 flex flex-col gap-6">
             <Input
-              type="password"
+              crossOrigin={undefined}
+              type={showPassword ? 'text' : 'password'}
+              {...register('newPassword', {
+                required: 'Vui lòng nhập mật khẩu',
+
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*!]).{8,20}$/,
+                  message:
+                    'Mật khẩu phải chứa ít nhất một chữ thường, một chữ hoa, một ký tự đặc biệt và có độ dài từ 8 đến 20 ký tự',
+                },
+              })}
               size="lg"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              className="!border-t-blue-gray-200 focus:!border-t-gray-900 w-full"
               labelProps={{
                 className: 'before:content-none after:content-none',
               }}
-              crossOrigin={undefined}
-              {...register('newPassword', {
-                required: 'Vui lòng nhập mật khẩu',
-              })}
             />
-            <ErrorInput errors={errors?.newPassword?.message} />
-          </div>
-
-          <div className="mb-4 flex flex-col gap-3">
-            <Typography
+            <Button
               placeholder={undefined}
-              variant="h6"
-              color="blue-gray"
-              className={` ${roboto.className}`}>
-              Nhập lại mật khẩu mới{' '}
-              <span className="text-red-700 font-bold text-lg">*</span>
-            </Typography>
+              size="sm"
+              color="blue"
+              variant="text"
+              className="!absolute right-1 top-1.5 rounded"
+              onClick={togglePasswordVisibility}>
+              {showPassword ? (
+                <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              ) : (
+                <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              )}
+            </Button>
+          </div>
+          <ErrorInput errors={errors?.newPassword?.message} />
+        </div>
+
+        <div className="mb-4 flex flex-col gap-3">
+          <Typography
+            placeholder={undefined}
+            variant="h6"
+            color="blue-gray"
+            className={` ${roboto.className}`}>
+            Nhập lại mật khẩu mới{' '}
+            <span className="text-red-700 font-bold text-lg">*</span>
+          </Typography>
+          <div className="flex relative w-full max-w-[24rem]">
             <Input
-              type="password"
+              type={showPasswordConfirm ? 'text' : 'password'}
               size="lg"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -113,6 +167,19 @@ function ForceChangePasswordForm({
               })}
             />
             <ErrorInput errors={errors?.confirmNewPassword?.message} />
+            <Button
+              placeholder={undefined}
+              size="sm"
+              color="blue"
+              variant="text"
+              className="!absolute right-1 top-1.5 rounded"
+              onClick={togglePasswordConfirmVisibility}>
+              {showPasswordConfirm ? (
+                <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              ) : (
+                <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+              )}
+            </Button>
           </div>
         </div>
 
@@ -134,6 +201,12 @@ function SigninForm({ signinForm, onSigninFormSubmit }) {
     handleSubmit,
     formState: { errors },
   } = signinForm
+
+  const [showPassword, setShowPassword] = useState(false)
+  const togglePasswordVisibility = () => {
+    setShowPassword((e) => !e)
+  }
+
   return (
     <>
       <Typography
@@ -189,18 +262,33 @@ function SigninForm({ signinForm, onSigninFormSubmit }) {
               Mật khẩu <span className="text-red-700 font-bold text-lg">*</span>
             </Typography>
             {/* Input password */}
-            <Input
-              type="password"
-              size="lg"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: 'before:content-none after:content-none',
-              }}
-              crossOrigin={undefined}
-              {...register('pass', {
-                required: 'Vui lòng nhập mật khẩu',
-              })}
-            />
+            <div className="flex relative w-full max-w-[24rem]">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                size="lg"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+                labelProps={{
+                  className: 'before:content-none after:content-none',
+                }}
+                crossOrigin={undefined}
+                {...register('pass', {
+                  required: 'Vui lòng nhập mật khẩu',
+                })}
+              />
+              <Button
+                placeholder={undefined}
+                size="sm"
+                color="blue"
+                variant="text"
+                className="!absolute right-1 top-1.5 rounded"
+                onClick={togglePasswordVisibility}>
+                {showPassword ? (
+                  <EyeFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                ) : (
+                  <EyeSlashFill className="hover:cursor-pointer text-[--blue-02] text-lg" />
+                )}
+              </Button>
+            </div>
             <ErrorInput
               // This is the error message
               errors={errors?.pass?.message}
@@ -265,19 +353,24 @@ export default function Page() {
   const onSigninFormSubmit = (data) => {
     axios
       .postForm(`${process.env.NEXT_PUBLIC_SERVER_HOST}/auth/login`, data)
-      .then(({ data: { jwt, permissions, forcePasswordChange = null } }) => {
-        if (forcePasswordChange) {
-          setEmail(data.email)
-          setIsForceChangePassword(true)
-        } else {
-          const decoded: { sub: string } = jwtDecode(jwt)
+      .then(
+        ({
+          data: { jwt, permissions, forcePasswordChange = null, roleIds },
+        }) => {
+          if (forcePasswordChange) {
+            setEmail(data.email)
+            setIsForceChangePassword(true)
+          } else {
+            const decoded: { sub: string } = jwtDecode(jwt)
 
-          Cookies.set('userId', decoded.sub, { expires: 3 })
-          Cookies.set('jwt', jwt, { expires: 3 })
-          Cookies.set('permissions', permissions, { expires: 3 })
-          router.push('/home-page')
+            Cookies.set('userId', decoded.sub, { expires: 3 })
+            Cookies.set('jwt', jwt, { expires: 3 })
+            Cookies.set('permissions', permissions, { expires: 3 })
+            Cookies.set('roleIds', roleIds, { expires: 3 })
+            router.push('/home-page')
+          }
         }
-      })
+      )
       .catch((error) => {
         toast.error(
           error.response?.data?.error?.message || 'Lỗi không xác định'

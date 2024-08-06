@@ -366,7 +366,12 @@ function AdminNavbar() {
                   <Link
                     href={`/profile/${userId}/about`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faCircleUser} className="text-xl" />
+                    <span className="w-[25px]">
+                      <FontAwesomeIcon
+                        icon={faCircleUser}
+                        className="text-xl"
+                      />
+                    </span>
                     Trang cá nhân
                   </Link>
                 </MenuItem>
@@ -375,7 +380,9 @@ function AdminNavbar() {
                   <Link
                     href={`/home-page`}
                     className="flex items-center gap-2 text-[--text-navbar] group-hover:text-[--blue-05]">
-                    <FontAwesomeIcon icon={faUser} className="" />
+                    <span className="w-[25px]">
+                      <FontAwesomeIcon icon={faUser} className="text-xl" />
+                    </span>
                     Người dùng
                   </Link>
                 </MenuItem>
@@ -384,7 +391,12 @@ function AdminNavbar() {
                   placeholder={undefined}
                   className="flex items-center gap-2 text-[--text-navbar] hover:!text-[--blue-05]"
                   onClick={handleLogout}>
-                  <FontAwesomeIcon icon={faRightFromBracket} className="" />
+                  <span className="w-[25px]">
+                    <FontAwesomeIcon
+                      icon={faRightFromBracket}
+                      className="text-xl"
+                    />
+                  </span>
                   Đăng xuất
                 </MenuItem>
               </MenuList>
