@@ -321,6 +321,7 @@ function CommentsListItem({ comment, depth }: CommentListItemProps) {
               {isOpenInputComments && (
                 <form
                   onSubmit={(e) => {
+                    setIsOpenInputComments((prev) => !prev)
                     onHandleUploadComment(e, comment.id, uploadComment)
                   }}>
                   <Textarea
