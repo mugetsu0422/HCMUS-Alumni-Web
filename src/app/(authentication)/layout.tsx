@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
       {children}
       <div className="xl:flex w-full md:w-[48%] hidden  ">
         <Image
-          className="md:h-[100%] brightness-75 blur-sm md:m-auto "
+          className="brightness-75 blur-sm md:m-auto "
           alt="Alumni Image"
           src="/authentication.png"
           width={950}
