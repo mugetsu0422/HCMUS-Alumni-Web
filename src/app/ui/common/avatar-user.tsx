@@ -7,13 +7,13 @@ import { size } from '@material-tailwind/react/types/components/avatar'
 
 export default function AvatarUser({ size }: { size?: size }) {
   const [avatarUrl, setAvatarUrl] = useState(
-    'https://storage.googleapis.com/hcmus-alumverse/images/users/avatar/none'
+    '/none-avatar.png'
   )
 
   useEffect(() => {
     const userId = Cookies.get('userId')
     setAvatarUrl(
-      `https://storage.googleapis.com/hcmus-alumverse/images/users/avatar/${userId}`
+      `https://storage.googleapis.com/hcmus-alumverse-dev/images/users/avatar/${userId}`
     )
   }, [])
 

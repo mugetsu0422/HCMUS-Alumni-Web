@@ -605,7 +605,7 @@ try {
                 ) : (
                   <>
                     <Button
-                      className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-2"
+                      className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[#e4e4e7] text-black px-4"
                       placeholder={undefined}
                       onClick={handleOpenEditVerifyInfor}>
                       <PencilFill /> Chỉnh sửa thông tin
@@ -614,7 +614,7 @@ try {
                     <Button
                       onClick={onSendRequest}
                       placeholder={undefined}
-                      className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-2">
+                      className="flex items-center gap-2 text-[10px] lg:text-[14px] normal-case bg-[--blue-05] text-white px-4">
                       <PersonCheckFill className="text-base" />
                       Yêu cầu xét duyệt
                     </Button>
