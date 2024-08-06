@@ -40,8 +40,8 @@ export default function ParticipateButton({
             placeholder={undefined}
             size="md"
             className={participateBtnClassName}>
-            Tham gia
             {isDisabled && <Spinner className="h-6 w-6"></Spinner>}
+            Tham gia
           </Button>
         ) : (
           <Button
@@ -50,8 +50,8 @@ export default function ParticipateButton({
             placeholder={undefined}
             size="md"
             className={cancelPartcipateBtnClassName}>
-            Huỷ tham gia
             {isDisabled && <Spinner className="h-6 w-6"></Spinner>}
+            Huỷ tham gia
           </Button>
         )
       ) : (

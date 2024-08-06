@@ -1,17 +1,15 @@
 'use client'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import CreatePost from '../../ui/counsel/create-post'
 import axios from 'axios'
-import { JWT_COOKIE, POST_STATUS } from '../../constant'
+import { JWT_COOKIE } from '../../constant'
 import Cookies from 'js-cookie'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import SearchAndFilter from '../../ui/counsel/search-and-filter'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@material-tailwind/react'
-import { Toaster } from 'react-hot-toast'
 import PostListItem from '../../ui/social-page/counsel/post-list-item'
-import checkPermission from '@/app/ui/common/checking-permission'
 import { roboto } from '@/app/ui/fonts'
 
 export default function Page() {
@@ -134,7 +132,7 @@ export default function Page() {
             title: params.get('title'),
           }}
         />
-        {checkPermission('Counsel.Create') && <CreatePost />}
+        <CreatePost />
         {!isLoading && (
           <InfiniteScroll
             dataLength={posts.length}

@@ -102,26 +102,6 @@ export default function EventsListItem({
             ))}
           </div>
         </div>
-        {/* {checkPermission('Event.Participant.Create') &&
-          (!isParticipated ? (
-            <Button
-              onClick={() => onClickParticipation()}
-              disabled={isDisabled}
-              placeholder={undefined}
-              size="md"
-              className="w-full lg:w-[400px] bg-[--blue-02] font-medium text-[16px]">
-              Tham gia
-            </Button>
-          ) : (
-            <Button
-              onClick={() => onClickParticipationCancel()}
-              disabled={isDisabled}
-              placeholder={undefined}
-              size="md"
-              className="w-full lg:w-[400px] bg-[#e4e6eb] text-[#4b4f56] font-medium text-[16px]">
-              Huỷ tham gia
-            </Button>
-          ))} */}
         <ParticipateButton
           requiredPermission={'Event.Participant.Create'}
           isParticipated={isParticipated}

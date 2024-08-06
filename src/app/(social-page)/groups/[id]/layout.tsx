@@ -39,6 +39,7 @@ import { JWT_COOKIE, GROUP_PRIVACY, GROUP_TABS } from '@/app/constant'
 import { nunito } from '@/app/ui/fonts'
 import NotFound404 from '@/app/ui/common/not-found-404'
 import checkPermission from '@/app/ui/common/checking-permission'
+import JoinGroupButtonDetails from '@/app/ui/social-page/groups/join-group-button-details'
 
 const GroupContext = createContext(null)
 export const useGroupContext = () => {
@@ -214,47 +215,13 @@ export default function GroupLayout({
               )}
             </div>
 
-            {checkPermission('Group.Join') &&
-              (isRequestPending ? (
-                <Button
-                  disabled={true}
-                  onClick={onClickJoinButton}
-                  size="sm"
-                  placeholder={undefined}
-                  className="h-fit text-white bg-[--blue-02] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
-                  {isJoining && <Spinner className="h-[14px] w-[14px]" />}
-                  Đang chờ duyệt
-                </Button>
-              ) : isJoined ? (
-                <Menu placement="bottom-end">
-                  <MenuHandler>
-                    <Button
-                      placeholder={undefined}
-                      className="normal-case px-4 py-2 text-[14px] h-fit bg-[--blue-04] text-[--blue-05] ">
-                      Đã tham gia
-                    </Button>
-                  </MenuHandler>
-                  <MenuList placeholder={undefined}>
-                    <MenuItem
-                      placeholder={undefined}
-                      onClick={handleOpenLeaveGroupDialog}
-                      className="flex items-center gap-1 text-black py-3">
-                      <BoxArrowInRight className="text-lg" />
-                      Rời khỏi nhóm
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              ) : (
-                <Button
-                  disabled={isJoining}
-                  onClick={onClickJoinButton}
-                  size="sm"
-                  placeholder={undefined}
-                  className="h-fit text-white bg-[--blue-02] normal-case text-[14px] w-36 flex justify-center items-center gap-2">
-                  {isJoining && <Spinner className="h-[14px] w-[14px]" />}
-                  Tham gia
-                </Button>
-              ))}
+            <JoinGroupButtonDetails
+              isRequestPending={isRequestPending}
+              isJoining={isJoining}
+              isJoined={isJoined}
+              onClickJoinButton={onClickJoinButton}
+              handleOpenLeaveGroupDialog={handleOpenLeaveGroupDialog}
+            />
           </div>
           {/*  */}
 
