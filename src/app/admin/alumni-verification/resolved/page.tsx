@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import Filter from '../../../ui/admin/verify-alumni/filter'
+import Filter from '../../../ui/admin/verify-alumni/filter-for-resovled'
 import { nunito } from '../../../ui/fonts'
 import { Button } from '@material-tailwind/react'
 import CardInformation from '../../../ui/admin/verify-alumni/card-information-resolved'
@@ -11,7 +11,7 @@ import { ADMIN_VERIFY_ALUMNI_PAGE_LIMIT, JWT_COOKIE } from '../../../constant'
 import { useSearchParams } from 'next/navigation'
 
 export default function Page() {
-  const status = 'resolved'
+  const [status, setStatus] = useState('approved')
   const searchParams = useSearchParams()
   const [myParams, setMyParams] = useState(`?status=${status}`)
   const [totalCount, setTotalCount] = useState(0)
@@ -77,12 +77,16 @@ export default function Page() {
     <div className="m-auto max-w-[1280px] flex flex-col bg-[#fafcfe] mt-[3.5vw] gap-y-3 p-4 px-10">
       <p
         className={`text-gray-900 font-bold text-lg lg:text-xl ${nunito.className}`}>
-        Cựu sinh viên đã xét duyệt - #{items.length}
+        Cựu sinh viên đã xét duyệt
       </p>
       {totalCount === 0 ? null : (
-        <Filter setMyParams={setMyParams} status={status} />
+        <Filter
+          setMyParams={setMyParams}
+          status={status}
+          setStatus={setStatus}
+        />
       )}
-      <div className="flex flex-wrap gap-5 justify-between mt-5">
+      <div className="flex flex-wrap gap-5 justify-between mt-5 overflow-x-auto">
         <CardInformation offset={offset} items={items} />
       </div>
       {offset.current + ADMIN_VERIFY_ALUMNI_PAGE_LIMIT >= itemNumber.current ||
