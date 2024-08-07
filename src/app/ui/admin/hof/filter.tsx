@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Input } from '@material-tailwind/react'
 import { useForm } from 'react-hook-form'
 import { FACULTIES } from '../../../constant'
@@ -22,10 +22,15 @@ export default function FilterAdmin({
       beginningYear: params.beginningYear || null,
     },
   })
+  const [isAdmin, setIsAdmin] = React.useState(false)
+
+  useEffect(() => {
+    setIsAdmin(isAdminLogin())
+  }, [])
 
   return (
     <div className={`w-fit flex items-end gap-5 flex-wrap`}>
-      {isAdminLogin() && (
+      {isAdmin && (
         <div className="flex flex-col gap-2">
           <p className="font-semibold text-md">Khoa</p>
           <select
