@@ -67,6 +67,7 @@ export default function Page() {
         },
       })
       .then(({ data }) => {
+        console.log(data)
         setUserBasicInfor(data.user)
         setAlumniData(data.alumni)
         setVerifyAlumni(data.alumniVerification)
@@ -113,69 +114,76 @@ export default function Page() {
       socialMediaLink: userBasicInfor?.socialMediaLink,
       facultyId: Number(data.facultyId) || null,
     }
-    
+
     const userVerification = {
       studentId: data.studentId,
       beginningYear: data.beginningYear,
       faculty: facultyData,
       socialMediaLink: userBasicInfor?.socialMediaLink,
     }
-    
-try {
-    await axios.put(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
-      { user: userData, alumni },
-      {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      }
-    )
 
-    await axios
-      .put(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-        userVerification,
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/profile`,
+        { user: userData, alumni },
         {
           headers: {
             Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
           },
         }
       )
-      .then(() => {
-        toast.success('Cập nhật thành công')
-        handleOpenEditVerifyInfor()
-        setUserBasicInfor({
-          id: userBasicInfor?.id,
-          fullName: userBasicInfor?.fullName,
-          socialMediaLink: userBasicInfor?.socialMediaLink,
-          email: userBasicInfor?.email,
-          avatarUrl: userBasicInfor?.avatarUrl,
-          phone: userBasicInfor?.phone,
-          sex: {
-            name: GENDER.find((gender) => gender.id === userBasicInfor?.sex)?.name,
-            id: userBasicInfor?.sex,
-          },
-          aboutMe: userBasicInfor?.aboutMe,
-          coverUrl: userBasicInfor?.coverUrl,
-          dob: userBasicInfor?.dob ? convertToInputDate(userBasicInfor?.dob) : '',
-          faculty: {
-            name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
-            id: data.facultyId,
-          },
+
+      await axios
+        .put(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+          userVerification,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        .then(() => {
+          toast.success('Cập nhật thành công')
+          handleOpenEditVerifyInfor()
+          setUserBasicInfor({
+            id: userBasicInfor?.id,
+            fullName: userBasicInfor?.fullName,
+            socialMediaLink: userBasicInfor?.socialMediaLink,
+            email: userBasicInfor?.email,
+            avatarUrl: userBasicInfor?.avatarUrl,
+            phone: userBasicInfor?.phone,
+            sex: {
+              name: GENDER.find((gender) => gender.id === userBasicInfor?.sex)
+                ?.name,
+              id: userBasicInfor?.sex,
+            },
+            aboutMe: userBasicInfor?.aboutMe,
+            coverUrl: userBasicInfor?.coverUrl,
+            dob: userBasicInfor?.dob
+              ? convertToInputDate(userBasicInfor?.dob)
+              : '',
+            faculty: {
+              name: FACULTIES.find((f) => f.id === data.facultyId)?.name,
+              id: data.facultyId,
+            },
+          })
+          setVerifyAlumni((prevState) => ({
+            ...prevState,
+            ...userVerification,
+          }))
         })
-        setVerifyAlumni((prevState) => ({
-          ...prevState,
-          ...userVerification,
-        }))
-      })
-      .catch((error) => {
+        .catch((error) => {
+          toast.error(
+            error?.response?.data?.error?.message || 'Lỗi không xác định'
+          )
+        })
+    } catch {
+      ;(error) =>
         toast.error(
           error?.response?.data?.error?.message || 'Lỗi không xác định'
         )
-      }) } catch {(error) =>toast.error(
-        error?.response?.data?.error?.message || 'Lỗi không xác định'
-      ) }
+    }
   }
 
   const onSubmitBasicInfor = async (data) => {
@@ -235,28 +243,48 @@ try {
 
   const onSendRequest = () => {
     const verification = {
-      avatar: userBasicInfor?.avatarUrl,
+      avatar: userBasicInfor?.avatarUrl || '',
       fullName: userBasicInfor?.fullName,
-      studentId: verifyAlumni?.studentId,
-      beginningYear: verifyAlumni?.beginningYear,
-      socialMediaLink: userBasicInfor?.socialMediaLink,
+      studentId: verifyAlumni?.studentId || '',
+      beginningYear: verifyAlumni?.beginningYear || '',
+      socialMediaLink: userBasicInfor?.socialMediaLink || '',
+      facultyId: +userBasicInfor?.faculty.id || '',
     }
-    axios
-      .postForm(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
-        verification,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(() => toast.success('Gửi yêu cầu xét duyệt lại thành công'))
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
+    if (verifyAlumni === null) {
+      axios
+        .postForm(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+          verification,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
         )
-      })
+        .then(() => toast.success(  ))
+        .catch((error) => {
+          toast.error(
+            error.response?.data?.error?.message || 'Lỗi không xác định'
+          )
+        })
+    } else {
+      axios
+        .put(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/alumni-verification`,
+          verification,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        .then(() => toast.success('Gửi yêu cầu xét duyệt thành công'))
+        .catch((error) => {
+          toast.error(
+            error.response?.data?.error?.message || 'Lỗi không xác định'
+          )
+        })
+    }
   }
 
   useEffect(() => {
