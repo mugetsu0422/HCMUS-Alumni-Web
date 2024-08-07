@@ -6,14 +6,12 @@ import Cookies from 'js-cookie'
 import { size } from '@material-tailwind/react/types/components/avatar'
 
 export default function AvatarUser({ size }: { size?: size }) {
-  const [avatarUrl, setAvatarUrl] = useState(
-    '/none-avatar.png'
-  )
+  const [avatarUrl, setAvatarUrl] = useState('/none-avatar.png')
 
   useEffect(() => {
     const userId = Cookies.get('userId')
     setAvatarUrl(
-      `https://storage.googleapis.com/hcmus-alumverse-dev/images/users/avatar/${userId}`
+      `https://storage.googleapis.com/${process.env.NEXT_PUBLIC_GCP_BUCKET_NAME}/images/users/avatar/${userId}`
     )
   }, [])
 
@@ -25,8 +23,7 @@ export default function AvatarUser({ size }: { size?: size }) {
       alt="avatar"
       onError={({ currentTarget }) => {
         currentTarget.onerror = null
-        currentTarget.src =
-          'https://storage.googleapis.com/hcmus-alumverse/images/users/avatar/none'
+        currentTarget.src = '/none-avatar.png'
       }}
     />
   )
