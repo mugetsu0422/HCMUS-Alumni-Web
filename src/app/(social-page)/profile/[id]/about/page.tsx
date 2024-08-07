@@ -217,6 +217,7 @@ export default function Page() {
         alumClass: data.alumClass,
         studentId: alumniData?.studentId,
       })
+      const facultyId = userBasicInfor?.faculty?.id
       setUserBasicInfor({
         id: userBasicInfor?.id,
         fullName: data.fullName,
@@ -232,8 +233,8 @@ export default function Page() {
         coverUrl: userBasicInfor?.coverUrl,
         dob: data.dob ? convertToInputDate(data.dob) : '',
         faculty: {
-          name: FACULTIES.find((f) => f.id === userBasicInfor?.facultyId)?.name,
-          id: userBasicInfor?.facultyId,
+          name: FACULTIES.find((f) => f.id === String(facultyId))?.name,
+          id: Number(userBasicInfor?.faculty?.id),
         },
       })
     } catch (error) {
@@ -261,7 +262,7 @@ export default function Page() {
             },
           }
         )
-        .then(() => toast.success(  ))
+        .then(() => toast.success('Gửi yêu cầu xét duyệt thành công'))
         .catch((error) => {
           toast.error(
             error.response?.data?.error?.message || 'Lỗi không xác định'
