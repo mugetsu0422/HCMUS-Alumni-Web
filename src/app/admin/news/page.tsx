@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import NewsListItem from '../../ui/admin/news/news-list-item'
 import SortHeader from '../../ui/admin/news/sort-header'
-import { Input, Button } from '@material-tailwind/react'
+import { Input, Button, Spinner } from '@material-tailwind/react'
 import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { JWT_COOKIE } from '../../constant'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -17,6 +17,7 @@ import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 import useHasAnyPermission from '@/hooks/use-has-any-permission'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
+import NoResult from '@/app/ui/common/no-results'
 
 interface FunctionSectionProps {
   onSearch: (keyword: string) => void
@@ -83,17 +84,12 @@ function FuntionSection({
         />
       </div>
       <div className="flex gap-5">
-
-          <Button
-            placeholder={undefined}
-            className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white"
-            disabled={!hasPermissionCreate}
-            >
-            <Link href={'/admin/news/create'}>
-              Tạo mới
-            </Link>
-          </Button>
-        
+        <Button
+          placeholder={undefined}
+          className="h-full font-bold normal-case text-base min-w-fit bg-[var(--blue-02)] text-white"
+          disabled={!hasPermissionCreate}>
+          <Link href={'/admin/news/create'}>Tạo mới</Link>
+        </Button>
 
         <Button
           onClick={() => {
@@ -124,6 +120,8 @@ export default function Page() {
     if (!tagNames) return []
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
+
+  const [isFetching, setIsFetching] = useState(true)
 
   const resetCurPage = () => {
     params.delete('page')
@@ -206,17 +204,25 @@ export default function Page() {
   }
 
   useEffect(() => {
-    axios
-      .get(`${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&fetchMode=MANAGEMENT`, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-        },
-      })
-      .then(({ data: { totalPages, news } }) => {
+    const fetchData = async () => {
+      setIsFetching(true)
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&fetchMode=MANAGEMENT`,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        const { totalPages, news } = response.data
         setTotalPages(totalPages)
         setNews(news)
-      })
-      .catch((error) => {})
+        setIsFetching(false)
+      } catch (error) {}
+    }
+
+    fetchData()
   }, [myParams])
 
   return (
@@ -234,43 +240,52 @@ export default function Page() {
         onDeleteTags={onDeleteTags}
       />
 
-      <div className="overflow-x-auto">
-        <SortHeader onOrder={onOrder} />
-        <div className="relative mb-10">
-          {news.map(
-            ({
-              id,
-              title,
-              thumbnail,
-              views,
-              status,
-              publishedAt,
-              faculty,
-              tags,
-            }) => (
-              <NewsListItem
-                key={id}
-                name={title}
-                imgSrc={thumbnail}
-                status={status}
-                views={views}
-                id={id}
-                publishedAt={publishedAt}
-                faculty={faculty}
-                tags={tags}
-              />
-            )
-          )}
+      {isFetching ? (
+        <div className="w-full flex justify-center items-center">
+          <Spinner className="h-8 w-8"></Spinner>
         </div>
-      </div>
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          curPage={curPage}
-          onNextPage={onNextPage}
-          onPrevPage={onPrevPage}
-        />
+      ) : (
+        <div className="overflow-x-auto">
+          {news.length > 0 && <SortHeader onOrder={onOrder} />}
+          <div className="relative mb-10">
+            {news.map(
+              ({
+                id,
+                title,
+                thumbnail,
+                views,
+                status,
+                publishedAt,
+                faculty,
+                tags,
+              }) => (
+                <NewsListItem
+                  key={id}
+                  name={title}
+                  imgSrc={thumbnail}
+                  status={status}
+                  views={views}
+                  id={id}
+                  publishedAt={publishedAt}
+                  faculty={faculty}
+                  tags={tags}
+                />
+              )
+            )}
+          </div>
+        </div>
       )}
+      {!isFetching &&
+        (totalPages > 1 ? (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        ) : (
+          <NoResult message="Không tìm thấy tin tức nào" />
+        ))}
     </div>
   )
 }

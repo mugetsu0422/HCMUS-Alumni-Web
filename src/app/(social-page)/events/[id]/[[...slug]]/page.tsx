@@ -492,9 +492,9 @@ export default function Page({
                   onParticipate={onParticipate}
                   onCancelParticipation={onCancelParticipation}
                   eventId={params.id}
-                  participateBtnClassName={`flex justify-center items-center gap-2 bg-[--blue-02] font-bold w-full text-[16px]`}
-                  cancelPartcipateBtnClassName={`flex justify-center items-center gap-2 bg-[#e4e6eb] text-[#4b4f56] font-bold w-full text-[16px]`}
-                  requiredBtnClassName={`py-3 px-6 bg-[#e4e6eb] text-[#4b4f56] normal-case w-full text-[16px]`}
+                  participateBtnClassName={`flex justify-center items-center gap-2 bg-[--blue-02] font-bold w-full max-w-[300px] text-[16px]`}
+                  cancelPartcipateBtnClassName={`flex justify-center items-center gap-2 bg-[#e4e6eb] text-[#4b4f56] font-bold w-full max-w-[300px] text-[16px]`}
+                  requiredBtnClassName={`py-3 px-6 bg-[#e4e6eb] text-[#4b4f56] normal-case w-full max-w-[300px] text-[16px]`}
                 />
               </div>
             </div>
