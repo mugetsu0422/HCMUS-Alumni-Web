@@ -24,6 +24,8 @@ import { XLg, HandThumbsUpFill } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { nunito } from '../fonts'
 import checkPermission from './checking-permission'
+import delay from '@/helper/delay'
+import toast from 'react-hot-toast'
 
 const PollContext = createContext(null)
 
@@ -97,6 +99,8 @@ function UserVotesDialog({
 }
 
 function VoteOption({ voteId, name }) {
+  const [isDisabled, setIsDisabled] = useState(false) // Prevent multiple click
+
   const {
     allowMultipleVotes,
     totalVoteCount,
@@ -110,13 +114,18 @@ function VoteOption({ voteId, name }) {
   const commonProps = {
     name: `${postId}-${voteId}`,
     id: `${postId}-${voteId}`,
-    className: 'h-6 w-6 hover:before:opacity-0',
+    className: 'h-6 w-6 border hover:before:opacity-0',
     containerProps: {
       className: 'p-0',
     },
-    onClick: () => handleVote(allowMultipleVotes, voteId),
+    onClick: async () => {
+      setIsDisabled(true)
+      await handleVote(allowMultipleVotes, voteId)
+      setIsDisabled(false)
+    },
     onChange: () => {},
     checked: selectedVoteIds.has(voteId),
+    disabled: isDisabled,
   }
 
   return (
@@ -126,19 +135,9 @@ function VoteOption({ voteId, name }) {
         htmlFor={`${postId}-${voteId}`}>
         {checkPermission('Counsel.Vote') &&
           (allowMultipleVotes ? (
-            <Checkbox
-              color="blue"
-              crossOrigin={undefined}
-              {...commonProps}
-              className="border-2"
-            />
+            <Checkbox color="blue" crossOrigin={undefined} {...commonProps} />
           ) : (
-            <Radio
-              color="blue"
-              crossOrigin={undefined}
-              {...commonProps}
-              className="border-2"
-            />
+            <Radio color="blue" crossOrigin={undefined} {...commonProps} />
           ))}
         <span className="text-black">{name}</span>
       </label>
@@ -165,11 +164,11 @@ function VoteOption({ voteId, name }) {
 }
 
 function AddNewVoteOptionInput() {
-  const { onAddVoteOption } = useContext(PollContext)
+  const { handleAddVoteOption } = useContext(PollContext)
   const { register, handleSubmit, reset } = useForm()
 
   const onSubmit = (data) => {
-    onAddVoteOption(data)
+    handleAddVoteOption(data)
     reset()
   }
 
@@ -195,15 +194,35 @@ function AddNewVoteOptionInput() {
 export default function Poll({
   allowMultipleVotes,
   allowAddOptions,
-  votes,
-  totalVoteCount,
-  selectedVoteIds,
-  votesCount,
-  handleVote,
+  votes: initialVotes,
+  onVote,
+  onChangeVote,
+  onRemoveVote,
   onAddVoteOption,
   postId,
   onFetchUserVotes,
 }) {
+  const [votes, setVotes] = useState(initialVotes)
+  const [totalVoteCount, setTotalVoteCount] = useState(() => {
+    if (!initialVotes) return 0
+    return initialVotes.reduce((acc, cur) => acc + cur.voteCount, 0)
+  })
+  const [votesCount, setVotesCount] = useState(() => {
+    const map = new Map()
+    if (!initialVotes) return map
+    initialVotes.forEach(({ id: { voteId }, voteCount }) => {
+      map.set(voteId, voteCount)
+    })
+    return map
+  })
+  const [selectedVoteIds, setSelectedVoteIds] = useState<Set<number>>(() => {
+    const set = new Set<number>()
+    initialVotes.forEach(({ isVoted, id: { voteId } }) => {
+      if (isVoted) set.add(voteId)
+    })
+    return set
+  })
+
   const [openUserVotesDialog, setOpenUserVotesDialog] = useState(false)
   const [currentDialogVoteId, setCurrentDialogVoteId] = useState(0)
   const [userVotes, setUserVotes] = useState([])
@@ -218,22 +237,25 @@ export default function Poll({
     voteOptionName: string,
     voteCount: number
   ) => {
-    if (!openUserVotesDialog && voteId != currentDialogVoteId) {
-      try {
-        const {
-          data: { users },
-        } = await onFetchUserVotes(postId, voteId)
-        setDialogHasMore(users.length > 0)
-        setUserVotes(users)
-      } catch (error) {}
+    setOpenUserVotesDialog((prev) => !prev)
 
+    if (!openUserVotesDialog && voteId != currentDialogVoteId) {
+      setUserVotes([])
+      setDialogHasMore(true)
       dialogPage.current = 0
       setCurrentDialogVoteId(voteId)
       setCurrentDialogVoteOptionName(voteOptionName)
       setCurrentDialogVoteCount(voteCount)
-    }
 
-    setOpenUserVotesDialog((prev) => !prev)
+      try {
+        const {
+          data: { users },
+        } = await onFetchUserVotes(postId, voteId)
+
+        setDialogHasMore(users.length > 0)
+        setUserVotes(users)
+      } catch (error) {}
+    }
   }
 
   const handleFetchMoreUserVotes = async () => {
@@ -254,6 +276,78 @@ export default function Poll({
     } catch (error) {}
   }
 
+  const handleVote = async (allowMultipleVotes: boolean, voteId: number) => {
+    try {
+      if (selectedVoteIds.has(voteId)) {
+        // Delete
+        selectedVoteIds.delete(voteId)
+        setSelectedVoteIds(new Set(selectedVoteIds))
+
+        await onRemoveVote(voteId)
+
+        setTotalVoteCount((old) => old - 1)
+        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
+        setVotesCount(temp)
+      } else {
+        if (allowMultipleVotes) {
+          // Add vote
+          selectedVoteIds.add(voteId)
+          setSelectedVoteIds(new Set(selectedVoteIds))
+
+          await onVote(voteId)
+
+          setTotalVoteCount((old) => old + 1)
+          const temp = new Map(
+            votesCount.set(voteId, votesCount.get(voteId) + 1)
+          )
+          setVotesCount(temp)
+        } else {
+          if (selectedVoteIds.size) {
+            // Update vote
+            const oldVoteId = Array.from(selectedVoteIds)[0]
+            selectedVoteIds.clear()
+            selectedVoteIds.add(voteId)
+            setSelectedVoteIds(new Set(selectedVoteIds))
+
+            await onChangeVote(oldVoteId, voteId)
+
+            votesCount.set(oldVoteId, votesCount.get(oldVoteId) - 1)
+            votesCount.set(voteId, votesCount.get(voteId) + 1)
+            const temp = new Map(votesCount)
+            setVotesCount(temp)
+          } else {
+            // Add vote
+            selectedVoteIds.add(voteId)
+            setSelectedVoteIds(new Set(selectedVoteIds))
+
+            await onVote(voteId)
+
+            setTotalVoteCount((old) => old + 1)
+            const temp = new Map(
+              votesCount.set(voteId, votesCount.get(voteId) + 1)
+            )
+            setVotesCount(temp)
+          }
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+    }
+  }
+  const handleAddVoteOption = async (data) => {
+    try {
+      const {
+        data: { vote },
+      } = await onAddVoteOption({ name: data.name })
+      setVotes((old) => [...old, vote])
+
+      votesCount.set(vote.id.voteId, 0)
+      setVotesCount(new Map(votesCount))
+    } catch (error) {
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
+    }
+  }
+
   return (
     <PollContext.Provider
       value={{
@@ -262,7 +356,7 @@ export default function Poll({
         selectedVoteIds,
         votesCount,
         handleVote,
-        onAddVoteOption,
+        handleAddVoteOption,
         postId,
         handleOpenUserVotesDialog,
         handleFetchMoreUserVotes,

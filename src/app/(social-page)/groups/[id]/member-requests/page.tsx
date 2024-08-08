@@ -72,7 +72,7 @@ export default function Page({ params }: { params: { id: string } }) {
         }
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

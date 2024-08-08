@@ -110,7 +110,7 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Cập nhật vai trò thành công')
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
   const onRemoveMember = (userId: string) => {
@@ -127,7 +127,7 @@ export default function Page({ params }: { params: { id: string } }) {
         toast.success('Xóa thành viên thành công')
       })
       .catch((error) => {
-        toast.error(error.response?.data?.error?.message.error?.message || 'Lỗi không xác định')
+        toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
       })
   }
 

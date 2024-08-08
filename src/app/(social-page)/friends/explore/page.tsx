@@ -16,6 +16,8 @@ function FriendListItem({ users }) {
   const [isDelete, setIsDelete] = useState(false)
 
   const onRequest = () => {
+    setIsDelete(true)
+
     const data = {
       friendId: users.id,
     }
@@ -31,7 +33,6 @@ function FriendListItem({ users }) {
       )
       .then(() => {
         toast.success('Gửi lời mời bạn thành công')
-        setIsDelete(true)
       })
       .catch((error) => {
         toast.error(

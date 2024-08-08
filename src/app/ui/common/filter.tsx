@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FACULTIES } from '../../constant'
 import styles from '@/app/ui/common/react-tag-autocomplete.module.css'
@@ -25,10 +25,15 @@ export default function Filter({
       facultyId: params.facultyId || 0,
     },
   })
+  const [isAdmin, setIsAdmin] = React.useState(false)
+
+  useEffect(() => {
+    setIsAdmin(isAdminLogin())
+  }, [])
 
   return (
     <div className={`w-full flex items-end gap-5 flex-wrap`}>
-      {isAdminLogin() && (
+      {isAdmin && (
         <div className="flex flex-col gap-2">
           <p className="font-semibold text-md">Khoa</p>
           <select

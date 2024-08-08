@@ -25,6 +25,8 @@ function FriendListItem({ friend }) {
   const [isDeleted, setIsDeleted] = useState(false)
 
   const handleDeleteFriend = () => {
+    setIsDeleted(true)
+
     axios
       .delete(
         `${process.env.NEXT_PUBLIC_SERVER_HOST}/user/friends/${friend.id}`,
@@ -36,7 +38,6 @@ function FriendListItem({ friend }) {
       )
       .then(() => {
         toast.success('Xóa bạn bè thành công')
-        setIsDeleted(true)
       })
       .catch((error) => {
         toast.error(
