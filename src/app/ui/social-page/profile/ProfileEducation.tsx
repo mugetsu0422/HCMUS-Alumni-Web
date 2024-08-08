@@ -20,6 +20,16 @@ import { useForm } from 'react-hook-form'
 import ErrorInput from '@/app/ui/error-input'
 import toast from 'react-hot-toast'
 
+function getTodayDate() {
+  const today = new Date()
+
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function DialogAddEducation({
   openDialogAddEducation,
   handleOpenDialogAddEducation,
@@ -106,8 +116,7 @@ export function DialogAddEducation({
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="startTime"
               type="month"
-              //min={todayString}
-              //defaultValue={tomorrowString}
+              max={getTodayDate()}
               onFocus={(e) => e.target.showPicker()}
               //onChange={(e) => onChange({ date: e.target.value })}
               {...register('startTime', {})}
@@ -124,8 +133,7 @@ export function DialogAddEducation({
               className="w-fit my-3 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:cursor-not-allowed transition-all border focus:border-2 px-3 py-3 rounded-md border-blue-gray-200 focus:border-gray-900"
               id="endTime"
               type="month"
-              //min={todayString}
-              //defaultValue={tomorrowString}
+              max={getTodayDate()}
               onFocus={(e) => e.target.showPicker()}
               //onChange={(e) => onChange({ date: e.target.value })}
               {...register('endTime', {})}
@@ -269,6 +277,7 @@ function DialogEditEducation({
               type="month"
               defaultValue={convertToMonthInputValue(educationData.startTime)}
               onFocus={(e) => e.target.showPicker()}
+              max={getTodayDate()}
               {...register('startTime', {})}
             />
           </div>
@@ -285,6 +294,7 @@ function DialogEditEducation({
               type="month"
               defaultValue={convertToMonthInputValue(educationData.endTime)}
               onFocus={(e) => e.target.showPicker()}
+              max={getTodayDate()}
               {...register('endTime', {})}
             />
           </div>

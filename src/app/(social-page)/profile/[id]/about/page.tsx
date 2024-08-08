@@ -288,6 +288,16 @@ export default function Page() {
     }
   }
 
+  function getTodayDate() {
+    const today = new Date()
+
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+  }
+
   useEffect(() => {
     setIsMounted(true)
     return () => {
@@ -487,6 +497,7 @@ export default function Page() {
                 defaultValue={
                   userBasicInfor?.dob && convertToInputDate(userBasicInfor?.dob)
                 }
+                max={getTodayDate()}
                 onFocus={(e) => e.target.showPicker()}
                 {...register('dob', {})}
               />

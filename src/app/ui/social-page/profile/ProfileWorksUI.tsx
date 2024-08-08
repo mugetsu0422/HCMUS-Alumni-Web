@@ -21,6 +21,16 @@ import ErrorInput from '@/app/ui/error-input'
 import toast from 'react-hot-toast'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 
+function getTodayDate() {
+  const today = new Date()
+
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function DialogAddWorks({
   openDialogAddWorks,
   handleOpenDialogAddWorks,
@@ -117,6 +127,7 @@ export function DialogAddWorks({
                 type="month"
                 defaultValue={tomorrowString}
                 onFocus={(e) => e.target.showPicker()}
+                max={getTodayDate()}
                 //onChange={(e) => onChange({ date: e.target.value })}
                 {...register('startTime', {})}
               />
@@ -134,6 +145,8 @@ export function DialogAddWorks({
                 type="month"
                 defaultValue={tomorrowString}
                 onFocus={(e) => e.target.showPicker()}
+                max={getTodayDate()}
+                //disabled
                 //onChange={(e) => onChange({ date: e.target.value })}
                 {...register('endTime', {})}
               />
@@ -294,6 +307,7 @@ function DialogEditWorks({
                 type="month"
                 defaultValue={convertToMonthInputValue(jobData.startTime)}
                 onFocus={(e) => e.target.showPicker()}
+                max={getTodayDate()}
                 {...register('startTime', {})}
               />
             </div>
@@ -310,6 +324,7 @@ function DialogEditWorks({
                 type="month"
                 defaultValue={convertToMonthInputValue(jobData.endTime)}
                 onFocus={(e) => e.target.showPicker()}
+                max={getTodayDate()}
                 {...register('endTime', {})}
               />
             </div>

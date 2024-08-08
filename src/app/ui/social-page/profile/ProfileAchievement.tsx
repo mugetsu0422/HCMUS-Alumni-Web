@@ -19,6 +19,16 @@ import moment from 'moment'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+function getTodayDate() {
+  const today = new Date()
+
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function DialogAddAchievements({
   openDialogAdd,
   handleOpenDialogAdd,
@@ -111,6 +121,7 @@ export function DialogAddAchievements({
               id="achievementTime"
               type="month"
               //defaultValue={tomorrowString}
+              max={getTodayDate()}
               onFocus={(e) => e.target.showPicker()}
               //onChange={(e) => onChange({ date: e.target.value })}
               {...register('achievementTime', {})}
@@ -259,6 +270,7 @@ function DialogEditAchievements({
               defaultValue={convertToMonthInputValue(
                 achivementData?.achievementTime
               )}
+              max={getTodayDate()}
               onFocus={(e) => e.target.showPicker()}
               //onChange={(e) => onChange({ date: e.target.value })}
               {...register('achievementTime', {})}
