@@ -114,7 +114,7 @@ function VoteOption({ voteId, name }) {
   const commonProps = {
     name: `${postId}-${voteId}`,
     id: `${postId}-${voteId}`,
-    className: 'h-6 w-6 hover:before:opacity-0',
+    className: 'h-6 w-6 border hover:before:opacity-0',
     containerProps: {
       className: 'p-0',
     },
@@ -139,14 +139,12 @@ function VoteOption({ voteId, name }) {
               color="blue"
               crossOrigin={undefined}
               {...commonProps}
-              className="border-2"
             />
           ) : (
             <Radio
               color="blue"
               crossOrigin={undefined}
               {...commonProps}
-              className="border-2"
             />
           ))}
         <span className="text-black">{name}</span>
