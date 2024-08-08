@@ -12,9 +12,10 @@ import Link from 'next/link'
 import axios from 'axios'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
 import Cookies from 'js-cookie'
-import { Button, Input } from '@material-tailwind/react'
+import { Button, Input, Spinner } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFilterCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import NoResult from '@/app/ui/common/no-results'
 
 const PAGE_SIZE = 9
 
@@ -161,6 +162,8 @@ export default function Page() {
   )
   const [hof, setHof] = useState([])
 
+  const [isFetching, setIsFetching] = useState(true)
+
   const resetCurPage = () => {
     params.delete('page')
     setCurPage(1)
@@ -225,23 +228,29 @@ export default function Page() {
   }
 
   useEffect(() => {
-    // Hof list
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&statusId=${POST_STATUS['Bình thường']}`,
-        {
-          headers: Cookies.get(JWT_COOKIE)
-            ? {
-                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-              }
-            : null,
-        }
-      )
-      .then(({ data: { totalPages, hof } }) => {
+    const fetchData = async () => {
+      setIsFetching(true)
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&statusId=${POST_STATUS['Bình thường']}`,
+          {
+            headers: Cookies.get(JWT_COOKIE)
+              ? {
+                  Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+                }
+              : null,
+          }
+        )
+        const { totalPages, hof } = response.data
         setTotalPages(totalPages)
         setHof(hof)
-      })
-      .catch((error) => {})
+        setIsFetching(false)
+      } catch (error) {
+        // Handle error
+      }
+    }
+
+    fetchData()
   }, [myParams])
 
   return (
@@ -262,19 +271,29 @@ export default function Page() {
             beginningYear: params.get('beginningYear'),
           }}
         />
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-10 gap-y-6">
-          {hof.map((hof) => (
-            <HofListItem key={hof.id} hof={hof} />
-          ))}
-        </div>
-        {totalPages > 1 && (
-          <Pagination
-            totalPages={totalPages}
-            curPage={curPage}
-            onNextPage={onNextPage}
-            onPrevPage={onPrevPage}
-          />
+        {isFetching ? (
+          <div className="w-full flex justify-center items-center">
+            <Spinner className="h-8 w-8"></Spinner>
+          </div>
+        ) : (
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-10 gap-y-6">
+            {hof.map((hof) => (
+              <HofListItem key={hof.id} hof={hof} />
+            ))}
+          </div>
         )}
+
+        {!isFetching &&
+          (totalPages > 1 ? (
+            <Pagination
+              totalPages={totalPages}
+              curPage={curPage}
+              onNextPage={onNextPage}
+              onPrevPage={onPrevPage}
+            />
+          ) : (
+            <NoResult message="Không tìm thấy gương thành công nào" />
+          ))}
       </div>
     </div>
   )

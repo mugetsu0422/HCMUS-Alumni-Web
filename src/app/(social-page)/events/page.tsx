@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import EventsListItem from '../../ui/social-page/events/events-list-item'
 import Pagination from '../../ui/common/pagination'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
@@ -10,7 +10,8 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { roboto } from '../../ui/fonts'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
-import toast, { Toaster } from 'react-hot-toast'
+import { Spinner } from '@material-tailwind/react'
+import NoResult from '@/app/ui/common/no-results'
 
 export default function Page() {
   const pathname = usePathname()
@@ -27,6 +28,8 @@ export default function Page() {
     if (!tagNames) return []
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
+
+  const [isFetching, setIsFetching] = useState(true)
 
   const resetCurPage = () => {
     params.delete('page')
@@ -125,28 +128,34 @@ export default function Page() {
   }
 
   useEffect(() => {
-    // Events list
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&statusId=${POST_STATUS['Bình thường']}`,
-        {
-          headers: Cookies.get(JWT_COOKIE)
-            ? {
-                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-              }
-            : null,
-        }
-      )
-      .then(({ data: { totalPages, events } }) => {
+    const fetchData = async () => {
+      setIsFetching(true)
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&statusId=${POST_STATUS['Bình thường']}`,
+          {
+            headers: Cookies.get(JWT_COOKIE)
+              ? {
+                  Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+                }
+              : null,
+          }
+        )
+        const { totalPages, events } = response.data
         setTotalPages(totalPages)
         setEvents(events)
-      })
-      .catch((error) => {})
+        setIsFetching(false)
+      } catch (error) {
+        // Handle error
+      }
+    }
+
+    fetchData()
   }, [myParams])
 
   return (
     <>
-      <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto mb-8 px-10">
+      <div className="max-w-[1200px] flex flex-col xl:flex-row justify-center gap-x-8 m-auto px-10">
         <div className="w-full flex justify-center flex-col gap-y-6 mt-10">
           <p
             className={`${roboto.className} ml-5 lg:ml-0 text-3xl font-bold text-[var(--blue-02)]`}>
@@ -166,25 +175,34 @@ export default function Page() {
             }}
           />
           <div className="flex flex-col gap-6 justify-center mt-4">
-            {events.map((event) => (
-              <EventsListItem
-                key={event.id}
-                event={event}
-                onParticipate={onParticipateEvent}
-                onCancelParticipation={onCancelEventParticipation}
-              />
-            ))}
+            {isFetching ? (
+              <div className="w-full flex justify-center items-center">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            ) : (
+              events.map((event) => (
+                <EventsListItem
+                  key={event.id}
+                  event={event}
+                  onParticipate={onParticipateEvent}
+                  onCancelParticipation={onCancelEventParticipation}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          curPage={curPage}
-          onNextPage={onNextPage}
-          onPrevPage={onPrevPage}
-        />
-      )}
+      {!isFetching &&
+        (totalPages > 1 ? (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        ) : (
+          <NoResult message="Không tìm thấy sự kiện nào" />
+        ))}
     </>
   )
 }

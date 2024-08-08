@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Input, Button } from '@material-tailwind/react'
+import { Input, Button, Spinner } from '@material-tailwind/react'
 import { roboto } from '../../ui/fonts'
 import { useForm } from 'react-hook-form'
 import { JWT_COOKIE } from '../../constant'
@@ -17,6 +17,7 @@ import HofListItem from '../../ui/admin/hof/hof-list-item'
 import FilterAdmin from '../../ui/admin/hof/filter'
 import Link from 'next/link'
 import useHasAnyPermission from '@/hooks/use-has-any-permission'
+import NoResult from '@/app/ui/common/no-results'
 
 function FuntionSection({
   onSearch,
@@ -101,6 +102,8 @@ export default function Page() {
   const [totalPages, setTotalPages] = useState(1)
   const [hof, setHof] = useState([])
 
+  const [isFetching, setIsFetching] = useState(true)
+
   const resetCurPage = () => {
     params.delete('page')
     setCurPage(1)
@@ -170,24 +173,28 @@ export default function Page() {
   }, 500)
 
   useEffect(() => {
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&fetchMode=MANAGEMENT`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { totalPages, hof } }) => {
+    const fetchData = async () => {
+      setIsFetching(true)
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/hof${myParams}&fetchMode=MANAGEMENT`,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        const { totalPages, hof } = response.data
         setTotalPages(totalPages)
         setHof(hof)
-      })
-      .catch((error) => {})
+        setIsFetching(false)
+      } catch (error) {}
+    }
+    fetchData()
   }, [myParams])
 
   return (
-    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw] overflow-x-auto">
+    <div className="flex flex-col sm:justify-center lg:justify-start m-auto max-w-[90%] mt-[3vw]">
       <p
         className={`${roboto.className} mx-auto w-full max-w-[1450px] text-3xl font-bold text-[var(--blue-01)]`}>
         Quản lý gương thành công
@@ -199,24 +206,32 @@ export default function Page() {
         onFilterFaculties={onFilterFaculties}
         onFilterBeginningYear={onFilterBeginningYear}
       />
-
-      <div className="overflow-x-auto">
-        <SortHeader onOrder={onOrder} />
-        <div className="relative mb-10">
-          {hof.map((hof) => (
-            <HofListItem key={hof.id} hof={hof} />
-          ))}
+      {isFetching ? (
+        <div className="w-full flex justify-center items-center">
+          <Spinner className="h-8 w-8"></Spinner>
         </div>
-      </div>
-
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          curPage={curPage}
-          onNextPage={onNextPage}
-          onPrevPage={onPrevPage}
-        />
+      ) : (
+        <div className="overflow-x-auto">
+          {hof.length > 0 && <SortHeader onOrder={onOrder} />}
+          <div className="relative mb-10">
+            {hof.map((hof) => (
+              <HofListItem key={hof.id} hof={hof} />
+            ))}
+          </div>
+        </div>
       )}
+
+      {!isFetching &&
+        (totalPages > 1 ? (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        ) : (
+          <NoResult message="Không tìm thấy gương thành công nào" />
+        ))}
     </div>
   )
 }

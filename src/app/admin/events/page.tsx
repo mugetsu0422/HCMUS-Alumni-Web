@@ -1,6 +1,6 @@
 'use client'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Input, Button } from '@material-tailwind/react'
+import { Input, Button, Spinner } from '@material-tailwind/react'
 import { ArrowCounterclockwise, Search } from 'react-bootstrap-icons'
 import { roboto } from '../../ui/fonts'
 import Pagination from '../../ui/common/pagination'
@@ -16,6 +16,7 @@ import FilterAdmin from '../../ui/common/filter'
 import Link from 'next/link'
 import { TagSelected, Tag } from 'react-tag-autocomplete'
 import useHasAnyPermission from '@/hooks/use-has-any-permission'
+import NoResult from '@/app/ui/common/no-results'
 
 // Mode 3: Fetch all events
 const FETCH_MODE = 3
@@ -125,6 +126,8 @@ export default function Page() {
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
 
+  const [isFetching, setIsFetching] = useState(true)
+
   const resetCurPage = () => {
     params.delete('page')
     setCurPage(1)
@@ -209,20 +212,24 @@ export default function Page() {
   }
 
   useEffect(() => {
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&fetchMode=MANAGEMENT`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { totalPages, events } }) => {
+    const fechtData = async () => {
+      setIsFetching(true)
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/events${myParams}&fetchMode=MANAGEMENT`,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+            },
+          }
+        )
+        const { totalPages, events } = response.data
         setTotalPages(totalPages)
         setEvents(events)
-      })
-      .catch((error) => {})
+        setIsFetching(false)
+      } catch (error) {}
+    }
+    fechtData()
   }, [myParams])
 
   return (
@@ -240,49 +247,58 @@ export default function Page() {
         onDeleteTags={onDeleteTags}
       />
 
-      <div className="overflow-x-auto">
-        <SortHeader onOrder={onOrder} />
-        <div className="relative mb-10">
-          {events.map(
-            ({
-              id,
-              title,
-              thumbnail,
-              participants,
-              organizationLocation,
-              organizationTime,
-              status,
-              tags,
-              faculty,
-              minimumParticipants,
-              maximumParticipants,
-            }) => (
-              <EventsListItem
-                key={id}
-                id={id}
-                title={title}
-                thumbnail={thumbnail}
-                participants={participants}
-                organizationLocation={organizationLocation}
-                organizationTime={organizationTime}
-                status={status}
-                tags={tags}
-                faculty={faculty}
-                minimumParticipants={minimumParticipants}
-                maximumParticipants={maximumParticipants}
-              />
-            )
-          )}
+      {isFetching ? (
+        <div className="w-full flex justify-center items-center">
+          <Spinner className="h-8 w-8"></Spinner>
         </div>
-      </div>
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          curPage={curPage}
-          onNextPage={onNextPage}
-          onPrevPage={onPrevPage}
-        />
+      ) : (
+        <div className="overflow-x-auto">
+          {events.length > 0 && <SortHeader onOrder={onOrder} />}
+          <div className="relative mb-10">
+            {events.map(
+              ({
+                id,
+                title,
+                thumbnail,
+                participants,
+                organizationLocation,
+                organizationTime,
+                status,
+                tags,
+                faculty,
+                minimumParticipants,
+                maximumParticipants,
+              }) => (
+                <EventsListItem
+                  key={id}
+                  id={id}
+                  title={title}
+                  thumbnail={thumbnail}
+                  participants={participants}
+                  organizationLocation={organizationLocation}
+                  organizationTime={organizationTime}
+                  status={status}
+                  tags={tags}
+                  faculty={faculty}
+                  minimumParticipants={minimumParticipants}
+                  maximumParticipants={maximumParticipants}
+                />
+              )
+            )}
+          </div>
+        </div>
       )}
+      {!isFetching &&
+        (totalPages > 1 ? (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        ) : (
+          <NoResult message="Không tìm thấy sự kiện nào" />
+        ))}
     </div>
   )
 }

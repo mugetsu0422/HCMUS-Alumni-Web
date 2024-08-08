@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 import { JWT_COOKIE, POST_STATUS } from '../../constant'
@@ -11,6 +11,8 @@ import Pagination from '../../ui/common/pagination'
 import { roboto } from '../../ui/fonts'
 import SearchAndFilterFaculty from '../../ui/social-page/common/filter-and-search'
 import NewsListItem from '../../ui/social-page/news/news-litst-item'
+import { Spinner } from '@material-tailwind/react'
+import NoResult from '@/app/ui/common/no-results'
 
 export default function Page() {
   const pathname = usePathname()
@@ -27,6 +29,8 @@ export default function Page() {
     if (!tagNames) return []
     return tagNames.split(',').map((tag) => ({ value: tag, label: tag }))
   })
+
+  const [isFetching, setIsFetching] = useState(true)
 
   const resetCurPage = () => {
     params.delete('page')
@@ -106,22 +110,29 @@ export default function Page() {
 
   useEffect(() => {
     // News list
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&statusId=${POST_STATUS['Bình thường']}`,
-        {
-          headers: Cookies.get(JWT_COOKIE)
-            ? {
-                Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-              }
-            : null,
-        }
-      )
-      .then(({ data: { totalPages, news } }) => {
+    const fetchData = async () => {
+      setIsFetching(true)
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_HOST}/news${myParams}&statusId=${POST_STATUS['Bình thường']}`,
+          {
+            headers: Cookies.get(JWT_COOKIE)
+              ? {
+                  Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+                }
+              : null,
+          }
+        )
+        const { totalPages, news } = response.data
         setTotalPages(totalPages)
         setNews(news)
-      })
-      .catch((error) => {})
+        setIsFetching(false)
+      } catch (error) {
+        // Handle error here
+      }
+    }
+
+    fetchData()
   }, [myParams])
 
   return (
@@ -146,31 +157,49 @@ export default function Page() {
               facultyId: params.get('facultyId'),
             }}
           />
-
-          {news.map(
-            ({ id, title, summary, publishedAt, faculty, tags, thumbnail }) => (
-              <NewsListItem
-                id={id}
-                key={id}
-                title={title}
-                summary={summary}
-                publishedAt={publishedAt}
-                faculty={faculty}
-                tags={tags}
-                thumbnail={thumbnail}
-              />
-            )
-          )}
+          <div className="flex flex-col gap-6 justify-center mt-4">
+            {isFetching ? (
+              <div className="w-full flex justify-center items-center">
+                <Spinner className="h-8 w-8"></Spinner>
+              </div>
+            ) : (
+              news.map(
+                ({
+                  id,
+                  title,
+                  summary,
+                  publishedAt,
+                  faculty,
+                  tags,
+                  thumbnail,
+                }) => (
+                  <NewsListItem
+                    id={id}
+                    key={id}
+                    title={title}
+                    summary={summary}
+                    publishedAt={publishedAt}
+                    faculty={faculty}
+                    tags={tags}
+                    thumbnail={thumbnail}
+                  />
+                )
+              )
+            )}
+          </div>
         </div>
       </div>
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          curPage={curPage}
-          onNextPage={onNextPage}
-          onPrevPage={onPrevPage}
-        />
-      )}
+      {!isFetching &&
+        (totalPages > 1 ? (
+          <Pagination
+            totalPages={totalPages}
+            curPage={curPage}
+            onNextPage={onNextPage}
+            onPrevPage={onPrevPage}
+          />
+        ) : (
+          <NoResult message="Không tìm thấy tin tức nào" />
+        ))}
     </>
   )
 }
