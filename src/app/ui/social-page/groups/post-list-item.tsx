@@ -368,7 +368,7 @@ export default function PostListItem({
         {/* this is the header of a post */}
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Link href="#">
+            <Link href={`/profile/${post.creator.id}`}>
               <Avatar
                 placeholder={undefined}
                 src={post.creator.avatarUrl}

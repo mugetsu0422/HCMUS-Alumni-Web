@@ -206,7 +206,7 @@ function AvatarAndCoverUser({
       <div className="absolute top-[70%] ml-[2vw] 2xl:ml-[1.5vw] lg:top-[50%] xl:top-[70%] flex flex-col items-end">
         <Avatar
           placeholder={undefined}
-          src={croppedAvatar}
+          src={croppedAvatar || '/none-avatar.png'}
           alt="user avatar"
           className="w-24 h-24 lg:w-32 lg:h-32 2xl:w-40 2xl:h-40 border-4 border-white border-radius object-cover "
         />
