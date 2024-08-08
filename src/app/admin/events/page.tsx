@@ -297,7 +297,9 @@ export default function Page() {
             onPrevPage={onPrevPage}
           />
         ) : (
-          <NoResult message="Không tìm thấy sự kiện nào" />
+          events.length === 0 && (
+            <NoResult message="Không tìm thấy sự kiện nào" />
+          )
         ))}
     </div>
   )

@@ -198,7 +198,7 @@ export default function Page() {
             onPrevPage={onPrevPage}
           />
         ) : (
-          <NoResult message="Không tìm thấy tin tức nào" />
+          news.length === 0 && <NoResult message="Không tìm thấy tin tức nào" />
         ))}
     </>
   )

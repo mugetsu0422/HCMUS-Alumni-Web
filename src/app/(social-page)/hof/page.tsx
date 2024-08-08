@@ -292,7 +292,9 @@ export default function Page() {
               onPrevPage={onPrevPage}
             />
           ) : (
-            <NoResult message="Không tìm thấy gương thành công nào" />
+            hof.length === 0 && (
+              <NoResult message="Không tìm thấy gương thành công nào" />
+            )
           ))}
       </div>
     </div>
