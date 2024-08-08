@@ -63,10 +63,6 @@ export default function Page({
   const [isReacted, setIsReacted] = useState(null)
   const [reactionCount, setReactionCount] = useState(null)
   const [reaction, setReaction] = useState([])
-  const [totalVoteCount, setTotalVoteCount] = useState(0)
-  const [votesCount, setVotesCount] = useState(new Map())
-  const [selectedVoteIds, setSelectedVoteIds] = useState<Set<number>>(null)
-  const [votes, setVotes] = useState([])
   const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
   const [isSingleComment, setIsSingleComment] = useState(false)
 
@@ -78,62 +74,6 @@ export default function Page({
     setOpenDeletePostDialog((e) => !e)
   }
 
-  const handleVote = async (allowMultipleVotes: boolean, voteId: number) => {
-    try {
-      if (selectedVoteIds.has(voteId)) {
-        // Delete
-        setTotalVoteCount((old) => old - 1)
-        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
-        setVotesCount(temp)
-        await onRemoveVote(voteId)
-
-        selectedVoteIds.delete(voteId)
-      } else {
-        if (allowMultipleVotes) {
-          // Add vote
-          await onVote(voteId)
-          setTotalVoteCount((old) => old + 1)
-          const temp = new Map(
-            votesCount.set(voteId, votesCount.get(voteId) + 1)
-          )
-          setVotesCount(temp)
-
-          selectedVoteIds.add(voteId)
-        } else {
-          if (selectedVoteIds.size) {
-            // Update vote
-            const oldVoteId = Array.from(selectedVoteIds)[0]
-
-            await onChangeVote(oldVoteId, voteId)
-            votesCount.set(oldVoteId, votesCount.get(oldVoteId) - 1)
-            votesCount.set(voteId, votesCount.get(voteId) + 1)
-            const temp = new Map(votesCount)
-            setVotesCount(temp)
-
-            selectedVoteIds.clear()
-            selectedVoteIds.add(voteId)
-            setSelectedVoteIds(new Set(selectedVoteIds))
-          } else {
-            // Add vote
-            await onVote(voteId)
-            setTotalVoteCount((old) => old + 1)
-            const temp = new Map(
-              votesCount.set(voteId, votesCount.get(voteId) + 1)
-            )
-            setVotesCount(temp)
-
-            selectedVoteIds.add(voteId)
-          }
-        }
-      }
-      setSelectedVoteIds(new Set(selectedVoteIds))
-    } catch (error) {
-      toast.error(
-        error.response?.data?.error?.message.error?.message ||
-          'Lỗi không xác định'
-      )
-    }
-  }
   function hanldeOpenReactDialog() {
     setOpenReactDialog((e) => !e)
   }
@@ -356,28 +296,16 @@ export default function Page({
       }
     )
   }
-  const onAddVoteOption = (vote: string) => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/votes`,
-        vote,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { vote } }) => {
-        setVotes((old) => [...old, vote])
-
-        votesCount.set(vote.id.voteId, 0)
-        setVotesCount(new Map(votesCount))
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+  const onAddVoteOption = (vote: object) => {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${post.id}/votes`,
+      vote,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
   const onFetchUserVotes = (
     postId: string,
@@ -438,35 +366,14 @@ export default function Page({
     Promise.all([postPromise, commentPromise])
       .then(([postRes, commentsRes]) => {
         const { data: post } = postRes
-        const { votes, reactionCount, isReacted } = post
+        const { reactionCount, isReacted } = post
         const { comments, comment } = commentsRes.data
 
         setPost(post)
-        setVotes(votes)
         if (comment) setComments([comment])
         else setComments(comments)
         setReactionCount(reactionCount)
         setIsReacted(isReacted)
-
-        setTotalVoteCount(() => {
-          if (!votes) return 0
-          return votes.reduce((acc, cur) => acc + cur.voteCount, 0)
-        })
-        setVotesCount(() => {
-          const map = new Map()
-          if (!votes) return map
-          votes.forEach(({ id: { voteId }, voteCount }) => {
-            map.set(voteId, voteCount)
-          })
-          return map
-        })
-        setSelectedVoteIds(() => {
-          const set = new Set<number>()
-          votes.forEach(({ isVoted, id: { voteId } }) => {
-            if (isVoted) set.add(voteId)
-          })
-          return set
-        })
 
         setIsLoading(false)
       })
@@ -607,15 +514,14 @@ export default function Page({
             {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
 
-          {votes.length !== 0 && (
+          {post.votes.length !== 0 && (
             <Poll
               allowMultipleVotes={post.allowMultipleVotes}
               allowAddOptions={post.allowAddOptions}
-              votes={votes}
-              totalVoteCount={totalVoteCount}
-              selectedVoteIds={selectedVoteIds}
-              votesCount={votesCount}
-              handleVote={handleVote}
+              votes={post.votes}
+              onVote={onVote}
+              onChangeVote={onChangeVote}
+              onRemoveVote={onRemoveVote}
               onAddVoteOption={onAddVoteOption}
               postId={post.id}
               onFetchUserVotes={onFetchUserVotes}
