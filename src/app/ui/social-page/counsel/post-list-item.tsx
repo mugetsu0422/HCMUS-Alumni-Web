@@ -84,87 +84,11 @@ export default function PostListItem({ post }: { post: PostProps }) {
   const { isTruncated, isReadingMore, setIsReadingMore } = useTruncatedElement({
     ref,
   })
-  const [totalVoteCount, setTotalVoteCount] = useState(() => {
-    if (!post.votes) return 0
-    return post.votes.reduce((acc, cur) => acc + cur.voteCount, 0)
-  })
-  const [votesCount, setVotesCount] = useState(() => {
-    const map = new Map()
-    if (!post.votes) return map
-    post.votes.forEach(({ id: { voteId }, voteCount }) => {
-      map.set(voteId, voteCount)
-    })
-    return map
-  })
-  const [selectedVoteIds, setSelectedVoteIds] = useState<Set<number>>(() => {
-    const set = new Set<number>()
-    post.votes.forEach(({ isVoted, id: { voteId } }) => {
-      if (isVoted) set.add(voteId)
-    })
-    return set
-  })
-  const [votes, setVotes] = useState(post.votes)
 
   const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
 
   const handleOpenDeletePostDialog = () => {
     setOpenDeletePostDialog((e) => !e)
-  }
-  const handleVote = async (allowMultipleVotes: boolean, voteId: number) => {
-    try {
-      if (selectedVoteIds.has(voteId)) {
-        // Delete
-        setTotalVoteCount((old) => old - 1)
-        const temp = new Map(votesCount.set(voteId, votesCount.get(voteId) - 1))
-        setVotesCount(temp)
-        await onRemoveVote(voteId)
-
-        selectedVoteIds.delete(voteId)
-      } else {
-        if (allowMultipleVotes) {
-          // Add vote
-          await onVote(voteId)
-          setTotalVoteCount((old) => old + 1)
-          const temp = new Map(
-            votesCount.set(voteId, votesCount.get(voteId) + 1)
-          )
-          setVotesCount(temp)
-
-          selectedVoteIds.add(voteId)
-        } else {
-          if (selectedVoteIds.size) {
-            // Update vote
-            const oldVoteId = Array.from(selectedVoteIds)[0]
-
-            await onChangeVote(oldVoteId, voteId)
-            votesCount.set(oldVoteId, votesCount.get(oldVoteId) - 1)
-            votesCount.set(voteId, votesCount.get(voteId) + 1)
-            const temp = new Map(votesCount)
-            setVotesCount(temp)
-
-            selectedVoteIds.clear()
-            selectedVoteIds.add(voteId)
-            setSelectedVoteIds(new Set(selectedVoteIds))
-          } else {
-            // Add vote
-            await onVote(voteId)
-            setTotalVoteCount((old) => old + 1)
-            const temp = new Map(
-              votesCount.set(voteId, votesCount.get(voteId) + 1)
-            )
-            setVotesCount(temp)
-
-            selectedVoteIds.add(voteId)
-          }
-        }
-      }
-      setSelectedVoteIds(new Set(selectedVoteIds))
-    } catch (error) {
-      toast.error(
-        error.response?.data?.error?.message.error?.message ||
-          'Lỗi không xác định'
-      )
-    }
   }
 
   function hanldeOpenReactDialog() {
@@ -402,28 +326,16 @@ export default function PostListItem({ post }: { post: PostProps }) {
       }
     )
   }
-  const onAddVoteOption = (vote: string) => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes`,
-        vote,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
-          },
-        }
-      )
-      .then(({ data: { vote } }) => {
-        setVotes((old) => [...old, vote])
-
-        votesCount.set(vote.id.voteId, 0)
-        setVotesCount(new Map(votesCount))
-      })
-      .catch((error) => {
-        toast.error(
-          error.response?.data?.error?.message || 'Lỗi không xác định'
-        )
-      })
+  const onAddVoteOption = (vote: object) => {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${post.id}/votes`,
+      vote,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,
+        },
+      }
+    )
   }
   const onFetchUserVotes = (
     postId: string,
@@ -562,15 +474,14 @@ export default function PostListItem({ post }: { post: PostProps }) {
             {post.pictures.length > 0 && <ImageGrid pictures={post.pictures} />}
           </div>
 
-          {isMounted && votes.length !== 0 && (
+          {isMounted && post.votes.length !== 0 && (
             <Poll
               allowMultipleVotes={post.allowMultipleVotes}
               allowAddOptions={post.allowAddOptions}
-              votes={votes}
-              totalVoteCount={totalVoteCount}
-              selectedVoteIds={selectedVoteIds}
-              votesCount={votesCount}
-              handleVote={handleVote}
+              votes={post.votes}
+              onVote={onVote}
+              onChangeVote={onChangeVote}
+              onRemoveVote={onRemoveVote}
               onAddVoteOption={onAddVoteOption}
               postId={post.id}
               onFetchUserVotes={onFetchUserVotes}

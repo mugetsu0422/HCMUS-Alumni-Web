@@ -12,11 +12,12 @@ import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import delay from '@/helper/delay'
 
 function FriendListItem({ friend, onRemove }) {
-  const [isRemoved, setIsRemoved] = useState(false)
-
   const onAccept = () => {
+    onRemove(friend.id)
+
     const data = {
       friendId: friend.id,
       action: 'ACCEPT',
@@ -32,7 +33,6 @@ function FriendListItem({ friend, onRemove }) {
         }
       )
       .then(() => {
-        onRemove(friend.id)
         toast.success('Chấp nhận lời mời kết bạn thành công')
       })
       .catch((error) => {
@@ -43,6 +43,8 @@ function FriendListItem({ friend, onRemove }) {
   }
 
   const onDeny = () => {
+    onRemove(friend.id)
+
     const data = {
       friendId: friend.id,
       action: 'DENY',
@@ -68,33 +70,32 @@ function FriendListItem({ friend, onRemove }) {
       })
   }
 
-  if (!isRemoved)
-    return (
-      <div className="flex justify-between w-[80%] m-auto items-center mt-4">
-        <Link
-          href={`/profile/${friend.id}/about`}
-          className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
-          <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
-          <p>{friend.fullName}</p>
-        </Link>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={onDeny}
-            placeholder={undefined}
-            size="md"
-            className="bg-[--delete-filter] text-black normal-case">
-            Từ chối
-          </Button>
-          <Button
-            onClick={onAccept}
-            placeholder={undefined}
-            size="md"
-            className="bg-[var(--blue-05)] normal-case">
-            Chấp nhận
-          </Button>
-        </div>
+  return (
+    <div className="flex justify-between w-[80%] m-auto items-center mt-4">
+      <Link
+        href={`/profile/${friend.id}/about`}
+        className="flex items-center gap-2  hover:bg-gray-400/[.25] p-2 rounded-lg">
+        <Avatar size="lg" src={friend.avatarUrl} placeholder={undefined} />
+        <p>{friend.fullName}</p>
+      </Link>
+      <div className="flex items-center gap-2">
+        <Button
+          onClick={onDeny}
+          placeholder={undefined}
+          size="md"
+          className="bg-[--delete-filter] text-black normal-case">
+          Từ chối
+        </Button>
+        <Button
+          onClick={onAccept}
+          placeholder={undefined}
+          size="md"
+          className="bg-[var(--blue-05)] normal-case">
+          Chấp nhận
+        </Button>
       </div>
-    )
+    </div>
+  )
 }
 
 export default function Page() {
@@ -150,7 +151,9 @@ export default function Page() {
   }, [myParams])
 
   const removeFriend = useCallback((userId) => {
-    setFriendRequests((prevList) => prevList.filter((req) => req.user.id !== userId))
+    setFriendRequests((prevList) =>
+      prevList.filter((req) => req.user.id !== userId)
+    )
   }, [])
 
   return (

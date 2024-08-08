@@ -24,7 +24,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
       .then((data) => {})
       .catch((error) => {
         toast.error(
-          error.response?.data?.error?.message.error?.message ||
+          error.response?.data?.error?.message ||
             'Lỗi không xác định'
         )
       })
