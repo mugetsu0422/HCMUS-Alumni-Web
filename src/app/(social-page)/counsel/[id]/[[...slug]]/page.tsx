@@ -309,7 +309,7 @@ export default function Page({
     pageSize: number = 50
   ) => {
     return axios.get(
-      `${process.env.NEXT_PUBLIC_SERVER_HOST}/groups/${postId}/votes/${voteId}?page=${page}&pageSize=${pageSize}`,
+      `${process.env.NEXT_PUBLIC_SERVER_HOST}/counsel/${postId}/votes/${voteId}?page=${page}&pageSize=${pageSize}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get(JWT_COOKIE)}`,

@@ -135,17 +135,9 @@ function VoteOption({ voteId, name }) {
         htmlFor={`${postId}-${voteId}`}>
         {checkPermission('Counsel.Vote') &&
           (allowMultipleVotes ? (
-            <Checkbox
-              color="blue"
-              crossOrigin={undefined}
-              {...commonProps}
-            />
+            <Checkbox color="blue" crossOrigin={undefined} {...commonProps} />
           ) : (
-            <Radio
-              color="blue"
-              crossOrigin={undefined}
-              {...commonProps}
-            />
+            <Radio color="blue" crossOrigin={undefined} {...commonProps} />
           ))}
         <span className="text-black">{name}</span>
       </label>
@@ -245,22 +237,25 @@ export default function Poll({
     voteOptionName: string,
     voteCount: number
   ) => {
-    if (!openUserVotesDialog && voteId != currentDialogVoteId) {
-      try {
-        const {
-          data: { users },
-        } = await onFetchUserVotes(postId, voteId)
-        setDialogHasMore(users.length > 0)
-        setUserVotes(users)
-      } catch (error) {}
+    setOpenUserVotesDialog((prev) => !prev)
 
+    if (!openUserVotesDialog && voteId != currentDialogVoteId) {
+      setUserVotes([])
+      setDialogHasMore(true)
       dialogPage.current = 0
       setCurrentDialogVoteId(voteId)
       setCurrentDialogVoteOptionName(voteOptionName)
       setCurrentDialogVoteCount(voteCount)
-    }
 
-    setOpenUserVotesDialog((prev) => !prev)
+      try {
+        const {
+          data: { users },
+        } = await onFetchUserVotes(postId, voteId)
+
+        setDialogHasMore(users.length > 0)
+        setUserVotes(users)
+      } catch (error) {}
+    }
   }
 
   const handleFetchMoreUserVotes = async () => {
@@ -336,10 +331,7 @@ export default function Poll({
         }
       }
     } catch (error) {
-      toast.error(
-        error.response?.data?.error?.message ||
-          'Lỗi không xác định'
-      )
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
   const handleAddVoteOption = async (data) => {
@@ -352,10 +344,7 @@ export default function Poll({
       votesCount.set(vote.id.voteId, 0)
       setVotesCount(new Map(votesCount))
     } catch (error) {
-      toast.error(
-        error.response?.data?.error?.message ||
-          'Lỗi không xác định'
-      )
+      toast.error(error.response?.data?.error?.message || 'Lỗi không xác định')
     }
   }
 
