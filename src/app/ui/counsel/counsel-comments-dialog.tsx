@@ -24,6 +24,7 @@ import { COMMENT_PAGE_SIZE } from '../../constant'
 import TextareaAutosize from 'react-textarea-autosize'
 import checkPermission from '@/app/ui/common/checking-permission'
 import AvatarUser from '../common/avatar-user'
+import CommentInput from '../social-page/counsel/comment-input'
 
 export default function CommentsDialog({
   post,
@@ -182,35 +183,16 @@ export default function CommentsDialog({
         </div>
       </DialogBody>
 
-      {checkPermission('Counsel.Comment.Create') && (
-        <DialogFooter placeholder={undefined} className="h-fit py-3 bg-white">
-          <form
-            className="h-full flex flex-start items-start w-full gap-2"
-            onSubmit={(e) => {
-              onHandleUploadComment(e, null, uploadComment)
-              setUploadComment('')
-            }}>
-            <AvatarUser />
-            <TextareaAutosize
-              spellCheck="false"
-              minRows={1}
-              maxRows={8}
-              placeholder="Bình luận của bạn"
-              className="focus:border-transparent w-full bg-[var(--comment-input)] scrollbar-webkit-main resize-none p-2 px-3 rounded-xl outline-none text-black"
-              value={uploadComment}
-              onChange={handleUploadCommentChange}
-            />
-            <Button
-              disabled={!uploadComment.trim()}
-              type="submit"
-              placeholder={undefined}
-              variant="text"
-              className="p-2">
-              <SendFill className="text-xl" />
-            </Button>
-          </form>
-        </DialogFooter>
-      )}
+      <DialogFooter
+        placeholder={undefined}
+        className="flex justify-center items-center h-fit py-3 bg-white">
+        <CommentInput
+          requiredPermission={'Counsel.Comment.Create'}
+          uploadComment={uploadComment}
+          handleUploadCommentChange={handleUploadCommentChange}
+          onHandleUploadComment={onHandleUploadComment}
+        />
+      </DialogFooter>
     </Dialog>
   )
 }
