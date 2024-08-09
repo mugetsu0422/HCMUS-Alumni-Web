@@ -46,6 +46,8 @@ import SingleCommentIndicator from '@/app/ui/common/single-comment-indicator'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 import AvatarUser from '@/app/ui/common/avatar-user'
 import delay from '@/helper/delay'
+import CommentInput from '@/app/ui/social-page/counsel/comment-input'
+import checkPermission from '@/app/ui/common/checking-permission'
 
 export default function Page({
   params,
@@ -552,51 +554,37 @@ export default function Page({
             openReactDialog={openReactDialog}
             hanldeOpenReactDialog={hanldeOpenReactDialog}
           />
-          <div className="flex flex-col gap-1">
-            <span className="border-t-[1px] border-[--secondary]"></span>
-            <Button
-              onClick={handleReactionClick}
-              placeholder={undefined}
-              variant="text"
-              className="flex gap-1 py-2 px-1 normal-case w-fit">
-              {isReacted ? (
-                <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
-              ) : (
-                <HandThumbsUp className="text-[16px]" />
-              )}
-              <span
-                className={
-                  isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
-                }>
-                Thích
-              </span>
-            </Button>
-            <span className="border-t-[1px] border-[--secondary]"> </span>
-          </div>
-
-          <div className="h-fit py-3 bg-white">
-            <form
-              className="h-full flex flex-start items-start w-full gap-2"
-              onSubmit={(e) => onHandleUploadComment(e, null, uploadComment)}>
-              <AvatarUser />
-              <ReactTextareaAutosize
-                spellCheck="false"
-                minRows={1}
-                maxRows={8}
-                placeholder="Bình luận của bạn"
-                className="focus:border-transparent w-full bg-[var(--comment-input)] scrollbar-webkit-main resize-none p-2 px-3 rounded-xl outline-none text-black"
-                value={uploadComment}
-                onChange={handleUploadCommentChange}
-              />
+          {checkPermission('Counsel.Reaction.Create') && (
+            <div className="flex flex-col gap-1">
+              <span className="border-t-[1px] border-[--secondary]"></span>
               <Button
-                disabled={!uploadComment.trim()}
-                type="submit"
+                onClick={handleReactionClick}
                 placeholder={undefined}
                 variant="text"
-                className="p-2">
-                <SendFill className="text-xl" />
+                className="flex gap-1 py-2 px-1 normal-case w-fit">
+                {isReacted ? (
+                  <HandThumbsUpFill className="text-[16px] text-[--blue-02]" />
+                ) : (
+                  <HandThumbsUp className="text-[16px]" />
+                )}
+                <span
+                  className={
+                    isReacted ? 'text-[--blue-02] text-[14px]' : 'text-[14px]'
+                  }>
+                  Thích
+                </span>
               </Button>
-            </form>
+              <span className="border-t-[1px] border-[--secondary]"> </span>
+            </div>
+          )}
+
+          <div className="h-fit py-3 bg-white">
+            <CommentInput
+              requiredPermission={'Counsel.Comment.Create'}
+              uploadComment={uploadComment}
+              handleUploadCommentChange={handleUploadCommentChange}
+              onHandleUploadComment={onHandleUploadComment}
+            />
           </div>
           <div className={`${nunito.className} mt-2`}>
             <p className="text-black font-bold text-lg">Bình luận</p>

@@ -24,8 +24,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
       .then((data) => {})
       .catch((error) => {
         toast.error(
-          error.response?.data?.error?.message ||
-            'Lỗi không xác định'
+          error.response?.data?.error?.message || 'Lỗi không xác định'
         )
       })
       .finally(() => {
@@ -41,7 +40,7 @@ export default function GroupsListItem({ group, onJoinGroup }) {
   return (
     <div
       className={`${nunito.className} flex justify-between items-center gap-4 w-full`}>
-      <Link className="flex gap-4" href={`/groups/${group.id}`}>
+      <Link className="flex gap-4 flex-1" href={`/groups/${group.id}`}>
         <Avatar
           src={group.coverUrl}
           alt="group avatar"

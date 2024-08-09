@@ -416,7 +416,7 @@ export default function Page({
             <img
               src={event?.thumbnail}
               alt="image event"
-              className="sm:w-[410px] sm:h-[250px] md:w-[500px] md:h-[350px]  xl:w-[550px] xl:h-[350px]  2xl:w-[40vw] 2xl:h-[400px] max-w-[1000px] object-cover object-center rounded-lg"
+              className="sm:min-w-[410px] sm:h-[250px] md:min-w-[500px] md:h-[350px]  xl:min-w-[550px] xl:h-[350px]  2xl:min-w-[40vw] 2xl:h-[400px] max-w-[1000px] object-cover object-center rounded-lg"
             />
             <div className="flex flex-col gap-4 w-full">
               <div>
@@ -492,9 +492,9 @@ export default function Page({
                   onParticipate={onParticipate}
                   onCancelParticipation={onCancelParticipation}
                   eventId={params.id}
-                  participateBtnClassName={`flex justify-center items-center gap-2 bg-[--blue-02] font-bold w-full text-[16px]`}
-                  cancelPartcipateBtnClassName={`flex justify-center items-center gap-2 bg-[#e4e6eb] text-[#4b4f56] font-bold w-full text-[16px]`}
-                  requiredBtnClassName={`py-3 px-6 bg-[#e4e6eb] text-[#4b4f56] normal-case w-full text-[16px]`}
+                  participateBtnClassName={`flex justify-center items-center gap-2 bg-[--blue-02] font-bold w-full max-w-[300px] text-[16px]`}
+                  cancelPartcipateBtnClassName={`flex justify-center items-center gap-2 bg-[#e4e6eb] text-[#4b4f56] font-bold w-full max-w-[300px] text-[16px]`}
+                  requiredBtnClassName={`py-3 px-6 bg-[#e4e6eb] text-[#4b4f56] normal-case w-full max-w-[300px] text-[16px]`}
                 />
               </div>
             </div>
