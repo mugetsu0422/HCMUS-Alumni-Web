@@ -53,9 +53,9 @@ export default function JoinGroupButton({
           onClick={() => router.push(`/profile/${userId}`)}
           size="sm"
           placeholder={undefined}
-          className="h-fit bg-[#e4e6eb] text-[#4b4f56] normal-case text-[14px] w-fit flex justify-center items-center gap-2">
+          className="h-fit bg-[#e4e6eb]  normal-case text-[14px] w-fit min-w-[176px] flex justify-center items-center gap-2  ">
           {isJoining && <Spinner className="h-[14px] w-[14px]" />}
-          Xét duyệt để tham gia
+          <p className="text-[#4b4f56] text-nowrap">Xét duyệt để tham gia</p>
         </Button>
       )}
     </>

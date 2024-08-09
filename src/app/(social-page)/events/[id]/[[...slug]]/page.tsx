@@ -416,7 +416,7 @@ export default function Page({
             <img
               src={event?.thumbnail}
               alt="image event"
-              className="sm:w-[410px] sm:h-[250px] md:w-[500px] md:h-[350px]  xl:w-[550px] xl:h-[350px]  2xl:w-[40vw] 2xl:h-[400px] max-w-[1000px] object-cover object-center rounded-lg"
+              className="sm:min-w-[410px] sm:h-[250px] md:min-w-[500px] md:h-[350px]  xl:min-w-[550px] xl:h-[350px]  2xl:min-w-[40vw] 2xl:h-[400px] max-w-[1000px] object-cover object-center rounded-lg"
             />
             <div className="flex flex-col gap-4 w-full">
               <div>
