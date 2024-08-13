@@ -76,6 +76,7 @@ export default function PostListItem({
   post: PostProps
   isJoined: boolean
 }) {
+  const [uploadComment, setUploadComment] = useState('')
   const [numberComments, setNumberComments] = useState(
     post.childrenCommentNumber
   )
@@ -93,6 +94,10 @@ export default function PostListItem({
   const [openDeletePostDialog, setOpenDeletePostDialog] = useState(false)
   const hasAnyPostPermission = useHasAnyPostPermission(post.permissions)
 
+  // Function to handle changes in the textarea
+  const handleUploadCommentChange = (event) => {
+    setUploadComment(event.target.value)
+  }
   const handleOpenDeletePostDialog = () => {
     setOpenDeletePostDialog((e) => !e)
   }
@@ -150,6 +155,7 @@ export default function PostListItem({
       toast.success('Đăng thành công', { id: postCommentToast })
       setComments((prev) => [comment].concat(prev))
       setNumberComments((e) => e + 1)
+      setUploadComment('')
     } catch (error) {
       toast.error(
         error.response?.data?.error?.message || 'Lỗi không xác định',
@@ -592,6 +598,8 @@ export default function PostListItem({
             onDeleteComment={onDeleteComment}
             onFetchChildrenComments={onFetchChildrenComments}
             onFetchComments={onFetchComments}
+            uploadComment={uploadComment}
+            handleUploadCommentChange={handleUploadCommentChange}
           />
         </div>
         <DeletePostDialog
