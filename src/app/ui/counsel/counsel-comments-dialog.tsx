@@ -38,15 +38,12 @@ export default function CommentsDialog({
   onDeleteComment,
   onFetchChildrenComments,
   onFetchComments,
+  uploadComment,
+  handleUploadCommentChange
 }) {
-  const [uploadComment, setUploadComment] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const commentPage = useRef(0)
-
-  // Function to handle changes in the textarea
-  const handleUploadCommentChange = (event) => {
-    setUploadComment(event.target.value)
-  }
+  
   const onShowMoreComments = (page: number, pageSize: number) => {
     setIsLoading(true)
     onFetchComments(page, pageSize).then(() => {
